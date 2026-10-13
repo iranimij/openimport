@@ -18,6 +18,11 @@ use Magento\Framework\App\ResourceConnection;
  */
 class RowHashStore
 {
+    /**
+     * Separates identifier, store view and line number in the delta key of extra lines of a record.
+     */
+    public const SEPARATOR = "\x1F";
+
     private const TABLE = 'openimport_row_hash';
     private const BATCH = 1000;
 
@@ -88,6 +93,8 @@ class RowHashStore
     }
 
     /**
+     * Removes the hashes of these records, including those of their extra lines (store views, more addresses).
+     *
      * @param int $profileId
      * @param string[] $identifiers
      * @return void
@@ -95,12 +102,24 @@ class RowHashStore
     public function delete(int $profileId, array $identifiers): void
     {
         $connection = $this->resource->getConnection();
-        $keys = array_map(fn (string $identifier): string => $this->key($identifier), array_values($identifiers));
+        $table = $this->resource->getTableName(self::TABLE);
+        $identifiers = array_values(array_unique(array_map('strval', $identifiers)));
+        $keys = array_map(fn (string $identifier): string => $this->key($identifier), $identifiers);
         foreach (array_chunk($keys, self::BATCH) as $chunk) {
-            $connection->delete(
-                $this->resource->getTableName(self::TABLE),
-                ['profile_id = ?' => $profileId, 'identifier_key IN (?)' => $chunk]
+            $connection->delete($table, ['profile_id = ?' => $profileId, 'identifier_key IN (?)' => $chunk]);
+        }
+        foreach (array_chunk($identifiers, 100) as $chunk) {
+            $likes = array_map(
+                fn (string $identifier): string => $connection->quoteInto(
+                    'identifier LIKE ?',
+                    str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $identifier) . self::SEPARATOR . '%'
+                ),
+                $chunk
             );
+            $connection->delete($table, [
+                'profile_id = ?' => $profileId,
+                '(' . implode(' OR ', $likes) . ')',
+            ]);
         }
     }
 

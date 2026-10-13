@@ -201,6 +201,32 @@ class ImportRunnerTest extends TestCase
         self::assertSame(0, $full->counts['unchanged']);
     }
 
+    public function testDeltaKeepsSeparateHashesForStoreViewLinesOfTheSameRecord(): void
+    {
+        $profile = $this->profile([
+            'delta' => true,
+            'mapping' => [
+                ['target' => 'sku', 'source' => 'sku'],
+                ['target' => 'store_view_code', 'source' => 'store'],
+                ['target' => 'name', 'source' => 'name'],
+            ],
+        ]);
+        $content = "sku,store,name\nA-1,,One\nA-1,de,Eins\nA-1,fr,Un\nA-2,,Two\n";
+
+        $this->execute($profile, $this->newRun(), $this->file($content));
+        self::assertCount(4, $this->hashes->hashes[5], 'one hash per line');
+
+        $second = $this->execute($profile, $this->newRun(), $this->file($content));
+        self::assertSame(4, $second->counts['unchanged']);
+        self::assertSame(1, $this->core->calls);
+
+        $this->execute($profile, $this->newRun(), $this->file(str_replace('Eins', 'Eins!', $content)));
+        self::assertSame([['sku' => 'A-1', 'store_view_code' => 'de', 'name' => 'Eins!']], array_map(
+            static fn (array $row): array => array_intersect_key($row, array_flip(['sku', 'store_view_code', 'name'])),
+            $this->core->rows
+        ));
+    }
+
     public function testCoreErrorsPointAtSourceRowsAndKeepTheirHashesOut(): void
     {
         $this->core->errors = [

@@ -13,7 +13,9 @@ OpenImport's own cron group or by `bin/magento openimport:run`; never inside a w
    as *skipped*).
 5. **Delta** (when switched on): a record whose prepared rows are exactly what the last successful run of this
    profile sent is skipped (counted as *unchanged*). Changing the profile's source, format, filters, behaviour,
-   mapping or value maps forgets the stored state, and a run with *full* ignores it.
+   mapping or value maps forgets the stored state, and a run with *full* ignores it. Each line of the file is
+   compared on its own, so a file with one line per store view (or several addresses or tier prices per record)
+   only sends the lines that changed.
 6. **Magento validates and imports** the rows with its own import engine. Its errors are reported against the rows
    of your file, not against Magento's internal row numbers.
 

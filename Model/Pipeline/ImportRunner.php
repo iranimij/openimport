@@ -75,9 +75,14 @@ class ImportRunner
     private array $pendingErrors = [];
 
     /**
-     * @var array<string, string> identifier => hash, saved after a successful live run
+     * @var array<string, string> delta key => hash, saved after a successful live run
      */
     private array $pendingHashes = [];
+
+    /**
+     * @var array<string, int> lines seen per identifier and store view in this run
+     */
+    private array $lineCounts = [];
 
     /**
      * @var array<string, int> preview totals by change type
@@ -240,6 +245,7 @@ class ImportRunner
         $this->errorCap = max(1, $this->config->getMaxErrorsPerRun());
         $this->pendingErrors = [];
         $this->pendingHashes = [];
+        $this->lineCounts = [];
         $this->previewTotals = array_fill_keys(
             [PreviewRecord::NEW, PreviewRecord::CHANGED, PreviewRecord::UNCHANGED, PreviewRecord::DELETED],
             0
@@ -358,10 +364,16 @@ class ImportRunner
             || in_array($behavior, self::DESTRUCTIVE_BEHAVIORS, true)
         );
         $existing = $needsExisting ? $reader->existing($identifiers) : [];
-        $stored = $useDelta ? $this->rowHashes->fetch((int) $profile->getProfileId(), $identifiers) : [];
+        $deltaKeys = [];
+        if ($useDelta) {
+            foreach ($batch as $index => [, $mapped]) {
+                $deltaKeys[$index] = $this->deltaKey($mapped);
+            }
+        }
+        $stored = $useDelta ? $this->rowHashes->fetch((int) $profile->getProfileId(), $deltaKeys) : [];
 
         $accepted = [];
-        foreach ($batch as [$line, $mapped]) {
+        foreach ($batch as $index => [$line, $mapped]) {
             $key = mb_strtolower($mapped->identifier);
             $exists = isset($existing[$key]);
             if (($behavior === ProfileInterface::BEHAVIOR_ONLY_ADD && $exists)
@@ -371,11 +383,11 @@ class ImportRunner
             }
             if ($useDelta) {
                 $hash = sha1((string) json_encode($mapped->rows, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
-                if (($stored[$mapped->identifier] ?? null) === $hash) {
+                if (($stored[$deltaKeys[$index]] ?? null) === $hash) {
                     $this->counts['unchanged']++;
                     continue;
                 }
-                $this->pendingHashes[$mapped->identifier] = $hash;
+                $this->pendingHashes[$deltaKeys[$index]] = $hash;
             }
             if (in_array($behavior, self::DESTRUCTIVE_BEHAVIORS, true) && $exists) {
                 $this->existingAffected++;
@@ -438,6 +450,26 @@ class ImportRunner
         }
 
         return $fill;
+    }
+
+    /**
+     * The key a source line's delta hash is stored under. A file can hold several lines per record: store-view lines
+     * (same SKU, other store view), several addresses or tier prices per customer or SKU. Each gets its own key
+     * (identifier, store view, n-th line of that pair in the file); the first default line keeps the bare identifier.
+     *
+     * @param MappedRow $mapped
+     * @return string
+     */
+    private function deltaKey(MappedRow $mapped): string
+    {
+        $store = (string) ($mapped->main()['store_view_code'] ?? '');
+        $pair = $mapped->identifier . RowHashStore::SEPARATOR . $store;
+        $line = $this->lineCounts[$pair] = ($this->lineCounts[$pair] ?? -1) + 1;
+        if ($store === '' && $line === 0) {
+            return $mapped->identifier;
+        }
+
+        return $pair . RowHashStore::SEPARATOR . $line;
     }
 
     /**
@@ -605,7 +637,15 @@ class ImportRunner
         if ($behavior === ProfileInterface::BEHAVIOR_DELETE) {
             $this->rowHashes->delete($profileId, $spool->allIdentifiers());
         } elseif ($this->pendingHashes !== []) {
-            $this->rowHashes->save($profileId, array_diff_key($this->pendingHashes, $failedIdentifiers), $this->runId);
+            $this->rowHashes->save(
+                $profileId,
+                array_filter(
+                    $this->pendingHashes,
+                    static fn (string $key): bool => !isset($failedIdentifiers[explode(RowHashStore::SEPARATOR, $key)[0]]),
+                    ARRAY_FILTER_USE_KEY
+                ),
+                $this->runId
+            );
         }
 
         return $this->outcome(

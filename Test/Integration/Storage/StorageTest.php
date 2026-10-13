@@ -149,6 +149,11 @@ class StorageTest extends TestCase
         self::assertSame(['Ä' => 'h3'], $store->fetch($profileId, ['Ä']));
         $store->delete($profileId, ['A']);
         self::assertSame(2, $store->count($profileId));
+
+        $sep = RowHashStore::SEPARATOR;
+        $store->save($profileId, ['A_1' => 'x', "A_1{$sep}de{$sep}0" => 'y', "A_1{$sep}{$sep}1" => 'z', "A%1{$sep}de{$sep}0" => 'w']);
+        $store->delete($profileId, ['A_1']);
+        self::assertSame(["A%1{$sep}de{$sep}0" => 'w'], $store->fetch($profileId, ['A_1', "A_1{$sep}de{$sep}0", "A%1{$sep}de{$sep}0"]));
         $store->clear($profileId);
         self::assertSame(0, $store->count($profileId));
     }

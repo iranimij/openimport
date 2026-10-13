@@ -26,7 +26,7 @@ Iman's Mac (`~/Projects/openimport-dev-env`, Warden) whenever the laptop is open
 | S5 | Run queue and processor, import pipeline, record readers (products, customers), preview, delta, safety threshold, `docs/runs.md` | PR open: `feat/m1-s5-pipeline` |
 | S6 | `openimport_stock_price` entity through core product import (existing products only) | PR open: `feat/m1-s6-stock-price` |
 | S7 | CLI: `openimport:run`, `openimport:profile:list`, `openimport:run:status`, `docs/cli.md` | PR open: `feat/m1-s7-cli` |
-| S8 | Oracle integration tests, coverage gate on the engine, 50k memory check, close | open |
+| S8 | Runner unit tests with fakes (coverage gate now includes Model/Pipeline), pipeline benchmark (one process per pass: 10k vs 50k memory, delta 1 %), close | in progress: `feat/m1-s8-close` |
 
 ## Exact next step
 

@@ -379,7 +379,7 @@ class ImportPipelineTest extends TestCase
         self::assertSame(0, $run->getCount('created'));
         $values = $this->current([$prefix . '-1', $prefix . '-2'], ['qty', 'price', 'special_price', 'name']);
         self::assertSame(
-            ['price' => '9.99', 'special_price' => '7.49', 'name' => 'Artikel 1', 'qty' => '0'],
+            ['price' => '9.99', 'special_price' => '7.49', 'name' => 'Artikel 1 ' . $prefix, 'qty' => '0'],
             $values[strtolower($prefix . '-1')]
         );
         self::assertSame('42', $values[strtolower($prefix . '-2')]['qty']);

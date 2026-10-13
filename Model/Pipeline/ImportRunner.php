@@ -212,7 +212,7 @@ class ImportRunner
 
     private function behavior(ProfileInterface $profile, EntityInfo $entity): string
     {
-        $behavior = $this->behavior;
+        $behavior = $profile->getBehavior();
         if (!$entity->existingOnly) {
             return $this->behavior = $behavior;
         }

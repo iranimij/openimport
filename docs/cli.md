@@ -4,6 +4,7 @@
 bin/magento openimport:profile:list
 bin/magento openimport:run <profile id or name> [--dry-run] [--file=path] [--full] [--confirm] [--queue]
 bin/magento openimport:run:status <run id>
+bin/magento openimport:queue:run [--limit=10]
 ```
 
 ## openimport:run
@@ -29,3 +30,8 @@ Shows any run (also runs started in the admin or by a schedule) with its counts,
 ## openimport:profile:list
 
 Lists all profiles with direction, entity, source, schedule, whether the schedule is active, and the last run.
+
+## openimport:queue:run
+
+Runs the queued runs now, oldest first (runs started in the admin wait in the queue). OpenImport's cron does the
+same every minute; the command is for stores without cron, deployments and tests.

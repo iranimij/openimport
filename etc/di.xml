@@ -53,6 +53,7 @@
                 <item name="openimport_run" xsi:type="object">Iranimij\OpenImport\Console\Command\RunCommand</item>
                 <item name="openimport_run_status" xsi:type="object">Iranimij\OpenImport\Console\Command\RunStatusCommand</item>
                 <item name="openimport_profile_list" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfileListCommand</item>
+                <item name="openimport_queue_run" xsi:type="object">Iranimij\OpenImport\Console\Command\QueueRunCommand</item>
             </argument>
         </arguments>
     </type>
@@ -63,6 +64,11 @@
             <argument name="queue" xsi:type="object">Iranimij\OpenImport\Model\Execution\RunQueue\Proxy</argument>
             <argument name="profiles" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfileFinder\Proxy</argument>
             <argument name="report" xsi:type="object">Iranimij\OpenImport\Console\Command\RunReport\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Console\Command\QueueRunCommand">
+        <arguments>
+            <argument name="processor" xsi:type="object">Iranimij\OpenImport\Model\Execution\RunProcessor\Proxy</argument>
         </arguments>
     </type>
     <type name="Iranimij\OpenImport\Console\Command\RunStatusCommand">

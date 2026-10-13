@@ -38,6 +38,20 @@ class FakeCoreImporter extends CoreImporter
 
     public bool $valid = true;
 
+    /**
+     * The last request; fails the test when core was never called.
+     *
+     * @return ImportRequest
+     */
+    public function lastRequest(): ImportRequest
+    {
+        if ($this->request === null) {
+            throw new \LogicException('Core was not called.');
+        }
+
+        return $this->request;
+    }
+
     public int $calls = 0;
 
     // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock

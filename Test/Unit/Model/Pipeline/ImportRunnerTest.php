@@ -167,10 +167,10 @@ class ImportRunnerTest extends TestCase
             ],
             $this->core->rows
         );
-        self::assertSame('catalog_product', $this->core->request?->entity);
-        self::assertSame('append', $this->core->request?->behavior);
-        self::assertFalse($this->core->request?->dryRun);
-        self::assertSame('openimport-run-9.csv', $this->core->request?->historyLabel);
+        self::assertSame('catalog_product', $this->core->lastRequest()->entity);
+        self::assertSame('append', $this->core->lastRequest()->behavior);
+        self::assertFalse($this->core->lastRequest()->dryRun);
+        self::assertSame('openimport-run-9.csv', $this->core->lastRequest()->historyLabel);
         self::assertSame(2, $outcome->counts['read']);
         self::assertSame(2, $outcome->counts['created']);
         self::assertSame(77, $outcome->historyId);
@@ -220,8 +220,8 @@ class ImportRunnerTest extends TestCase
         self::assertSame('A-2', $this->errors->stored[0]->identifier);
         self::assertSame('price', $this->errors->stored[0]->field);
         self::assertSame(['A-1'], array_keys($this->hashes->hashes[5]));
-        self::assertTrue($this->core->request?->skipErrors);
-        self::assertSame(5, $this->core->request?->allowedErrors);
+        self::assertTrue($this->core->lastRequest()->skipErrors);
+        self::assertSame(5, $this->core->lastRequest()->allowedErrors);
     }
 
     public function testOwnErrorsStopTheRunOrAreSkipped(): void
@@ -243,7 +243,7 @@ class ImportRunnerTest extends TestCase
             static fn (array $row): array => array_intersect_key($row, ['sku' => 1, 'name' => 1, 'price' => 1]),
             $this->core->rows
         ));
-        self::assertSame(1, $this->core->request?->allowedErrors);
+        self::assertSame(1, $this->core->lastRequest()->allowedErrors);
     }
 
     public function testErrorCap(): void
@@ -299,7 +299,7 @@ class ImportRunnerTest extends TestCase
         );
 
         self::assertSame(RunInterface::STATUS_SUCCESS, $outcome->status, $outcome->message);
-        self::assertTrue($this->core->request?->dryRun);
+        self::assertTrue($this->core->lastRequest()->dryRun);
         self::assertSame(
             [1, 1, 1],
             [$outcome->counts['created'], $outcome->counts['updated'], $outcome->counts['unchanged']]
@@ -355,7 +355,7 @@ class ImportRunnerTest extends TestCase
 
         $confirmed = $this->execute($profile, $this->newRun(RunInterface::MODE_LIVE, ['confirmed' => true]), $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $confirmed->status, $confirmed->message);
-        self::assertSame('delete', $this->core->request?->behavior);
+        self::assertSame('delete', $this->core->lastRequest()->behavior);
         self::assertSame(['A-9' => 'y'], $this->hashes->hashes[5], 'deleted records forget their hashes');
 
         $this->shop->total = 100;
@@ -382,8 +382,8 @@ class ImportRunnerTest extends TestCase
         self::assertStringContainsString('replace up to 2 record(s)', $outcome->message);
         $replace = $this->execute($profile, $this->newRun(RunInterface::MODE_LIVE, ['confirmed' => true]), $this->file("sku\nA-1\n"));
         self::assertSame(RunInterface::STATUS_SUCCESS, $replace->status);
-        self::assertSame('replace', $this->core->request?->behavior);
-        self::assertSame('advanced_pricing', $this->core->request?->entity);
+        self::assertSame('replace', $this->core->lastRequest()->behavior);
+        self::assertSame('advanced_pricing', $this->core->lastRequest()->entity);
     }
 
     public function testDryRunWithoutReaderChecksOnly(): void
@@ -414,7 +414,7 @@ class ImportRunnerTest extends TestCase
         $outcome = $this->execute($profile, $this->newRun(), $this->file("sku,qty\nA-1,5\nX-9,1\n"));
 
         self::assertSame(1, $outcome->counts['skipped']);
-        self::assertSame('catalog_product', $this->core->request?->entity);
+        self::assertSame('catalog_product', $this->core->lastRequest()->entity);
         self::assertSame([['sku' => 'A-1', 'qty' => '5']], $this->core->rows);
 
         $this->expectException(PipelineException::class);

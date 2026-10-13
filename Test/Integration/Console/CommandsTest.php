@@ -30,11 +30,12 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[AppIsolation(true)]
 class CommandsTest extends TestCase
 {
-    private string $file = '';
+    /** Nullable: the 2.4.7 test framework resets test properties to null after each test. */
+    private ?string $file = '';
 
     protected function tearDown(): void
     {
-        if ($this->file !== '' && is_file($this->file)) {
+        if ($this->file !== null && $this->file !== '' && is_file($this->file)) {
             unlink($this->file);
         }
     }

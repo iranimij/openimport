@@ -46,4 +46,35 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="openimport_run" xsi:type="object">Iranimij\OpenImport\Console\Command\RunCommand</item>
+                <item name="openimport_run_status" xsi:type="object">Iranimij\OpenImport\Console\Command\RunStatusCommand</item>
+                <item name="openimport_profile_list" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfileListCommand</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Commands are built on every bin/magento call: load their heavy dependencies only when they run. -->
+    <type name="Iranimij\OpenImport\Console\Command\RunCommand">
+        <arguments>
+            <argument name="processor" xsi:type="object">Iranimij\OpenImport\Model\Execution\RunProcessor\Proxy</argument>
+            <argument name="queue" xsi:type="object">Iranimij\OpenImport\Model\Execution\RunQueue\Proxy</argument>
+            <argument name="profiles" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfileFinder\Proxy</argument>
+            <argument name="report" xsi:type="object">Iranimij\OpenImport\Console\Command\RunReport\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Console\Command\RunStatusCommand">
+        <arguments>
+            <argument name="runs" xsi:type="object">Iranimij\OpenImport\Api\RunRepositoryInterface\Proxy</argument>
+            <argument name="report" xsi:type="object">Iranimij\OpenImport\Console\Command\RunReport\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Console\Command\ProfileListCommand">
+        <arguments>
+            <argument name="profiles" xsi:type="object">Iranimij\OpenImport\Api\ProfileRepositoryInterface\Proxy</argument>
+            <argument name="runs" xsi:type="object">Iranimij\OpenImport\Api\RunRepositoryInterface\Proxy</argument>
+        </arguments>
+    </type>
 </config>

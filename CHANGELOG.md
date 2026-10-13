@@ -33,3 +33,5 @@ All notable changes to this project are documented here. The format follows
   for Delete and Replace; delta hashes saved only for rows Magento imported. See docs/runs.md.
 - Stock & prices entity (`openimport_stock_price`): qty, stock status, price, special price and dates, cost of
   existing products through Magento's product import; unknown SKUs are skipped and counted, never created.
+- CLI: `openimport:run` (dry run, file, full, confirm, queue only; exit code for scripts), `openimport:run:status`,
+  `openimport:profile:list`. See docs/cli.md.

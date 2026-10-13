@@ -11,6 +11,7 @@ nav:
   - Transforms and expressions: transforms.md
   - Mapping and filters: mapping.md
   - Runs, dry runs and safety: runs.md
+  - Command line: cli.md
   - Developers:
       - Core bridge: core-bridge.md
       - Core facts: core-facts.md

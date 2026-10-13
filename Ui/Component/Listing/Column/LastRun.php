@@ -56,11 +56,13 @@ class LastRun extends Column
         $ids = array_map(static fn (array $item): int => (int) $item['profile_id'], $items);
         $connection = $this->resource->getConnection();
         $table = $this->resource->getTableName('openimport_run');
-        $latest = $connection->select()
-            ->from($table, ['run_id' => new \Zend_Db_Expr('MAX(run_id)')])
-            ->where('profile_id IN (?)', $ids)
-            ->group('profile_id');
-        $rows = $connection->fetchAll(
+        $latest = array_map('intval', $connection->fetchCol(
+            $connection->select()
+                ->from($table, ['run_id' => new \Zend_Db_Expr('MAX(run_id)')])
+                ->where('profile_id IN (?)', $ids)
+                ->group('profile_id')
+        ));
+        $rows = $latest === [] ? [] : $connection->fetchAll(
             $connection->select()
                 ->from($table, ['run_id', 'profile_id', 'status', 'mode', 'created_at'])
                 ->where('run_id IN (?)', $latest)

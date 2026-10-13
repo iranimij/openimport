@@ -28,6 +28,13 @@ Iman's Mac (`~/Projects/openimport-dev-env`, Warden) whenever the laptop is open
 | S7 | CLI: `openimport:run`, `openimport:profile:list`, `openimport:run:status`, `docs/cli.md` | PR open: `feat/m1-s7-cli` |
 | S8 | Runner unit tests with fakes (coverage gate now includes Model/Pipeline), pipeline benchmark (one process per pass: 10k vs 50k memory, delta 1 %), close | in progress: `feat/m1-s8-close` |
 
+### M2 · Admin (in progress) and M3 · Automation (started)
+
+| Slice | State |
+|---|---|
+| M2 S1 admin grids, form, mapping editor, run page; `openimport:queue:run` | PR #12 (stacked on #11) |
+| M3 S1 cron group, scheduler (exactly once), housekeeping, `docs/schedules.md` | PR open: `feat/m3-s1-cron` |
+
 ## Exact next step
 
 Merge S1, S2, S3 in order when CI is green; S5 (pipeline runner) on `feat/m1-s5-pipeline`.

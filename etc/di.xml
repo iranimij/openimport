@@ -106,4 +106,23 @@
             <argument name="resourceModel" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Run</argument>
         </arguments>
     </virtualType>
+
+    <type name="Iranimij\OpenImport\Model\Execution\SourceResolver">
+        <arguments>
+            <argument name="sources" xsi:type="array">
+                <item name="upload" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\UploadSource</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Model\Schedule\Scheduler">
+        <arguments>
+            <argument name="logger" xsi:type="object">Iranimij\OpenImport\Logger</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Cron\Tick">
+        <arguments>
+            <argument name="logger" xsi:type="object">Iranimij\OpenImport\Logger</argument>
+            <argument name="processor" xsi:type="object">Iranimij\OpenImport\Model\Execution\RunProcessor\Proxy</argument>
+        </arguments>
+    </type>
 </config>

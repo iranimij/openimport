@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Iranimij_OpenImport::css/openimport.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template" name="openimport.run.view"
+                   template="Iranimij_OpenImport::run/view.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Iranimij\OpenImport\ViewModel\RunView</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

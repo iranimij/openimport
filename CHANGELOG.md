@@ -35,3 +35,7 @@ All notable changes to this project are documented here. The format follows
   existing products through Magento's product import; unknown SKUs are skipped and counted, never created.
 - CLI: `openimport:run` (dry run, file, full, confirm, queue only; exit code for scripts), `openimport:run:status`,
   `openimport:profile:list`. See docs/cli.md.
+- Admin: profile and run grids under System › Data Transfer, the six-step profile form (upload with server-side
+  sample, mapping editor with auto-match, transform chips, value maps and a live preview of the first rows, rules,
+  schedule), run page with counts, change preview, typed confirmation, cancel, error report (original rows,
+  formula-protected) and file download; English and German. See docs/admin.md.

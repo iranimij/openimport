@@ -14,16 +14,12 @@ use Iranimij\OpenImport\Model\Bridge\CoreImporter;
 use Iranimij\OpenImport\Model\Bridge\ImportRequest;
 use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\Entity\EntityInfo;
-use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Entity\RecordReaderInterface;
 use Iranimij\OpenImport\Model\Entity\RecordReaderPool;
 use Iranimij\OpenImport\Model\Filter\FilterException;
 use Iranimij\OpenImport\Model\Filter\RowFilter;
-use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
 use Iranimij\OpenImport\Model\Mapping\CompiledMapping;
 use Iranimij\OpenImport\Model\Mapping\MappedRow;
-use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
-use Iranimij\OpenImport\Model\Mapping\MappingException;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\ResourceModel\Run as RunResource;
@@ -33,7 +29,6 @@ use Iranimij\OpenImport\Model\Storage\ErrorRecord;
 use Iranimij\OpenImport\Model\Storage\PreviewRecord;
 use Iranimij\OpenImport\Model\Storage\PreviewStore;
 use Iranimij\OpenImport\Model\Storage\RowHashStore;
-use Iranimij\OpenImport\Model\Transform\ValueMap;
 use Magento\ImportExport\Model\Import;
 
 /**
@@ -44,6 +39,11 @@ use Magento\ImportExport\Model\Import;
  */
 class ImportRunner
 {
+    /**
+     * Start of the dry-run message part that says a live run will need the typed confirmation.
+     */
+    public const CONFIRMATION_NOTE = 'A live run will ask for confirmation';
+
     private const BATCH = 500;
     private const PROGRESS_EVERY = 2000;
     private const PREVIEW_SAMPLE = 200;
@@ -116,9 +116,7 @@ class ImportRunner
 
     /**
      * @param ReaderFactory $readerFactory
-     * @param RowFilterCompiler $filterCompiler
-     * @param MappingCompiler $mappingCompiler
-     * @param EntityRegistry $entities
+     * @param ProfileCompiler $profileCompiler
      * @param RecordReaderPool $recordReaders
      * @param CoreImporter $coreImporter
      * @param ErrorLog $errorLog
@@ -130,9 +128,7 @@ class ImportRunner
      */
     public function __construct(
         private readonly ReaderFactory $readerFactory,
-        private readonly RowFilterCompiler $filterCompiler,
-        private readonly MappingCompiler $mappingCompiler,
-        private readonly EntityRegistry $entities,
+        private readonly ProfileCompiler $profileCompiler,
         private readonly RecordReaderPool $recordReaders,
         private readonly CoreImporter $coreImporter,
         private readonly ErrorLog $errorLog,
@@ -181,10 +177,10 @@ class ImportRunner
         } catch (ReaderException $exception) {
             throw new PipelineException($exception->getMessage(), 0, $exception);
         }
-        [$mapping, $entity] = $this->compileMapping($profile, $strictColumns);
+        [$mapping, $entity] = $this->profileCompiler->mapping($profile, $strictColumns);
         $behavior = $this->behavior($profile, $entity);
         $useDelta = $profile->isDelta() && empty($options['full']) && in_array($behavior, self::DELTA_BEHAVIORS, true);
-        $filter = $this->compileFilter($profile, $strictColumns);
+        $filter = $this->profileCompiler->filter($profile, $strictColumns);
         $recordReader = $this->recordReaders->get($profile->getEntity());
         if ($recordReader === null && !in_array($behavior, [ProfileInterface::BEHAVIOR_ADD_UPDATE,
                 ProfileInterface::BEHAVIOR_REPLACE, ProfileInterface::BEHAVIOR_DELETE], true)) {
@@ -254,52 +250,6 @@ class ImportRunner
         $this->sampleCounts = [];
         $this->existingAffected = 0;
         $this->firstError = null;
-    }
-
-    /**
-     * @param ProfileInterface $profile
-     * @param string[]|null $columns
-     * @return array{0: CompiledMapping, 1: EntityInfo}
-     */
-    private function compileMapping(ProfileInterface $profile, ?array $columns): array
-    {
-        if ($profile->getMapping() === []) {
-            throw new PipelineException('The profile has no mapping yet.');
-        }
-        $fields = [];
-        $maps = [];
-        foreach ($profile->getMapping() as $row) {
-            $field = $this->mappingCompiler->field($row);
-            $fields[] = $field;
-            $pairs = $profile->getValueMaps()[$field->target] ?? [];
-            if ($pairs !== []) {
-                $maps[$field->target] = new ValueMap(
-                    $pairs,
-                    !empty($row['value_map_case_sensitive']),
-                    !empty($row['value_map_strict'])
-                );
-            }
-        }
-        $entity = $this->entities->resolve($profile->getEntity(), $fields);
-        try {
-            return [$this->mappingCompiler->compile($fields, $entity, $maps, $columns), $entity];
-        } catch (MappingException $exception) {
-            throw new PipelineException("The mapping does not fit this file:\n" . $exception->getMessage(), 0, $exception);
-        }
-    }
-
-    /**
-     * @param ProfileInterface $profile
-     * @param string[]|null $columns
-     * @return RowFilter
-     */
-    private function compileFilter(ProfileInterface $profile, ?array $columns): RowFilter
-    {
-        try {
-            return $this->filterCompiler->compile($profile->getRowFilters(), $columns);
-        } catch (FilterException $exception) {
-            throw new PipelineException("The row filters do not fit this file:\n" . $exception->getMessage(), 0, $exception);
-        }
     }
 
     /**
@@ -713,7 +663,7 @@ class ImportRunner
         }
         $parts[] = $valid ? 'Magento accepts the rows.' : 'Magento refuses the rows; see the errors.';
         if ($safety !== null) {
-            $parts[] = 'A live run will ask for confirmation: ' . $safety;
+            $parts[] = self::CONFIRMATION_NOTE . ': ' . $safety;
         }
 
         return implode(' ', $parts);

@@ -1,0 +1,180 @@
+<?php
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+
+/** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Iranimij\OpenImport\ViewModel\RunView $view */
+$view = $block->getData('view_model');
+$run = $view->run();
+?>
+<?php if ($run === null): ?>
+    <div class="message message-error"><?= $escaper->escapeHtml(__('This run does not exist.')) ?></div>
+<?php else: ?>
+<div class="openimport-run"
+     <?php if ($view->isActive()): ?>
+     data-mage-init='<?= $escaper->escapeHtmlAttr(json_encode([
+         'Iranimij_OpenImport/js/run/status' => [
+             'url' => $view->url('openimport/run/status'),
+             'status' => $run->getStatus(),
+         ],
+     ])) ?>'
+     <?php endif; ?>>
+    <section class="admin__page-section">
+        <div class="admin__page-section-title">
+            <strong class="title"><?= $escaper->escapeHtml(__('Status')) ?></strong>
+        </div>
+        <p>
+            <?= /* @noEscape */ $view->statusHtml() ?>
+            <?= $escaper->escapeHtml($run->isDryRun() ? __('Dry run') : __('Live run')) ?> ·
+            <?php if ($view->profile() !== null): ?>
+                <a href="<?= $escaper->escapeUrl($view->profileUrl()) ?>"><?= $escaper->escapeHtml($run->getProfileName()) ?></a>
+            <?php else: ?>
+                <?= $escaper->escapeHtml($run->getProfileName()) ?>
+            <?php endif; ?>
+            · <?= $escaper->escapeHtml(__('started by %1', $run->getRequestedBy() ?? $run->getTrigger())) ?>
+            <?php if ($view->duration() !== ''): ?>
+                · <?= $escaper->escapeHtml(__('took %1', $view->duration())) ?>
+            <?php endif; ?>
+            <?php if ($run->getPeakMemoryMb() > 0): ?>
+                · <?= $escaper->escapeHtml(__('peak memory %1 MB', $run->getPeakMemoryMb())) ?>
+            <?php endif; ?>
+        </p>
+        <?php if ($view->isActive()): ?>
+            <div class="message message-notice" role="status">
+                <?= $escaper->escapeHtml($run->getStatus() === 'queued'
+                    ? __('Waiting for OpenImport\'s cron (runs every minute). This page updates by itself.')
+                    : __('Running. Rows done so far:')) ?>
+                <span data-role="progress"><?= $escaper->escapeHtml($run->getStatus() === 'running' ? (string) $run->getProgressRows() : '') ?></span>
+            </div>
+        <?php endif; ?>
+        <?php if ($run->getMessage() !== ''): ?>
+            <div class="message <?= $escaper->escapeHtmlAttr(in_array($run->getStatus(), ['failed', 'needs_confirmation'], true) ? 'message-warning' : 'message-notice') ?>">
+                <?php foreach (explode("\n", $run->getMessage()) as $line): ?>
+                    <?= $escaper->escapeHtml($line) ?><br/>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="openimport-counts">
+            <?php foreach ($view->counts() as $label => $count): ?>
+                <div class="openimport-count">
+                    <strong><?= $escaper->escapeHtml(number_format($count)) ?></strong>
+                    <span><?= $escaper->escapeHtml($label) ?></span>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="openimport-run-actions">
+            <?php if ($view->canConfirm()): ?>
+                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/confirm')) ?>">
+                    <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+                    <label class="admin__field-label" for="openimport-confirmation">
+                        <?= $escaper->escapeHtml(__('Type %1 to run it for real', $view->confirmationWord())) ?>
+                    </label>
+                    <input id="openimport-confirmation" name="confirmation" class="admin__control-text" type="text"
+                           autocomplete="off" required="required"/>
+                    <button type="submit" class="action-primary"><span><?= $escaper->escapeHtml(__('Run for real')) ?></span></button>
+                </form>
+            <?php elseif ($view->confirmationWord() !== ''): ?>
+                <p><?= $escaper->escapeHtml(__('A user allowed to confirm runs above the safety limit has to start this run.')) ?></p>
+            <?php elseif ($view->canRunForReal()): ?>
+                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/confirm')) ?>">
+                    <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+                    <button type="submit" class="action-primary"><span><?= $escaper->escapeHtml(__('Run for real')) ?></span></button>
+                </form>
+            <?php endif; ?>
+            <?php if ($view->profile() !== null): ?>
+                <a class="action-secondary" href="<?= $escaper->escapeUrl($view->profileUrl()) ?>"><?= $escaper->escapeHtml(__('Edit profile')) ?></a>
+            <?php endif; ?>
+            <?php if ($view->canCancel()): ?>
+                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/cancel')) ?>">
+                    <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+                    <button type="submit" class="action-secondary"><span><?= $escaper->escapeHtml(__('Cancel')) ?></span></button>
+                </form>
+            <?php endif; ?>
+            <?php if ($run->getSourceFile() !== null): ?>
+                <a class="action-secondary" href="<?= $escaper->escapeUrl($view->url('openimport/run/download')) ?>"><?= $escaper->escapeHtml(__('Download the file')) ?></a>
+            <?php endif; ?>
+            <?php if ($run->getCount('errors') > 0): ?>
+                <a class="action-secondary" href="<?= $escaper->escapeUrl($view->url('openimport/run/errorReport')) ?>"><?= $escaper->escapeHtml(__('Download error report')) ?></a>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <?php $records = $view->previewRecords(); ?>
+    <?php if ($records !== []): ?>
+        <section class="admin__page-section">
+            <div class="admin__page-section-title">
+                <strong class="title"><?= $escaper->escapeHtml(__('What would change')) ?></strong>
+            </div>
+            <p class="admin__field-note"><?= $escaper->escapeHtml(__('A sample of up to %1 records per kind; the totals above count every row.', \Iranimij\OpenImport\ViewModel\RunView::PREVIEW_SHOWN)) ?></p>
+            <div class="openimport-scroll" tabindex="0">
+                <table class="data-grid">
+                    <thead>
+                    <tr>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('Row')) ?></th>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('Record')) ?></th>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('Change')) ?></th>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('Field')) ?></th>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('Now')) ?></th>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('After the run')) ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($records as $record): ?>
+                        <?php $diff = $record->diff ?: ['' => [null, null]]; ?>
+                        <?php foreach ($diff as $field => [$before, $after]): ?>
+                            <tr>
+                                <td><?= $escaper->escapeHtml((string) $record->sourceRow) ?></td>
+                                <td><?= $escaper->escapeHtml($record->identifier) ?></td>
+                                <td><?= $escaper->escapeHtml($view->changeLabel($record->changeType)) ?></td>
+                                <td><?= $escaper->escapeHtml((string) $field) ?></td>
+                                <td class="openimport-diff-before"><?= $escaper->escapeHtml((string) $before) ?></td>
+                                <td><?= $escaper->escapeHtml((string) $after) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <?php $errors = $view->errors(); ?>
+    <?php if ($errors !== []): ?>
+        <section class="admin__page-section">
+            <div class="admin__page-section-title">
+                <strong class="title"><?= $escaper->escapeHtml(__('Errors')) ?></strong>
+            </div>
+            <?php if (count($errors) < $run->getCount('errors')): ?>
+                <p class="admin__field-note"><?= $escaper->escapeHtml(__('The first %1 of %2 errors. The error report has all stored errors.', count($errors), $run->getCount('errors'))) ?></p>
+            <?php endif; ?>
+            <div class="openimport-scroll" tabindex="0">
+                <table class="data-grid">
+                    <thead>
+                    <tr>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('Row')) ?></th>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('Record')) ?></th>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('Field')) ?></th>
+                        <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml(__('What is wrong')) ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($errors as $error): ?>
+                        <tr>
+                            <td><?= $escaper->escapeHtml($error->sourceRow > 0 ? (string) $error->sourceRow : '–') ?></td>
+                            <td><?= $escaper->escapeHtml($error->identifier) ?></td>
+                            <td><?= $escaper->escapeHtml($error->field) ?></td>
+                            <td><?= $escaper->escapeHtml($error->message) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    <?php endif; ?>
+</div>
+<?php endif; ?>

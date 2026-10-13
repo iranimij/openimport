@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Iranimij_OpenImport::menu_profiles" title="OpenImport Profiles" translate="title"
+             module="Iranimij_OpenImport" sortOrder="50" parent="Magento_Backend::system_convert"
+             action="openimport/profile/index" resource="Iranimij_OpenImport::profiles"/>
+        <add id="Iranimij_OpenImport::menu_runs" title="OpenImport Runs" translate="title"
+             module="Iranimij_OpenImport" sortOrder="60" parent="Magento_Backend::system_convert"
+             action="openimport/run/index" resource="Iranimij_OpenImport::runs"/>
+    </menu>
+</config>

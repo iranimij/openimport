@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">openimport_run_listing.openimport_run_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>openimport_run_columns</spinner>
+        <deps>
+            <dep>openimport_run_listing.openimport_run_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="openimport_run_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">run_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Iranimij_OpenImport::runs</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+                      name="openimport_run_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>run_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="openimport_run_columns">
+        <column name="run_id" sortOrder="10">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Run</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="profile_name" sortOrder="20">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Profile</label>
+            </settings>
+        </column>
+        <column name="run_trigger" component="Magento_Ui/js/grid/columns/select" sortOrder="30">
+            <settings>
+                <options class="Iranimij\OpenImport\Model\Config\Source\RunTrigger"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Started by</label>
+            </settings>
+        </column>
+        <column name="mode" component="Magento_Ui/js/grid/columns/select" sortOrder="40">
+            <settings>
+                <options class="Iranimij\OpenImport\Model\Config\Source\RunMode"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Mode</label>
+            </settings>
+        </column>
+        <column name="status" class="Iranimij\OpenImport\Ui\Component\Listing\Column\RunStatus" sortOrder="50">
+            <settings>
+                <options class="Iranimij\OpenImport\Model\Config\Source\RunStatus"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="count_read" sortOrder="60">
+            <settings>
+                <label translate="true">Rows</label>
+            </settings>
+        </column>
+        <column name="count_created" sortOrder="70">
+            <settings>
+                <label translate="true">New</label>
+            </settings>
+        </column>
+        <column name="count_updated" sortOrder="80">
+            <settings>
+                <label translate="true">Updated</label>
+            </settings>
+        </column>
+        <column name="count_unchanged" sortOrder="90">
+            <settings>
+                <label translate="true">Unchanged</label>
+            </settings>
+        </column>
+        <column name="count_errors" sortOrder="100">
+            <settings>
+                <label translate="true">Errors</label>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="110">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Started</label>
+            </settings>
+        </column>
+        <column name="duration" class="Iranimij\OpenImport\Ui\Component\Listing\Column\Duration" sortOrder="120">
+            <settings>
+                <label translate="true">Duration</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Iranimij\OpenImport\Ui\Component\Listing\Column\RunActions" sortOrder="200">
+            <settings>
+                <indexField>run_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

@@ -17,6 +17,7 @@ use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Pipeline\PreviewBuilder;
+use Iranimij\OpenImport\Model\Pipeline\ProfileCompiler;
 use Iranimij\OpenImport\Model\Pipeline\RunOutcome;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\PreviewRecord;
@@ -83,9 +84,7 @@ class ImportRunnerTest extends TestCase
     {
         return new ImportRunner(
             new ReaderFactory(),
-            new RowFilterCompiler(),
-            new MappingCompiler(new TransformPool()),
-            new EntityRegistry(),
+            new ProfileCompiler(new MappingCompiler(new TransformPool()), new RowFilterCompiler(), new EntityRegistry()),
             new RecordReaderPool([
                 'catalog_product' => $this->shop,
                 'openimport_stock_price' => $this->shop,

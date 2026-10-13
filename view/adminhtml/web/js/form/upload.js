@@ -1,0 +1,103 @@
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ *
+ * File upload of an upload profile: sends the file to the server, keeps its token in source_config.file and shares
+ * the server's sample (columns, first rows) with the sample table and the mapping editor.
+ */
+define([
+    'jquery',
+    'Magento_Ui/js/form/element/abstract',
+    'mage/translate'
+], function ($, Abstract, $t) {
+    'use strict';
+
+    return Abstract.extend({
+        defaults: {
+            template: 'Iranimij_OpenImport/form/upload',
+            uploadUrl: '',
+            sourceType: 'upload',
+            fileName: '',
+            uploading: false,
+            message: '',
+            sample: null,
+            listens: {
+                sourceType: 'onSourceType'
+            },
+            tracks: {
+                fileName: true,
+                uploading: true,
+                message: true,
+                sample: true
+            }
+        },
+
+        /** @inheritdoc */
+        initialize: function () {
+            var config;
+
+            this._super();
+            config = this.source.get(this.dataScope) || {};
+            this.fileName = config.file_name || '';
+            this.onSourceType(this.sourceType);
+
+            return this;
+        },
+
+        /**
+         * Only upload profiles show the upload field.
+         *
+         * @param {String} type
+         */
+        onSourceType: function (type) {
+            this.visible(type === 'upload' || !type);
+        },
+
+        /**
+         * Sends the chosen file.
+         *
+         * @param {Object} component
+         * @param {Event} event
+         */
+        upload: function (component, event) {
+            var file = event.target.files && event.target.files[0],
+                data = new FormData(),
+                self = this;
+
+            if (!file) {
+                return;
+            }
+            data.append('file', file);
+            data.append('form_key', window.FORM_KEY);
+            data.append('format', this.source.get('data.format') || 'auto');
+            this.uploading = true;
+            this.message = '';
+            $.ajax({
+                url: this.uploadUrl,
+                type: 'POST',
+                data: data,
+                processData: false,
+                contentType: false,
+                dataType: 'json'
+            }).done(function (response) {
+                if (response.error) {
+                    self.message = response.error;
+
+                    return;
+                }
+                self.source.set(self.dataScope + '.file', response.file.token);
+                self.source.set(self.dataScope + '.file_name', response.file.name);
+                self.fileName = response.file.name;
+                if (response.format && self.source.get('data.format') === 'auto') {
+                    self.message = $t('Detected: %1').replace('%1', response.format.toUpperCase());
+                }
+                self.sample = response;
+            }).fail(function () {
+                self.message = $t('The file could not be uploaded. Try again.');
+            }).always(function () {
+                self.uploading = false;
+                event.target.value = '';
+            });
+        }
+    });
+});

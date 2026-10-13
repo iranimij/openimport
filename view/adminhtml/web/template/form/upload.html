@@ -1,0 +1,30 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<div class="admin__field openimport-upload" visible="visible">
+    <label class="admin__field-label" attr="for: uid">
+        <span translate="'File'"></span>
+    </label>
+    <div class="admin__field-control">
+        <input type="file" class="admin__control-file"
+               accept=".csv,.tsv,.txt,.xlsx,.json,.xml"
+               attr="id: uid, 'aria-describedby': uid + '-note'"
+               event="change: upload"
+               disable="uploading"/>
+        <div class="admin__field-note" attr="id: uid + '-note'">
+            <!-- ko if: fileName -->
+            <span translate="'Current file:'"></span> <strong text="fileName"></strong>
+            <!-- /ko -->
+            <!-- ko ifnot: fileName -->
+            <span translate="'CSV, Excel (.xlsx), JSON or XML. The first rows appear in step 3.'"></span>
+            <!-- /ko -->
+        </div>
+        <div class="message message-notice" role="status" if="uploading">
+            <span translate="'Uploading and reading the file …'"></span>
+        </div>
+        <div class="message message-warning" role="alert" if="message" text="message"></div>
+    </div>
+</div>

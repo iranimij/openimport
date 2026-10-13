@@ -82,6 +82,25 @@ class Run extends AbstractDb
     }
 
     /**
+     * Cancels a run that has not started; false when it already started or does not exist.
+     *
+     * @param int $runId
+     * @return bool
+     */
+    public function cancelQueued(int $runId): bool
+    {
+        return $this->getConnection()->update(
+            $this->getMainTable(),
+            [
+                'status' => RunInterface::STATUS_CANCELLED,
+                'message' => 'Cancelled before it started.',
+                'finished_at' => (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+            ],
+            ['run_id = ?' => $runId, 'status = ?' => RunInterface::STATUS_QUEUED]
+        ) === 1;
+    }
+
+    /**
      * Puts a claimed run back into the queue (its profile or entity is busy).
      *
      * @param int $runId

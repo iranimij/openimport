@@ -114,7 +114,6 @@ class ProfileValidatorTest extends TestCase
             'A schedule needs 5 fields (minute hour day month weekday), "every night" has 2.',
             '"not-an-address" is not an e-mail address.',
             'sku: Step 1: unknown transform "shout". Transforms: ' . implode(', ', (new TransformPool())->names()) . '.',
-            'Map the identifier column sku (a source column or a fixed value).',
             'The filter mode must be "include" or "exclude".',
         ], $problems);
     }

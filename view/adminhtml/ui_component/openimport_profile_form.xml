@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">openimport_profile_form.openimport_profile_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Profile</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\BackButton"/>
+            <button name="delete" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\DeleteButton"/>
+            <button name="save" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\SaveButton"/>
+            <button name="save_dry_run" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\SaveDryRunButton"/>
+        </buttons>
+        <namespace>openimport_profile_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>openimport_profile_form.openimport_profile_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="openimport_profile_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="openimport/profile/save"/>
+        </settings>
+        <aclResource>Iranimij_OpenImport::profiles</aclResource>
+        <dataProvider class="Iranimij\OpenImport\Ui\DataProvider\ProfileFormDataProvider"
+                      name="openimport_profile_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>profile_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="what" sortOrder="10">
+        <settings>
+            <label translate="true">1 · What</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="profile_id" formElement="hidden">
+            <settings>
+                <dataScope>profile_id</dataScope>
+            </settings>
+        </field>
+        <field name="name" formElement="input" sortOrder="10">
+            <settings>
+                <label translate="true">Name</label>
+                <dataScope>name</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">255</rule>
+                </validation>
+                <notice translate="true">For example "Nightly stock from supplier A".</notice>
+            </settings>
+        </field>
+        <field name="direction" formElement="select" sortOrder="20">
+            <settings>
+                <label translate="true">Direction</label>
+                <dataScope>direction</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\Direction"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="entity" formElement="select" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filterBy" xsi:type="array">
+                        <item name="target" xsi:type="string">${ $.provider }:${ $.parentScope }.direction</item>
+                        <item name="field" xsi:type="string">direction</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">What</label>
+                <dataScope>entity</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">"Stock &amp; prices" changes only quantity, stock status and prices of products that already exist.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\Entity"/>
+                        <caption translate="true">Choose …</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="where" sortOrder="20">
+        <settings>
+            <label translate="true">2 · Where</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="source_type" formElement="select" sortOrder="10">
+            <settings>
+                <label translate="true">Source</label>
+                <dataScope>source_type</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\SourceType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="upload" component="Iranimij_OpenImport/js/form/upload" formElement="input" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="uploadUrl" xsi:type="url" path="openimport/profile/upload"/>
+                    <item name="sampleUrl" xsi:type="url" path="openimport/profile/sample"/>
+                    <item name="template" xsi:type="string">Iranimij_OpenImport/form/upload</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="sourceType" xsi:type="string">${ $.provider }:data.source_type</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">File</label>
+                <dataScope>source_config</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="file" sortOrder="30">
+        <settings>
+            <label translate="true">3 · File</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="format" formElement="select" sortOrder="10">
+            <settings>
+                <label translate="true">Format</label>
+                <dataScope>format</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\Format"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="delimiter" formElement="select" sortOrder="20">
+            <settings>
+                <label translate="true">Delimiter (CSV)</label>
+                <dataScope>format_options.delimiter</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\Delimiter"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="encoding" formElement="select" sortOrder="30">
+            <settings>
+                <label translate="true">Encoding (CSV)</label>
+                <dataScope>format_options.encoding</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\Encoding"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="has_header" formElement="checkbox" sortOrder="40">
+            <settings>
+                <label translate="true">First row holds the column names</label>
+                <dataScope>format_options.has_header</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="sheet" formElement="input" sortOrder="50">
+            <settings>
+                <label translate="true">Sheet (Excel)</label>
+                <dataScope>format_options.sheet</dataScope>
+                <notice translate="true">Name or position; empty = first sheet.</notice>
+            </settings>
+        </field>
+        <field name="record_path" formElement="input" sortOrder="60">
+            <settings>
+                <label translate="true">Record path (JSON, XML)</label>
+                <dataScope>format_options.record_path</dataScope>
+                <notice translate="true">JSON: data.items · XML: /catalog/product or //product. Empty = detect.</notice>
+            </settings>
+        </field>
+        <container name="sample" component="Iranimij_OpenImport/js/form/sample-table" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">Iranimij_OpenImport/form/sample-table</item>
+                    <item name="sampleUrl" xsi:type="url" path="openimport/profile/sample"/>
+                </item>
+            </argument>
+        </container>
+    </fieldset>
+
+    <fieldset name="map" sortOrder="40">
+        <settings>
+            <label translate="true">4 · Map</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="mapping" component="Iranimij_OpenImport/js/form/mapping-editor" formElement="input" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">Iranimij_OpenImport/form/mapping-editor</item>
+                    <item name="fieldsUrl" xsi:type="url" path="openimport/profile/fields"/>
+                    <item name="previewUrl" xsi:type="url" path="openimport/profile/preview"/>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Mapping</label>
+                <dataScope>mapping</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="rules" sortOrder="50">
+        <settings>
+            <label translate="true">5 · Rules</label>
+            <collapsible>true</collapsible>
+            <opened>false</opened>
+        </settings>
+        <field name="behavior" formElement="select" sortOrder="10">
+            <settings>
+                <label translate="true">Behaviour</label>
+                <dataScope>behavior</dataScope>
+                <notice translate="true">Replace and Delete above the safety limit wait for a typed confirmation.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\Behavior"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="on_error" formElement="select" sortOrder="20">
+            <settings>
+                <label translate="true">Rows with errors</label>
+                <dataScope>on_error</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\OnError"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="allowed_errors" formElement="input" sortOrder="30">
+            <settings>
+                <label translate="true">Errors allowed</label>
+                <dataScope>allowed_errors</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="delta" formElement="checkbox" sortOrder="40">
+            <settings>
+                <label translate="true">Skip unchanged rows</label>
+                <dataScope>delta</dataScope>
+                <notice translate="true">Rows that are exactly what the last successful run sent are skipped. Changes made in the admin since then are not noticed; run with "full" now and then if you edit records by hand.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="safety_threshold" formElement="input" sortOrder="50">
+            <settings>
+                <label translate="true">Safety limit (%)</label>
+                <dataScope>safety_threshold</dataScope>
+                <notice translate="true">Empty = the limit in Stores › Configuration › iranimij › OpenImport.</notice>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits-range" xsi:type="string">1-100</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="filter_mode" formElement="select" sortOrder="60">
+            <settings>
+                <label translate="true">Row filters</label>
+                <dataScope>filter_mode</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="include" xsi:type="array">
+                                <item name="value" xsi:type="string">include</item>
+                                <item name="label" xsi:type="string" translate="true">Import only the rows that match</item>
+                            </option>
+                            <option name="exclude" xsi:type="array">
+                                <item name="value" xsi:type="string">exclude</item>
+                                <item name="label" xsi:type="string" translate="true">Skip the rows that match</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="filter_match" formElement="select" sortOrder="70">
+            <settings>
+                <label translate="true">A row matches when</label>
+                <dataScope>filter_match</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="all" xsi:type="array">
+                                <item name="value" xsi:type="string">all</item>
+                                <item name="label" xsi:type="string" translate="true">all conditions hold</item>
+                            </option>
+                            <option name="any" xsi:type="array">
+                                <item name="value" xsi:type="string">any</item>
+                                <item name="label" xsi:type="string" translate="true">any condition holds</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <dynamicRows name="row_filters" sortOrder="80">
+            <settings>
+                <label translate="true">Conditions</label>
+                <addButtonLabel translate="true">Add condition</addButtonLabel>
+                <dndConfig>
+                    <param name="enabled" xsi:type="boolean">false</param>
+                </dndConfig>
+                <dataScope/>
+            </settings>
+            <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="isTemplate" xsi:type="boolean">true</item>
+                        <item name="is_collection" xsi:type="boolean">true</item>
+                        <item name="componentType" xsi:type="string">container</item>
+                    </item>
+                </argument>
+                <field name="column" formElement="input" sortOrder="10">
+                    <settings>
+                        <label translate="true">Column of the file</label>
+                        <dataScope>column</dataScope>
+                    </settings>
+                </field>
+                <field name="operator" formElement="select" sortOrder="20">
+                    <settings>
+                        <label translate="true">Condition</label>
+                        <dataScope>operator</dataScope>
+                    </settings>
+                    <formElements>
+                        <select>
+                            <settings>
+                                <options class="Iranimij\OpenImport\Model\Config\Source\FilterOperator"/>
+                            </settings>
+                        </select>
+                    </formElements>
+                </field>
+                <field name="value" formElement="input" sortOrder="30">
+                    <settings>
+                        <label translate="true">Value or expression</label>
+                        <dataScope>value</dataScope>
+                    </settings>
+                </field>
+                <actionDelete name="action_delete" sortOrder="40">
+                    <settings>
+                        <label translate="true">Remove</label>
+                    </settings>
+                </actionDelete>
+            </container>
+        </dynamicRows>
+    </fieldset>
+
+    <fieldset name="when" sortOrder="60">
+        <settings>
+            <label translate="true">6 · When</label>
+            <collapsible>true</collapsible>
+            <opened>false</opened>
+        </settings>
+        <field name="schedule_preset" formElement="select" sortOrder="10">
+            <settings>
+                <label translate="true">Schedule</label>
+                <dataScope>schedule_preset</dataScope>
+                <notice translate="true">Times are in the time zone of Stores › Configuration › General › Locale.</notice>
+                <switcherConfig>
+                    <rules>
+                    <rule name="0">
+                        <value/>
+                        <actions>
+                            <action name="0">
+                                <target>openimport_profile_form.openimport_profile_form.when.schedule_custom</target>
+                                <callback>hide</callback>
+                            </action>
+                        </actions>
+                    </rule>
+                    <rule name="1">
+                        <value>0 * * * *</value>
+                        <actions>
+                            <action name="0">
+                                <target>openimport_profile_form.openimport_profile_form.when.schedule_custom</target>
+                                <callback>hide</callback>
+                            </action>
+                        </actions>
+                    </rule>
+                    <rule name="2">
+                        <value>0 2 * * *</value>
+                        <actions>
+                            <action name="0">
+                                <target>openimport_profile_form.openimport_profile_form.when.schedule_custom</target>
+                                <callback>hide</callback>
+                            </action>
+                        </actions>
+                    </rule>
+                    <rule name="3">
+                        <value>0 6 * * 1-5</value>
+                        <actions>
+                            <action name="0">
+                                <target>openimport_profile_form.openimport_profile_form.when.schedule_custom</target>
+                                <callback>hide</callback>
+                            </action>
+                        </actions>
+                    </rule>
+                    <rule name="4">
+                        <value>custom</value>
+                        <actions>
+                            <action name="0">
+                                <target>openimport_profile_form.openimport_profile_form.when.schedule_custom</target>
+                                <callback>show</callback>
+                            </action>
+                        </actions>
+                    </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="manual" xsi:type="array">
+                                <item name="value" xsi:type="string"/>
+                                <item name="label" xsi:type="string" translate="true">Manual only</item>
+                            </option>
+                            <option name="hourly" xsi:type="array">
+                                <item name="value" xsi:type="string">0 * * * *</item>
+                                <item name="label" xsi:type="string" translate="true">Every hour</item>
+                            </option>
+                            <option name="nightly" xsi:type="array">
+                                <item name="value" xsi:type="string">0 2 * * *</item>
+                                <item name="label" xsi:type="string" translate="true">Every night at 02:00</item>
+                            </option>
+                            <option name="weekdays" xsi:type="array">
+                                <item name="value" xsi:type="string">0 6 * * 1-5</item>
+                                <item name="label" xsi:type="string" translate="true">Weekdays at 06:00</item>
+                            </option>
+                            <option name="custom" xsi:type="array">
+                                <item name="value" xsi:type="string">custom</item>
+                                <item name="label" xsi:type="string" translate="true">Custom (cron expression)</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="schedule_custom" formElement="input" sortOrder="20">
+            <settings>
+                <label translate="true">Cron expression</label>
+                <dataScope>schedule_custom</dataScope>
+                <notice translate="true">minute hour day month weekday, for example 30 5 * * 1-6</notice>
+            </settings>
+        </field>
+        <field name="is_active" formElement="checkbox" sortOrder="30">
+            <settings>
+                <label translate="true">Schedule is on</label>
+                <dataScope>is_active</dataScope>
+                <notice translate="true">New profiles start off: switch the schedule on after a dry run you are happy with.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="notify" formElement="select" sortOrder="40">
+            <settings>
+                <label translate="true">E-mail</label>
+                <dataScope>notify</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\Notify"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="notify_emails" formElement="input" sortOrder="50">
+            <settings>
+                <label translate="true">Send to</label>
+                <dataScope>notify_emails</dataScope>
+                <notice translate="true">Comma-separated. Empty = the admin who created the profile.</notice>
+            </settings>
+        </field>
+        <field name="after_success" formElement="select" sortOrder="60">
+            <settings>
+                <label translate="true">Source file after a successful run</label>
+                <dataScope>after_success</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\AfterSuccess"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

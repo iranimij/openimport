@@ -77,4 +77,27 @@
             <argument name="runs" xsi:type="object">Iranimij\OpenImport\Api\RunRepositoryInterface\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="openimport_profile_listing_data_source" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Profile\Grid\Collection</item>
+                <item name="openimport_run_listing_data_source" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Run\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Iranimij\OpenImport\Model\ResourceModel\Profile\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">openimport_profile</argument>
+            <argument name="resourceModel" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Profile</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\ResourceModel\Run\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">openimport_run</argument>
+            <argument name="resourceModel" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Run</argument>
+        </arguments>
+    </virtualType>
 </config>

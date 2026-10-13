@@ -1,0 +1,156 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<div class="admin__field openimport-mapping" visible="visible">
+    <div class="openimport-mapping-toolbar">
+        <button type="button" class="action-secondary" click="autoMatch" disable="loadingFields || !columns.length">
+            <span translate="'Auto-match'"></span>
+        </button>
+        <button type="button" class="action-secondary" click="addRequired" disable="loadingFields || !fields.length">
+            <span translate="'Add required fields'"></span>
+        </button>
+        <button type="button" class="action-secondary" click="addRow">
+            <span translate="'Add field'"></span>
+        </button>
+        <button type="button" class="action-secondary" click="runPreview" disable="previewing">
+            <span translate="'Preview the first rows'"></span>
+        </button>
+        <span class="admin__field-note" role="status" if="loadingFields" translate="'Loading fields …'"></span>
+    </div>
+    <div class="message message-notice" role="status" if="notice" text="notice"></div>
+    <p class="admin__field-note" if="!entity" translate="'Choose what to import in step 1 first.'"></p>
+
+    <table class="data-grid openimport-mapping-table" if="rows().length">
+        <thead>
+        <tr>
+            <th class="data-grid-th" scope="col" translate="'Magento field'"></th>
+            <th class="data-grid-th" scope="col" translate="'Store view'" if="stores.length"></th>
+            <th class="data-grid-th" scope="col" translate="'From the file'"></th>
+            <th class="data-grid-th" scope="col" translate="'Transforms'"></th>
+            <th class="data-grid-th" scope="col" translate="'Required'"></th>
+            <th class="data-grid-th" scope="col"><span class="admin__visually-hidden" translate="'Actions'"></span></th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- ko foreach: { data: rows, as: 'row' } -->
+        <tr>
+            <td>
+                <select class="admin__control-select"
+                        attr="'aria-label': $t('Magento field')"
+                        options="$parent.fieldOptions(), optionsText: 'label', optionsValue: 'value', optionsCaption: $t('Choose …'), value: row.field, valueAllowUnset: true"></select>
+                <input type="text" class="admin__control-text openimport-mapping-other"
+                       attr="'aria-label': $t('Other Magento field (code)'), placeholder: $t('or type a field code')"
+                       value="row.field"/>
+            </td>
+            <td if="$parent.stores.length">
+                <select class="admin__control-select"
+                        attr="'aria-label': $t('Store view')"
+                        options="$parent.storeOptions(), optionsText: 'label', optionsValue: 'value', value: row.store"></select>
+            </td>
+            <td>
+                <select class="admin__control-select"
+                        attr="'aria-label': $t('Column of the file')"
+                        options="$parent.sourceOptions(), optionsText: 'label', optionsValue: 'value', value: row.source, valueAllowUnset: true"></select>
+                <input type="text" class="admin__control-text" if="!row.source()"
+                       attr="'aria-label': $t('Fixed value'), placeholder: $t('Fixed value')"
+                       value="row.staticValue"/>
+            </td>
+            <td>
+                <ul class="openimport-chips">
+                    <!-- ko foreach: { data: row.transforms, as: 'transform' } -->
+                    <li class="openimport-chip">
+                        <span text="$parents[1].transformLabel(transform)"></span>
+                        <button type="button" class="action-default openimport-chip-button"
+                                attr="'aria-label': $t('Move up')"
+                                click="function () { $parents[1].moveTransform(row, $index(), -1); }">↑</button>
+                        <button type="button" class="action-default openimport-chip-button"
+                                attr="'aria-label': $t('Move down')"
+                                click="function () { $parents[1].moveTransform(row, $index(), 1); }">↓</button>
+                        <button type="button" class="action-default openimport-chip-button"
+                                attr="'aria-label': $t('Remove transform')"
+                                click="function () { $parents[1].removeTransform(row, $index()); }">×</button>
+                    </li>
+                    <!-- /ko -->
+                </ul>
+                <div class="openimport-add-transform">
+                    <select class="admin__control-select"
+                            attr="'aria-label': $t('Add a transform')"
+                            options="$parent.catalogue, optionsText: 'label', optionsValue: 'name', optionsCaption: $t('Add a transform …'), value: row.addName"></select>
+                    <!-- ko foreach: row.addArgs -->
+                    <input type="text" class="admin__control-text"
+                           attr="'aria-label': label, placeholder: label"
+                           value="value"/>
+                    <!-- /ko -->
+                    <button type="button" class="action-secondary" if="row.addName()"
+                            click="function () { $parent.addTransform(row); }">
+                        <span translate="'Add'"></span>
+                    </button>
+                </div>
+                <button type="button" class="action-link" click="function () { row.showMap(!row.showMap()); }">
+                    <span translate="'Value map'"></span>
+                </button>
+                <div class="openimport-value-map" if="row.showMap()">
+                    <textarea class="admin__control-textarea" rows="4"
+                              attr="'aria-label': $t('Value map: one pair per line'), placeholder: 'ja => 1\nnein => 0'"
+                              value="row.valueMap"></textarea>
+                    <div class="admin__field-note" translate="'One pair per line: from => to. Add the transform “Value map” to use it.'"></div>
+                    <label>
+                        <input type="checkbox" checked="row.caseSensitive"/>
+                        <span translate="'Case matters'"></span>
+                    </label>
+                    <label>
+                        <input type="checkbox" checked="row.strict"/>
+                        <span translate="'Values not in the map are errors'"></span>
+                    </label>
+                </div>
+            </td>
+            <td>
+                <input type="checkbox" checked="row.required" attr="'aria-label': $t('Empty is an error')"/>
+            </td>
+            <td>
+                <button type="button" class="action-delete" attr="'aria-label': $t('Remove field'), title: $t('Remove field')"
+                        click="function () { $parent.removeRow(row); }">
+                    <span translate="'Remove'"></span>
+                </button>
+            </td>
+        </tr>
+        <!-- /ko -->
+        </tbody>
+    </table>
+
+    <!-- ko if: preview -->
+    <div class="openimport-preview" role="region" attr="'aria-label': $t('Preview of the first rows')">
+        <h3 translate="'What Magento will receive'"></h3>
+        <!-- ko foreach: preview.problems || [] -->
+        <div class="message message-error" role="alert" text="$data"></div>
+        <!-- /ko -->
+        <div class="openimport-scroll" tabindex="0" if="preview.rows && preview.rows.length">
+            <table class="data-grid">
+                <thead>
+                <tr>
+                    <th class="data-grid-th" scope="col" translate="'Row'"></th>
+                    <!-- ko foreach: preview.columns -->
+                    <th class="data-grid-th" scope="col" text="$data"></th>
+                    <!-- /ko -->
+                    <th class="data-grid-th" scope="col" translate="'Problems'"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- ko foreach: { data: preview.rows, as: 'line' } -->
+                <tr>
+                    <td text="line.row"></td>
+                    <!-- ko foreach: { data: $parent.preview.columns, as: 'column' } -->
+                    <td text="$parents[1].previewCell(line.values, column)"></td>
+                    <!-- /ko -->
+                    <td text="line.errors.join(' · ')"></td>
+                </tr>
+                <!-- /ko -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- /ko -->
+</div>

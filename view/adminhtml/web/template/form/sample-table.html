@@ -1,0 +1,42 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<div class="admin__field openimport-sample">
+    <div class="admin__field-label">
+        <span translate="'First rows'"></span>
+    </div>
+    <div class="admin__field-control">
+        <div class="message message-warning" role="alert" if="error" text="error"></div>
+        <p class="admin__field-note" if="!error && !columns.length && !loading"
+           translate="'Upload a file in step 2 to see its first rows here.'"></p>
+        <p class="admin__field-note" if="loading" role="status" translate="'Reading the file …'"></p>
+        <!-- ko if: columns.length -->
+        <p class="admin__field-note" text="detectedText()"></p>
+        <div class="openimport-scroll" tabindex="0" role="region" attr="'aria-label': $t('First rows of the file')">
+            <table class="data-grid">
+                <thead>
+                <tr>
+                    <th class="data-grid-th" scope="col" translate="'Row'"></th>
+                    <!-- ko foreach: columns -->
+                    <th class="data-grid-th" scope="col" text="$data"></th>
+                    <!-- /ko -->
+                </tr>
+                </thead>
+                <tbody>
+                <!-- ko foreach: { data: rows, as: 'row' } -->
+                <tr>
+                    <td text="row.__row"></td>
+                    <!-- ko foreach: { data: $parent.columns, as: 'column' } -->
+                    <td text="$parents[1].cell(row, column)"></td>
+                    <!-- /ko -->
+                </tr>
+                <!-- /ko -->
+                </tbody>
+            </table>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>

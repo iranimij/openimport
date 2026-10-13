@@ -51,6 +51,10 @@ class MappingCompiler
             $problem = $this->check($field, $entity, $seen, $sourceColumns);
             if ($problem !== null) {
                 $problems[] = sprintf('%s: %s', $label, $problem);
+                if ($field->target !== '' && $field->storeView() === null) {
+                    // Mapped, just wrongly: no extra "map the identifier" hint for it.
+                    $defaultColumns[] = $field->column();
+                }
                 continue;
             }
             $seen[strtolower($field->target)] = true;
@@ -61,6 +65,9 @@ class MappingCompiler
                 );
             } catch (TransformException $exception) {
                 $problems[] = sprintf('%s: %s', $label, $exception->getMessage());
+                if ($field->storeView() === null) {
+                    $defaultColumns[] = $field->column();
+                }
                 continue;
             }
             $source = $field->source;

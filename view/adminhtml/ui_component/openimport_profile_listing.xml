@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">openimport_profile_listing.openimport_profile_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add profile</label>
+                <aclResource>Iranimij_OpenImport::profiles_edit</aclResource>
+            </button>
+        </buttons>
+        <spinner>openimport_profile_columns</spinner>
+        <deps>
+            <dep>openimport_profile_listing.openimport_profile_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="openimport_profile_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">profile_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Iranimij_OpenImport::profiles</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+                      name="openimport_profile_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>profile_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="openimport_profile_columns">
+        <column name="profile_id" sortOrder="10">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="name" sortOrder="20">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
+        <column name="direction" component="Magento_Ui/js/grid/columns/select" sortOrder="30">
+            <settings>
+                <options class="Iranimij\OpenImport\Model\Config\Source\Direction"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Direction</label>
+            </settings>
+        </column>
+        <column name="entity" class="Iranimij\OpenImport\Ui\Component\Listing\Column\EntityName" sortOrder="40">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">What</label>
+            </settings>
+        </column>
+        <column name="source_type" component="Magento_Ui/js/grid/columns/select" sortOrder="50">
+            <settings>
+                <options class="Iranimij\OpenImport\Model\Config\Source\SourceType"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Source</label>
+            </settings>
+        </column>
+        <column name="schedule" class="Iranimij\OpenImport\Ui\Component\Listing\Column\Schedule" sortOrder="60">
+            <settings>
+                <label translate="true">Schedule</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="last_run" class="Iranimij\OpenImport\Ui\Component\Listing\Column\LastRun" sortOrder="70">
+            <settings>
+                <label translate="true">Last run</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="80">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Changed</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Iranimij\OpenImport\Ui\Component\Listing\Column\ProfileActions"
+                       sortOrder="200">
+            <settings>
+                <indexField>profile_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

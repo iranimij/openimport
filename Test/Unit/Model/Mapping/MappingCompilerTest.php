@@ -176,6 +176,24 @@ class MappingCompilerTest extends TestCase
         }
     }
 
+    public function testOwnEntitiesLimitTheFields(): void
+    {
+        $entity = (new EntityRegistry())->get('openimport_stock_price') ?? throw new \LogicException();
+        $mapping = $this->compiler()->compile(
+            [new FieldMapping('sku', 'SKU'), new FieldMapping('qty', 'Bestand'), new FieldMapping('special_price', 'SP')],
+            $entity
+        );
+
+        self::assertSame(['sku', 'qty', 'special_price'], $mapping->columns());
+        self::assertSame('catalog_product', $entity->importEntity());
+        self::assertTrue($entity->existingOnly);
+        self::assertSame('catalog_product', (new EntityRegistry())->get('catalog_product')?->importEntity());
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('name: openimport_stock_price can only set sku, qty, is_in_stock, price');
+        $this->compiler()->compile([new FieldMapping('sku', 'SKU'), new FieldMapping('name', 'N')], $entity);
+    }
+
     public function testStoreViewsOnlyWhereTheEntityHasThem(): void
     {
         $this->expectException(MappingException::class);

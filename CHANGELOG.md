@@ -31,3 +31,5 @@ All notable changes to this project are documented here. The format follows
   errors (OpenImport's and Magento's) mapped to the rows of the source file with the original row kept for the
   error report; dry runs with a field-level preview of products and customers; safety threshold with confirmation
   for Delete and Replace; delta hashes saved only for rows Magento imported. See docs/runs.md.
+- Stock & prices entity (`openimport_stock_price`): qty, stock status, price, special price and dates, cost of
+  existing products through Magento's product import; unknown SKUs are skipped and counted, never created.

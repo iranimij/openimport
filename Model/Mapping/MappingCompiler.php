@@ -155,6 +155,9 @@ class MappingCompiler
                 return 'this field cannot have a store-view value';
             }
         }
+        if ($entity->columns !== [] && !in_array($field->column(), $entity->columns, true)) {
+            return sprintf('%s can only set %s', $entity->code, implode(', ', $entity->columns));
+        }
         if ($field->source !== null && $sourceColumns !== null && !in_array($field->source, $sourceColumns, true)) {
             return sprintf('the file has no column "%s"', $field->source);
         }

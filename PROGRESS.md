@@ -24,7 +24,7 @@ Iman's Mac (`~/Projects/openimport-dev-env`, Warden) whenever the laptop is open
 | S3 | Mapping compiler, store-view rows, auto-match, row filters, entity registry, `docs/mapping.md` (only add / only update move to S5: they need the database) | PR #6 (stacked on #5) |
 | S4 | Schema (9 tables + whitelist), `Api/` profile and run repositories, validator, storage services (errors, preview, hashes, locks), cron expressions | PR #7 (stacked on #6) |
 | S5 | Run queue and processor, import pipeline, record readers (products, customers), preview, delta, safety threshold, `docs/runs.md` | PR open: `feat/m1-s5-pipeline` |
-| S6 | `openimport_stock_price` entity (MSI or legacy stock) | open |
+| S6 | `openimport_stock_price` entity through core product import (existing products only) | PR open: `feat/m1-s6-stock-price` |
 | S7 | CLI: `openimport:run`, `openimport:profile:list`, `openimport:run:status` | open |
 | S8 | Oracle integration tests, coverage gate on the engine, 50k memory check, close | open |
 

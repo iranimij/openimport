@@ -79,6 +79,14 @@ class ProfileValidator
             }
         }
         if ($import && $entity !== '') {
+            $known = $this->entities->get($entity);
+            if ($known !== null && $known->existingOnly && !in_array(
+                $profile->getBehavior(),
+                [ProfileInterface::BEHAVIOR_ADD_UPDATE, ProfileInterface::BEHAVIOR_ONLY_UPDATE],
+                true
+            )) {
+                $problems[] = sprintf('%s only updates existing records: use Add/Update or Only update.', $entity);
+            }
             $problems = array_merge($problems, $this->mapping($profile));
         }
         if ($import && $profile->getRowFilters() !== []) {

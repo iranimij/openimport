@@ -23,6 +23,12 @@ class EntityRegistry
     public const STOCK_PRICE = 'openimport_stock_price';
 
     /**
+     * What a Stock & prices profile may change (through core's product import, only existing products).
+     */
+    public const STOCK_PRICE_COLUMNS = ['sku', 'qty', 'is_in_stock', 'price', 'special_price',
+        'special_price_from_date', 'special_price_to_date', 'cost'];
+
+    /**
      * @var array<string, EntityInfo>
      */
     private array $entities = [];
@@ -56,7 +62,18 @@ class EntityRegistry
             new EntityInfo(self::CUSTOMER_ADDRESS, ['_email', '_website', '_entity_id'], false, [], $customerSynonyms),
             new EntityInfo(self::CUSTOMER_COMPOSITE, ['email', '_website'], false, [], $customerSynonyms),
             new EntityInfo(self::STOCK_SOURCES, ['sku', 'source_code'], false, [], $productSynonyms),
-            new EntityInfo(self::STOCK_PRICE, ['sku'], false, [], $productSynonyms),
+            new EntityInfo(
+                self::STOCK_PRICE,
+                ['sku'],
+                false,
+                [],
+                $productSynonyms + ['sonderpreis von' => 'special_price_from_date',
+                    'sonderpreis bis' => 'special_price_to_date', 'einkaufspreis' => 'cost', 'ek' => 'cost',
+                    'verfügbar' => 'is_in_stock', 'lieferbar' => 'is_in_stock'],
+                self::PRODUCT,
+                self::STOCK_PRICE_COLUMNS,
+                true
+            ),
         ];
         foreach (array_merge($builtIn, array_values($entities)) as $entity) {
             $this->entities[$entity->code] = $entity;

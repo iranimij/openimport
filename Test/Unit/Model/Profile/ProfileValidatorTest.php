@@ -29,7 +29,9 @@ class ProfileValidatorTest extends TestCase
 
             public function codes(string $direction): array
             {
-                return $direction === 'export' ? ['catalog_product', 'openimport_order'] : ['catalog_product', 'customer'];
+                return $direction === 'export'
+                    ? ['catalog_product', 'openimport_order']
+                    : ['catalog_product', 'customer', 'openimport_stock_price'];
             }
         };
 
@@ -115,6 +117,21 @@ class ProfileValidatorTest extends TestCase
             'Map the identifier column sku (a source column or a fixed value).',
             'The filter mode must be "include" or "exclude".',
         ], $problems);
+    }
+
+    public function testStockAndPricesOnlyUpdates(): void
+    {
+        $profile = new ProfileStub([
+            'name' => 'Stock',
+            'entity' => 'openimport_stock_price',
+            'behavior' => 'delete',
+            'mapping' => [['target' => 'sku', 'source' => 'SKU'], ['target' => 'name', 'source' => 'Name']],
+        ]);
+
+        self::assertSame([
+            'openimport_stock_price only updates existing records: use Add/Update or Only update.',
+            'name: openimport_stock_price can only set ' . implode(', ', EntityRegistry::STOCK_PRICE_COLUMNS),
+        ], $this->validator()->validate($profile));
     }
 
     public function testExportProfilesSkipImportRules(): void

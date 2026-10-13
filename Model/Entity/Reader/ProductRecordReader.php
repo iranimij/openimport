@@ -86,6 +86,8 @@ class ProductRecordReader implements RecordReaderInterface
         foreach ($columns as $column) {
             $code = match ($column) {
                 'product_online' => 'status',
+                'special_price_from_date' => 'special_from_date',
+                'special_price_to_date' => 'special_to_date',
                 'product_type', 'attribute_set_code', 'qty', 'is_in_stock' => null,
                 default => in_array($column, self::SKIPPED, true) ? null : $column,
             };

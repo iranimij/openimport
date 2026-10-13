@@ -21,6 +21,14 @@ mapped are ignored. The identifier field of the entity must be mapped:
 | Customer addresses | `_email`, `_website`, `_entity_id` |
 | Stock sources (MSI) | `sku`, `source_code` |
 
+### Stock & prices
+
+The *Stock & prices* entity (`openimport_stock_price`) is made for supplier feeds: it can set `qty`, `is_in_stock`,
+`price`, `special_price`, `special_price_from_date`, `special_price_to_date` and `cost` of products that already
+exist, through Magento's own product import (with MSI, `qty` goes to the default source). SKUs the shop does not
+have are skipped and counted as *skipped by behaviour*; they are never created. For quantities per MSI source, use the
+*Stock sources* entity.
+
 ### Auto-match
 
 The mapping editor suggests a mapping from the file's column names, in this order: the exact name; the name ignoring

@@ -96,6 +96,12 @@ class ImportRunner
     private ?ErrorRecord $firstError = null;
 
     /**
+     * The behaviour this run applies (own entities that only change existing records turn Add/Update into Only
+     * update).
+     */
+    private string $behavior = ProfileInterface::BEHAVIOR_ADD_UPDATE;
+
+    /**
      * @param ReaderFactory $readerFactory
      * @param RowFilterCompiler $filterCompiler
      * @param MappingCompiler $mappingCompiler
@@ -147,8 +153,6 @@ class ImportRunner
         $this->heartbeat = $heartbeat;
         $options = $run->getOptions();
         $dryRun = $run->isDryRun();
-        $behavior = $profile->getBehavior();
-        $useDelta = $profile->isDelta() && empty($options['full']) && in_array($behavior, self::DELTA_BEHAVIORS, true);
 
         try {
             $format = $profile->getFormat() === 'auto'
@@ -165,6 +169,8 @@ class ImportRunner
             throw new PipelineException($exception->getMessage(), 0, $exception);
         }
         [$mapping, $entity] = $this->compileMapping($profile, $strictColumns);
+        $behavior = $this->behavior($profile, $entity);
+        $useDelta = $profile->isDelta() && empty($options['full']) && in_array($behavior, self::DELTA_BEHAVIORS, true);
         $filter = $this->compileFilter($profile, $strictColumns);
         $recordReader = $this->recordReaders->get($profile->getEntity());
         if ($recordReader === null && !in_array($behavior, [ProfileInterface::BEHAVIOR_ADD_UPDATE,
@@ -202,6 +208,19 @@ class ImportRunner
         $spool->close();
 
         return $this->finish($profile, $run, $spool, $entity, $recordReader, $dryRun);
+    }
+
+    private function behavior(ProfileInterface $profile, EntityInfo $entity): string
+    {
+        $behavior = $this->behavior;
+        if (!$entity->existingOnly) {
+            return $this->behavior = $behavior;
+        }
+        if (!in_array($behavior, [ProfileInterface::BEHAVIOR_ADD_UPDATE, ProfileInterface::BEHAVIOR_ONLY_UPDATE], true)) {
+            throw new PipelineException(sprintf('%s only updates existing records. Use Add/Update.', $entity->code));
+        }
+
+        return $this->behavior = ProfileInterface::BEHAVIOR_ONLY_UPDATE;
     }
 
     private function reset(int $runId): void
@@ -323,7 +342,7 @@ class ImportRunner
         if ($batch === []) {
             return;
         }
-        $behavior = $profile->getBehavior();
+        $behavior = $this->behavior;
         $identifiers = array_map(static fn (array $item): string => $item[1]->identifier, $batch);
         $needsExisting = $reader !== null && (
             in_array($behavior, [ProfileInterface::BEHAVIOR_ONLY_ADD, ProfileInterface::BEHAVIOR_ONLY_UPDATE], true)
@@ -435,7 +454,7 @@ class ImportRunner
         ?RecordReaderInterface $reader,
         bool $dryRun
     ): RunOutcome {
-        $behavior = $profile->getBehavior();
+        $behavior = $this->behavior;
         $ownErrors = $this->counts['errors'];
         $allowed = $profile->getAllowedErrors();
         $skipErrors = $profile->getOnError() === ProfileInterface::ON_ERROR_SKIP;
@@ -467,7 +486,7 @@ class ImportRunner
         }
 
         $request = new ImportRequest(
-            $profile->getEntity(),
+            $entity->importEntity(),
             match ($behavior) {
                 ProfileInterface::BEHAVIOR_DELETE => Import::BEHAVIOR_DELETE,
                 ProfileInterface::BEHAVIOR_REPLACE => Import::BEHAVIOR_REPLACE,
@@ -550,7 +569,7 @@ class ImportRunner
      */
     private function safetyMessage(ProfileInterface $profile, ?RecordReaderInterface $reader, Spool $spool): ?string
     {
-        $behavior = $profile->getBehavior();
+        $behavior = $this->behavior;
         if (!in_array($behavior, self::DESTRUCTIVE_BEHAVIORS, true)) {
             return null;
         }

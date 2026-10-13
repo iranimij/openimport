@@ -350,7 +350,7 @@ class ImportPipelineTest extends TestCase
     public function testStockAndPricesUpdateOnlyExistingProducts(): void
     {
         $prefix = 'OI-SP-' . bin2hex(random_bytes(3));
-        $this->run($this->profile(), $this->csv($this->supplierRows($prefix, 2)), RunInterface::MODE_LIVE);
+        $this->runFile($this->profile(), $this->csv($this->supplierRows($prefix, 2)), RunInterface::MODE_LIVE);
         $profile = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class)->create()
             ->setName('Stock ' . $prefix)
             ->setEntity('openimport_stock_price')
@@ -368,12 +368,12 @@ class ImportPipelineTest extends TestCase
             ['Artikelnummer' => $prefix . '-unknown', 'Bestand' => '5', 'Preis' => '1,00', 'Sonderpreis' => ''],
         ]);
 
-        $dry = $this->run($profile, $file, RunInterface::MODE_DRY_RUN);
+        $dry = $this->runFile($profile, $file, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $dry->getStatus(), $dry->getMessage());
         self::assertSame(1, $dry->getCount('skipped'));
         self::assertSame(2, $dry->getCount('updated'));
 
-        $run = $this->run($profile, $file, RunInterface::MODE_LIVE);
+        $run = $this->runFile($profile, $file, RunInterface::MODE_LIVE);
         self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
         self::assertSame(1, $run->getCount('skipped'));
         self::assertSame(0, $run->getCount('created'));

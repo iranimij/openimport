@@ -64,6 +64,45 @@ class LockManager
     }
 
     /**
+     * Records a one-time event ("schedule:12:202610130200"); true only for the first caller, ever.
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function claimOnce(string $name): bool
+    {
+        $now = $this->now();
+        try {
+            $this->resource->getConnection()->insert($this->resource->getTableName(self::TABLE), [
+                'lock_name' => $name,
+                'run_id' => null,
+                'acquired_at' => $now,
+                'heartbeat_at' => $now,
+            ]);
+            return true;
+        } catch (DuplicateException $exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Removes one-time records and locks whose name starts with the prefix and that are older than the cut-off.
+     *
+     * @param string $prefix
+     * @param \DateTimeImmutable $before
+     * @return int removed rows
+     */
+    public function purge(string $prefix, \DateTimeImmutable $before): int
+    {
+        $connection = $this->resource->getConnection();
+
+        return $connection->delete($this->resource->getTableName(self::TABLE), [
+            'lock_name LIKE ?' => str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $prefix) . '%',
+            'acquired_at < ?' => $before->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
+        ]);
+    }
+
+    /**
      * @param string $name
      * @param int $runId
      * @return void

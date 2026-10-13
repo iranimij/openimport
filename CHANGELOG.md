@@ -39,3 +39,7 @@ All notable changes to this project are documented here. The format follows
   sample, mapping editor with auto-match, transform chips, value maps and a live preview of the first rows, rules,
   schedule), run page with counts, change preview, typed confirmation, cancel, error report (original rows,
   formula-protected) and file download; English and German. See docs/admin.md.
+- Schedules: own cron group `openimport` in a separate process; every minute due profiles are queued (store time
+  zone, each due minute exactly once even with overlapping or late cron, up to 10 minutes of catch-up) and queued
+  runs are processed within the time budget; hourly housekeeping removes old run files, unused uploads and schedule
+  records and fails runs that died. See docs/schedules.md.

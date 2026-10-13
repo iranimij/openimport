@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="openimport">
+        <job name="openimport_tick" instance="Iranimij\OpenImport\Cron\Tick" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="openimport_cleanup" instance="Iranimij\OpenImport\Cron\Cleanup" method="execute">
+            <schedule>17 * * * *</schedule>
+        </job>
+    </group>
+</config>

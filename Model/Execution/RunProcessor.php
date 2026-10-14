@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
+use Iranimij\OpenImport\Model\Notification\RunMailer;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Pipeline\RunOutcome;
@@ -35,6 +36,7 @@ class RunProcessor
      * @param LockManager $locks
      * @param SourceResolver $sources
      * @param LoggerInterface $logger
+     * @param RunMailer $mailer
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -44,7 +46,8 @@ class RunProcessor
         private readonly RunFiles $runFiles,
         private readonly LockManager $locks,
         private readonly SourceResolver $sources,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly RunMailer $mailer
     ) {
     }
 
@@ -82,6 +85,7 @@ class RunProcessor
     {
         $run = $this->runRepository->getById($runId);
         $held = [];
+        $profile = null;
         try {
             $profile = $this->profile($run);
             foreach ($this->lockNames($profile, $run) as $name) {
@@ -110,7 +114,12 @@ class RunProcessor
             }
         }
 
-        return $this->finish($runId, $outcome);
+        $finished = $this->finish($runId, $outcome);
+        if ($profile !== null) {
+            $this->mailer->send($profile, $finished);
+        }
+
+        return $finished;
     }
 
     private function profile(RunInterface $run): ProfileInterface

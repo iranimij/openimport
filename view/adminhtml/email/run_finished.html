@@ -1,0 +1,27 @@
+<!--@subject {{trans "OpenImport: %profile %status" profile=$profile_name status=$status_label}} @-->
+<!--@vars {
+"var profile_name":"Profile name",
+"var status_label":"Status in words",
+"var mode_label":"Dry run or live run",
+"var message":"Run message",
+"var counts_html|raw":"Counts table",
+"var run_url":"Link to the run page",
+"var errors_note":"Note about errors",
+"template config_path=\"design/email/header_template\"":"Email Header Template",
+"template config_path=\"design/email/footer_template\"":"Email Footer Template"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<p>{{trans "The run of the OpenImport profile <strong>%profile</strong> (%mode) finished with the result <strong>%status</strong>." profile=$profile_name mode=$mode_label status=$status_label |raw}}</p>
+
+<p>{{var message}}</p>
+
+{{var counts_html|raw}}
+
+{{if errors_note}}
+<p>{{var errors_note}}</p>
+{{/if}}
+
+<p><a href="{{var run_url}}">{{trans "Open the run"}}</a></p>
+
+{{template config_path="design/email/footer_template"}}

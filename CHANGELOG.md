@@ -48,3 +48,5 @@ All notable changes to this project are documented here. The format follows
   private key, phpseclib 3) and FTP/FTPS; file name patterns and newest/oldest/first/last choice; keep, move or
   delete the file after a successful run; "Test connection" in the form; secrets encrypted with Magento's key and
   never shown again. See docs/sources.md.
+- E-mail notifications per profile (never, on failure, always) to the profile's addresses or the creating admin,
+  with counts, message and a link to the run; template `openimport_notify_run_finished`.

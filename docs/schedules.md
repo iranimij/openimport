@@ -55,3 +55,11 @@ time (products and Stock & prices share the product entity).
 - Uploaded files no profile uses any more are removed after two days.
 - A run that has been "running" for more than 90 minutes without a live lock (the PHP process died, the server
   restarted) is marked failed with "The run stopped without finishing", so the profile can run again.
+
+## E-mails
+
+Each profile says when to send an e-mail (step 6): never, on failure (failed, finished with errors, needs
+confirmation) or always, to the comma-separated addresses, or, when empty, to the admin who created the profile.
+The e-mail carries the result, the counts, the run message, a note on errors and a link to the run page. It uses
+the store's e-mail settings (Stores › Configuration › General › Store Email Addresses, "General Contact" as sender)
+and the template *OpenImport: a run finished*, which can be customised under Marketing › Email Templates.

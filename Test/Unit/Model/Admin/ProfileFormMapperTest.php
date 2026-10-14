@@ -103,5 +103,8 @@ class ProfileFormMapperTest extends TestCase
         self::assertSame('custom', $form['schedule_preset']);
         self::assertSame('30 5 * * 1-6', $form['schedule_custom']);
         self::assertSame('', $mapper->toForm(new ProfileStub())['schedule_preset']);
+        // A new profile (and one that never stored has_header) shows the header toggle on.
+        self::assertSame('1', $mapper->toForm(new ProfileStub())['format_options']['has_header']);
+        self::assertSame('0', $mapper->toForm(new ProfileStub(['format_options' => ['has_header' => '0']]))['format_options']['has_header']);
     }
 }

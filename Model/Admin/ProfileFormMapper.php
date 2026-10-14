@@ -79,7 +79,8 @@ class ProfileFormMapper
             'source_type' => $profile->getSourceType(),
             'source_config' => $source,
             'format' => $profile->getFormat(),
-            'format_options' => $profile->getFormatOptions(),
+            // An unset has_header means "yes"; the toggle must show (and post) that, not an empty value.
+            'format_options' => $profile->getFormatOptions() + ['has_header' => '1'],
             'behavior' => $profile->getBehavior(),
             'on_error' => $profile->getOnError(),
             'allowed_errors' => (string) $profile->getAllowedErrors(),

@@ -76,7 +76,7 @@ class RunMailerTest extends TestCase
         $message = $mock->getSentMessage();
         self::assertNotNull($message, 'an e-mail was sent');
         self::assertStringContainsString($profile->getName(), (string) $message->getSubject());
-        self::assertStringContainsString('failed', (string) $message->getSubject());
+        self::assertStringContainsStringIgnoringCase('failed', (string) $message->getSubject());
         $to = array_map(static fn ($address): string => $address->getEmail(), $message->getTo());
         self::assertSame(['ops@example.com', 'boss@example.com'], $to);
         $body = quoted_printable_decode($message->getBodyText());

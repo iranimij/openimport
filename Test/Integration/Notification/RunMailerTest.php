@@ -74,7 +74,7 @@ class RunMailerTest extends TestCase
         $run = $this->failedRun($profile);
 
         $message = $mock->getSentMessage();
-        self::assertNotNull($message, 'an e-mail was sent');
+        self::assertNotNull($message, 'an e-mail was sent: ' . (Bootstrap::getObjectManager()->get(RunMailer::class)->lastError() ?? 'no error'));
         self::assertStringContainsString($profile->getName(), (string) $message->getSubject());
         self::assertStringContainsStringIgnoringCase('failed', (string) $message->getSubject());
         $to = array_map(static fn ($address): string => $address->getEmail(), $message->getTo());

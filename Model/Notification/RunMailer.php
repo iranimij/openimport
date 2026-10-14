@@ -31,6 +31,18 @@ class RunMailer
         RunInterface::STATUS_NEEDS_CONFIRMATION,
     ];
 
+    private ?string $lastError = null;
+
+    /**
+     * Why the last send() sent nothing (also logged), null when it went out.
+     *
+     * @return string|null
+     */
+    public function lastError(): ?string
+    {
+        return $this->lastError;
+    }
+
     /**
      * @param TransportBuilder $transportBuilder
      * @param UserCollectionFactory $users
@@ -96,6 +108,7 @@ class RunMailer
      */
     public function send(ProfileInterface $profile, RunInterface $run): array
     {
+        $this->lastError = null;
         if (!$this->wants($profile, $run)) {
             return [];
         }
@@ -114,6 +127,7 @@ class RunMailer
                 ->getTransport();
             $transport->sendMessage();
         } catch (\Throwable $exception) {
+            $this->lastError = $exception->getMessage();
             $this->logger->error(sprintf(
                 'OpenImport: the e-mail about run %d could not be sent: %s',
                 (int) $run->getRunId(),
@@ -122,6 +136,7 @@ class RunMailer
 
             return [];
         }
+        $this->lastError = null;
 
         return $recipients;
     }

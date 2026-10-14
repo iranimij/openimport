@@ -147,3 +147,8 @@
 .openimport-grid-run [class*="grid-severity-"] {
     color: #2f2f2f;
 }
+
+/* Core's "Select" action menu in the grids is light grey by default; dark enough to read on OpenImport's pages. */
+.admin__data-grid-wrap .data-grid-actions-cell .action-select {
+    color: #41362f;
+}

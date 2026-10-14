@@ -68,13 +68,13 @@ define([
                 data: data,
                 dataType: 'json'
             }).done(function (response) {
+                self.busy = false;
                 self.ok = !!response.ok;
                 self.message = response.message || '';
             }).fail(function () {
+                self.busy = false;
                 self.ok = false;
                 self.message = $t('The test could not be run. Try again.');
-            }).always(function () {
-                self.busy = false;
             });
         }
     });

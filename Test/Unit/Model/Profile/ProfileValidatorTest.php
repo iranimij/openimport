@@ -46,7 +46,7 @@ class ProfileValidatorTest extends TestCase
             new RowFilterCompiler(),
             new EntityRegistry(),
             $codes,
-            new DestinationPool(['download' => new DownloadDestination()]),
+            new DestinationPool(['download' => new DownloadDestination(), 'folder' => new DownloadDestination(), 'sftp' => new DownloadDestination(), 'email' => new DownloadDestination()]),
             new WriterFactory(new FakeObjectManager(), ['csv' => CsvWriter::class, 'xlsx' => XlsxWriter::class])
         );
     }
@@ -199,6 +199,22 @@ class ProfileValidatorTest extends TestCase
         self::assertSame(
             ['"dropbox" is not an export destination.', 'OpenImport cannot write json files.'],
             $validator->validate(new ProfileStub(['format' => 'json', 'export_options' => ['destination' => 'dropbox']] + $base))
+        );
+        self::assertSame(
+            ['Enter the server folder to write to.'],
+            $validator->validate(new ProfileStub(['format' => 'csv', 'export_options' => ['destination' => 'folder']] + $base))
+        );
+        self::assertSame(
+            ['Enter the server (host name) of the destination.', 'Enter the user name for the destination server.'],
+            $validator->validate(new ProfileStub(['format' => 'csv', 'export_options' => ['destination' => 'sftp']] + $base))
+        );
+        self::assertSame(
+            ['Enter at least one e-mail address to send the file to.'],
+            $validator->validate(new ProfileStub(['format' => 'csv', 'export_options' => ['destination' => 'email']] + $base))
+        );
+        self::assertSame(
+            ['"nope" is not an e-mail address.'],
+            $validator->validate(new ProfileStub(['format' => 'csv', 'export_options' => ['destination' => 'email', 'emails' => 'a@example.com, nope']] + $base))
         );
     }
 }

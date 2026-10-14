@@ -59,7 +59,7 @@ class OrderExportTest extends TestCase
         return Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save($profile);
     }
 
-    private function run(ProfileInterface $profile, string $mode = RunInterface::MODE_LIVE): RunInterface
+    private function process(ProfileInterface $profile, string $mode = RunInterface::MODE_LIVE): RunInterface
     {
         $run = Bootstrap::getObjectManager()->get(RunQueue::class)->queue($profile, $mode, RunInterface::TRIGGER_CLI);
 
@@ -107,7 +107,7 @@ class OrderExportTest extends TestCase
             ->setCarrierCode('dhl')->setTitle('DHL')->setTrackNumber('JD0001'));
         $shipment->save();
 
-        $rows = $this->rows($this->run($this->profile(['statuses' => 'processing, pending, complete, closed'])));
+        $rows = $this->rows($this->process($this->profile(['statuses' => 'processing, pending, complete, closed'])));
         $exported = array_column($rows, 'increment_id');
         self::assertContains('100000001', $exported);
         self::assertContains('100000002', $exported);
@@ -138,26 +138,26 @@ class OrderExportTest extends TestCase
     #[DataFixture('Magento/Sales/_files/order_list.php')]
     public function testFiltersOnlyNewAndOneRowPerOrder(): void
     {
-        $perOrder = $this->rows($this->run($this->profile(['rows' => 'order'])));
+        $perOrder = $this->rows($this->process($this->profile(['rows' => 'order'])));
         $perOrderIds = array_column($perOrder, 'increment_id');
         self::assertSame(count(array_unique($perOrderIds)), count($perOrderIds), 'one row per order');
         self::assertArrayNotHasKey('item_sku', $perOrder[0]);
 
-        $status = $this->rows($this->run($this->profile(['statuses' => 'complete'])));
+        $status = $this->rows($this->process($this->profile(['statuses' => 'complete'])));
         self::assertNotEmpty($status);
         self::assertSame(['complete'], array_values(array_unique(array_column($status, 'status'))));
 
-        $none = $this->run($this->profile(['from' => '2099-01-01']));
+        $none = $this->process($this->profile(['from' => '2099-01-01']));
         self::assertStringContainsString('Nothing to export', $none->getMessage());
 
         $onlyNew = $this->profile(['only' => 'new', 'rows' => 'order']);
-        $first = $this->rows($this->run($onlyNew));
+        $first = $this->rows($this->process($onlyNew));
         $marks = Bootstrap::getObjectManager()->get(ExportMarkStore::class);
         self::assertSame(count($first), $marks->count((int) $onlyNew->getProfileId(), 'order'));
-        $second = $this->run($onlyNew);
+        $second = $this->process($onlyNew);
         self::assertStringContainsString('Nothing to export', $second->getMessage(), 'everything is exported already');
 
-        $dry = $this->run($this->profile(['only' => 'new', 'rows' => 'order']), RunInterface::MODE_DRY_RUN);
+        $dry = $this->process($this->profile(['only' => 'new', 'rows' => 'order']), RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $dry->getStatus());
         self::assertSame(0, $marks->count((int) $dry->getProfileId(), 'order'), 'a dry run marks nothing');
     }
@@ -174,7 +174,7 @@ class OrderExportTest extends TestCase
                 ['target' => 'Summe', 'source' => 'grand_total', 'transforms' => [['name' => 'number', 'args' => ['2', ',']]]],
             ]]
         );
-        $run = $this->run($profile);
+        $run = $this->process($profile);
         self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
         $var = Bootstrap::getObjectManager()->get(Filesystem::class)->getDirectoryRead(DirectoryList::VAR_DIR);
         $written = 'openimport/it-out-' . $tag . '/orders-' . $run->getRunId() . '.csv';

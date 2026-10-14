@@ -137,3 +137,13 @@
     color: #006bb4;
     text-decoration: underline;
 }
+
+/* "Last run" cell in the profile grid: link and status chip dark enough to read (WCAG AA). */
+.openimport-grid-run a {
+    color: #1a5a96;
+    text-decoration: underline;
+}
+
+.openimport-grid-run [class*="grid-severity-"] {
+    color: #2f2f2f;
+}

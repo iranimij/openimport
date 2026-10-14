@@ -76,7 +76,7 @@ class LastRun extends Column
             $item[$this->getData('name')] = $run === null
                 ? $this->escaper->escapeHtml((string) __('Never run'))
                 : sprintf(
-                    '<a href="%s">%s</a> %s',
+                    '<span class="openimport-grid-run"><a href="%s">%s</a> %s</span>',
                     $this->escaper->escapeUrl($this->urlBuilder->getUrl('openimport/run/view', ['id' => $run['run_id']])),
                     $this->escaper->escapeHtml((string) __($run['mode'] === 'live' ? 'Run #%1' : 'Dry run #%1', $run['run_id'])),
                     $this->chip->html((string) $run['status'])

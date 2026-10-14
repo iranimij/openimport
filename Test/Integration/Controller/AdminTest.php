@@ -69,6 +69,8 @@ class AdminTest extends AbstractBackendController
     private function fresh(): void
     {
         $this->resetRequest();
+        // The application object keeps the request it was built with: a new one for the new request.
+        $this->_objectManager->removeSharedInstance(\Magento\Framework\App\Http::class);
         $response = $this->getResponse();
         if ($response instanceof \Magento\Framework\HTTP\PhpEnvironment\Response) {
             $response->clearBody();

@@ -68,6 +68,17 @@ class AdminTest extends AbstractBackendController
      * @param array<string, mixed> $data
      * @return void
      */
+    /**
+     * A fresh request and an empty response body (Magento appends every rendered page to the shared response).
+     */
+    private function fresh(): void
+    {
+        $this->fresh();
+        $this->_objectManager->removeSharedInstance(\Magento\Framework\App\ResponseInterface::class);
+        $this->_objectManager->removeSharedInstance(\Magento\Framework\App\Response\Http::class);
+        $this->_response = null;
+    }
+
     private function post(string $uri, array $data): void
     {
         $formKey = $this->_objectManager->get(FormKey::class)->getFormKey();
@@ -97,11 +108,11 @@ class AdminTest extends AbstractBackendController
         $this->dispatch('backend/openimport/profile/index');
         self::assertStringContainsString('openimport_profile_listing', (string) $this->getResponse()->getBody());
 
-        $this->resetRequest();
+        $this->fresh();
         $this->dispatch('backend/openimport/run/index');
         self::assertStringContainsString('openimport_run_listing', (string) $this->getResponse()->getBody());
 
-        $this->resetRequest();
+        $this->fresh();
         $this->dispatch('backend/openimport/profile/new');
         $body = (string) $this->getResponse()->getBody();
         self::assertStringContainsString('openimport_profile_form', $body);
@@ -144,9 +155,9 @@ class AdminTest extends AbstractBackendController
         self::assertTrue($profile->getMapping()[1]['value_map_strict']);
         self::assertSame('exclude', $profile->getRowFilters()['mode']);
 
-        $this->resetRequest();
+        $this->fresh();
         $this->post('backend/openimport/profile/save', ['name' => '', 'entity' => 'catalog_product', 'behavior' => 'merge']);
-        $this->assertSessionMessages($this->contains('Give the profile a name.'), MessageInterface::TYPE_ERROR);
+        $this->assertSessionMessages(self::containsEqual('Give the profile a name.'), MessageInterface::TYPE_ERROR);
         $this->assertRedirect($this->stringContains('openimport/profile/new'));
     }
 
@@ -174,7 +185,7 @@ class AdminTest extends AbstractBackendController
         self::assertSame(';', $sample['detected']['delimiter']);
         self::assertSame('2', $sample['rows'][0]['__row']);
 
-        $this->resetRequest();
+        $this->fresh();
         $this->post('backend/openimport/profile/preview', [
             'entity' => 'catalog_product',
             'format' => 'auto',
@@ -189,7 +200,7 @@ class AdminTest extends AbstractBackendController
         self::assertSame(['sku' => 'A-1', 'price' => '10.5'], $preview['rows'][0]['values']);
         self::assertStringContainsString('"abc" is not a number', $preview['rows'][1]['errors'][0]);
 
-        $this->resetRequest();
+        $this->fresh();
         $this->post('backend/openimport/profile/sample', ['file' => '../../app/etc/env.php']);
         self::assertSame('Upload a file first.', $this->json()['error']);
     }
@@ -206,19 +217,19 @@ class AdminTest extends AbstractBackendController
         $runId = $this->redirectedRunId();
         self::assertSame(RunInterface::STATUS_QUEUED, $runs->getById($runId)->getStatus());
 
-        $this->resetRequest();
+        $this->fresh();
         $this->dispatch('backend/openimport/run/status/id/' . $runId);
         self::assertSame('queued', $this->json()['status']);
 
         Bootstrap::getObjectManager()->get(RunProcessor::class)->process($runId);
-        $this->resetRequest();
+        $this->fresh();
         $this->dispatch('backend/openimport/run/view/id/' . $runId);
         $body = (string) $this->getResponse()->getBody();
         self::assertStringContainsString('Failed', $body);
         self::assertStringContainsString($prefix . '-2', $body);
         self::assertStringContainsString('Download error report', $body);
 
-        $this->resetRequest();
+        $this->fresh();
         $this->dispatch('backend/openimport/run/errorReport/id/' . $runId);
         $report = (string) $this->getResponse()->getBody();
         if ($report === '') {
@@ -232,26 +243,26 @@ class AdminTest extends AbstractBackendController
         $profile = Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save(
             $profile->setSourceConfig(['file' => $fixed, 'file_name' => 'products.csv'])
         );
-        $this->resetRequest();
+        $this->fresh();
         $this->post('backend/openimport/profile/run', ['id' => $profile->getProfileId(), 'mode' => 'dry_run']);
         $dryId = $this->redirectedRunId();
         Bootstrap::getObjectManager()->get(RunProcessor::class)->process($dryId);
-        $this->resetRequest();
+        $this->fresh();
         $this->dispatch('backend/openimport/run/view/id/' . $dryId);
         self::assertStringContainsString('Run for real', (string) $this->getResponse()->getBody());
         self::assertStringContainsString('What would change', (string) $this->getResponse()->getBody());
 
-        $this->resetRequest();
+        $this->fresh();
         $this->post('backend/openimport/run/confirm', ['id' => $dryId]);
         $live = $runs->getById($this->redirectedRunId());
         self::assertFalse($live->isDryRun());
         self::assertSame($dryId, $live->getParentRunId());
 
-        $this->resetRequest();
+        $this->fresh();
         $this->post('backend/openimport/run/cancel', ['id' => $live->getRunId()]);
         self::assertSame(RunInterface::STATUS_CANCELLED, $runs->getById((int) $live->getRunId())->getStatus());
 
-        $this->resetRequest();
+        $this->fresh();
         $this->dispatch('backend/openimport/run/download/id/' . $dryId);
         self::assertSame(200, $this->getResponse()->getHttpResponseCode());
     }
@@ -274,6 +285,6 @@ class AdminTest extends AbstractBackendController
         $runs->save($run);
 
         $this->post('backend/openimport/run/confirm', ['id' => $run->getRunId(), 'confirmation' => 'delete']);
-        $this->assertSessionMessages($this->contains('Type DELETE to confirm.'), MessageInterface::TYPE_ERROR);
+        $this->assertSessionMessages(self::containsEqual('Type DELETE to confirm.'), MessageInterface::TYPE_ERROR);
     }
 }

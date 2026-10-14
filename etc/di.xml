@@ -84,6 +84,7 @@
     <type name="Iranimij\OpenImport\Console\Command\ProfilesExportCommand">
         <arguments>
             <argument name="profiles" xsi:type="object">Iranimij\OpenImport\Api\ProfileRepositoryInterface\Proxy</argument>
+            <argument name="finder" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfileFinder\Proxy</argument>
             <argument name="json" xsi:type="object">Iranimij\OpenImport\Model\Profile\ProfileJson\Proxy</argument>
         </arguments>
     </type>

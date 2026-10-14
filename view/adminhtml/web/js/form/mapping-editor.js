@@ -91,12 +91,13 @@ define([
 
         /** @inheritdoc */
         initialize: function () {
+            // Listeners can fire while the links are set up: the debounced loader must exist before _super().
+            this.fetchLater = _.debounce(this.fetchFields.bind(this), 300);
             this._super();
             this.rows = ko.observableArray([]);
             _.each(this.initialValue || this.value() || [], function (row) {
                 this.rows.push(this.makeRow(row));
             }, this);
-            this.fetchLater = _.debounce(this.fetchFields.bind(this), 300);
             this.fetchFields();
 
             return this;

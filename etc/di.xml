@@ -55,6 +55,9 @@
                 <item name="openimport_profile_list" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfileListCommand</item>
                 <item name="openimport_queue_run" xsi:type="object">Iranimij\OpenImport\Console\Command\QueueRunCommand</item>
                 <item name="openimport_secrets_reencrypt" xsi:type="object">Iranimij\OpenImport\Console\Command\SecretsReencryptCommand</item>
+                <item name="openimport_profiles_export" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfilesExportCommand</item>
+                <item name="openimport_profiles_import" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfilesImportCommand</item>
+                <item name="openimport_doctor" xsi:type="object">Iranimij\OpenImport\Console\Command\DoctorCommand</item>
             </argument>
         </arguments>
     </type>
@@ -76,6 +79,22 @@
         <arguments>
             <argument name="runs" xsi:type="object">Iranimij\OpenImport\Api\RunRepositoryInterface\Proxy</argument>
             <argument name="report" xsi:type="object">Iranimij\OpenImport\Console\Command\RunReport\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Console\Command\ProfilesExportCommand">
+        <arguments>
+            <argument name="profiles" xsi:type="object">Iranimij\OpenImport\Api\ProfileRepositoryInterface\Proxy</argument>
+            <argument name="json" xsi:type="object">Iranimij\OpenImport\Model\Profile\ProfileJson\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Console\Command\ProfilesImportCommand">
+        <arguments>
+            <argument name="json" xsi:type="object">Iranimij\OpenImport\Model\Profile\ProfileJson\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Console\Command\DoctorCommand">
+        <arguments>
+            <argument name="indexers" xsi:type="object">Magento\Framework\Indexer\IndexerRegistry\Proxy</argument>
         </arguments>
     </type>
     <type name="Iranimij\OpenImport\Console\Command\SecretsReencryptCommand">

@@ -11,7 +11,10 @@ namespace Iranimij\OpenImport\Test\Integration\Console;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
+use Iranimij\OpenImport\Console\Command\DoctorCommand;
 use Iranimij\OpenImport\Console\Command\ProfileListCommand;
+use Iranimij\OpenImport\Console\Command\ProfilesExportCommand;
+use Iranimij\OpenImport\Console\Command\ProfilesImportCommand;
 use Iranimij\OpenImport\Console\Command\RunCommand;
 use Iranimij\OpenImport\Console\Command\RunStatusCommand;
 use Magento\Framework\Console\CommandListInterface;
@@ -133,5 +136,57 @@ class CommandsTest extends TestCase
 
         self::assertSame(1, $run->execute(['profile' => $profile->getName(), '--dry-run' => true]));
         self::assertStringContainsString('Upload a file to run this profile.', $run->getDisplay());
+    }
+
+    public function testProfilesExportImportAndDoctor(): void
+    {
+        $name = 'JSON ' . bin2hex(random_bytes(3));
+        $profile = $this->profile($name)->setSourceType('sftp')->setSourceConfig([
+            'host' => 'files.example.com', 'username' => 'shop', 'secrets' => ['password' => 'enc'],
+        ]);
+        Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save($profile);
+
+        $export = new CommandTester(Bootstrap::getObjectManager()->create(ProfilesExportCommand::class));
+        $export->execute(['profile' => [$name]]);
+        $json = $export->getDisplay();
+        self::assertStringNotContainsString('secrets', $json, 'secrets never leave the store');
+        self::assertStringNotContainsString('"enc"', $json);
+        $data = json_decode($json, true);
+        self::assertSame($name, $data['profiles'][0]['name']);
+        self::assertSame('files.example.com', $data['profiles'][0]['source_config']['host']);
+
+        $file = sys_get_temp_dir() . '/openimport-profiles-' . bin2hex(random_bytes(3)) . '.json';
+        $data['profiles'][0]['allowed_errors'] = 7;
+        $data['profiles'][] = ['name' => $name . ' copy', 'entity' => 'catalog_product', 'mapping' => [['target' => 'sku', 'source' => 'SKU']]];
+        file_put_contents($file, json_encode($data));
+        $this->file = $file;
+
+        $import = new CommandTester(Bootstrap::getObjectManager()->create(ProfilesImportCommand::class));
+        self::assertSame(0, $import->execute(['file' => $file, '--dry-run' => true]));
+        self::assertStringContainsString('update ' . $name, $import->getDisplay());
+        self::assertStringContainsString('create ' . $name . ' copy', $import->getDisplay());
+        self::assertStringContainsString('nothing saved', $import->getDisplay());
+
+        self::assertSame(0, $import->execute(['file' => $file]));
+        self::assertStringContainsString('1 profile(s) created, 1 updated.', $import->getDisplay());
+        $repository = Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class);
+        $updated = $repository->getByName($name);
+        self::assertSame(7, $updated->getAllowedErrors());
+        self::assertSame(['password' => 'enc'], $updated->getSourceConfig()['secrets'], 'stored secrets are kept');
+        self::assertSame('catalog_product', $repository->getByName($name . ' copy')->getEntity());
+
+        $data['profiles'][1]['entity'] = 'no_such_entity';
+        $data['profiles'][1]['behavior'] = 'merge';
+        file_put_contents($file, json_encode($data));
+        self::assertSame(1, $import->execute(['file' => $file]));
+        self::assertStringContainsString('Nothing was saved', $import->getDisplay());
+        self::assertStringContainsString($name . ' copy: Magento has no import entity "no_such_entity".', $import->getDisplay());
+        self::assertSame(7, $repository->getByName($name)->getAllowedErrors());
+
+        $doctor = new CommandTester(Bootstrap::getObjectManager()->create(DoctorCommand::class));
+        $doctor->execute([]);
+        self::assertStringContainsString('Cron:', $doctor->getDisplay());
+        self::assertStringContainsString('PHP ext-zip: loaded.', $doctor->getDisplay());
+        self::assertStringContainsString('var/openimport: writable.', $doctor->getDisplay());
     }
 }

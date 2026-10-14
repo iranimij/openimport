@@ -40,3 +40,21 @@ same every minute; the command is for stores without cron, deployments and tests
 
 After `bin/magento encryption:key:change`: encrypts every stored source password, private key and token again
 with the current key. Run it while the old key is still in `app/etc/env.php`.
+
+## `openimport:profiles:export [profile …]`
+
+Writes profiles as JSON to standard output (all profiles, or the ones named by id or name): every setting,
+mapping and value map, never passwords, keys, tokens or upload tokens. Keep the file in version control or move it
+to another store: `bin/magento openimport:profiles:export > profiles.json`.
+
+## `openimport:profiles:import <file> [--dry-run]`
+
+Creates the profiles of such a file; a profile with the same name is updated (its stored secrets are kept).
+Everything is checked first and listed as "create …" / "update …"; one problem and nothing is saved. `--dry-run`
+checks and lists without saving. Enter passwords and keys in the admin afterwards.
+
+## `openimport:doctor`
+
+Checks what makes imports slow or stuck and says what to do: cron (has `openimport_tick` run in the last
+10 minutes?), indexers on "Update on Save", PHP extensions and `memory_limit`, `var/openimport` writable, runs
+waiting longer than 15 minutes, runs "running" for more than 90 minutes. Exit code 1 when something needs a look.

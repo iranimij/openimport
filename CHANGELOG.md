@@ -58,3 +58,5 @@ All notable changes to this project are documented here. The format follows
   and tracking; filters by status, date and store; "only new" and "new or changed" through export marks. Export
   destinations: server folder, SFTP, FTP, e-mail attachment. Mapping editor in export mode (file column ← Magento
   column, "Add every column"); output options (BOM, line ending, JSON root/pretty, XML root/record).
+- CLI: `openimport:profiles:export` / `openimport:profiles:import` (JSON without secrets, dry run, all or nothing),
+  `openimport:doctor` (cron, indexers, PHP, folders, stuck runs).

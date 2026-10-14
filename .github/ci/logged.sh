@@ -22,7 +22,9 @@ if [ "$status" -ne 0 ]; then
       if (!preg_match_all("/^\d+\) [^\n]+\n.*?(?=^\d+\) |^(FAILURES|ERRORS|OK, but)|\z)/ms", $text, $m)) { exit(0); }
       foreach (array_slice($m[0], 0, 10) as $block) {
         $lines = array_map(static fn ($l) => strlen($l) > 300 ? substr($l, 0, 300) . " …" : $l, explode("\n", trim($block)));
-        $body = substr(implode("\n", $lines), 0, 1500);
+        // Head and tail of the block: the test name and message first, the "Failed asserting" lines and file last.
+        if (count($lines) > 14) { $lines = array_merge(array_slice($lines, 0, 4), ["…"], array_slice($lines, -10)); }
+        $body = substr(implode("\n", $lines), 0, 2000);
         echo "::error title=" . str_replace(["%", ":", ","], ["%25", "%3A", "%2C"], substr(strtok($block, "\n"), 0, 120)) . "::" . str_replace(["%", "\r", "\n"], ["%25", "%0D", "%0A"], $body) . "\n";
       }' "$log"
   fi

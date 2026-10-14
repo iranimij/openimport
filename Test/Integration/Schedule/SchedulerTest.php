@@ -85,22 +85,22 @@ class SchedulerTest extends TestCase
         $inactive = $this->profile('0 3 * * *', false);
 
         // 03:00 Berlin = 01:00 UTC in October (CEST). Two overlapping cron processes in the same minute.
-        $scheduler->queueDue($this->at('2026-10-14 01:00:20'));
-        $scheduler->queueDue($this->at('2026-10-14 01:00:50'));
+        $scheduler->queueDue($this->moment('2026-10-14 01:00:20'));
+        $scheduler->queueDue($this->moment('2026-10-14 01:00:50'));
         self::assertSame(1, $this->runsOf($nightly));
         self::assertSame(0, $this->runsOf($inactive));
 
         // A late cron (5 minutes later) does not fire the same minute again.
-        $scheduler->queueDue($this->at('2026-10-14 01:05:00'));
+        $scheduler->queueDue($this->moment('2026-10-14 01:05:00'));
         self::assertSame(1, $this->runsOf($nightly));
 
         // Next night, cron was down at 03:00 and comes back at 03:07: the missed minute fires once.
-        $scheduler->queueDue($this->at('2026-10-15 01:07:00'));
-        $scheduler->queueDue($this->at('2026-10-15 01:08:00'));
+        $scheduler->queueDue($this->moment('2026-10-15 01:07:00'));
+        $scheduler->queueDue($this->moment('2026-10-15 01:08:00'));
         self::assertSame(2, $this->runsOf($nightly));
 
         // Too late (outside the catch-up window): nothing.
-        $scheduler->queueDue($this->at('2026-10-16 01:30:00'));
+        $scheduler->queueDue($this->moment('2026-10-16 01:30:00'));
         self::assertSame(2, $this->runsOf($nightly));
 
         $runs = Bootstrap::getObjectManager()->get(RunRepositoryInterface::class);

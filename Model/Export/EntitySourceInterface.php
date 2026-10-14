@@ -24,11 +24,21 @@ interface EntitySourceInterface
      *
      * @param ProfileInterface $profile
      * @param callable $onHeader receives string[] column names, once, before the first row
-     * @param callable $onRow receives array<string, mixed> column => value per row
+     * @param callable $onRow receives array<string, mixed> column => value per row; returns whether the row
+     *        made it into the file (row filters)
      * @return void
      * @throws PipelineException
      */
     public function read(ProfileInterface $profile, callable $onHeader, callable $onRow): void;
+
+    /**
+     * After a successful live run: a chance to remember what was exported ("only new" exports).
+     *
+     * @param ProfileInterface $profile
+     * @param int $runId
+     * @return void
+     */
+    public function finish(ProfileInterface $profile, int $runId): void;
 
     /**
      * The columns the entity can have, for the mapping editor (a best effort; the file's header is what read()

@@ -90,13 +90,14 @@ class ExportRunner
                     $writer->open($path, $mapping->columns($columns), $options);
                     $opened = true;
                 },
-                function (array $row) use ($writer, $mapping, $filter, &$opened, $path, $options): void {
+                function (array $row) use ($writer, $mapping, $filter, &$opened, $path, $options): bool {
                     if (!$opened) {
                         $writer->open($path, $mapping->columns(array_keys($row)), $options);
                         $opened = true;
                     }
                     $this->counts['read']++;
-                    if (!$filter->keep($row)) {
+                    $kept = $filter->keep($row);
+                    if (!$kept) {
                         $this->counts['filtered']++;
                     } else {
                         $writer->write($mapping->map($row));
@@ -105,6 +106,8 @@ class ExportRunner
                     if ($this->counts['read'] % self::PROGRESS_EVERY === 0) {
                         $this->progress();
                     }
+
+                    return $kept;
                 }
             );
         } catch (\RuntimeException $exception) {
@@ -134,6 +137,7 @@ class ExportRunner
             return [new RunOutcome(RunInterface::STATUS_SUCCESS, $this->counts, 'Dry run: ' . $summary . ' The file was not delivered.'), $path];
         }
         $delivered = $this->destinations->get($profile)->deliver($profile, $run, $path, $writer);
+        $source->finish($profile, $this->runId);
 
         return [new RunOutcome(RunInterface::STATUS_SUCCESS, $this->counts, $summary . ' ' . $delivered), $path];
     }

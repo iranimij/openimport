@@ -151,9 +151,33 @@ class ProfileValidator
                 break;
         }
         if ($profile->getDirection() === ProfileInterface::DIRECTION_EXPORT) {
-            $destination = trim((string) ($profile->getExportOptions()['destination'] ?? ''));
+            $export = $profile->getExportOptions();
+            $out = static fn (string $key): string => is_scalar($export[$key] ?? null) ? trim((string) $export[$key]) : '';
+            $destination = $out('destination');
             if ($destination !== '' && !in_array($destination, $this->destinations->types(), true)) {
                 $problems[] = sprintf('"%s" is not an export destination.', $destination);
+            }
+            if ($destination === 'folder' && $out('path') === '') {
+                $problems[] = 'Enter the server folder to write to.';
+            }
+            if (in_array($destination, ['sftp', 'ftp'], true)) {
+                if ($out('host') === '') {
+                    $problems[] = 'Enter the server (host name) of the destination.';
+                }
+                if ($out('username') === '') {
+                    $problems[] = 'Enter the user name for the destination server.';
+                }
+            }
+            if ($destination === 'email') {
+                $emails = array_filter(array_map('trim', explode(',', $out('emails'))));
+                if ($emails === []) {
+                    $problems[] = 'Enter at least one e-mail address to send the file to.';
+                }
+                foreach ($emails as $email) {
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+                        $problems[] = sprintf('"%s" is not an e-mail address.', $email);
+                    }
+                }
             }
             if (!in_array($profile->getFormat(), $this->writers->formats(), true) && $profile->getFormat() !== 'auto') {
                 $problems[] = sprintf('OpenImport cannot write %s files.', $profile->getFormat());

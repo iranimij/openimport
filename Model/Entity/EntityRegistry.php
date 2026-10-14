@@ -21,6 +21,7 @@ class EntityRegistry
     public const CUSTOMER_COMPOSITE = 'customer_composite';
     public const STOCK_SOURCES = 'stock_sources';
     public const STOCK_PRICE = 'openimport_stock_price';
+    public const ORDER = 'openimport_order';
 
     /**
      * What a Stock & prices profile may change (through core's product import, only existing products).

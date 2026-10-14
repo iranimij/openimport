@@ -34,3 +34,35 @@ nowhere. A live run delivers it and keeps a copy in the run folder for "Keep run
   (SKUs with leading zeros survive). Excel's limit of 1,048,575 rows is enforced with a plain message.
 - Destinations use the same encrypted secrets and the same SSRF, path and folder rules as sources
   (see [Sources](sources.md)).
+
+## Orders
+
+The **Orders** entity is OpenImport's own (Magento has no order export). One row per order line by default
+(order, customer, totals, billing and shipping address, payment, shipments and tracking numbers repeated on every
+line; child lines of configurable and bundle products left out unless chosen), or one row per order. Filters:
+statuses, created from/until (UTC), store views, and *Which orders*: all, only orders this profile has not
+exported before, or new and changed orders (an order whose `updated_at` moved after its export, for status
+changes). Exported orders are remembered per profile (`openimport_export_mark`) after a successful live run; dry
+runs remember nothing. Typical use: a nightly "new orders" file for an ERP over SFTP.
+
+Columns: `increment_id`, `state`, `status`, `created_at`, `updated_at`, `store_code`, `store_name`,
+`customer_email`, `customer_firstname`, `customer_lastname`, `customer_group`, `customer_is_guest`,
+`order_currency_code`, `subtotal`, `subtotal_incl_tax`, `discount_amount`, `discount_description`, `coupon_code`,
+`shipping_amount`, `shipping_incl_tax`, `tax_amount`, `grand_total`, `total_paid`, `total_refunded`, `total_due`,
+`total_qty_ordered`, `weight`, `shipping_method`, `shipping_description`, `payment_method`,
+`payment_last_trans_id`, `payment_po_number`, `customer_note`, `shipment_increment_ids`, `tracking_numbers`,
+`tracking_carriers`, `remote_ip`, `billing_*` and `shipping_*` (firstname, lastname, company, street, city,
+postcode, region, country_id, telephone, email, vat_id), and per line `item_id`, `item_sku`, `item_name`,
+`item_product_type`, `item_parent_sku`, `item_qty_ordered`, `item_qty_invoiced`, `item_qty_shipped`,
+`item_qty_refunded`, `item_qty_canceled`, `item_price`, `item_price_incl_tax`, `item_row_total`,
+`item_row_total_incl_tax`, `item_discount_amount`, `item_tax_amount`, `item_tax_percent`, `item_weight`,
+`item_product_options`. Amounts are in the order's currency without trailing zeros.
+
+## Destinations
+
+- **Download**: the file stays in the run folder, with a button on the run page.
+- **Server folder**: under `var/openimport/<path>` or an allowed absolute folder (created when missing). A file of
+  the same name is kept and the new one gets the date and time, or overwritten (profile setting).
+- **SFTP / FTP**: uploaded into the remote folder; same login settings and secrets as sources.
+- **E-mail**: attached (up to 10 MB) to an e-mail sent through the store's mail settings, template
+  *OpenImport: an exported file*.

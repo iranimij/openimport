@@ -1,0 +1,14 @@
+<!--@subject {{var subject}} @-->
+<!--@vars {
+"var profile_name":"Profile name",
+"var file_name":"File name",
+"var rows":"Number of rows",
+"var subject":"Subject",
+"template config_path=\"design/email/header_template\"":"Email Header Template",
+"template config_path=\"design/email/footer_template\"":"Email Footer Template"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<p>{{trans "The OpenImport profile <strong>%profile</strong> exported %rows row(s). The file <strong>%file</strong> is attached." profile=$profile_name rows=$rows file=$file_name |raw}}</p>
+
+{{template config_path="design/email/footer_template"}}

@@ -54,3 +54,7 @@ All notable changes to this project are documented here. The format follows
   (CSV/TSV, Excel .xlsx without a library, JSON, XML) with row filters, column mapping (rename, reorder, transforms,
   fixed values), file name placeholders and the formula guard; dry runs write without delivering; download from the
   run page. `number` transform takes a decimal separator. See docs/exports.md.
+- Order export (`openimport_order`): one row per order line or per order with totals, addresses, payment, shipments
+  and tracking; filters by status, date and store; "only new" and "new or changed" through export marks. Export
+  destinations: server folder, SFTP, FTP, e-mail attachment. Mapping editor in export mode (file column ← Magento
+  column, "Add every column"); output options (BOM, line ending, JSON root/pretty, XML root/record).

@@ -9,4 +9,6 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
     <template id="openimport_notify_run_finished" label="OpenImport: a run finished" file="run_finished.html"
               type="html" module="Iranimij_OpenImport" area="frontend"/>
+    <template id="openimport_export_file" label="OpenImport: an exported file" file="export_file.html"
+              type="html" module="Iranimij_OpenImport" area="frontend"/>
 </config>

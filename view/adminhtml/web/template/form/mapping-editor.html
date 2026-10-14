@@ -6,31 +6,35 @@
 -->
 <div class="admin__field openimport-mapping" visible="visible">
     <div class="openimport-mapping-toolbar">
-        <button type="button" class="action-secondary" click="autoMatch" disable="loadingFields || !columns.length">
+        <button type="button" class="action-secondary" click="autoMatch" disable="loadingFields || !columns.length" ifnot="isExport()">
             <span translate="'Auto-match'"></span>
         </button>
-        <button type="button" class="action-secondary" click="addRequired" disable="loadingFields || !fields.length">
+        <button type="button" class="action-secondary" click="addRequired" disable="loadingFields || !fields.length" ifnot="isExport()">
             <span translate="'Add required fields'"></span>
+        </button>
+        <button type="button" class="action-secondary" click="addAllColumns" disable="loadingFields || !fields.length" if="isExport()">
+            <span translate="'Add every column'"></span>
         </button>
         <button type="button" class="action-secondary" click="addRow">
             <span translate="'Add field'"></span>
         </button>
-        <button type="button" class="action-secondary" click="runPreview" disable="previewing">
+        <button type="button" class="action-secondary" click="runPreview" disable="previewing" ifnot="isExport()">
             <span translate="'Preview the first rows'"></span>
         </button>
         <span class="admin__field-note" role="status" if="loadingFields" translate="'Loading fields …'"></span>
     </div>
     <div class="message message-notice" role="status" if="notice" text="notice"></div>
-    <p class="admin__field-note" if="!entity" translate="'Choose what to import in step 1 first.'"></p>
+    <p class="admin__field-note" if="!entity" translate="'Choose what to import or export in step 1 first.'"></p>
+    <p class="admin__field-note" if="entity && isExport() && !rows().length" translate="'Without a mapping every column is exported as Magento names it. Add columns to rename, reorder or transform them.'"></p>
 
     <table class="data-grid openimport-mapping-table" if="rows().length">
         <thead>
         <tr>
-            <th class="data-grid-th" scope="col" translate="'Magento field'"></th>
+            <th class="data-grid-th" scope="col" text="isExport() ? $t('Column in the file') : $t('Magento field')"></th>
             <th class="data-grid-th" scope="col" translate="'Store view'" if="stores.length"></th>
-            <th class="data-grid-th" scope="col" translate="'From the file'"></th>
+            <th class="data-grid-th" scope="col" text="isExport() ? $t('From Magento') : $t('From the file')"></th>
             <th class="data-grid-th" scope="col" translate="'Transforms'"></th>
-            <th class="data-grid-th" scope="col" translate="'Required'"></th>
+            <th class="data-grid-th" scope="col" translate="'Required'" ifnot="isExport()"></th>
             <th class="data-grid-th" scope="col"><span class="admin__visually-hidden" translate="'Actions'"></span></th>
         </tr>
         </thead>
@@ -38,11 +42,11 @@
         <!-- ko foreach: { data: rows, as: 'row' } -->
         <tr>
             <td>
-                <select class="admin__control-select"
+                <select class="admin__control-select" ifnot="$parent.isExport()"
                         attr="'aria-label': $t('Magento field')"
                         options="$parent.fieldOptions(), optionsText\: 'label', optionsValue\: 'value', optionsCaption\: $t('Choose …'), value\: row.field, valueAllowUnset\: true"></select>
                 <input type="text" class="admin__control-text openimport-mapping-other"
-                       attr="'aria-label': $t('Other Magento field (code)'), placeholder: $t('or type a field code')"
+                       attr="'aria-label': $parent.isExport() ? $t('Column in the file') : $t('Other Magento field (code)'), placeholder: $parent.isExport() ? $t('Column name') : $t('or type a field code')"
                        ko-value="row.field">
             </td>
             <td if="$parent.stores.length">
@@ -52,7 +56,7 @@
             </td>
             <td>
                 <select class="admin__control-select"
-                        attr="'aria-label': $t('Column of the file')"
+                        attr="'aria-label': $parent.isExport() ? $t('Magento column') : $t('Column of the file')"
                         options="$parent.sourceOptions(), optionsText\: 'label', optionsValue\: 'value', value\: row.source, valueAllowUnset\: true"></select>
                 <input type="text" class="admin__control-text" if="!row.source()"
                        attr="'aria-label': $t('Fixed value'), placeholder: $t('Fixed value')"
@@ -107,7 +111,7 @@
                     </label>
                 </div>
             </td>
-            <td>
+            <td ifnot="$parent.isExport()">
                 <input type="checkbox" ko-checked="row.required" attr="'aria-label': $t('Empty is an error')">
             </td>
             <td>

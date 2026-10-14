@@ -60,6 +60,7 @@ define([
             fieldsUrl: '',
             previewUrl: '',
             entity: '',
+            direction: 'import',
             columns: [],
             catalogue: CATALOGUE,
             fields: [],
@@ -71,13 +72,16 @@ define([
             notice: '',
             imports: {
                 entity: '${ $.provider }:data.entity',
+                direction: '${ $.provider }:data.direction',
                 columns: 'openimport_profile_form.openimport_profile_form.file.sample:columns'
             },
             listens: {
                 entity: 'loadFields',
+                direction: 'loadFields',
                 columns: 'loadFields'
             },
             tracks: {
+                direction: true,
                 fields: true,
                 stores: true,
                 matches: true,
@@ -195,7 +199,12 @@ define([
                 url: this.fieldsUrl,
                 type: 'POST',
                 dataType: 'json',
-                data: {'form_key': window.FORM_KEY, entity: this.entity, columns: this.columns || []}
+                data: {
+                    'form_key': window.FORM_KEY,
+                    entity: this.entity,
+                    direction: this.direction || 'import',
+                    columns: this.columns || []
+                }
             }).done(function (response) {
                 self.fields = response.fields || [];
                 self.stores = response.stores || [];
@@ -219,12 +228,44 @@ define([
         },
 
         /**
+         * Exports map the other way round: the file column is typed, the value comes from a Magento column.
+         *
+         * @returns {Boolean}
+         */
+        isExport: function () {
+            return this.direction === 'export';
+        },
+
+        /**
          * @returns {Array}
          */
         sourceOptions: function () {
-            return [{value: '', label: $t('(fixed value)')}].concat(_.map(this.columns || [], function (column) {
+            var columns = this.isExport()
+                ? _.map(this.fields, function (field) {
+                    return field.code;
+                })
+                : this.columns || [];
+
+            return [{value: '', label: $t('(fixed value)')}].concat(_.map(columns, function (column) {
                 return {value: column, label: column};
             }));
+        },
+
+        /**
+         * Exports: one row per Magento column, named like the column (rows that exist are kept).
+         */
+        addAllColumns: function () {
+            var present = {};
+
+            _.each(this.rows(), function (row) {
+                present[row.field()] = true;
+            });
+            _.each(this.fields, function (field) {
+                if (!present[field.code]) {
+                    this.rows.push(this.makeRow({target: field.code, source: field.code}));
+                }
+            }, this);
+            this.sync();
         },
 
         /**

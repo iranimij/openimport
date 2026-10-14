@@ -107,6 +107,156 @@
                 </select>
             </formElements>
         </field>
+        <field name="order_rows" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">One row per</label>
+                <dataScope>export_options.order.rows</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">item</item>
+                                <item name="label" xsi:type="string" translate="true">Order line (order columns repeated)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">order</item>
+                                <item name="label" xsi:type="string" translate="true">Order</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="order_only" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="41">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Which orders</label>
+                <dataScope>export_options.order.only</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">all</item>
+                                <item name="label" xsi:type="string" translate="true">All that match</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">new</item>
+                                <item name="label" xsi:type="string" translate="true">Only orders not exported before by this profile</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">new_or_changed</item>
+                                <item name="label" xsi:type="string" translate="true">New orders and orders changed since their export</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="order_statuses" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="42">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Statuses</label>
+                <dataScope>export_options.order.statuses</dataScope>
+                <notice translate="true">Comma-separated status codes. Empty = every status.</notice>
+                <placeholder translate="true">pending, processing</placeholder>
+            </settings>
+        </field>
+        <field name="order_from" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="43">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Created from</label>
+                <dataScope>export_options.order.from</dataScope>
+                <notice translate="true">Date or date and time (UTC). Empty = no limit.</notice>
+                <placeholder translate="true">2026-01-01</placeholder>
+            </settings>
+        </field>
+        <field name="order_to" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="44">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Created until</label>
+                <dataScope>export_options.order.to</dataScope>
+                <placeholder translate="true">2026-12-31 23:59:59</placeholder>
+            </settings>
+        </field>
+        <field name="order_items" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="45">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Order lines</label>
+                <dataScope>export_options.order.items</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">parents</item>
+                                <item name="label" xsi:type="string" translate="true">Products as ordered (one line per configurable or bundle)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">all</item>
+                                <item name="label" xsi:type="string" translate="true">Every line, child products too</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
     </fieldset>
 
     <fieldset name="where" sortOrder="20">
@@ -581,6 +731,318 @@
                 <placeholder translate="true">products-{date}.{ext}</placeholder>
             </settings>
         </field>
+        <field name="dest_path_folder" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">folder</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Folder</label>
+                <dataScope>export_options.path</dataScope>
+                <notice translate="true">Under var/openimport, or an absolute path inside a folder allowed in the settings. Created when missing.</notice>
+                <placeholder translate="true">exports</placeholder>
+            </settings>
+        </field>
+        <field name="dest_overwrite" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="21">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">folder</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Same name already there</label>
+                <dataScope>export_options.overwrite</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string" translate="true">Keep both (add date and time to the new name)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string" translate="true">Overwrite</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="dest_host" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="22">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Server</label>
+                <dataScope>export_options.host</dataScope>
+                <placeholder translate="true">files.example.com</placeholder>
+            </settings>
+        </field>
+        <field name="dest_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="23">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Port</label>
+                <dataScope>export_options.port</dataScope>
+                <notice translate="true">Empty = 22 for SFTP, 21 for FTP.</notice>
+            </settings>
+        </field>
+        <field name="dest_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="24">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">User name</label>
+                <dataScope>export_options.username</dataScope>
+            </settings>
+        </field>
+        <field name="dest_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="25">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Login</label>
+                <dataScope>export_options.auth_sftp</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">password</item>
+                                <item name="label" xsi:type="string" translate="true">Password</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">key</item>
+                                <item name="label" xsi:type="string" translate="true">Private key</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="dest_password" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="26">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Password</label>
+                <dataScope>export_options.password</dataScope>
+                <notice translate="true">Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="dest_private_key" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="27">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="forAuth" xsi:type="array">
+                        <item name="0" xsi:type="string">key</item>
+                    </item>
+                    <item name="authScope" xsi:type="string">export_options</item>
+                    <item name="authField" xsi:type="string">auth_sftp</item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Private key</label>
+                <dataScope>export_options.private_key</dataScope>
+                <notice translate="true">OpenSSH or PEM private key for key login. Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="dest_passphrase" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="28">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="forAuth" xsi:type="array">
+                        <item name="0" xsi:type="string">key</item>
+                    </item>
+                    <item name="authScope" xsi:type="string">export_options</item>
+                    <item name="authField" xsi:type="string">auth_sftp</item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Key passphrase</label>
+                <dataScope>export_options.passphrase</dataScope>
+            </settings>
+        </field>
+        <field name="dest_ssl" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="29">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Encryption (FTPS)</label>
+                <dataScope>export_options.ssl</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string" translate="true">Explicit TLS (FTPS)</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="dest_passive" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Passive mode</label>
+                <dataScope>export_options.passive</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string" translate="true">Yes (usual)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="dest_path_remote" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="31">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Remote folder</label>
+                <dataScope>export_options.path</dataScope>
+                <notice translate="true">Empty = where the login lands.</notice>
+                <placeholder translate="true">/incoming</placeholder>
+            </settings>
+        </field>
+        <field name="dest_emails" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">email</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Send to</label>
+                <dataScope>export_options.emails</dataScope>
+                <notice translate="true">Comma-separated e-mail addresses.</notice>
+                <placeholder translate="true">erp@example.com, buyer@example.com</placeholder>
+            </settings>
+        </field>
+        <field name="dest_subject" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="33">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">email</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Subject</label>
+                <dataScope>export_options.subject</dataScope>
+                <notice translate="true">Empty = "OpenImport export: (profile name)".</notice>
+            </settings>
+        </field>
         <field name="source_test" component="Iranimij_OpenImport/js/form/test-source" formElement="input" sortOrder="90">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -670,6 +1132,138 @@
                 <dataScope>format_options.record_path</dataScope>
                 <notice translate="true">JSON: data.items · XML: /catalog/product or //product. Empty = detect.</notice>
             </settings>
+        </field>
+        <field name="out_bom" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="32">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">csv</item>
+                        <item name="1" xsi:type="string">auto</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">format</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Excel-friendly UTF-8 (BOM)</label>
+                <dataScope>format_options.bom</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string" translate="true">Yes</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="out_line_ending" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="33">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">csv</item>
+                        <item name="1" xsi:type="string">auto</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">format</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Line ending</label>
+                <dataScope>format_options.line_ending</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">lf</item>
+                                <item name="label" xsi:type="string" translate="true">LF (Linux, macOS)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">crlf</item>
+                                <item name="label" xsi:type="string" translate="true">CRLF (Windows)</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="out_root" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="61">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">xml</item>
+                        <item name="1" xsi:type="string">json</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">format</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Root element / key</label>
+                <dataScope>format_options.root</dataScope>
+                <notice translate="true">XML: the root element (default "export"). JSON: wrap the rows in an object under this key (default: a plain array).</notice>
+                <placeholder translate="true">export</placeholder>
+            </settings>
+        </field>
+        <field name="out_record" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="62">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">xml</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">format</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Record element</label>
+                <dataScope>format_options.record</dataScope>
+                <notice translate="true">Default "item".</notice>
+                <placeholder translate="true">item</placeholder>
+            </settings>
+        </field>
+        <field name="out_pretty" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="63">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">json</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">format</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Readable JSON (line breaks)</label>
+                <dataScope>format_options.pretty</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string" translate="true">Yes</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
         </field>
         <container name="sample" component="Iranimij_OpenImport/js/form/sample-table" sortOrder="70">
             <argument name="data" xsi:type="array">

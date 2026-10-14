@@ -17,15 +17,17 @@ define([
             forAuth: [],
             forDirection: 'import',
             authField: 'auth',
+            authScope: 'source_config',
+            typeField: 'source_type',
             sourceType: '',
             direction: 'import',
             auth: '',
             secret: false,
             storedNote: '',
             imports: {
-                sourceType: '${ $.provider }:data.source_type',
+                sourceType: '${ $.provider }:data.${ $.typeField }',
                 direction: '${ $.provider }:data.direction',
-                auth: '${ $.provider }:data.source_config.${ $.authField }'
+                auth: '${ $.provider }:data.${ $.authScope }.${ $.authField }'
             },
             listens: {
                 sourceType: 'refresh',

@@ -39,6 +39,10 @@ class EntityCodes
             // OpenImport's own entity, imported through core's product import.
             $codes[] = EntityRegistry::STOCK_PRICE;
         }
+        if ($direction === 'export') {
+            // OpenImport's own order export (core has none).
+            $codes[] = EntityRegistry::ORDER;
+        }
 
         return $codes;
     }

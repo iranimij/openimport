@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Controller\Adminhtml\Profile;
 
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
+use Iranimij\OpenImport\Model\Export\EntitySourcePool;
 use Iranimij\OpenImport\Model\Entity\FieldList;
 use Iranimij\OpenImport\Model\Mapping\AutoMatcher;
 use Magento\Backend\App\Action;
@@ -31,13 +32,15 @@ class Fields extends Action implements HttpPostActionInterface
      * @param EntityRegistry $entities
      * @param AutoMatcher $autoMatcher
      * @param StoreManagerInterface $storeManager
+     * @param EntitySourcePool $exportSources
      */
     public function __construct(
         Context $context,
         private readonly FieldList $fields,
         private readonly EntityRegistry $entities,
         private readonly AutoMatcher $autoMatcher,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly EntitySourcePool $exportSources
     ) {
         parent::__construct($context);
     }
@@ -50,6 +53,14 @@ class Fields extends Action implements HttpPostActionInterface
         /** @var Json $json */
         $json = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $entity = (string) $this->getRequest()->getParam('entity');
+        if ($this->getRequest()->getParam('direction') === 'export') {
+            $fields = [];
+            foreach ($this->exportSources->get($entity)->columns($entity) as $column) {
+                $fields[] = ['code' => $column, 'label' => $column, 'required' => false, 'identifier' => false];
+            }
+
+            return $json->setData(['fields' => $fields, 'stores' => [], 'matches' => []]);
+        }
         $fields = $this->fields->fields($entity);
         $info = $this->entities->resolve($entity, []);
         $stores = [];

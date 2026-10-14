@@ -144,10 +144,31 @@
             </argument>
         </arguments>
     </type>
+    <type name="Iranimij\OpenImport\Model\Export\EntitySourcePool">
+        <arguments>
+            <argument name="sources" xsi:type="array">
+                <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Export\Order\OrderEntitySource</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Iranimij\OpenImport\Model\Export\Destination\SftpDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
+        <arguments>
+            <argument name="protocol" xsi:type="string">sftp</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Export\Destination\FtpDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
+        <arguments>
+            <argument name="protocol" xsi:type="string">ftp</argument>
+        </arguments>
+    </virtualType>
     <type name="Iranimij\OpenImport\Model\Export\DestinationPool">
         <arguments>
             <argument name="destinations" xsi:type="array">
                 <item name="download" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\DownloadDestination</item>
+                <item name="folder" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\FolderDestination</item>
+                <item name="sftp" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\SftpDestination</item>
+                <item name="ftp" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\FtpDestination</item>
+                <item name="email" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\EmailDestination</item>
             </argument>
         </arguments>
     </type>

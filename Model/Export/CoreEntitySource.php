@@ -63,6 +63,15 @@ class CoreEntitySource implements EntitySourceInterface
     }
 
     /**
+     * Core entities export everything each time; nothing to remember.
+     *
+     * @inheritDoc
+     */
+    public function finish(ProfileInterface $profile, int $runId): void
+    {
+    }
+
+    /**
      * @inheritDoc
      */
     public function columns(string $entity): array

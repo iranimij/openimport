@@ -9,14 +9,11 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\Execution\Source;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
-use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\Execution\FetchedFile;
 use Iranimij\OpenImport\Model\Execution\SourceInterface;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
-use Magento\Framework\App\Filesystem\DirectoryList;
+use Iranimij\OpenImport\Model\Security\FolderSandbox;
 use Magento\Framework\Exception\FileSystemException;
-use Magento\Framework\Filesystem;
-use Magento\Framework\Filesystem\DriverInterface;
 
 /**
  * A folder on the Magento server, sandboxed: `var/openimport/<path>` for a relative path, or an absolute path inside
@@ -28,16 +25,12 @@ use Magento\Framework\Filesystem\DriverInterface;
  */
 class FolderSource implements SourceInterface
 {
-    public const BASE = 'openimport';
-
     /**
-     * @param Filesystem $filesystem
-     * @param Config $config
+     * @param FolderSandbox $sandbox
      * @param FileSelector $selector
      */
     public function __construct(
-        private readonly Filesystem $filesystem,
-        private readonly Config $config,
+        private readonly FolderSandbox $sandbox,
         private readonly FileSelector $selector
     ) {
     }
@@ -84,9 +77,9 @@ class FolderSource implements SourceInterface
         if ($reference === '' || $action === 'keep') {
             return;
         }
-        $driver = $this->driver();
+        $driver = $this->sandbox->driver();
         $directory = $this->directory($profile);
-        $real = $this->realPath($reference);
+        $real = $this->sandbox->realPath($reference);
         if ($real === null || !str_starts_with($real, $directory . '/')) {
             throw new PipelineException('The imported file is no longer in the source folder.');
         }
@@ -112,31 +105,12 @@ class FolderSource implements SourceInterface
      */
     public function directory(ProfileInterface $profile): string
     {
-        $path = trim((string) ($profile->getSourceConfig()['path'] ?? ''));
-        if ($path === '' || str_contains($path, "\0")) {
+        $path = (string) ($profile->getSourceConfig()['path'] ?? '');
+        if (trim($path) === '') {
             throw new PipelineException('Enter the server folder to read from.');
         }
-        $var = $this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
-        if (!str_starts_with($path, '/')) {
-            $relative = self::BASE . '/' . ltrim($path, '/');
-            if (str_contains('/' . $relative . '/', '/../')) {
-                throw new PipelineException('The folder may not contain "..".');
-            }
-            $path = $var->getAbsolutePath($relative);
-        }
-        $real = $this->realPath($path);
-        if ($real === null || !$this->driver()->isDirectory($real)) {
-            throw new PipelineException(sprintf('The folder %s does not exist.', $path));
-        }
-        foreach ($this->allowedRoots() as $root) {
-            if ($real === $root || str_starts_with($real, $root . '/')) {
-                return $real;
-            }
-        }
-        throw new PipelineException(sprintf(
-            'The folder %s is outside the allowed folders (var/openimport and the folders allowed in the settings).',
-            $real
-        ));
+
+        return $this->sandbox->resolve($path);
     }
 
     /**
@@ -148,7 +122,7 @@ class FolderSource implements SourceInterface
      */
     private function files(string $directory): array
     {
-        $driver = $this->driver();
+        $driver = $this->sandbox->driver();
         try {
             $files = [];
             foreach ($driver->readDirectory($directory) as $path) {
@@ -162,24 +136,6 @@ class FolderSource implements SourceInterface
         }
 
         return $files;
-    }
-
-    /**
-     * @return string[] real paths of var/openimport and the allowed folders
-     */
-    private function allowedRoots(): array
-    {
-        $var = $this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
-        $var->create(self::BASE);
-        $roots = [];
-        foreach (array_merge([$var->getAbsolutePath(self::BASE)], $this->config->getAllowedFolders()) as $root) {
-            $real = $this->realPath((string) $root);
-            if ($real !== null) {
-                $roots[] = rtrim($real, '/');
-            }
-        }
-
-        return $roots;
     }
 
     /**
@@ -203,7 +159,7 @@ class FolderSource implements SourceInterface
     private function freeName(string $folder, string $name): string
     {
         $target = $folder . '/' . $name;
-        if (!$this->driver()->isExists($target)) {
+        if (!$this->sandbox->driver()->isExists($target)) {
             return $target;
         }
         $info = new \SplFileInfo($name);
@@ -211,24 +167,5 @@ class FolderSource implements SourceInterface
         $stem = $extension === '' ? $name : substr($name, 0, -strlen($extension) - 1);
 
         return $folder . '/' . $stem . '-' . gmdate('Ymd-His') . ($extension === '' ? '' : '.' . $extension);
-    }
-
-    /**
-     * @param string $path
-     * @return string|null
-     */
-    private function realPath(string $path): ?string
-    {
-        $real = (new \SplFileInfo($path))->getRealPath();
-
-        return $real === false ? null : rtrim($real, '/');
-    }
-
-    /**
-     * @return DriverInterface
-     */
-    private function driver(): DriverInterface
-    {
-        return $this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)->getDriver();
     }
 }

@@ -115,9 +115,12 @@ class SourcesTest extends TestCase
     public function testFolderSourceStaysInsideTheAllowedFolders(): void
     {
         $source = Bootstrap::getObjectManager()->get(FolderSource::class);
+        $factory = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class);
         foreach (['../../app/etc', '/etc', '/tmp'] as $path) {
+            // Not saved: the validator refuses ".." already; the source itself must refuse the rest.
+            $profile = $factory->create()->setSourceType('folder')->setSourceConfig(['path' => $path]);
             try {
-                $source->directory($this->profile('folder', ['path' => $path]));
+                $source->directory($profile);
                 self::fail($path . ' must be refused');
             } catch (PipelineException $exception) {
                 self::assertMatchesRegularExpression('/outside the allowed folders|may not contain|does not exist/', $exception->getMessage(), $path);

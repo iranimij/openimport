@@ -148,10 +148,18 @@ class AdminTest extends AbstractBackendController
         return $body;
     }
 
-    public function testGridsAndForm(): void
+    public function testProfileGrid(): void
     {
         self::assertStringContainsString('openimport_profile_listing', $this->page('backend/openimport/profile/index'));
+    }
+
+    public function testRunGrid(): void
+    {
         self::assertStringContainsString('openimport_run_listing', $this->page('backend/openimport/run/index'));
+    }
+
+    public function testProfileForm(): void
+    {
         $body = $this->page('backend/openimport/profile/new');
         self::assertStringContainsString('openimport_profile_form', $body);
         self::assertStringNotContainsString('<script>alert', $body);
@@ -243,10 +251,10 @@ class AdminTest extends AbstractBackendController
         self::assertSame('Upload a file first.', $this->json()['error']);
     }
 
-    public function testRunPageConfirmAndReports(): void
+    public function testRunPageAndErrorReport(): void
     {
         $prefix = 'OI-ADM-' . bin2hex(random_bytes(3));
-        $token = $this->upload("sku,name,price\n{$prefix}-1,One,10\n{$prefix}-2,Two,abc\n");
+        $token = $this->upload("sku,name,price\n{$prefix}-1,One {$prefix},10\n{$prefix}-2,Two {$prefix},abc\n");
         $profile = $this->profile($token);
 
         $this->post('backend/openimport/profile/run', ['id' => $profile->getProfileId(), 'mode' => 'dry_run']);
@@ -274,14 +282,20 @@ class AdminTest extends AbstractBackendController
             $report = (string) file_get_contents(Bootstrap::getObjectManager()->get(Filesystem::class)
                 ->getDirectoryRead(DirectoryList::VAR_DIR)->getAbsolutePath('openimport/runs/' . $runId . '/errors.csv'));
         }
-        self::assertStringContainsString('Row,Record,Field,Error,sku,name,price', $report);
+        self::assertStringContainsString('Row,Record,Field,Error', $report);
+        self::assertStringContainsString($prefix . '-2,price,', $report);
+    }
 
-        // A fixed file runs for real from the run page.
-        $fixed = $this->upload("sku,name,price\n{$prefix}-1,One,10\n{$prefix}-2,Two,12\n");
-        $profile = Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save(
-            $profile->setSourceConfig(['file' => $fixed, 'file_name' => 'products.csv'])
-        );
-        $this->fresh();
+    /**
+     * One rendered page per test: the shared layout keeps the first page it rendered.
+     */
+    public function testConfirmFromTheDryRunPage(): void
+    {
+        $prefix = 'OI-ADC-' . bin2hex(random_bytes(3));
+        $token = $this->upload("sku,name,price\n{$prefix}-1,One {$prefix},10\n{$prefix}-2,Two {$prefix},12\n");
+        $profile = $this->profile($token);
+        $runs = Bootstrap::getObjectManager()->get(RunRepositoryInterface::class);
+
         $this->post('backend/openimport/profile/run', ['id' => $profile->getProfileId(), 'mode' => 'dry_run']);
         $dryId = $this->redirectedRunId();
         Bootstrap::getObjectManager()->get(RunProcessor::class)->process($dryId);

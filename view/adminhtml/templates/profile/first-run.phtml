@@ -1,0 +1,18 @@
+<?php
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+
+/** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Iranimij\OpenImport\ViewModel\FirstRun $viewModel */
+$viewModel = $block->getData('view_model');
+?>
+<?php if ($viewModel->isFirstRun()): ?>
+<div class="message message-notice openimport-first-run" role="status">
+    <strong><?= $escaper->escapeHtml(__('Welcome to OpenImport.')) ?></strong>
+    <?= $escaper->escapeHtml(__('Open a sample profile or add your own, upload a file and press "Save and dry run": nothing is written until you run it for real. Runs are processed by Magento\'s cron within a minute; "bin/magento openimport:doctor" checks that cron and the indexers are set up well.')) ?>
+    <a href="https://github.com/iranimij/openimport#readme" target="_blank" rel="noopener"><?= $escaper->escapeHtml(__('Documentation')) ?></a>
+</div>
+<?php endif; ?>

@@ -12,6 +12,11 @@
     </head>
     <body>
         <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template" name="openimport.first_run" template="Iranimij_OpenImport::profile/first-run.phtml" before="-">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Iranimij\OpenImport\ViewModel\FirstRun</argument>
+                </arguments>
+            </block>
             <uiComponent name="openimport_profile_listing"/>
         </referenceContainer>
     </body>

@@ -60,3 +60,5 @@ All notable changes to this project are documented here. The format follows
   column, "Add every column"); output options (BOM, line ending, JSON root/pretty, XML root/record).
 - CLI: `openimport:profiles:export` / `openimport:profiles:import` (JSON without secrets, dry run, all or nothing),
   `openimport:doctor` (cron, indexers, PHP, folders, stuck runs).
+- Two sample profiles on first install (schedules off), a first-run notice on the profiles page, and an admin
+  system message while runs wait but cron has not run OpenImport's job.

@@ -414,3 +414,7 @@
 "Without a mapping every column is exported as Magento names it. Add columns to rename, reorder or transform them.","Without a mapping every column is exported as Magento names it. Add columns to rename, reorder or transform them."
 "XML: the root element (default ""export""). JSON: wrap the rows in an object under this key (default: a plain array).","XML: the root element (default ""export""). JSON: wrap the rows in an object under this key (default: a plain array)."
 "Yes","Yes"
+"Welcome to OpenImport.","Welcome to OpenImport."
+"Open a sample profile or add your own, upload a file and press ""Save and dry run"": nothing is written until you run it for real. Runs are processed by Magento's cron within a minute; ""bin/magento openimport:doctor"" checks that cron and the indexers are set up well.","Open a sample profile or add your own, upload a file and press ""Save and dry run"": nothing is written until you run it for real. Runs are processed by Magento's cron within a minute; ""bin/magento openimport:doctor"" checks that cron and the indexers are set up well."
+"Documentation","Documentation"
+"OpenImport: runs are waiting, but Magento's cron has not run OpenImport's job in the last 10 minutes. Set up cron (bin/magento cron:run every minute) or run bin/magento openimport:queue:run. <a href=""%1"">Runs</a>","OpenImport: runs are waiting, but Magento's cron has not run OpenImport's job in the last 10 minutes. Set up cron (bin/magento cron:run every minute) or run bin/magento openimport:queue:run. <a href=""%1"">Runs</a>"

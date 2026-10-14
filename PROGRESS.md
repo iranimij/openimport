@@ -39,6 +39,7 @@ Iman's Mac (`~/Projects/openimport-dev-env`, Warden) whenever the laptop is open
 | M3 S4a export engine: writers (CSV, XLSX, JSON, XML), core entity source, export mapping, runner, download destination, `docs/exports.md` | PR open: `feat/m3-s4-export-writers` |
 | M3 S4b order export, export marks, folder/SFTP/FTP/e-mail destinations, mapping editor export mode, form fields | PR open: `feat/m3-s4b-orders-destinations` |
 | M3 S5 CLI: profiles export/import (JSON, all or nothing), doctor | PR open: `feat/m3-s5-cli-doctor` |
+| M3 S6 sample profiles, first-run notice, cron system message | PR open: `feat/m3-s6-admin-polish` |
 
 ## Exact next step
 

@@ -71,6 +71,8 @@ class AdminTest extends AbstractBackendController
         $this->resetRequest();
         // The application object keeps the request it was built with: a new one for the new request.
         $this->_objectManager->removeSharedInstance(\Magento\Framework\App\Http::class);
+        // Building any admin URL turns the secret key back on (Url::_setRouteParams); the next request must not need it.
+        $this->_objectManager->get(\Magento\Backend\Model\UrlInterface::class)->turnOffSecretKey();
         $response = $this->getResponse();
         if ($response instanceof \Magento\Framework\HTTP\PhpEnvironment\Response) {
             $response->clearBody();

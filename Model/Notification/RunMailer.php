@@ -127,6 +127,22 @@ class RunMailer
     }
 
     /**
+     * The default store view, which e-mails are rendered for.
+     *
+     * @return int
+     */
+    private function storeId(): int
+    {
+        try {
+            $store = $this->storeManager->getDefaultStoreView();
+
+            return $store === null ? Store::DEFAULT_STORE_ID : (int) $store->getId();
+        } catch (\Throwable $exception) {
+            return Store::DEFAULT_STORE_ID;
+        }
+    }
+
+    /**
      * @param ProfileInterface $profile
      * @param RunInterface $run
      * @return array<string, string>

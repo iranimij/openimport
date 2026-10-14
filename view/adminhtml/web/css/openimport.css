@@ -131,3 +131,9 @@
     align-items: flex-end;
     margin: 1rem 0 2rem;
 }
+
+/* Links in the run summary: underlined and dark enough to read next to the muted status text. */
+.openimport-run .admin__page-section p a {
+    color: #006bb4;
+    text-decoration: underline;
+}

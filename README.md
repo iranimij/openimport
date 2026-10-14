@@ -64,6 +64,13 @@ import supports them), advanced pricing, customers, customer addresses, customer
 the fast *Stock & prices* update (existing products only), and order export. Anything Magento's own import can do
 with a CSV, OpenImport does with a mapped file.
 
+## How it compares
+
+A feature-by-feature table against Firebear Improved Import & Export, Amasty Import and Export, Xtento and Magento's
+built-in import, from their public docs: [docs/comparison.md](docs/comparison.md). In short: the paid tools have
+more entities and cloud drives today (that is 1.1 and 1.2); OpenImport has the dry run with a field-level preview,
+the typed safety confirmation, delta mode, schedules on Open Source, and no price.
+
 ## Why not Magento's built-in import?
 
 Core import wants a CSV in its own column layout, imports everything or nothing, and tells you about errors only

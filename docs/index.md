@@ -19,6 +19,9 @@ runs; `bin/magento openimport:doctor` tells you whether it does.
 
 ## Where to start
 
+Coming from a paid tool? [How OpenImport compares](comparison.md) with Firebear, Amasty, Xtento and Magento's own import.
+
+
 1. [Admin](admin.md): the profile form step by step, the run page, grids and roles.
 2. [Mapping and filters](mapping.md): columns, store views, auto-match, row filters.
 3. [Transforms and expressions](transforms.md): what you can do with a value on its way in.

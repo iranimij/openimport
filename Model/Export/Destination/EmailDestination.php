@@ -18,6 +18,7 @@ use Magento\Framework\App\Area;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * The file as an e-mail attachment (export_options.emails, comma-separated; subject optional), through the store's
@@ -30,10 +31,12 @@ class EmailDestination implements DestinationInterface
     /**
      * @param AttachmentTransportBuilder $transportBuilder
      * @param Filesystem $filesystem
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         private readonly AttachmentTransportBuilder $transportBuilder,
-        private readonly Filesystem $filesystem
+        private readonly Filesystem $filesystem,
+        private readonly StoreManagerInterface $storeManager
     ) {
     }
 
@@ -60,7 +63,7 @@ class EmailDestination implements DestinationInterface
         try {
             $this->transportBuilder
                 ->setTemplateIdentifier('openimport_export_file')
-                ->setTemplateOptions(['area' => Area::AREA_ADMINHTML, 'store' => Store::DEFAULT_STORE_ID])
+                ->setTemplateOptions(['area' => Area::AREA_FRONTEND, 'store' => $this->storeId()])
                 ->setTemplateVars([
                     'profile_name' => $profile->getName(),
                     'file_name' => $name,
@@ -105,5 +108,21 @@ class EmailDestination implements DestinationInterface
         }
 
         return $emails;
+    }
+
+    /**
+     * The default store view, which e-mails are rendered for (header and footer templates are frontend ones).
+     *
+     * @return int
+     */
+    private function storeId(): int
+    {
+        try {
+            $store = $this->storeManager->getDefaultStoreView();
+
+            return $store === null ? Store::DEFAULT_STORE_ID : (int) $store->getId();
+        } catch (\Throwable $exception) {
+            return Store::DEFAULT_STORE_ID;
+        }
     }
 }

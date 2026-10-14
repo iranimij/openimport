@@ -19,6 +19,7 @@ define([
             busy: false,
             ok: null,
             message: '',
+            sample: null,
             direction: 'import',
             imports: {
                 sourceType: '${ $.provider }:data.source_type',
@@ -31,7 +32,8 @@ define([
             tracks: {
                 busy: true,
                 ok: true,
-                message: true
+                message: true,
+                sample: true
             }
         },
 
@@ -74,6 +76,9 @@ define([
                 self.busy = false;
                 self.ok = !!response.ok;
                 self.message = response.message || '';
+                if (response.sample) {
+                    self.sample = response.sample;
+                }
             }).fail(function () {
                 self.busy = false;
                 self.ok = false;

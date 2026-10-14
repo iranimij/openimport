@@ -24,11 +24,13 @@ define([
             loading: false,
             imports: {
                 uploaded: 'openimport_profile_form.openimport_profile_form.where.upload:sample',
+                tested: 'openimport_profile_form.openimport_profile_form.where.source_test:sample',
                 format: '${ $.provider }:data.format',
                 options: '${ $.provider }:data.format_options'
             },
             listens: {
                 uploaded: 'apply',
+                tested: 'apply',
                 format: 'reload',
                 options: 'reload'
             },

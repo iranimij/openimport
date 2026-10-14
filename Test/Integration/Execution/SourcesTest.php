@@ -69,7 +69,7 @@ class SourcesTest extends TestCase
         return Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save($profile);
     }
 
-    private function run(ProfileInterface $profile, string $mode = RunInterface::MODE_LIVE): RunInterface
+    private function process(ProfileInterface $profile, string $mode = RunInterface::MODE_LIVE): RunInterface
     {
         $run = Bootstrap::getObjectManager()->get(RunQueue::class)->queue($profile, $mode, RunInterface::TRIGGER_CLI);
 
@@ -91,11 +91,11 @@ class SourcesTest extends TestCase
         $resolver = Bootstrap::getObjectManager()->get(SourceResolver::class);
         self::assertStringContainsString('the next run reads stock-new.csv', $resolver->source($profile)->test($profile));
 
-        $dry = $this->run($profile, RunInterface::MODE_DRY_RUN);
+        $dry = $this->process($profile, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $dry->getStatus(), $dry->getMessage());
         self::assertTrue($var->isExist($folder . '/stock-new.csv'), 'a dry run leaves the file where it is');
 
-        $live = $this->run($profile);
+        $live = $this->process($profile);
         self::assertSame(RunInterface::STATUS_SUCCESS, $live->getStatus(), $live->getMessage());
         self::assertSame(1, $live->getCount('created'));
         self::assertFalse($var->isExist($folder . '/stock-new.csv'));
@@ -103,11 +103,11 @@ class SourcesTest extends TestCase
         self::assertTrue($var->isExist($folder . '/stock-old.csv'));
 
         $delete = $this->profile('folder', ['path' => 'it-' . $tag, 'pattern' => 'stock-*.csv'], 'delete');
-        $second = $this->run($delete);
+        $second = $this->process($delete);
         self::assertSame(RunInterface::STATUS_SUCCESS, $second->getStatus(), $second->getMessage());
         self::assertFalse($var->isExist($folder . '/stock-old.csv'));
 
-        $empty = $this->run($delete);
+        $empty = $this->process($delete);
         self::assertSame(RunInterface::STATUS_FAILED, $empty->getStatus());
         self::assertStringContainsString('No file matches "stock-*.csv" (1 file(s) in the folder)', $empty->getMessage());
     }

@@ -241,18 +241,31 @@ class UrlSource implements SourceInterface
         if (preg_match('/filename\*=(?:UTF-8\'\')?([^;]+)/i', $disposition, $match) === 1
             || preg_match('/filename="?([^";]+)"?/i', $disposition, $match) === 1) {
             $name = urldecode(trim($match[1], " \t\""));
-            $name = (new \SplFileInfo(str_replace('\\', '/', $name)))->getFilename();
+            $name = self::lastSegment(str_replace('\\', '/', $name));
             if ($name !== '') {
                 return $name;
             }
         }
         $path = (string) ($parts['path'] ?? '');
-        $last = (new \SplFileInfo($path))->getFilename();
+        $last = self::lastSegment($path);
         if ($last !== '' && str_contains($last, '.')) {
             return $last;
         }
 
         return 'download.' . (self::EXTENSIONS[$type] ?? 'csv');
+    }
+
+    /**
+     * The part after the last slash (SplFileInfo keeps the slash of "/name" on some PHP versions).
+     *
+     * @param string $path
+     * @return string
+     */
+    private static function lastSegment(string $path): string
+    {
+        $pos = strrpos($path, '/');
+
+        return $pos === false ? $path : substr($path, $pos + 1);
     }
 
     /**

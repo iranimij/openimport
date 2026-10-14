@@ -143,9 +143,11 @@ class OrderExportTest extends TestCase
         self::assertSame(count(array_unique($perOrderIds)), count($perOrderIds), 'one row per order');
         self::assertArrayNotHasKey('item_sku', $perOrder[0]);
 
-        $status = $this->rows($this->process($this->profile(['statuses' => 'complete'])));
+        // Filter by a status the fixture orders really have (core's order list differs between versions).
+        $wanted = (string) $perOrder[0]['status'];
+        $status = $this->rows($this->process($this->profile(['statuses' => $wanted])));
         self::assertNotEmpty($status);
-        self::assertSame(['complete'], array_values(array_unique(array_column($status, 'status'))));
+        self::assertSame([$wanted], array_values(array_unique(array_column($status, 'status'))));
 
         $none = $this->process($this->profile(['from' => '2099-01-01']));
         self::assertStringContainsString('Nothing to export', $none->getMessage());
@@ -182,6 +184,7 @@ class OrderExportTest extends TestCase
         self::assertStringContainsString('Written to', $run->getMessage());
         $content = $var->readFile($written);
         self::assertStringStartsWith("Bestellnummer,Summe\n", $content);
-        self::assertMatchesRegularExpression('/^1000000\d,\d+,\d{2}$/m', $content);
+        // The decimal comma makes the cell a quoted one.
+        self::assertMatchesRegularExpression('/^1000000\d,"\d+,\d{2}"$/m', $content);
     }
 }

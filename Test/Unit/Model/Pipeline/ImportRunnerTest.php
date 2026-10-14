@@ -443,6 +443,18 @@ class ImportRunnerTest extends TestCase
         self::assertSame('catalog_product', $this->core->lastRequest()->entity);
         self::assertSame([['sku' => 'A-1', 'qty' => '5']], $this->core->rows);
 
+        // An empty price cell means "leave unchanged": Magento gets the current price instead of an empty required cell.
+        $this->shop->records['a-1']['price'] = '12.5';
+        $this->execute(
+            $this->profile([
+                'entity' => 'openimport_stock_price',
+                'mapping' => [['target' => 'sku', 'source' => 'sku'], ['target' => 'qty', 'source' => 'qty'], ['target' => 'price', 'source' => 'price']],
+            ]),
+            $this->newRun(),
+            $this->file("sku,qty,price\nA-1,5,\n")
+        );
+        self::assertSame([['sku' => 'A-1', 'qty' => '5', 'price' => '12.5']], $this->core->rows);
+
         $this->expectException(PipelineException::class);
         $this->expectExceptionMessage('openimport_stock_price only updates existing records');
         $this->execute(

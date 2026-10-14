@@ -64,21 +64,21 @@ class AdminTest extends AbstractBackendController
     }
 
     /**
-     * @param string $uri
-     * @param array<string, mixed> $data
-     * @return void
-     */
-    /**
      * A fresh request and an empty response body (Magento appends every rendered page to the shared response).
      */
     private function fresh(): void
     {
-        $this->fresh();
+        $this->resetRequest();
         $this->_objectManager->removeSharedInstance(\Magento\Framework\App\ResponseInterface::class);
         $this->_objectManager->removeSharedInstance(\Magento\Framework\App\Response\Http::class);
         $this->_response = null;
     }
 
+    /**
+     * @param string $uri
+     * @param array<string, mixed> $data
+     * @return void
+     */
     private function post(string $uri, array $data): void
     {
         $formKey = $this->_objectManager->get(FormKey::class)->getFormKey();

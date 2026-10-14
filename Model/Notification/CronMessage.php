@@ -65,7 +65,7 @@ class CronMessage implements MessageInterface
      */
     public function getText()
     {
-        return __(
+        return (string) __(
             'OpenImport: runs are waiting, but Magento\'s cron has not run OpenImport\'s job in the last 10 minutes. '
             . 'Set up cron (bin/magento cron:run every minute) or run bin/magento openimport:queue:run. <a href="%1">Runs</a>',
             $this->urlBuilder->getUrl('openimport/run/index')

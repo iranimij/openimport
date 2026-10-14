@@ -41,7 +41,8 @@ class CaptureAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * @param string[] $headerColumns
+     * @return $this
      */
     public function setHeaderCols(array $headerColumns)
     {
@@ -55,7 +56,8 @@ class CaptureAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * @param array<string, mixed> $rowData
+     * @return $this
      */
     public function writeRow(array $rowData)
     {

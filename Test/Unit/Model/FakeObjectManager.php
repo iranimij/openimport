@@ -23,7 +23,9 @@ class FakeObjectManager implements ObjectManagerInterface
     }
 
     /**
-     * @inheritDoc
+     * @param string $type
+     * @param array<string, mixed> $arguments
+     * @return mixed
      */
     public function create($type, array $arguments = [])
     {
@@ -47,7 +49,8 @@ class FakeObjectManager implements ObjectManagerInterface
     }
 
     /**
-     * @inheritDoc
+     * @param array<string, mixed> $configuration
+     * @return void
      */
     public function configure(array $configuration)
     {

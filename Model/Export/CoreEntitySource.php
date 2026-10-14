@@ -73,10 +73,8 @@ class CoreEntitySource implements EntitySourceInterface
             return [];
         }
         $columns = [];
-        if ($adapter instanceof EavEntity || $adapter instanceof LegacyEntity) {
-            foreach ($adapter->getAttributeCollection() as $attribute) {
-                $columns[] = (string) $attribute->getAttributeCode();
-            }
+        foreach ($adapter->getAttributeCollection() as $attribute) {
+            $columns[] = (string) $attribute->getAttributeCode();
         }
 
         return array_values(array_unique(array_merge($this->permanentColumns($entity), $columns)));

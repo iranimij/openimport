@@ -107,7 +107,8 @@ class ExportRunner
                     }
                 }
             );
-        } catch (WriterException $exception) {
+        } catch (\RuntimeException $exception) {
+            // Writers throw WriterException (a RuntimeException) from inside the callbacks.
             throw new PipelineException($exception->getMessage(), 0, $exception);
         } finally {
             $writer->close();

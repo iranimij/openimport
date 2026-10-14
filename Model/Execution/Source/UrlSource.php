@@ -241,13 +241,13 @@ class UrlSource implements SourceInterface
         if (preg_match('/filename\*=(?:UTF-8\'\')?([^;]+)/i', $disposition, $match) === 1
             || preg_match('/filename="?([^";]+)"?/i', $disposition, $match) === 1) {
             $name = urldecode(trim($match[1], " \t\""));
-            $name = self::lastSegment(str_replace('\\', '/', $name));
+            $name = $this->lastSegment(str_replace('\\', '/', $name));
             if ($name !== '') {
                 return $name;
             }
         }
         $path = (string) ($parts['path'] ?? '');
-        $last = self::lastSegment($path);
+        $last = $this->lastSegment($path);
         if ($last !== '' && str_contains($last, '.')) {
             return $last;
         }
@@ -261,7 +261,7 @@ class UrlSource implements SourceInterface
      * @param string $path
      * @return string
      */
-    private static function lastSegment(string $path): string
+    private function lastSegment(string $path): string
     {
         $pos = strrpos($path, '/');
 

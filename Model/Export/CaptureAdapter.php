@@ -46,10 +46,13 @@ class CaptureAdapter extends AbstractAdapter
      */
     public function setHeaderCols(array $headerColumns)
     {
-        $this->_headerCols = array_flip(array_map('strval', $headerColumns));
+        // Core may name a column twice (sku is permanent and an attribute); its own CSV writer flips the list, which
+        // keeps one. The file must have each column once too.
+        $columns = array_values(array_unique(array_map('strval', $headerColumns)));
+        $this->_headerCols = array_flip($columns);
         if (!$this->headerSent && $this->onHeader !== null) {
             $this->headerSent = true;
-            ($this->onHeader)(array_values(array_map('strval', $headerColumns)));
+            ($this->onHeader)($columns);
         }
 
         return $this;

@@ -64,7 +64,7 @@ class SchedulerTest extends TestCase
         );
     }
 
-    private function at(string $time): \DateTimeImmutable
+    private function moment(string $time): \DateTimeImmutable
     {
         return new \DateTimeImmutable($time, new \DateTimeZone('UTC'));
     }

@@ -24,6 +24,7 @@ use Magento\Framework\App\Config\MutableScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Filesystem;
+use Magento\Store\Model\ScopeInterface;
 use Magento\TestFramework\Fixture\AppArea;
 use Magento\TestFramework\Fixture\DbIsolation;
 use Magento\TestFramework\Helper\Bootstrap;
@@ -70,8 +71,11 @@ class SchedulerTest extends TestCase
 
     protected function setUp(): void
     {
-        Bootstrap::getObjectManager()->get(MutableScopeConfigInterface::class)
-            ->setValue('general/locale/timezone', 'Europe/Berlin');
+        // The scheduler reads the store's time zone (store scope), as TimezoneInterface does.
+        $config = Bootstrap::getObjectManager()->get(MutableScopeConfigInterface::class);
+        $config->setValue('general/locale/timezone', 'Europe/Berlin');
+        $config->setValue('general/locale/timezone', 'Europe/Berlin', ScopeInterface::SCOPE_STORE, 'default');
+        $config->setValue('general/locale/timezone', 'Europe/Berlin', ScopeInterface::SCOPE_STORE);
     }
 
     public function testEachDueMinuteFiresOnce(): void

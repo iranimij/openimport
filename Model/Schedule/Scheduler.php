@@ -51,7 +51,7 @@ class Scheduler
         $zone = new \DateTimeZone($this->timezone->getConfigTimezone() ?: 'UTC');
         $now = ($now ?? new \DateTimeImmutable('now'))->setTimezone($zone);
         $collection = $this->profiles->create()
-            ->addFieldToFilter(ProfileInterface::IS_ACTIVE, 1)
+            ->addFieldToFilter(ProfileInterface::IS_ACTIVE, ['eq' => 1])
             ->addFieldToFilter(ProfileInterface::SCHEDULE, ['notnull' => true]);
         $queued = [];
         foreach ($collection as $profile) {

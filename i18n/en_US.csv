@@ -372,3 +372,4 @@
 "File name","File name"
 "Placeholders: {entity}, {profile}, {date}, {time}, {datetime}, {run}, {ext}. Empty = {entity}-{datetime}.{ext}","Placeholders: {entity}, {profile}, {date}, {time}, {datetime}, {run}, {ext}. Empty = {entity}-{datetime}.{ext}"
 "products-{date}.{ext}","products-{date}.{ext}"
+"Decimal separator (. or ,)","Decimal separator (. or ,)"

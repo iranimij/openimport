@@ -27,7 +27,7 @@ define([
         {name: 'suffix', label: $t('Add at the end'), args: [$t('Text')]},
         {name: 'default', label: $t('Value when empty'), args: [$t('Value')]},
         {name: 'decimal_comma', label: $t('Decimal comma → dot'), args: []},
-        {name: 'number', label: $t('Number'), args: [$t('Decimals (optional)')]},
+        {name: 'number', label: $t('Number'), args: [$t('Decimals (optional)'), $t('Decimal separator (. or ,)')]},
         {name: 'math', label: $t('Calculate'), args: [$t('Operator + - * /'), $t('Number')]},
         {name: 'round', label: $t('Round'), args: [$t('Decimals'), $t('Mode: half_up, up, down, ending'), $t('Ending, e.g. .99')]},
         {name: 'price_adjust', label: $t('Change price by %'), args: [$t('Percent, e.g. 15 or -10'), $t('Decimals')]},

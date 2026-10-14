@@ -13,7 +13,7 @@
                accept=".csv,.tsv,.txt,.xlsx,.json,.xml"
                attr="id: uid, 'aria-describedby': uid + '-note'"
                event="change: upload"
-               disable="uploading"/>
+               disable="uploading">
         <div class="admin__field-note" attr="id: uid + '-note'">
             <!-- ko if: fileName -->
             <span text="$t('Current file\:')"></span> <strong text="fileName"></strong>

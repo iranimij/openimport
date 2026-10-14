@@ -43,7 +43,7 @@
                         options="$parent.fieldOptions(), optionsText\: 'label', optionsValue\: 'value', optionsCaption\: $t('Choose …'), value\: row.field, valueAllowUnset\: true"></select>
                 <input type="text" class="admin__control-text openimport-mapping-other"
                        attr="'aria-label': $t('Other Magento field (code)'), placeholder: $t('or type a field code')"
-                       value="row.field"/>
+                       value="row.field">
             </td>
             <td if="$parent.stores.length">
                 <select class="admin__control-select"
@@ -56,7 +56,7 @@
                         options="$parent.sourceOptions(), optionsText\: 'label', optionsValue\: 'value', value\: row.source, valueAllowUnset\: true"></select>
                 <input type="text" class="admin__control-text" if="!row.source()"
                        attr="'aria-label': $t('Fixed value'), placeholder: $t('Fixed value')"
-                       value="row.staticValue"/>
+                       value="row.staticValue">
             </td>
             <td>
                 <ul class="openimport-chips">
@@ -82,7 +82,7 @@
                     <!-- ko foreach: row.addArgs -->
                     <input type="text" class="admin__control-text"
                            attr="'aria-label': label, placeholder: label"
-                           value="value"/>
+                           value="value">
                     <!-- /ko -->
                     <button type="button" class="action-secondary" if="row.addName()"
                             click="function () { $parent.addTransform(row); }">
@@ -98,17 +98,17 @@
                               value="row.valueMap"></textarea>
                     <div class="admin__field-note" text="$t('One pair per line\: from => to. Add the transform “Value map” to use it.')"></div>
                     <label>
-                        <input type="checkbox" checked="row.caseSensitive"/>
+                        <input type="checkbox" checked="row.caseSensitive">
                         <span translate="'Case matters'"></span>
                     </label>
                     <label>
-                        <input type="checkbox" checked="row.strict"/>
+                        <input type="checkbox" checked="row.strict">
                         <span translate="'Values not in the map are errors'"></span>
                     </label>
                 </div>
             </td>
             <td>
-                <input type="checkbox" checked="row.required" attr="'aria-label': $t('Empty is an error')"/>
+                <input type="checkbox" checked="row.required" attr="'aria-label': $t('Empty is an error')">
             </td>
             <td>
                 <button type="button" class="action-delete" attr="'aria-label': $t('Remove field'), title: $t('Remove field')"

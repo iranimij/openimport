@@ -76,6 +76,6 @@ class FakeEncryptor implements EncryptorInterface
      */
     public function validateKey($key)
     {
-        return true;
+        throw new \LogicException('Not needed in unit tests.');
     }
 }

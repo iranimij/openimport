@@ -1,0 +1,59 @@
+name: Release
+
+# Tags main and publishes a GitHub release with the changelog section of the version. Run by hand:
+# Actions › Release › Run workflow › version (e.g. 1.0.0). Packagist picks the tag up through its GitHub hook.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (without v), must have a section in CHANGELOG.md
+        required: true
+      prerelease:
+        description: Mark as pre-release
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Release notes from the changelog
+        id: notes
+        run: |
+          v="${{ inputs.version }}"
+          awk -v v="$v" '
+            $0 ~ "^## \\[" v "\\]" { on = 1; next }
+            on && /^## \[/ { exit }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then echo "CHANGELOG.md has no section for $v"; exit 1; fi
+          {
+            echo "OpenImport $v — import and export for Magento 2 and Mage-OS. Free, MIT, built on Magento's own import engine."
+            echo
+            echo 'Install: `composer require iranimij/openimport && bin/magento module:enable Iranimij_Base Iranimij_OpenImport && bin/magento setup:upgrade`'
+            echo
+            echo "Documentation: https://iranimij.github.io/openimport/"
+            echo
+            cat notes.md
+          } > release.md
+
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${{ inputs.version }}"
+          git config user.name "Iman Aboheydary"
+          git config user.email "iranimij@gmail.com"
+          git tag -a "v$v" -m "OpenImport $v"
+          git push origin "v$v"
+          extra=""
+          if [ "${{ inputs.prerelease }}" = "true" ]; then extra="--prerelease"; fi
+          gh release create "v$v" --title "OpenImport $v" --notes-file release.md $extra

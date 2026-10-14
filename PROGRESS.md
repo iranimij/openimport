@@ -19,14 +19,15 @@ Iman's Mac (`~/Projects/openimport-dev-env`, Warden) whenever the laptop is open
   (#15), S4a export engine (#16), S4b orders and destinations (#17), S5 profiles JSON and doctor (#18), S6 sample
   profiles and notices (#19) are a stacked chain, merged bottom-up as each goes green.
 
-## Current milestone
+## Released
 
-**M4 · Release** on `feat/m4-release` (stacked on M3 S6): uninstall class, `docs/security.md`, README and docs
-index for 1.0, changelog 1.0.0. Still to do: merge the chain, tag v1.0.0-rc1 and v1.0.0 (`gh release create`),
-Packagist, Notion §10 and the M3/M4 report.
+**1.0.0 (2026-10-15):** M3 chain merged (#13, #20, #15–#19), M4 (#21 uninstall, security docs, README, changelog;
+#22 release workflow), tag and GitHub release `v1.0.0` through the Release workflow (cloud sessions cannot push tags
+or create releases; Actions › Release › Run workflow does it). Dev-env: 14 Playwright scenarios green on 2.4.9
+(dev-env #3, #4 merged; `.github/ci/openimport-ref` back to `main`).
 
-Dev-env: `feat/m3-playwright` carries the M3 scenarios (URL and SFTP sources, schedule, export to XLSX and SFTP,
-German locale); 12 of 13 green at the last run, the grid-status scenario found the `?? []` column bug fixed in #15.
+Open for Iman: Packagist submission and GitHub hook, repository settings (squash only, delete branch on merge,
+`main` protected with `ci-ok`), a look at the admin on the Mac. Next product work: Notion "12 · Roadmap 1.x".
 
 ## Lessons kept (also in Notion)
 
@@ -42,7 +43,7 @@ German locale); 12 of 13 green at the last run, the grid-status scenario found t
 
 ## Exact next step
 
-Watch #15 (`feat/m3-s3-notify`) and the dev-env E2E run; merge and retarget up the chain; then open the M4 PR.
+Nothing in flight. Start 1.1 from Notion "12 · Roadmap 1.x" after Iman picks the order (categories, attributes, CMS, remote images, webhook trigger).
 
 ## Open questions
 

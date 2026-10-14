@@ -185,6 +185,6 @@ class OrderExportTest extends TestCase
         $content = $var->readFile($written);
         self::assertStringStartsWith("Bestellnummer,Summe\n", $content);
         // The decimal comma makes the cell a quoted one.
-        self::assertMatchesRegularExpression('/^1000000\d,"\d+,\d{2}"$/m', $content);
+        self::assertMatchesRegularExpression('/^1000000\d,"\d+,\d{2}"\r?$/m', $content);
     }
 }

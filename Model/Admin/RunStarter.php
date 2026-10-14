@@ -67,14 +67,18 @@ class RunStarter
      */
     public function liveFromDryRun(ProfileInterface $profile, RunInterface $dryRun, bool $confirmed = false): RunInterface
     {
-        $file = $dryRun->getSourceFile();
-        if ($file === null) {
-            throw new LocalizedException(__('The dry run has no file to import.'));
+        $options = [];
+        if ($profile->getDirection() === ProfileInterface::DIRECTION_IMPORT) {
+            $file = $dryRun->getSourceFile();
+            if ($file === null) {
+                throw new LocalizedException(__('The dry run has no file to import.'));
+            }
+            $options = [
+                'file' => $this->runFiles->absolute($file),
+                'original_name' => (string) ($dryRun->getOptions()['original_name'] ?? 'source'),
+            ];
         }
-        $options = [
-            'file' => $this->runFiles->absolute($file),
-            'original_name' => (string) ($dryRun->getOptions()['original_name'] ?? 'source'),
-        ];
+        // An export reads Magento again: the live run delivers a fresh file, not the dry run's.
         if ($confirmed) {
             $options['confirmed'] = true;
         }

@@ -12,38 +12,37 @@ Iman's Mac (`~/Projects/openimport-dev-env`, Warden) whenever the laptop is open
 - **M0 · Foundation + core-bridge spike** (2026-10-13): skeleton, CI on 7 Magento/PHP pairs, core bridge with oracle
   tests (#1, #2, #3), dev-env with Warden fixture, Playwright baseline and benchmark workflow (dev-env #1), baselines
   in `docs/baseline.md` (10k/20k/50k).
+- **M1 · Engine** (2026-10-13/14): readers, transforms, mapping, schema and repositories, pipeline, stock & prices,
+  CLI, runner tests and benchmark (#4–#11 merged).
+- **M2 · Admin** (2026-10-14): grids, profile form, mapping editor, run page, `openimport:queue:run` (#12 merged).
+- **M3 · Automation** (2026-10-14): S1 cron and schedules (#13), S2 sources (#20, replaces #14) merged; S3 e-mails
+  (#15), S4a export engine (#16), S4b orders and destinations (#17), S5 profiles JSON and doctor (#18), S6 sample
+  profiles and notices (#19) are a stacked chain, merged bottom-up as each goes green.
 
 ## Current milestone
 
-**M1 · Engine** (started 2026-10-13).
+**M4 · Release** on `feat/m4-release` (stacked on M3 S6): uninstall class, `docs/security.md`, README and docs
+index for 1.0, changelog 1.0.0. Still to do: merge the chain, tag v1.0.0-rc1 and v1.0.0 (`gh release create`),
+Packagist, Notion §10 and the M3/M4 report.
 
-| # | Slice | State |
-|---|---|---|
-| S1 | Readers: CSV/TSV, XLSX (own), JSON, XML, format detection, `docs/file-formats.md`; 50k baseline | PR #4 |
-| S2 | Transforms and the safe expression language, value maps, number parsing, `docs/transforms.md` | PR #5 (stacked on #4) |
-| S3 | Mapping compiler, store-view rows, auto-match, row filters, entity registry, `docs/mapping.md` (only add / only update move to S5: they need the database) | PR #6 (stacked on #5) |
-| S4 | Schema (9 tables + whitelist), `Api/` profile and run repositories, validator, storage services (errors, preview, hashes, locks), cron expressions | PR #7 (stacked on #6) |
-| S5 | Run queue and processor, import pipeline, record readers (products, customers), preview, delta, safety threshold, `docs/runs.md` | PR open: `feat/m1-s5-pipeline` |
-| S6 | `openimport_stock_price` entity through core product import (existing products only) | PR open: `feat/m1-s6-stock-price` |
-| S7 | CLI: `openimport:run`, `openimport:profile:list`, `openimport:run:status`, `docs/cli.md` | PR open: `feat/m1-s7-cli` |
-| S8 | Runner unit tests with fakes (coverage gate now includes Model/Pipeline), pipeline benchmark (one process per pass: 10k vs 50k memory, delta 1 %), close | in progress: `feat/m1-s8-close` |
+Dev-env: `feat/m3-playwright` carries the M3 scenarios (URL and SFTP sources, schedule, export to XLSX and SFTP,
+German locale); 12 of 13 green at the last run, the grid-status scenario found the `?? []` column bug fixed in #15.
 
-### M2 · Admin (in progress) and M3 · Automation (started)
+## Lessons kept (also in Notion)
 
-| Slice | State |
-|---|---|
-| M2 S1 admin grids, form, mapping editor, run page; `openimport:queue:run` | PR #12 (stacked on #11) |
-| M3 S1 cron group, scheduler (exactly once), housekeeping, `docs/schedules.md` | PR open: `feat/m3-s1-cron` |
-| M3 S2 sources: folder, URL (SSRF guard, Google Sheets), SFTP, FTP, after-success move/delete, secrets, Test connection, `docs/sources.md` | PR open: `feat/m3-s2-sources` |
-| M3 S3 e-mail notifications (`RunMailer`, template, integration test) | PR open: `feat/m3-s3-notify` |
-| M3 S4a export engine: writers (CSV, XLSX, JSON, XML), core entity source, export mapping, runner, download destination, `docs/exports.md` | PR open: `feat/m3-s4-export-writers` |
-| M3 S4b order export, export marks, folder/SFTP/FTP/e-mail destinations, mapping editor export mode, form fields | PR open: `feat/m3-s4b-orders-destinations` |
-| M3 S5 CLI: profiles export/import (JSON, all or nothing), doctor | PR open: `feat/m3-s5-cli-doctor` |
-| M3 S6 sample profiles, first-run notice, cron system message | PR open: `feat/m3-s6-admin-polish` |
+- Magento's knockout template renderer wraps any attribute value with a colon in braces: write `text="$t('Label\:')"`
+  and `options="..., optionsText\: 'label'"`; native `value`/`checked`/`disabled` attributes are plain HTML, use
+  `ko-value`, `ko-checked`, `ko-disabled`.
+- `foreach ($data['items'] ?? [] as &$row)` iterates a copy; test by reference on the array itself.
+- `setup:install` builds every console command before stores exist: proxy anything that reaches the store manager.
+- A UI toggle without data posts `0`: give the form data explicit defaults.
+- Integration tests: every shared service keeps the first request; one layout page per test, empty the same request
+  object between dispatches, file answers (FileResponse) never reach the test response.
+- E-mails render in the frontend area for the default store view (header/footer templates live there).
 
 ## Exact next step
 
-Merge S1, S2, S3 in order when CI is green; S5 (pipeline runner) on `feat/m1-s5-pipeline`.
+Watch #15 (`feat/m3-s3-notify`) and the dev-env E2E run; merge and retarget up the chain; then open the M4 PR.
 
 ## Open questions
 

@@ -30,9 +30,9 @@
     <table class="data-grid openimport-mapping-table" if="rows().length">
         <thead>
         <tr>
-            <th class="data-grid-th" scope="col" text="isExport() ? $t('Column in the file') : $t('Magento field')"></th>
+            <th class="data-grid-th" scope="col" text="isExport() ? $t('Column in the file') \: $t('Magento field')"></th>
             <th class="data-grid-th" scope="col" translate="'Store view'" if="stores.length"></th>
-            <th class="data-grid-th" scope="col" text="isExport() ? $t('From Magento') : $t('From the file')"></th>
+            <th class="data-grid-th" scope="col" text="isExport() ? $t('From Magento') \: $t('From the file')"></th>
             <th class="data-grid-th" scope="col" translate="'Transforms'"></th>
             <th class="data-grid-th" scope="col" translate="'Required'" ifnot="isExport()"></th>
             <th class="data-grid-th" scope="col"><span class="admin__visually-hidden" translate="'Actions'"></span></th>

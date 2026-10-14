@@ -69,9 +69,12 @@ class AdminTest extends AbstractBackendController
     private function fresh(): void
     {
         $this->resetRequest();
-        $this->_objectManager->removeSharedInstance(\Magento\Framework\App\ResponseInterface::class);
-        $this->_objectManager->removeSharedInstance(\Magento\Framework\App\Response\Http::class);
-        $this->_response = null;
+        $response = $this->getResponse();
+        if ($response instanceof \Magento\Framework\HTTP\PhpEnvironment\Response) {
+            $response->clearBody();
+            $response->clearHeader('Location');
+            $response->setStatusCode(200);
+        }
     }
 
     /**

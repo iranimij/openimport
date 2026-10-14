@@ -11,12 +11,14 @@ namespace Iranimij\OpenImport\Model\Profile;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Execution\Source\FileSelector;
+use Iranimij\OpenImport\Model\Export\DestinationPool;
 use Iranimij\OpenImport\Model\Filter\FilterException;
 use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
 use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
 use Iranimij\OpenImport\Model\Mapping\MappingException;
 use Iranimij\OpenImport\Model\Schedule\CronExpression;
 use Iranimij\OpenImport\Model\Transform\ValueMap;
+use Iranimij\OpenImport\Model\Writer\WriterFactory;
 
 /**
  * Checks a profile before it is saved and lists every problem in plain words.
@@ -28,12 +30,16 @@ class ProfileValidator
      * @param RowFilterCompiler $filterCompiler
      * @param EntityRegistry $entities
      * @param EntityCodes $entityCodes
+     * @param DestinationPool $destinations
+     * @param WriterFactory $writers
      */
     public function __construct(
         private readonly MappingCompiler $mappingCompiler,
         private readonly RowFilterCompiler $filterCompiler,
         private readonly EntityRegistry $entities,
-        private readonly EntityCodes $entityCodes
+        private readonly EntityCodes $entityCodes,
+        private readonly DestinationPool $destinations,
+        private readonly WriterFactory $writers
     ) {
     }
 
@@ -143,6 +149,15 @@ class ProfileValidator
                     $problems[] = 'The port must be a number between 1 and 65535.';
                 }
                 break;
+        }
+        if ($profile->getDirection() === ProfileInterface::DIRECTION_EXPORT) {
+            $destination = trim((string) ($profile->getExportOptions()['destination'] ?? ''));
+            if ($destination !== '' && !in_array($destination, $this->destinations->types(), true)) {
+                $problems[] = sprintf('"%s" is not an export destination.', $destination);
+            }
+            if (!in_array($profile->getFormat(), $this->writers->formats(), true) && $profile->getFormat() !== 'auto') {
+                $problems[] = sprintf('OpenImport cannot write %s files.', $profile->getFormat());
+            }
         }
         $pick = $text('pick');
         if ($pick !== '' && !in_array($pick, FileSelector::PICKS, true)) {

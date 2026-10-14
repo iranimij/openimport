@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
+use Iranimij\OpenImport\Model\Export\ExportRunner;
 use Iranimij\OpenImport\Model\Notification\RunMailer;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
@@ -37,6 +38,7 @@ class RunProcessor
      * @param SourceResolver $sources
      * @param LoggerInterface $logger
      * @param RunMailer $mailer
+     * @param ExportRunner $exportRunner
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -47,7 +49,8 @@ class RunProcessor
         private readonly LockManager $locks,
         private readonly SourceResolver $sources,
         private readonly LoggerInterface $logger,
-        private readonly RunMailer $mailer
+        private readonly RunMailer $mailer,
+        private readonly ExportRunner $exportRunner
     ) {
     }
 
@@ -159,11 +162,22 @@ class RunProcessor
      */
     private function runProfile(ProfileInterface $profile, RunInterface $run, array $locks): RunOutcome
     {
-        if ($profile->getDirection() !== ProfileInterface::DIRECTION_IMPORT) {
-            throw new PipelineException('Export runs are not available yet.');
-        }
         $runId = (int) $run->getRunId();
         $folder = $this->runFiles->folder($runId);
+        $heartbeat = function () use ($locks, $runId): void {
+            foreach ($locks as $name) {
+                $this->locks->heartbeat($name, $runId);
+            }
+        };
+        if ($profile->getDirection() === ProfileInterface::DIRECTION_EXPORT) {
+            [$outcome, $path] = $this->exportRunner->run($profile, $run, $folder, $heartbeat);
+            if ($path !== '') {
+                $run->setOutputFile($this->runFiles->relative($path));
+                $this->runRepository->save($run);
+            }
+
+            return $outcome;
+        }
         $fetched = $this->sources->fetch($profile, $run, $folder);
         $staged = $this->runFiles->stageSource($runId, $fetched->path, $fetched->name);
         $run->setSourceFile($this->runFiles->relative($staged));
@@ -172,11 +186,6 @@ class RunProcessor
             $run->setOptions($run->getOptions() + ['original_name' => $fetched->name]);
         }
         $this->runRepository->save($run);
-        $heartbeat = function () use ($locks, $runId): void {
-            foreach ($locks as $name) {
-                $this->locks->heartbeat($name, $runId);
-            }
-        };
         $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $fetched->name, $heartbeat);
         if ($fetched->reference !== '' && !$run->isDryRun() && empty($run->getOptions()['file'])
             && in_array($outcome->status, [RunInterface::STATUS_SUCCESS, RunInterface::STATUS_PARTIAL], true)) {

@@ -50,3 +50,7 @@ All notable changes to this project are documented here. The format follows
   never shown again. See docs/sources.md.
 - E-mail notifications per profile (never, on failure, always) to the profile's addresses or the creating admin,
   with counts, message and a link to the run; template `openimport_notify_run_finished`.
+- Exports: every Magento export entity through core's own export code, streamed through OpenImport's writers
+  (CSV/TSV, Excel .xlsx without a library, JSON, XML) with row filters, column mapping (rename, reorder, transforms,
+  fixed values), file name placeholders and the formula guard; dry runs write without delivering; download from the
+  run page. `number` transform takes a decimal separator. See docs/exports.md.

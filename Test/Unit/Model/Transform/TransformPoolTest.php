@@ -159,7 +159,8 @@ class TransformPoolTest extends TestCase
             'date empty output' => [[$step('date', 'auto', ' ')], 'the output format is empty'],
             'map without value map' => [['map'], 'the field "field" has no value map'],
             'expr parse error' => [[$step('expr', '1 +')], 'expr: The expression ends too early'],
-            'max count' => [[$step('number', 1, 2)], 'takes 0 to 1 arguments, 2 given'],
+            'max count' => [[$step('number', 1, '.', 3)], 'takes 0 to 2 arguments, 3 given'],
+            'number separator' => [[$step('number', 2, ';')], 'the decimal separator must be "." or ","'],
         ];
     }
 

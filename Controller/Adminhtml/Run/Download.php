@@ -54,7 +54,9 @@ class Download extends Action implements HttpGetActionInterface
                 || !$this->filesystem->getDirectoryRead(DirectoryList::VAR_DIR)->isFile($file)) {
                 throw new LocalizedException(__('The file of this run is no longer kept.'));
             }
-            $name = $run->getOptions()['original_name'] ?? (new \SplFileInfo($file))->getFilename();
+            $name = $this->getRequest()->getParam('file') === 'output'
+                ? (new \SplFileInfo($file))->getFilename()
+                : ($run->getOptions()['original_name'] ?? (new \SplFileInfo($file))->getFilename());
 
             return $this->fileFactory->create(
                 (string) $name,

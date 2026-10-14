@@ -15,17 +15,21 @@ define([
         defaults: {
             forTypes: [],
             forAuth: [],
+            forDirection: 'import',
             authField: 'auth',
             sourceType: '',
+            direction: 'import',
             auth: '',
             secret: false,
             storedNote: '',
             imports: {
                 sourceType: '${ $.provider }:data.source_type',
+                direction: '${ $.provider }:data.direction',
                 auth: '${ $.provider }:data.source_config.${ $.authField }'
             },
             listens: {
                 sourceType: 'refresh',
+                direction: 'refresh',
                 auth: 'refresh'
             },
             tracks: {
@@ -47,13 +51,14 @@ define([
         },
 
         /**
-         * Shows the field for the chosen source type (and authentication, when "forAuth" is set).
+         * Shows the field for the chosen direction and source type (and authentication, when "forAuth" is set).
          */
         refresh: function () {
             var typeOk = this.forTypes.length === 0 || this.forTypes.indexOf(this.sourceType) !== -1,
-                authOk = this.forAuth.length === 0 || this.forAuth.indexOf(this.auth || '') !== -1;
+                authOk = this.forAuth.length === 0 || this.forAuth.indexOf(this.auth || '') !== -1,
+                directionOk = !this.forDirection || this.forDirection === (this.direction || 'import');
 
-            this.visible(typeOk && authOk);
+            this.visible(typeOk && authOk && directionOk);
         },
 
         /**

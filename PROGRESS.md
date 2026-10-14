@@ -36,6 +36,7 @@ Iman's Mac (`~/Projects/openimport-dev-env`, Warden) whenever the laptop is open
 | M3 S1 cron group, scheduler (exactly once), housekeeping, `docs/schedules.md` | PR open: `feat/m3-s1-cron` |
 | M3 S2 sources: folder, URL (SSRF guard, Google Sheets), SFTP, FTP, after-success move/delete, secrets, Test connection, `docs/sources.md` | PR open: `feat/m3-s2-sources` |
 | M3 S3 e-mail notifications (`RunMailer`, template, integration test) | PR open: `feat/m3-s3-notify` |
+| M3 S4a export engine: writers (CSV, XLSX, JSON, XML), core entity source, export mapping, runner, download destination, `docs/exports.md` | PR open: `feat/m3-s4-export-writers` |
 
 ## Exact next step
 

@@ -21,8 +21,13 @@ define([
             uploading: false,
             message: '',
             sample: null,
+            direction: 'import',
+            imports: {
+                direction: '${ $.provider }:data.direction'
+            },
             listens: {
-                sourceType: 'onSourceType'
+                sourceType: 'onSourceType',
+                direction: 'onSourceType'
             },
             tracks: {
                 fileName: true,
@@ -39,18 +44,18 @@ define([
             this._super();
             config = this.source.get(this.dataScope) || {};
             this.fileName = config.file_name || '';
-            this.onSourceType(this.sourceType);
+            this.onSourceType();
 
             return this;
         },
 
         /**
-         * Only upload profiles show the upload field.
-         *
-         * @param {String} type
+         * Only upload profiles (imports) show the upload field.
          */
-        onSourceType: function (type) {
-            this.visible(type === 'upload' || !type);
+        onSourceType: function () {
+            var type = this.sourceType;
+
+            this.visible((type === 'upload' || !type) && (this.direction || 'import') !== 'export');
         },
 
         /**

@@ -31,7 +31,7 @@ Numbers are read the way files write them: `1234.5`, `1,5`, `1.234,56`, `1,234.5
 | Transform | Arguments | Example |
 |---|---|---|
 | `decimal_comma` | – | for files with decimal commas: `1.234,50` → `1234.5`, `1.234` → `1234` |
-| `number` | decimals (optional) | `number(2)`: `5` → `5.00` |
+| `number` | decimals (optional), decimal separator `.` or `,` (optional) | `number(2)`: `5` → `5.00`; `number(2, ",")`: `12.5` → `12,50` (exports) |
 | `math` | operator (`+ - * /`, `× ÷`, or `add`, `subtract`, `multiply`, `divide`), operand | `math("*", 1.19)` |
 | `round` | decimals (default 2), mode `half_up` / `up` / `down` / `ending`, ending | `round(2, "ending", .99)`: `12.30` → `12.99` |
 | `price_adjust` | percent, decimals (default 2) | `price_adjust(10)`: `19.99` → `21.99` |

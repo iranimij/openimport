@@ -134,6 +134,23 @@
             <argument name="protocol" xsi:type="string">ftp</argument>
         </arguments>
     </virtualType>
+    <type name="Iranimij\OpenImport\Model\Writer\WriterFactory">
+        <arguments>
+            <argument name="writers" xsi:type="array">
+                <item name="csv" xsi:type="string">Iranimij\OpenImport\Model\Writer\CsvWriter</item>
+                <item name="xlsx" xsi:type="string">Iranimij\OpenImport\Model\Writer\XlsxWriter</item>
+                <item name="json" xsi:type="string">Iranimij\OpenImport\Model\Writer\JsonWriter</item>
+                <item name="xml" xsi:type="string">Iranimij\OpenImport\Model\Writer\XmlWriter</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Model\Export\DestinationPool">
+        <arguments>
+            <argument name="destinations" xsi:type="array">
+                <item name="download" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\DownloadDestination</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteClientFactory">
         <arguments>
             <argument name="clients" xsi:type="array">

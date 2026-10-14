@@ -115,7 +115,7 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
-        <field name="source_type" formElement="select" sortOrder="10">
+        <field name="source_type" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="10">
             <settings>
                 <label translate="true">Source</label>
                 <dataScope>source_type</dataScope>
@@ -136,6 +136,7 @@
                     <item name="template" xsi:type="string">Iranimij_OpenImport/form/upload</item>
                     <item name="imports" xsi:type="array">
                         <item name="sourceType" xsi:type="string">${ $.provider }:data.source_type</item>
+                        <item name="direction" xsi:type="string">${ $.provider }:data.direction</item>
                     </item>
                 </item>
             </argument>
@@ -546,6 +547,38 @@
                 <dataScope>source_config.move_to</dataScope>
                 <notice translate="true">Subfolder of the source folder, used when "Source file after a successful run" is "Move". Empty = "processed".</notice>
                 <placeholder translate="true">processed</placeholder>
+            </settings>
+        </field>
+        <field name="export_destination" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="12">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">export</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Destination</label>
+                <dataScope>export_options.destination</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\Destination"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="export_file_name" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="14">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">File name</label>
+                <dataScope>export_options.file_name</dataScope>
+                <notice translate="true">Placeholders: {entity}, {profile}, {date}, {time}, {datetime}, {run}, {ext}. Empty = {entity}-{datetime}.{ext}</notice>
+                <placeholder translate="true">products-{date}.{ext}</placeholder>
             </settings>
         </field>
         <field name="source_test" component="Iranimij_OpenImport/js/form/test-source" formElement="input" sortOrder="90">

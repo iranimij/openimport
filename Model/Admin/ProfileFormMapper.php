@@ -86,6 +86,11 @@ class ProfileFormMapper
             'format' => $profile->getFormat(),
             // An unset has_header means "yes"; the toggle must show (and post) that, not an empty value.
             'format_options' => $profile->getFormatOptions() + ['has_header' => '1'],
+            'export_options' => $this->secrets->strip($profile->getExportOptions())
+                + array_combine(
+                    array_map(static fn (string $name): string => $name . '_stored', array_keys($this->secrets->stored($profile->getExportOptions()))),
+                    array_map(static fn (bool $stored): string => $stored ? '1' : '0', $this->secrets->stored($profile->getExportOptions()))
+                ),
             'behavior' => $profile->getBehavior(),
             'on_error' => $profile->getOnError(),
             'allowed_errors' => (string) $profile->getAllowedErrors(),
@@ -140,6 +145,15 @@ class ProfileFormMapper
             }
         }
         $profile->setSourceConfig($this->secrets->merge($source, $profile->getSourceConfig()));
+
+        $export = is_array($data['export_options'] ?? null) ? $data['export_options'] : [];
+        $export = array_map(static fn ($value) => is_scalar($value) ? trim((string) $value) : $value, $export);
+        foreach (array_keys($export) as $key) {
+            if (str_ends_with((string) $key, '_stored')) {
+                unset($export[$key]);
+            }
+        }
+        $profile->setExportOptions($this->secrets->merge($export, $profile->getExportOptions()));
 
         $options = is_array($data['format_options'] ?? null) ? $data['format_options'] : [];
         $profile->setFormatOptions(array_filter(

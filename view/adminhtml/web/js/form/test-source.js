@@ -19,11 +19,14 @@ define([
             busy: false,
             ok: null,
             message: '',
+            direction: 'import',
             imports: {
-                sourceType: '${ $.provider }:data.source_type'
+                sourceType: '${ $.provider }:data.source_type',
+                direction: '${ $.provider }:data.direction'
             },
             listens: {
-                sourceType: 'onSourceType'
+                sourceType: 'onSourceType',
+                direction: 'onSourceType'
             },
             tracks: {
                 busy: true,
@@ -35,18 +38,18 @@ define([
         /** @inheritdoc */
         initialize: function () {
             this._super();
-            this.onSourceType(this.sourceType);
+            this.onSourceType();
 
             return this;
         },
 
         /**
-         * Uploads are checked by uploading; every other source has a test.
-         *
-         * @param {String} type
+         * Uploads are checked by uploading; every other source has a test. Export destinations get theirs later.
          */
-        onSourceType: function (type) {
-            this.visible(type !== 'upload' && !!type);
+        onSourceType: function () {
+            var type = this.sourceType;
+
+            this.visible(!!type && type !== 'upload' && (this.direction || 'import') !== 'export');
             this.message = '';
             this.ok = null;
         },

@@ -72,7 +72,7 @@ jobs:
           .github/ci/logged.sh "composer (coverage)" composer update --no-interaction --no-progress --prefer-dist
       - run: .github/ci/logged.sh coverage vendor/bin/phpunit -c phpunit.coverage.xml --coverage-clover clover.xml --coverage-text
       # Gate namespaces grow with the code (07 · Build Brief §6).
-      - run: .github/ci/logged.sh "coverage gate" php .github/ci/coverage-gate.php clover.xml 85 Model/Source Model/Bridge Model/Reader Model/Value Model/Expression Model/Transform Model/Mapping Model/Filter Model/Schedule Model/Profile Model/Pipeline
+      - run: .github/ci/logged.sh "coverage gate" php .github/ci/coverage-gate.php clover.xml 85 Model/Source Model/Bridge Model/Reader Model/Value Model/Expression Model/Transform Model/Mapping Model/Filter Model/Schedule Model/Profile Model/Pipeline Model/Writer Model/Security
 
   integration:
     name: Unit + integration ${{ matrix.magento }} / PHP ${{ matrix.php }}

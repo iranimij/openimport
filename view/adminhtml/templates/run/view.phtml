@@ -101,6 +101,9 @@ $run = $view->run();
             <?php if ($run->getSourceFile() !== null): ?>
                 <a class="action-secondary" href="<?= $escaper->escapeUrl($view->url('openimport/run/download')) ?>"><?= $escaper->escapeHtml(__('Download the file')) ?></a>
             <?php endif; ?>
+            <?php if ($run->getOutputFile() !== null): ?>
+                <a class="action-primary" href="<?= $escaper->escapeUrl($view->url('openimport/run/download', ['file' => 'output'])) ?>"><?= $escaper->escapeHtml(__('Download the export')) ?></a>
+            <?php endif; ?>
             <?php if ($run->getCount('errors') > 0): ?>
                 <a class="action-secondary" href="<?= $escaper->escapeUrl($view->url('openimport/run/errorReport')) ?>"><?= $escaper->escapeHtml(__('Download error report')) ?></a>
             <?php endif; ?>

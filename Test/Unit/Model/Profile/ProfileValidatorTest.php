@@ -15,6 +15,12 @@ use Iranimij\OpenImport\Model\Profile\EntityCodes;
 use Iranimij\OpenImport\Model\Profile\ProfileValidator;
 use Iranimij\OpenImport\Model\Transform\TransformPool;
 use Iranimij\OpenImport\Test\Unit\Model\ProfileStub;
+use Iranimij\OpenImport\Model\Export\Destination\DownloadDestination;
+use Iranimij\OpenImport\Model\Export\DestinationPool;
+use Iranimij\OpenImport\Model\Writer\CsvWriter;
+use Iranimij\OpenImport\Model\Writer\WriterFactory;
+use Iranimij\OpenImport\Model\Writer\XlsxWriter;
+use Iranimij\OpenImport\Test\Unit\Model\FakeObjectManager;
 use PHPUnit\Framework\TestCase;
 
 class ProfileValidatorTest extends TestCase
@@ -39,7 +45,9 @@ class ProfileValidatorTest extends TestCase
             new MappingCompiler(new TransformPool()),
             new RowFilterCompiler(),
             new EntityRegistry(),
-            $codes
+            $codes,
+            new DestinationPool(['download' => new DownloadDestination()]),
+            new WriterFactory(new FakeObjectManager(), ['csv' => CsvWriter::class, 'xlsx' => XlsxWriter::class])
         );
     }
 
@@ -180,5 +188,17 @@ class ProfileValidatorTest extends TestCase
             $validator->validate(new ProfileStub(['source_type' => 'folder', 'source_config' => ['path' => 'a/../b', 'pick' => 'best']] + $base))
         );
         self::assertSame([], $validator->validate(new ProfileStub(['source_type' => 'upload', 'source_config' => []] + $base)));
+    }
+
+    public function testExportProfilesNeedAWritableFormatAndAKnownDestination(): void
+    {
+        $validator = $this->validator();
+        $base = ['direction' => 'export', 'entity' => 'catalog_product', 'source_type' => 'upload', 'source_config' => []] + $this->valid();
+
+        self::assertSame([], $validator->validate(new ProfileStub(['format' => 'xlsx', 'export_options' => ['destination' => 'download']] + $base)));
+        self::assertSame(
+            ['"dropbox" is not an export destination.', 'OpenImport cannot write json files.'],
+            $validator->validate(new ProfileStub(['format' => 'json', 'export_options' => ['destination' => 'dropbox']] + $base))
+        );
     }
 }

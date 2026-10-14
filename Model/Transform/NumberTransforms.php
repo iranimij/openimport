@@ -77,15 +77,19 @@ class NumberTransforms implements TransformProviderInterface
      */
     private function number(Arguments $arguments): \Closure
     {
-        $arguments->expectCount(0, 1);
+        $arguments->expectCount(0, 2);
         $decimals = $arguments->count() > 0 ? $arguments->integer(0, 2, 0, 10) : null;
+        $separator = $arguments->count() > 1 ? trim($arguments->string(1)) : '.';
+        if (!in_array($separator, ['.', ','], true)) {
+            throw $arguments->error('the decimal separator must be "." or ","');
+        }
 
         return fn (string $value): string => $this->apply(
             $value,
             'number',
             fn (float $number): string => $decimals === null
-                ? $this->text->fromFloat($number)
-                : number_format($this->roundHalfUp($number, $decimals), $decimals, '.', '')
+                ? str_replace('.', $separator, $this->text->fromFloat($number))
+                : number_format($this->roundHalfUp($number, $decimals), $decimals, $separator, '')
         );
     }
 

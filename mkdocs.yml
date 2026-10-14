@@ -12,6 +12,7 @@ nav:
   - Mapping and filters: mapping.md
   - Runs, dry runs and safety: runs.md
   - Sources: sources.md
+  - Exports: exports.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
   - Admin: admin.md

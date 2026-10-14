@@ -15,6 +15,10 @@ use PHPUnit\Framework\TestCase;
 
 class UrlGuardTest extends TestCase
 {
+    /**
+     * @param string[] $allowedHosts
+     * @return UrlGuard
+     */
     private function guard(array $allowedHosts = []): UrlGuard
     {
         $config = new FakeConfig();

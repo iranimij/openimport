@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/security/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Security - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Security";
+        var mkdocs_page_input_path = "security.md";
+        var mkdocs_page_url = "/openimport/security/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Security</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#admin-actions">Admin actions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#remote-sources-and-destinations">Remote sources and destinations</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#credentials">Credentials</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#file-formats">File formats</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#writing-into-magento">Writing into Magento</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-stays-with-you">What stays with you</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Security</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/security.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h1>
+<p>OpenImport fetches files from other servers, reads formats that can carry attacks, and writes into the catalog. This
+page lists what the module does about that, what the settings control, and what remains your job.</p>
+<h2 id="admin-actions">Admin actions<a class="headerlink" href="#admin-actions" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Every controller is behind an ACL resource: <em>View profiles</em>, <em>Create and edit profiles</em>, <em>Run profiles</em>, <em>Confirm
+  runs above the safety limit</em>, <em>View runs and error reports</em>, plus the configuration section. Roles that may view but
+  not edit get a read-only form.</li>
+<li>Everything that changes state is a POST with Magento's form key; everything that reads is a GET. File answers go
+  through Magento's <code>FileFactory</code>, never a raw path.</li>
+<li>Uploads: 256 MB at most, only <code>.csv .tsv .txt .xlsx .json .xml</code>, stored under a random token in <code>var/openimport/tmp</code>
+  and removed by housekeeping. A token is accepted only if it names a file in that folder (no <code>..</code>, no other folder).</li>
+<li>Sample and preview answers, error reports and the run page escape every value; messages from Magento's importer
+  are shown as text.</li>
+</ul>
+<h2 id="remote-sources-and-destinations">Remote sources and destinations<a class="headerlink" href="#remote-sources-and-destinations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Web address:</strong> <code>http</code> and <code>https</code> only, no credentials in the URL. The host is resolved and every address must
+  be public: loopback, private (RFC 1918), link-local (169.254.x, the cloud metadata address), carrier-grade NAT,
+  IPv6 ULA and link-local, and IPv4-mapped IPv6 are refused. The request is pinned to the checked address
+  (<code>CURLOPT_RESOLVE</code>), every redirect hop is checked again, basic auth and bearer tokens are sent to the first host
+  only, and downloads stop at 256 MB. Hosts you trust (a warehouse system on the LAN) go into <em>Allowed private hosts</em>.</li>
+<li><strong>Server folder:</strong> only <code>var/openimport</code> and the folders listed in <em>Allowed folders</em> (absolute paths, real paths
+  compared, so symlinks out of the sandbox do not help). Patterns pick files; the module never runs them.</li>
+<li><strong>SFTP / FTP:</strong> host names are resolved and checked like URLs. SFTP uses phpseclib (password or private key, with an
+  optional passphrase); FTP uses PHP's <code>ftp_*</code> functions with TLS when switched on, passive mode. Nothing is executed on
+  the remote side; the module lists, downloads, uploads, renames and deletes inside the configured folder.</li>
+<li><strong>E-mail destination:</strong> attachments are capped (setting), the recipients come from the profile, never from the
+  file.</li>
+</ul>
+<h2 id="credentials">Credentials<a class="headerlink" href="#credentials" title="Permanent link">&para;</a></h2>
+<p>Passwords, private keys, passphrases and tokens are encrypted with Magento's encryptor and stored under a separate
+<code>secrets</code> key of the profile. They are never written to logs, run messages, JSON profile exports, the admin form (the
+form shows "stored" and lets you replace a secret, not read it) or the error report. After a key rotation run
+<code>bin/magento openimport:secrets:reencrypt</code>.</p>
+<h2 id="file-formats">File formats<a class="headerlink" href="#file-formats" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>XML:</strong> streamed with <code>XMLReader</code>; documents with a <code>DOCTYPE</code> are refused, so there is no entity expansion and no
+  external entity. The parser never resolves URLs.</li>
+<li><strong>XLSX:</strong> read from the zip with size checks; a workbook whose parts would unpack to more than 512 MB is refused
+  (zip bombs). Only the parts the reader needs are opened.</li>
+<li><strong>CSV written by the module</strong> (error reports, exports): cells starting with <code>= + - @</code> or a tab are prefixed with an
+  apostrophe when the <em>formula guard</em> setting is on (default), so a product name cannot become a spreadsheet formula.</li>
+<li><strong>Expressions and transforms:</strong> the expression language is parsed once per run into a small AST and evaluated
+  without <code>eval</code>; it has no access to PHP functions, files or the database. Division by zero and type errors become
+  row errors.</li>
+</ul>
+<h2 id="writing-into-magento">Writing into Magento<a class="headerlink" href="#writing-into-magento" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Magento's own importer validates and writes every row. OpenImport does not write catalog tables itself.</li>
+<li>Runs that would delete or replace more records than the profile's safety threshold stop and wait for a typed
+  confirmation by a user with the <em>Confirm runs above the safety limit</em> resource. New profiles always start with a dry
+  run.</li>
+<li>One run per profile and one live import per core entity at a time (database locks with heartbeats), so two cron
+  ticks cannot import the same file twice.</li>
+</ul>
+<h2 id="what-stays-with-you">What stays with you<a class="headerlink" href="#what-stays-with-you" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Protect <code>var/openimport</code> like the rest of <code>var/</code>: it holds uploaded and fetched files and the error reports.</li>
+<li>Give SFTP/FTP accounts the smallest folder they need; the module cannot escape its folder, but the account could.</li>
+<li>Keep Magento's cron under a user that cannot write to the code base.</li>
+<li>Report problems privately, see <a href="https://github.com/iranimij/openimport/blob/main/SECURITY.md">SECURITY.md</a>.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../admin/" class="btn btn-neutral float-left" title="Admin"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../core-bridge/" class="btn btn-neutral float-right" title="Core bridge">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../admin/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../core-bridge/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/transforms/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Transforms and expressions - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Transforms and expressions";
+        var mkdocs_page_input_path = "transforms.md";
+        var mkdocs_page_url = "/openimport/transforms/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Transforms and expressions</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#text">Text</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#numbers">Numbers</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dates">Dates</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#value-maps">Value maps</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#expressions">Expressions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#your-own-transforms">Your own transforms</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Transforms and expressions</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/transforms.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="transforms-and-expressions">Transforms and expressions<a class="headerlink" href="#transforms-and-expressions" title="Permanent link">&para;</a></h1>
+<p>Every mapped field can run a list of transforms, in order, on the value taken from the source column (or the static
+value). Each step gets the previous step's result.</p>
+<p>Empty values stay empty in number and date transforms, so an empty price never turns into 0. A value a transform
+cannot handle (text in a number transform, an impossible date) becomes a row error naming the field, the step and the
+value; the rest of the file still imports.</p>
+<h2 id="text">Text<a class="headerlink" href="#text" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Transform</th>
+<th>Arguments</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>trim</code></td>
+<td>–</td>
+<td><code>"  Shirt "</code> → <code>Shirt</code></td>
+</tr>
+<tr>
+<td><code>lower</code>, <code>upper</code>, <code>title</code></td>
+<td>–</td>
+<td><code>red shirt</code> → <code>Red Shirt</code> (title)</td>
+</tr>
+<tr>
+<td><code>replace</code></td>
+<td>find, replace (default: nothing)</td>
+<td><code>replace("cm", " cm")</code>: <code>10cm</code> → <code>10 cm</code></td>
+</tr>
+<tr>
+<td><code>regex</code></td>
+<td>pattern, replace (default: nothing)</td>
+<td><code>regex("^ART-(\d+)$", "$1")</code>: <code>ART-0042</code> → <code>0042</code></td>
+</tr>
+<tr>
+<td><code>strip_html</code></td>
+<td>–</td>
+<td><code>&lt;p&gt;Soft &amp;amp; warm&lt;/p&gt;</code> → <code>Soft &amp; warm</code></td>
+</tr>
+<tr>
+<td><code>prefix</code>, <code>suffix</code></td>
+<td>text</td>
+<td><code>prefix("DE-")</code>: <code>42</code> → <code>DE-42</code> (empty values stay empty)</td>
+</tr>
+<tr>
+<td><code>default</code></td>
+<td>value</td>
+<td>used when the value is empty</td>
+</tr>
+<tr>
+<td><code>split</code></td>
+<td>separator, position (1 = first, -1 = last)</td>
+<td><code>split(";", 2)</code>: <code>a;b;c</code> → <code>b</code></td>
+</tr>
+<tr>
+<td><code>join</code></td>
+<td>separator, column, …</td>
+<td><code>join(" ", "Brand")</code>: <code>Shirt</code> → <code>Shirt ACME</code>; empty parts are left out</td>
+</tr>
+</tbody>
+</table>
+<p>Regex patterns are written without delimiters and are Unicode-aware; <code>(?i)</code> at the start ignores case. A pattern
+that backtracks too much fails the row instead of hanging the run.</p>
+<h2 id="numbers">Numbers<a class="headerlink" href="#numbers" title="Permanent link">&para;</a></h2>
+<p>Numbers are read the way files write them: <code>1234.5</code>, <code>1,5</code>, <code>1.234,56</code>, <code>1,234.56</code>, <code>1 234,5</code>, <code>1'234.50</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Transform</th>
+<th>Arguments</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>decimal_comma</code></td>
+<td>–</td>
+<td>for files with decimal commas: <code>1.234,50</code> → <code>1234.5</code>, <code>1.234</code> → <code>1234</code></td>
+</tr>
+<tr>
+<td><code>number</code></td>
+<td>decimals (optional), decimal separator <code>.</code> or <code>,</code> (optional)</td>
+<td><code>number(2)</code>: <code>5</code> → <code>5.00</code>; <code>number(2, ",")</code>: <code>12.5</code> → <code>12,50</code> (exports)</td>
+</tr>
+<tr>
+<td><code>math</code></td>
+<td>operator (<code>+ - * /</code>, <code>× ÷</code>, or <code>add</code>, <code>subtract</code>, <code>multiply</code>, <code>divide</code>), operand</td>
+<td><code>math("*", 1.19)</code></td>
+</tr>
+<tr>
+<td><code>round</code></td>
+<td>decimals (default 2), mode <code>half_up</code> / <code>up</code> / <code>down</code> / <code>ending</code>, ending</td>
+<td><code>round(2, "ending", .99)</code>: <code>12.30</code> → <code>12.99</code></td>
+</tr>
+<tr>
+<td><code>price_adjust</code></td>
+<td>percent, decimals (default 2)</td>
+<td><code>price_adjust(10)</code>: <code>19.99</code> → <code>21.99</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>round</code> with mode <code>ending</code> moves to the next price with the given cents: <code>12.30</code> → <code>12.99</code>, <code>12.99</code> stays, and with
+<code>.49</code>: <code>12.60</code> → <code>13.49</code>.</p>
+<h2 id="dates">Dates<a class="headerlink" href="#dates" title="Permanent link">&para;</a></h2>
+<p><code>date(from_format, to_format)</code> with PHP date letters (<code>d.m.Y</code>, <code>m/d/Y</code>, <code>Y-m-d H:i:s</code>). <code>from_format</code> <code>auto</code> (the
+default) accepts ISO dates (<code>2024-01-31</code>, with or without time) and German dates (<code>31.01.2024</code>, with or without time).
+<code>to_format</code> defaults to <code>Y-m-d</code>. Impossible dates such as <code>31.02.2024</code> are row errors. No time-zone conversion.</p>
+<h2 id="value-maps">Value maps<a class="headerlink" href="#value-maps" title="Permanent link">&para;</a></h2>
+<p><code>map</code> replaces whole values using the field's value map (<code>Ja</code> → <code>1</code>, <code>rot</code> → <code>Red</code>). Case and surrounding spaces are
+ignored by default; values not in the map pass through unchanged, or are row errors when the map is strict.</p>
+<h2 id="expressions">Expressions<a class="headerlink" href="#expressions" title="Permanent link">&para;</a></h2>
+<p><code>expr(expression)</code> computes a value from the whole source row. Expressions are parsed once per run; there is no
+<code>eval</code> and no access to PHP functions.</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Column</td>
+<td><code>{Column Name}</code> (a <code>}</code> inside a name is written <code>}}</code>)</td>
+</tr>
+<tr>
+<td>Current value</td>
+<td><code>value</code></td>
+</tr>
+<tr>
+<td>Text</td>
+<td><code>'text'</code> or <code>"text"</code> (a doubled quote inside is one quote)</td>
+</tr>
+<tr>
+<td>Number</td>
+<td><code>42</code>, <code>1.5</code>, <code>1e3</code> (start with a digit: <code>0.5</code>, not <code>.5</code>)</td>
+</tr>
+<tr>
+<td>Arithmetic</td>
+<td><code>+ - * / %</code></td>
+</tr>
+<tr>
+<td>Join text</td>
+<td><code>.</code> (<code>{Brand} . ' ' . {Name}</code>)</td>
+</tr>
+<tr>
+<td>Compare</td>
+<td><code>= != &lt;&gt; &lt; &lt;= &gt; &gt;=</code> (numbers as numbers, text ignoring case)</td>
+</tr>
+<tr>
+<td>Logic</td>
+<td><code>and</code>, <code>or</code>, <code>not</code>, <code>true</code>, <code>false</code></td>
+</tr>
+</tbody>
+</table>
+<p>Functions: <code>IF(condition, then, else)</code>, <code>ROUND(number, decimals)</code>, <code>CONCAT(…)</code>, <code>LOWER(text)</code>, <code>UPPER(text)</code>,
+<code>TRIM(text)</code>, <code>COALESCE(…)</code> (first non-empty), <code>LEN(text)</code>, <code>NUMBER(text)</code>, <code>REPLACE(text, find, replace)</code>,
+<code>CONTAINS(text, part)</code>, <code>MIN(…)</code>, <code>MAX(…)</code>, <code>ABS(number)</code>. Function names and keywords ignore case.</p>
+<p>Rules:</p>
+<ul>
+<li>Arithmetic with an empty value gives an empty value: <code>{Special price} * 1.19</code> stays empty when there is no special
+  price.</li>
+<li>Text that is not a number in arithmetic, and division by zero, are row errors.</li>
+<li>Empty text, <code>0</code> and <code>false</code> are false in conditions; everything else is true.</li>
+<li>Whole numbers keep every digit; decimals have 15 significant digits.</li>
+<li>Expressions are limited to 2,000 characters and 40 levels of nesting.</li>
+</ul>
+<p>Examples:</p>
+<pre><code class="language-text">IF({Stock} &gt; 0, 1, 0)
+ROUND(NUMBER({Preis}) * 1.19, 2)
+CONCAT({Brand}, ' ', {Model}, ' ', {Color})
+IF(CONTAINS({Category}, 'sale'), {Price} * 0.9, {Price})
+COALESCE({EAN}, {GTIN}, {Supplier SKU})
+</code></pre>
+<h2 id="your-own-transforms">Your own transforms<a class="headerlink" href="#your-own-transforms" title="Permanent link">&para;</a></h2>
+<p>Implement <code>Iranimij\OpenImport\Model\Transform\TransformProviderInterface</code> and add the class to the <code>providers</code>
+argument of <code>Iranimij\OpenImport\Model\Transform\TransformPool</code> in your module's <code>di.xml</code>. A provider may also
+replace a built-in transform by using its name.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../file-formats/" class="btn btn-neutral float-left" title="File formats"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../mapping/" class="btn btn-neutral float-right" title="Mapping and filters">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../file-formats/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../mapping/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

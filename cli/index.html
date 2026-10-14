@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/cli/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Command line - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Command line";
+        var mkdocs_page_input_path = "cli.md";
+        var mkdocs_page_url = "/openimport/cli/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Command line</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#openimportrun">openimport:run</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openimportrunstatus">openimport:run:status</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openimportprofilelist">openimport:profile:list</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openimportqueuerun">openimport:queue:run</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openimportsecretsreencrypt">openimport:secrets:reencrypt</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openimportprofilesexport-profile">openimport:profiles:export [profile …]</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openimportprofilesimport-file-dry-run">openimport:profiles:import &lt;file&gt; [--dry-run]</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openimportdoctor">openimport:doctor</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Command line</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/cli.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="command-line">Command line<a class="headerlink" href="#command-line" title="Permanent link">&para;</a></h1>
+<pre><code class="language-bash">bin/magento openimport:profile:list
+bin/magento openimport:run &lt;profile id or name&gt; [--dry-run] [--file=path] [--full] [--confirm] [--queue]
+bin/magento openimport:run:status &lt;run id&gt;
+bin/magento openimport:queue:run [--limit=10]
+</code></pre>
+<h2 id="openimportrun">openimport:run<a class="headerlink" href="#openimportrun" title="Permanent link">&para;</a></h2>
+<p>Runs a profile now, in the terminal, and prints the result: status, counts, the first changes (dry runs) and the first
+errors with the row of the file they come from.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--dry-run</code></td>
+<td>Check and preview only; nothing changes in the shop.</td>
+</tr>
+<tr>
+<td><code>--file=path</code></td>
+<td>Read this file instead of the profile's source.</td>
+</tr>
+<tr>
+<td><code>--full</code></td>
+<td>Ignore the delta state: send every row.</td>
+</tr>
+<tr>
+<td><code>--confirm</code></td>
+<td>Confirm a Delete or Replace run above the safety threshold.</td>
+</tr>
+<tr>
+<td><code>--queue</code></td>
+<td>Only add the run to the queue; OpenImport's cron runs it.</td>
+</tr>
+</tbody>
+</table>
+<p>The exit code is 0 for <em>Success</em> and <em>Partial</em>, 1 otherwise, so the command can be used in scripts and deployment
+pipelines.</p>
+<h2 id="openimportrunstatus">openimport:run:status<a class="headerlink" href="#openimportrunstatus" title="Permanent link">&para;</a></h2>
+<p>Shows any run (also runs started in the admin or by a schedule) with its counts, changes and errors.</p>
+<h2 id="openimportprofilelist">openimport:profile:list<a class="headerlink" href="#openimportprofilelist" title="Permanent link">&para;</a></h2>
+<p>Lists all profiles with direction, entity, source, schedule, whether the schedule is active, and the last run.</p>
+<h2 id="openimportqueuerun">openimport:queue:run<a class="headerlink" href="#openimportqueuerun" title="Permanent link">&para;</a></h2>
+<p>Runs the queued runs now, oldest first (runs started in the admin wait in the queue). OpenImport's cron does the
+same every minute; the command is for stores without cron, deployments and tests.</p>
+<h2 id="openimportsecretsreencrypt"><code>openimport:secrets:reencrypt</code><a class="headerlink" href="#openimportsecretsreencrypt" title="Permanent link">&para;</a></h2>
+<p>After <code>bin/magento encryption:key:change</code>: encrypts every stored source password, private key and token again
+with the current key. Run it while the old key is still in <code>app/etc/env.php</code>.</p>
+<h2 id="openimportprofilesexport-profile"><code>openimport:profiles:export [profile …]</code><a class="headerlink" href="#openimportprofilesexport-profile" title="Permanent link">&para;</a></h2>
+<p>Writes profiles as JSON to standard output (all profiles, or the ones named by id or name): every setting,
+mapping and value map, never passwords, keys, tokens or upload tokens. Keep the file in version control or move it
+to another store: <code>bin/magento openimport:profiles:export &gt; profiles.json</code>.</p>
+<h2 id="openimportprofilesimport-file-dry-run"><code>openimport:profiles:import &lt;file&gt; [--dry-run]</code><a class="headerlink" href="#openimportprofilesimport-file-dry-run" title="Permanent link">&para;</a></h2>
+<p>Creates the profiles of such a file; a profile with the same name is updated (its stored secrets are kept).
+Everything is checked first and listed as "create …" / "update …"; one problem and nothing is saved. <code>--dry-run</code>
+checks and lists without saving. Enter passwords and keys in the admin afterwards.</p>
+<h2 id="openimportdoctor"><code>openimport:doctor</code><a class="headerlink" href="#openimportdoctor" title="Permanent link">&para;</a></h2>
+<p>Checks what makes imports slow or stuck and says what to do: cron (has <code>openimport_tick</code> run in the last
+10 minutes?), indexers on "Update on Save", PHP extensions and <code>memory_limit</code>, <code>var/openimport</code> writable, runs
+waiting longer than 15 minutes, runs "running" for more than 90 minutes. Exit code 1 when something needs a look.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../schedules/" class="btn btn-neutral float-left" title="Schedules and cron"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../admin/" class="btn btn-neutral float-right" title="Admin">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../schedules/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../admin/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

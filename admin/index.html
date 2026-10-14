@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/admin/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Admin - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Admin";
+        var mkdocs_page_input_path = "admin.md";
+        var mkdocs_page_url = "/openimport/admin/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Admin</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#profiles">Profiles</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#runs">Runs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#permissions">Permissions</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Admin</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/admin.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="admin">Admin<a class="headerlink" href="#admin" title="Permanent link">&para;</a></h1>
+<p>OpenImport lives under <strong>System › Data Transfer</strong>: <em>OpenImport Profiles</em> and <em>OpenImport Runs</em>. Settings are under
+<strong>Stores › Configuration › iranimij › OpenImport</strong>.</p>
+<h2 id="profiles">Profiles<a class="headerlink" href="#profiles" title="Permanent link">&para;</a></h2>
+<p>The profile list shows each profile's direction, what it imports or exports, its source, schedule and last run.
+Row actions: <em>Edit</em>, <em>Dry run</em>, <em>Run now</em>, <em>Duplicate</em> (the copy starts with its schedule off) and <em>Delete</em> (runs
+and error reports are kept).</p>
+<p>The profile form has six steps:</p>
+<ol>
+<li><strong>What</strong>: name, import or export, and what (Products, Stock &amp; prices, Customers …).</li>
+<li><strong>Where</strong>: the source. For <em>Upload a file</em>, choose the file; it is read on the server, never in the browser.</li>
+<li><strong>File</strong>: format and its options (delimiter, encoding, sheet, record path). The first 20 rows of the file are
+   shown and read again when an option changes.</li>
+<li><strong>Map</strong>: one row per Magento field: the column of the file (or a fixed value), the store view, transforms
+   (add, move up and down, remove), <em>required</em>, and a value map. <strong>Auto-match</strong> proposes a mapping from the column
+   names, <strong>Add required fields</strong> adds what Magento needs for new records, <strong>Preview the first rows</strong> shows what
+   Magento will receive, row by row, with any problems.</li>
+<li><strong>Rules</strong>: behaviour, rows with errors, allowed errors, <em>skip unchanged rows</em> (delta), safety limit, row filters.</li>
+<li><strong>When</strong>: manual or a schedule (presets or a cron expression), schedule on/off, e-mails, what happens to the source
+   file after a successful run.</li>
+</ol>
+<p><strong>Save and dry run</strong> saves and starts a dry run straight away. New profiles have their schedule off; switch it on
+after a dry run you are happy with.</p>
+<h2 id="runs">Runs<a class="headerlink" href="#runs" title="Permanent link">&para;</a></h2>
+<p>Runs are queued and run by OpenImport's cron within a minute (or by <code>bin/magento openimport:run</code>). The run page
+shows the status, the numbers (rows read, new, changed, unchanged, skipped, errors), and refreshes itself while the
+run is queued or running.</p>
+<ul>
+<li><strong>Dry runs</strong> list what would change: for each record the field, the value now and the value after the run.
+  <strong>Run for real</strong> imports the very file the dry run checked.</li>
+<li>Runs with <em>Delete</em> or <em>Replace</em> above the safety limit need the word DELETE or REPLACE typed in, by a role allowed
+  to confirm them (<em>Confirm runs above the safety limit</em>).</li>
+<li><strong>Download error report</strong> gives a CSV with the row number, record, field and error, followed by the original row,
+  so you can fix the rows and import them again. Cells that a spreadsheet would run as formulas are protected.</li>
+<li><strong>Download the file</strong> gives the file the run read.</li>
+<li>A queued run can be cancelled.</li>
+</ul>
+<h2 id="permissions">Permissions<a class="headerlink" href="#permissions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Allows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View profiles</td>
+<td>the profile list and form (read only)</td>
+</tr>
+<tr>
+<td>Create and edit profiles</td>
+<td>saving, duplicating and deleting profiles, uploading files</td>
+</tr>
+<tr>
+<td>Run profiles</td>
+<td>dry runs, live runs, cancelling queued runs</td>
+</tr>
+<tr>
+<td>Confirm runs above the safety limit</td>
+<td>the typed confirmation for Delete and Replace</td>
+</tr>
+<tr>
+<td>View runs and error reports</td>
+<td>the run list, run pages and downloads</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../cli/" class="btn btn-neutral float-left" title="Command line"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../security/" class="btn btn-neutral float-right" title="Security">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../cli/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../security/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

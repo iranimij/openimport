@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/core-facts/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Core facts - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Core facts";
+        var mkdocs_page_input_path = "core-facts.md";
+        var mkdocs_page_url = "/openimport/core-facts/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Core facts</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developers</li>
+      <li class="breadcrumb-item active">Core facts</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/core-facts.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="core-facts-openimport-relies-on">Core facts OpenImport relies on<a class="headerlink" href="#core-facts-openimport-relies-on" title="Permanent link">&para;</a></h1>
+<p>Checked during M0 against Magento Open Source 2.4.7, 2.4.8 and 2.4.9 source code and CI. Each line says what
+OpenImport does with it.</p>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Consequence for OpenImport</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The REST import endpoints <code>/V1/import/csv</code> and <code>/V1/import/json</code> (modules ImportCsvApi / ImportJsonApi) are <strong>not part of Magento Open Source 2.4.9</strong>; Adobe documents them for Adobe Commerce.</td>
+<td>Starting an import remotely is a real gap on Open Source. OpenImport's REST trigger for profiles (1.1) fills it.</td>
+</tr>
+<tr>
+<td><code>Magento\ImportExport\Model\Import</code> validates and imports from any <code>AbstractSource</code>; the same instance keeps the validated bunch ids for <code>importSource()</code>.</td>
+<td><code>MappedSource</code> + <code>CoreImporter</code>, see <a href="../core-bridge/">Core bridge</a>.</td>
+</tr>
+<tr>
+<td>Core's <code>ProcessingErrorAggregator</code> is shared (no <code>shared="false"</code>).</td>
+<td>Cleared before every run.</td>
+</tr>
+<tr>
+<td><code>Import::getValidatedIds()</code> exists only from 2.4.9.</td>
+<td><code>CoreImport::getBunchIds()</code> reads the entity adapter's ids on every version.</td>
+</tr>
+<tr>
+<td>Scheduled import/export is Adobe Commerce only.</td>
+<td>OpenImport's schedules run on Open Source (own cron group).</td>
+</tr>
+<tr>
+<td><code>Export::export()</code> returns the whole file as a string; the entity adapter writes through a writer (<code>AbstractAdapter</code>: <code>setHeaderCols()</code>, <code>writeRow()</code>, <code>getContents()</code>). Admin exports go through the message queue.</td>
+<td>OpenImport calls the entity adapter with its own streaming writers (CSV, XLSX, JSON, XML) in its runner; no queue consumer needed (M3).</td>
+</tr>
+<tr>
+<td><code>Magento\Framework\Filesystem\Io\Sftp</code> logs in with a password only and uses phpseclib 3. <code>magento/framework</code> does not declare phpseclib; every Magento project has <code>phpseclib/phpseclib ^3.0</code> through the product metapackage.</td>
+<td>OpenImport talks to <code>phpseclib3\Net\SFTP</code> directly for password and private-key logins and declares <code>phpseclib/phpseclib ^3.0</code> (already installed in every store, so no new download).</td>
+</tr>
+<tr>
+<td>The MSI import entity is <code>stock_sources</code> (<code>Magento_InventoryImportExport</code>); it does not exist when MSI is disabled.</td>
+<td>The Stock &amp; price entity writes through <code>stock_sources</code> with MSI and through product <code>qty</code> without it.</td>
+</tr>
+<tr>
+<td>Core's CSV source only opens files inside the Magento root (<code>PathValidator</code>).</td>
+<td>OpenImport keeps run files under <code>var/openimport/runs/&lt;id&gt;/</code>.</td>
+</tr>
+<tr>
+<td>Core product import time is dominated by URL rewrites and indexers; see <a href="../baseline/">Baseline</a>.</td>
+<td>Doctor warns about "Update on Save" indexers; delta mode skips unchanged rows.</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../core-bridge/" class="btn btn-neutral float-left" title="Core bridge"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../baseline/" class="btn btn-neutral float-right" title="Baseline">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../core-bridge/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../baseline/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

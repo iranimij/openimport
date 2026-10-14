@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/core-bridge/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Core bridge - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Core bridge";
+        var mkdocs_page_input_path = "core-bridge.md";
+        var mkdocs_page_url = "/openimport/core-bridge/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Core bridge</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#the-pieces">The pieces</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-the-bunches-are-removed">Why the bunches are removed</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#import-history">Import history</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#evidence">Evidence</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-the-spike-found">What the spike found</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developers</li>
+      <li class="breadcrumb-item active">Core bridge</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/core-bridge.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="core-bridge-how-openimport-writes-data">Core bridge: how OpenImport writes data<a class="headerlink" href="#core-bridge-how-openimport-writes-data" title="Permanent link">&para;</a></h1>
+<p>OpenImport never writes catalog, customer or stock tables itself. It prepares rows (read the file, map columns,
+transform values, filter rows) and hands them to Magento's own import engine, the one behind
+System › Data Transfer › Import. Whatever core would write for an equivalent CSV file is what OpenImport writes.</p>
+<h2 id="the-pieces">The pieces<a class="headerlink" href="#the-pieces" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Job</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Model\Source\MappedSource</code></td>
+<td>Core's <code>AbstractSource</code> over OpenImport's prepared rows. No temporary CSV file: core pulls rows from a generator. Missing columns become empty cells, like an empty CSV cell ("leave unchanged").</td>
+</tr>
+<tr>
+<td><code>Model\Bridge\CoreImport</code></td>
+<td>Core's <code>Import</code> model plus <code>getBunchIds()</code>: the <code>importexport_importdata</code> rows this import validated (2.4.9 has <code>getValidatedIds()</code>, 2.4.7 and 2.4.8 do not).</td>
+</tr>
+<tr>
+<td><code>Model\Bridge\CoreImporter</code></td>
+<td>Validate, then (live runs only) add a core import history row, import, invalidate the entity's indexers, and always remove this run's bunches.</td>
+</tr>
+<tr>
+<td><code>Model\Bridge\ImportRequest</code> / <code>ImportResult</code> / <code>RowError</code></td>
+<td>What to run, and what came back (counts, errors with 0-based row positions, history id, time).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-the-bunches-are-removed">Why the bunches are removed<a class="headerlink" href="#why-the-bunches-are-removed" title="Permanent link">&para;</a></h2>
+<p>Core validation stores the validated rows in <code>importexport_importdata</code> and later imports the bunches whose ids the
+entity adapter collected. A dry run validates and stops, so its bunches would stay in the table. They are deleted by
+id at the end of every run, dry or live, and also when core throws.</p>
+<h2 id="import-history">Import history<a class="headerlink" href="#import-history" title="Permanent link">&para;</a></h2>
+<p>Core's import updates the most recent history row of the current admin user (2.4.7, 2.4.8) or the row named in
+<code>_import_history_id</code> (2.4.9). A live OpenImport run adds its own history row right before the import and passes its
+id, so core's updates land on OpenImport's row on every version, never on someone else's import. The run appears
+under System › Data Transfer › Import History with its summary. The history row has no downloadable file yet
+(M1 writes the mapped rows there).</p>
+<h2 id="evidence">Evidence<a class="headerlink" href="#evidence" title="Permanent link">&para;</a></h2>
+<p><code>Test/Integration/Bridge/CoreBridgeTest.php</code> imports the same rows twice, once through core's CSV source (the admin
+path) and once through <code>MappedSource</code>, and compares the results field by field:</p>
+<ul>
+<li>simple products: new products with stock, special price, HTML description, disabled status, "Not Visible
+  Individually", a store-view row; updates including <code>__EMPTY__VALUE__</code>; Replace and Delete;</li>
+<li>customers;</li>
+<li>dry run: nothing written, no bunch left behind;</li>
+<li>invalid rows with "skip errors": reported with their 0-based position, same outcome as core's CSV import; nothing
+  imported with "stop on error";</li>
+<li>import history row written and completed.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Magento</th>
+<th>PHP</th>
+<th>Result (CI run <a href="https://github.com/iranimij/openimport/actions/runs/38402758703">38402758703</a>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.4.7-p10</td>
+<td>8.2, 8.3</td>
+<td>11 / 11 green</td>
+</tr>
+<tr>
+<td>2.4.8-p5</td>
+<td>8.2, 8.3, 8.4</td>
+<td>11 / 11 green</td>
+</tr>
+<tr>
+<td>2.4.9</td>
+<td>8.3, 8.4</td>
+<td>11 / 11 green</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Decision:</strong> <code>MappedSource</code> straight into core on every supported version. The temporary-CSV fallback planned in
+02 · Architecture is not needed and is not built.</p>
+<h2 id="what-the-spike-found">What the spike found<a class="headerlink" href="#what-the-spike-found" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Core's error aggregator is shared.</strong> <code>ProcessingErrorAggregator</code> is a DI singleton. Core runs one import per
+   admin request; OpenImport runs many per process (cron, CLI). Without <code>clear()</code> before each run, errors of earlier
+   runs counted against the next run and stopped valid imports. <code>CoreImporter</code> clears it first.</li>
+<li><strong>Store-view rows of new products need <code>attribute_set_code</code> and <code>product_type</code>.</strong> Core validates every row of a
+   product that is new in the file as a new product. A store-view row with only <code>sku</code>, <code>store_view_code</code> and <code>name</code>
+   is refused ("Product Type is invalid or not supported"), through the CSV source as well. OpenImport's
+   store-view expansion (M1) copies both onto the rows it generates.</li>
+<li><strong>An empty cell in a required attribute's column is an error, also for existing products.</strong> A file with a <code>name</code>
+   or <code>price</code> column must fill it on every row. The mapping preview (M1) flags such rows before core sees them.</li>
+<li><strong>Validated bunches stay in <code>importexport_importdata</code> unless removed.</strong> Removed by id after every run.</li>
+<li><strong>Core's history update targets "the last row of this admin user"</strong> (2.4.7, 2.4.8) or <code>_import_history_id</code>
+   (2.4.9). Adding OpenImport's own row right before the import and passing its id works on all three.</li>
+<li><strong>Core reports 0-based positions of the rows it received.</strong> Mapping back to source line numbers is M1 (rows can be
+   filtered out or expanded into store-view rows on the way).</li>
+<li><strong>"Skip rows with errors" skips everything after one critical error.</strong> Core's row errors are critical by default,
+   and the product, customer and other entities stop saving every row once the aggregator holds a critical error
+   (<code>hasToBeTerminated()</code>), even with the skip-errors strategy, while the import still reports success (found in
+   M1). With <em>Skip rows with errors</em>, OpenImport leaves the rows core rejected out (<code>SkipRowsSource</code>), validates the
+   rest again and imports that; errors of every pass still point at the original rows. At most four validation
+   passes; a critical error without a row stops the run with nothing imported.</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../security/" class="btn btn-neutral float-left" title="Security"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../core-facts/" class="btn btn-neutral float-right" title="Core facts">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../security/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../core-facts/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

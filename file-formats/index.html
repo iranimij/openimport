@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/file-formats/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>File formats - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "File formats";
+        var mkdocs_page_input_path = "file-formats.md";
+        var mkdocs_page_url = "/openimport/file-formats/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">File formats</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#csv-and-tsv">CSV and TSV</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#excel-xlsx">Excel (.xlsx)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#json">JSON</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#xml">XML</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#column-names-in-json-and-xml-files">Column names in JSON and XML files</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">File formats</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/file-formats.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="file-formats">File formats<a class="headerlink" href="#file-formats" title="Permanent link">&para;</a></h1>
+<p>OpenImport reads CSV, Excel (.xlsx), JSON and XML files without any extra library. The format comes from the
+profile, or is detected from the file name and, when the name says nothing, from the first bytes of the file.</p>
+<p>Every reader returns rows of text keyed by column name, and every row keeps its position in the file, so an error
+says "row 18" and row 18 is what the merchant sees in Excel or a text editor.</p>
+<h2 id="csv-and-tsv">CSV and TSV<a class="headerlink" href="#csv-and-tsv" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Delimiter</td>
+<td>auto</td>
+<td>Detected from the header line: comma, semicolon, tab or pipe (counted outside quotes).</td>
+</tr>
+<tr>
+<td>Enclosure</td>
+<td><code>"</code></td>
+<td>Doubled enclosures inside a cell (<code>""</code>) are one quote.</td>
+</tr>
+<tr>
+<td>Encoding</td>
+<td>auto</td>
+<td>UTF-8 (with or without byte order mark), UTF-16 with byte order mark (Excel "Unicode text"), otherwise Windows-1252. Can be set to UTF-8, Windows-1252, ISO-8859-1 or ISO-8859-15.</td>
+</tr>
+<tr>
+<td>First row is the header</td>
+<td>yes</td>
+<td>Without a header, columns are named <code>column_1</code>, <code>column_2</code>, …</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Quoted cells may hold delimiters and line breaks.</li>
+<li>Empty lines are skipped; row numbers still count them.</li>
+<li>Empty header cells become <code>column_&lt;n&gt;</code>; duplicate headers become <code>name (2)</code>, <code>name (3)</code>.</li>
+<li>Short rows are filled with empty cells; extra cells without a header are dropped.</li>
+<li>The file is streamed: memory does not grow with the file size.</li>
+</ul>
+<h2 id="excel-xlsx">Excel (.xlsx)<a class="headerlink" href="#excel-xlsx" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sheet</td>
+<td>first sheet</td>
+<td>A sheet name (case does not matter) or its position (1, 2, …).</td>
+</tr>
+<tr>
+<td>First row is the header</td>
+<td>yes</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Text, numbers, booleans (<code>1</code> / <code>0</code>) and the cached results of formulas are read. Error cells (<code>#N/A</code>) are empty.</li>
+<li>Numbers come out as Excel shows them, without binary noise (<code>0.3</code>, not <code>0.30000000000000004</code>).</li>
+<li>Cells with a date or time format become <code>2024-01-31</code> or <code>2024-01-31 14:30:00</code> (1900 and 1904 date systems).</li>
+<li>Row numbers are the sheet's own row numbers; empty rows are skipped.</li>
+<li>Old Excel files (.xls) are not supported: save them as .xlsx or .csv.</li>
+<li>Workbooks that would unpack to more than 512 MB are refused.</li>
+<li>The sheet is streamed with PHP's XMLReader; only the shared strings table is held in memory.</li>
+</ul>
+<h2 id="json">JSON<a class="headerlink" href="#json" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record path</td>
+<td>auto</td>
+<td>A dot path to the list of records, e.g. <code>data.items</code>. Auto: the document itself when it is a list, otherwise its only list of objects.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Nested objects become dotted columns: <code>{"stock": {"qty": 3}}</code> gives the column <code>stock.qty</code>.</li>
+<li>Lists of plain values are joined with a comma (<code>["red", "blue"]</code> gives <code>red,blue</code>); lists of objects are kept as
+  JSON text in one column, for a transform to pick apart.</li>
+<li><code>true</code> / <code>false</code> become <code>1</code> / <code>0</code>, <code>null</code> becomes an empty cell. Very large integers keep every digit.</li>
+<li>JSON files are read into memory, up to 50 MB by default. Use CSV or XML for larger files.</li>
+</ul>
+<h2 id="xml">XML<a class="headerlink" href="#xml" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record path</td>
+<td>children of the root</td>
+<td><code>/catalog/products/product</code> (from the root) or <code>//product</code> (at any depth).</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Child elements become columns (<code>sku</code>, <code>stock.qty</code>), attributes become <code>@id</code> or <code>price.@currency</code>.</li>
+<li>Repeated plain children are joined with a comma (<code>&lt;category&gt;Men&lt;/category&gt;&lt;category&gt;Sale&lt;/category&gt;</code> gives
+  <code>Men,Sale</code>); repeated children with their own children are kept as JSON text.</li>
+<li>CDATA is read as text.</li>
+<li>The file is streamed record by record: memory does not grow with the file size.</li>
+<li>Files with a DOCTYPE are refused, and the parser never loads anything from the network (no XML entity attacks).</li>
+</ul>
+<h2 id="column-names-in-json-and-xml-files">Column names in JSON and XML files<a class="headerlink" href="#column-names-in-json-and-xml-files" title="Permanent link">&para;</a></h2>
+<p>JSON and XML records do not all need the same fields. The column list shown in the mapping editor comes from the
+first 1,000 records; fields that only appear later are still imported when they are mapped by name.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../transforms/" class="btn btn-neutral float-right" title="Transforms and expressions">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../transforms/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

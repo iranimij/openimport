@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/mapping/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Mapping and filters - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Mapping and filters";
+        var mkdocs_page_input_path = "mapping.md";
+        var mkdocs_page_url = "/openimport/mapping/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Mapping and filters</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#mapping">Mapping</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#stock-prices">Stock &amp; prices</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#auto-match">Auto-match</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#store-view-values-products">Store-view values (products)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#row-filters">Row filters</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Mapping and filters</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/mapping.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="mapping-store-views-and-row-filters">Mapping, store views and row filters<a class="headerlink" href="#mapping-store-views-and-row-filters" title="Permanent link">&para;</a></h1>
+<h2 id="mapping">Mapping<a class="headerlink" href="#mapping" title="Permanent link">&para;</a></h2>
+<p>A profile maps Magento fields (core import columns) to the file:</p>
+<ul>
+<li><strong>Source column</strong>: the value comes from that column of the file.</li>
+<li><strong>Fixed value</strong>: the same value for every row (for example <code>attribute_set_code</code> = <code>Default</code>, <code>_website</code> = <code>base</code>).</li>
+<li><strong>Transforms</strong>: an ordered list applied to the value (see <a href="../transforms/">Transforms and expressions</a>). A field
+  with no source column and an <code>expr</code> transform computes its value from the whole row.</li>
+<li><strong>Required</strong>: an empty result makes the row an error instead of sending it.</li>
+</ul>
+<p>Magento fields that are not mapped are not sent, so Magento leaves them unchanged. Columns of the file that are not
+mapped are ignored. The identifier field of the entity must be mapped:</p>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Identifier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Products (<code>catalog_product</code>), Stock &amp; prices</td>
+<td><code>sku</code></td>
+</tr>
+<tr>
+<td>Advanced pricing</td>
+<td><code>sku</code>, <code>tier_price_website</code>, <code>tier_price_customer_group</code>, <code>tier_price_qty</code></td>
+</tr>
+<tr>
+<td>Customers, customers with address</td>
+<td><code>email</code>, <code>_website</code></td>
+</tr>
+<tr>
+<td>Customer addresses</td>
+<td><code>_email</code>, <code>_website</code>, <code>_entity_id</code></td>
+</tr>
+<tr>
+<td>Stock sources (MSI)</td>
+<td><code>sku</code>, <code>source_code</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="stock-prices">Stock &amp; prices<a class="headerlink" href="#stock-prices" title="Permanent link">&para;</a></h3>
+<p>The <em>Stock &amp; prices</em> entity (<code>openimport_stock_price</code>) is made for supplier feeds: it can set <code>qty</code>, <code>is_in_stock</code>,
+<code>price</code>, <code>special_price</code>, <code>special_price_from_date</code>, <code>special_price_to_date</code> and <code>cost</code> of products that already
+exist, through Magento's own product import (with MSI, <code>qty</code> goes to the default source). SKUs the shop does not
+have are skipped and counted as <em>skipped by behaviour</em>; they are never created. For quantities per MSI source, use the
+<em>Stock sources</em> entity.</p>
+<h3 id="auto-match">Auto-match<a class="headerlink" href="#auto-match" title="Permanent link">&para;</a></h3>
+<p>The mapping editor suggests a mapping from the file's column names, in this order: the exact name; the name ignoring
+case, spaces, underscores, hyphens and dots (<code>Special Price</code> → <code>special_price</code>); known synonyms (<code>Artikelnummer</code> →
+<code>sku</code>, <code>Bestand</code> / <code>Menge</code> → <code>qty</code>, <code>Preis</code> → <code>price</code>, <code>Bezeichnung</code> → <code>name</code>, <code>E-Mail</code> → <code>email</code>, <code>Vorname</code> →
+<code>firstname</code> …); and store-view columns (<code>name_de</code>, <code>name (de)</code>, <code>name [de]</code>). Each column is used once.</p>
+<h2 id="store-view-values-products">Store-view values (products)<a class="headerlink" href="#store-view-values-products" title="Permanent link">&para;</a></h2>
+<p>Map a field as <code>store:&lt;store view code&gt;:&lt;field&gt;</code>, for example <code>store:de:name</code>. One row of the file then becomes the
+default row plus one row per store view that has at least one non-empty value. Store-view rows carry the SKU, the
+attribute set and the product type (Magento needs those for new products) and the store-view fields only.</p>
+<h2 id="row-filters">Row filters<a class="headerlink" href="#row-filters" title="Permanent link">&para;</a></h2>
+<p>Row filters decide which rows of the file are imported, before mapping:</p>
+<ul>
+<li><strong>Mode</strong>: <em>include</em> imports only the matching rows; <em>exclude</em> skips them.</li>
+<li><strong>Match</strong>: <em>all</em> conditions or <em>any</em> condition.</li>
+<li><strong>Conditions</strong>: a column, an operator and a value, or an <a href="../transforms/#expressions">expression</a>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Matches when the cell (trimmed, ignoring case) …</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>equals</code>, <code>not_equals</code></td>
+<td>is / is not the value</td>
+</tr>
+<tr>
+<td><code>contains</code>, <code>not_contains</code>, <code>starts_with</code>, <code>ends_with</code></td>
+<td>contains / starts / ends with the value</td>
+</tr>
+<tr>
+<td><code>in</code>, <code>not_in</code></td>
+<td>is / is not one of a comma-separated list</td>
+</tr>
+<tr>
+<td><code>empty</code>, <code>not_empty</code></td>
+<td>is empty / not empty (a missing column is empty)</td>
+</tr>
+<tr>
+<td><code>greater_than</code>, <code>less_than</code></td>
+<td>is a number above / below the value (decimal commas allowed)</td>
+</tr>
+<tr>
+<td><code>regex</code></td>
+<td>matches the pattern</td>
+</tr>
+</tbody>
+</table>
+<p>Rows skipped by a filter are counted as "skipped by filter" on the run page, not as errors.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../transforms/" class="btn btn-neutral float-left" title="Transforms and expressions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../runs/" class="btn btn-neutral float-right" title="Runs, dry runs and safety">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../transforms/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../runs/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

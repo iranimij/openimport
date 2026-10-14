@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/runs/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Runs, dry runs and safety - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Runs, dry runs and safety";
+        var mkdocs_page_input_path = "runs.md";
+        var mkdocs_page_url = "/openimport/runs/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Runs, dry runs and safety</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#what-happens-in-a-run">What happens in a run</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dry-runs">Dry runs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#errors">Errors</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#safety-threshold">Safety threshold</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#statuses">Statuses</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Runs, dry runs and safety</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/runs.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="runs-dry-runs-and-safety">Runs, dry runs and safety<a class="headerlink" href="#runs-dry-runs-and-safety" title="Permanent link">&para;</a></h1>
+<p>A run reads one file through a profile. Runs are queued (admin buttons, schedules, the CLI) and executed by
+OpenImport's own cron group or by <code>bin/magento openimport:run</code>; never inside a web request.</p>
+<h2 id="what-happens-in-a-run">What happens in a run<a class="headerlink" href="#what-happens-in-a-run" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Read</strong> the file (see <a href="../file-formats/">File formats</a>).</li>
+<li><strong>Row filters</strong> skip rows (counted as <em>filtered</em>).</li>
+<li><strong>Mapping and transforms</strong> build Magento's import rows; a row that cannot be mapped becomes an error with its row
+   number in your file.</li>
+<li><strong>Behaviour</strong>: <em>Only add new</em> skips records that exist, <em>Only update existing</em> skips records that do not (counted
+   as <em>skipped</em>).</li>
+<li><strong>Delta</strong> (when switched on): a record whose prepared rows are exactly what the last successful run of this
+   profile sent is skipped (counted as <em>unchanged</em>). Changing the profile's source, format, filters, behaviour,
+   mapping or value maps forgets the stored state, and a run with <em>full</em> ignores it. Each line of the file is
+   compared on its own, so a file with one line per store view (or several addresses or tier prices per record)
+   only sends the lines that changed.</li>
+<li><strong>Magento validates and imports</strong> the rows with its own import engine. Its errors are reported against the rows
+   of your file, not against Magento's internal row numbers.</li>
+</ol>
+<p>Prepared rows are written to the run folder (<code>var/openimport/runs/&lt;run id&gt;/</code>), so memory use does not grow with the
+file.</p>
+<h2 id="dry-runs">Dry runs<a class="headerlink" href="#dry-runs" title="Permanent link">&para;</a></h2>
+<p>A dry run does everything except the import: Magento validates every row, and OpenImport compares the prepared rows
+with what the shop has now. The run page shows the totals (new, changed, unchanged, deleted) and a sample of up to 200
+records per kind with <em>before → after</em> for every changed field. Comparison follows Magento's rules: empty cells
+change nothing, numbers compare as numbers (12.50 = 12.5), Yes/No equal 1/0. Products and customers are compared field
+by field; categories, images and product relations are not compared.</p>
+<h2 id="errors">Errors<a class="headerlink" href="#errors" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Stop on error</strong> (default): if any row has an error, nothing is imported.</li>
+<li><strong>Skip rows with errors</strong>: valid rows are imported as long as the number of errors stays within <em>allowed errors</em>.</li>
+</ul>
+<p>Every error names the row in your file, the record's identifier, the field and what is wrong. The first 10,000 errors
+of a run are stored (setting <em>Errors kept per run</em>); the count includes all of them.</p>
+<h2 id="safety-threshold">Safety threshold<a class="headerlink" href="#safety-threshold" title="Permanent link">&para;</a></h2>
+<p>Runs with the <em>Delete</em> or <em>Replace</em> behaviour that would affect more than the safety threshold (default 10 % of the
+records of that kind in the shop) stop with the status <strong>Needs confirmation</strong> and do nothing. Confirming the run
+(typing DELETE or REPLACE in the admin, or <code>--confirm</code> on the CLI) runs it.</p>
+<h2 id="statuses">Statuses<a class="headerlink" href="#statuses" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Queued</td>
+<td>Waiting for the next cron minute (or the CLI).</td>
+</tr>
+<tr>
+<td>Running</td>
+<td>Being processed.</td>
+</tr>
+<tr>
+<td>Success</td>
+<td>Everything went through.</td>
+</tr>
+<tr>
+<td>Partial</td>
+<td>Valid rows were imported, some rows had errors.</td>
+</tr>
+<tr>
+<td>Failed</td>
+<td>Nothing was imported; the message says why.</td>
+</tr>
+<tr>
+<td>Needs confirmation</td>
+<td>Above the safety threshold; nothing was done.</td>
+</tr>
+<tr>
+<td>Cancelled</td>
+<td>Stopped by an admin before it started.</td>
+</tr>
+</tbody>
+</table>
+<p>Only one run of a profile runs at a time, and only one live import per kind of record (products, customers …), so
+two imports never fight over the same indexers.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../mapping/" class="btn btn-neutral float-left" title="Mapping and filters"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../sources/" class="btn btn-neutral float-right" title="Sources">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../mapping/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../sources/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

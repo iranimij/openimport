@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/baseline/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Baseline - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Baseline";
+        var mkdocs_page_input_path = "baseline.md";
+        var mkdocs_page_url = "/openimport/baseline/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Baseline</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#results-run-38403542694-2026-10-13">Results (run 38403542694, 2026-10-13)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-it-says">What it says</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#50000-products-run-38403706606-2026-10-13">50,000 products (run 38403706606, 2026-10-13)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#the-whole-pipeline-m1-run-38518924669-and-38422135458-2026-10-14">The whole pipeline (M1, run 38518924669 and 38422135458, 2026-10-14)</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developers</li>
+      <li class="breadcrumb-item active">Baseline</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/baseline.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="baseline-core-import-speed-and-the-core-bridges-overhead">Baseline: core import speed and the core bridge's overhead<a class="headerlink" href="#baseline-core-import-speed-and-the-core-bridges-overhead" title="Permanent link">&para;</a></h1>
+<p>Measured in M0 so every later speed claim compares against Magento's own importer, never against another vendor.</p>
+<p><strong>Method.</strong> <code>openimport-dev-env/ci/benchmark.php</code> in the dev-env's Benchmark workflow: Magento Open Source 2.4.9,
+PHP 8.3, MariaDB 10.6, OpenSearch 2.12, Redis, no sample data, <strong>all indexers on "Update by Schedule"</strong>, a GitHub
+Actions runner (4 vCPU, 16 GB). Datasets are generated deterministically by <code>ci/generate-datasets.php</code>:</p>
+<ul>
+<li><code>products-10k</code>: 10,000 simple products, 3 categories each (created on the fly), stock, price, a special price on
+  every 7th, an HTML description, plus a German store-view row on every 10th product (11,000 rows);</li>
+<li><code>customers-20k</code>: 20,000 customers with one default address (<code>customer_composite</code>).</li>
+</ul>
+<p>Each dataset is imported twice through core's CSV source (create, then the same file again = every entity updated,
+no value changes) and twice through OpenImport's <code>MappedSource</code> (same rows, other SKUs / e-mails / names). All passes
+run in one PHP process, so peak memory grows from pass to pass and is shown for orientation only.</p>
+<h2 id="results-run-38403542694-2026-10-13">Results (run <a href="https://github.com/iranimij/openimport-dev-env/actions/runs/38403542694">38403542694</a>, 2026-10-13)<a class="headerlink" href="#results-run-38403542694-2026-10-13" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Path</th>
+<th>Pass</th>
+<th>Rows</th>
+<th>Created</th>
+<th>Updated</th>
+<th>Seconds</th>
+<th>Rows / min</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>products-10k</td>
+<td>core CSV</td>
+<td>create</td>
+<td>11,000</td>
+<td>10,000</td>
+<td>10</td>
+<td>87.0</td>
+<td>7,584</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>core CSV</td>
+<td>update</td>
+<td>11,000</td>
+<td>0</td>
+<td>11,000</td>
+<td>89.6</td>
+<td>7,363</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>OpenImport</td>
+<td>create</td>
+<td>11,000</td>
+<td>10,000</td>
+<td>10</td>
+<td>86.1</td>
+<td>7,670</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>OpenImport</td>
+<td>update</td>
+<td>11,000</td>
+<td>0</td>
+<td>11,000</td>
+<td>91.8</td>
+<td>7,191</td>
+</tr>
+<tr>
+<td>customers-20k</td>
+<td>core CSV</td>
+<td>create</td>
+<td>20,000</td>
+<td>20,000</td>
+<td>0</td>
+<td>24.5</td>
+<td>49,077</td>
+</tr>
+<tr>
+<td>customers-20k</td>
+<td>core CSV</td>
+<td>update</td>
+<td>20,000</td>
+<td>0</td>
+<td>20,000</td>
+<td>25.2</td>
+<td>47,623</td>
+</tr>
+<tr>
+<td>customers-20k</td>
+<td>OpenImport</td>
+<td>create</td>
+<td>20,000</td>
+<td>20,000</td>
+<td>0</td>
+<td>26.5</td>
+<td>45,299</td>
+</tr>
+<tr>
+<td>customers-20k</td>
+<td>OpenImport</td>
+<td>update</td>
+<td>20,000</td>
+<td>0</td>
+<td>20,000</td>
+<td>27.0</td>
+<td>44,447</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-it-says">What it says<a class="headerlink" href="#what-it-says" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>The core bridge costs almost nothing:</strong> products −1 % / +2.5 %, customers +8 % / +7 % (reading the CSV in PHP and
+  building associative rows). The budget in 02 · Architecture is 15 % for the whole pipeline.</li>
+<li><strong>Re-importing an unchanged catalog costs as much as creating it</strong> (90 s for 10k products). A nightly supplier
+  file usually changes a few percent of the rows: delta mode (M1) skips unchanged rows before core sees them. Target:
+  a run with 1 % changed rows takes at most 10 % of a full run.</li>
+<li><strong>Rate:</strong> about 7,500 product rows or 48,000 customer rows per minute on a CI runner with indexers on schedule.
+  Shops with "Update on Save" indexers will be slower; <code>openimport:doctor</code> warns about it.</li>
+<li>50,000 products: see below. Configurable products and the full pipeline (readers, mapping, delta) are measured at
+  the end of M1 (memory flat from 10k to 50k is an M1 done-when).</li>
+</ul>
+<h2 id="50000-products-run-38403706606-2026-10-13">50,000 products (run <a href="https://github.com/iranimij/openimport-dev-env/actions/runs/38403706606">38403706606</a>, 2026-10-13)<a class="headerlink" href="#50000-products-run-38403706606-2026-10-13" title="Permanent link">&para;</a></h2>
+<p>Same method, <code>products-50k</code> (50,000 simple products plus 5,000 German store-view rows = 55,000 rows).</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Pass</th>
+<th>Rows</th>
+<th>Created</th>
+<th>Updated</th>
+<th>Seconds</th>
+<th>Rows / min</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>core CSV</td>
+<td>create</td>
+<td>55,000</td>
+<td>50,000</td>
+<td>50</td>
+<td>438.6</td>
+<td>7,523</td>
+</tr>
+<tr>
+<td>core CSV</td>
+<td>update</td>
+<td>55,000</td>
+<td>0</td>
+<td>55,000</td>
+<td>471.6</td>
+<td>6,997</td>
+</tr>
+<tr>
+<td>OpenImport</td>
+<td>create</td>
+<td>55,000</td>
+<td>50,000</td>
+<td>50</td>
+<td>453.8</td>
+<td>7,272</td>
+</tr>
+<tr>
+<td>OpenImport</td>
+<td>update</td>
+<td>55,000</td>
+<td>0</td>
+<td>55,000</td>
+<td>497.1</td>
+<td>6,639</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Core's rate stays flat from 10k to 50k (about 7,500 rows per minute): no slowdown with catalog size at this scale.</li>
+<li>Bridge overhead +3.5 % (create) and +5.4 % (update), inside the 15 % budget.</li>
+<li>Peak memory is not comparable between passes here (one process, four passes). The M1 memory check runs each pass in
+  its own process.</li>
+</ul>
+<h2 id="the-whole-pipeline-m1-run-38518924669-and-38422135458-2026-10-14">The whole pipeline (M1, run <a href="https://github.com/iranimij/openimport-dev-env/actions/runs/38518924669">38518924669</a> and <a href="https://github.com/iranimij/openimport-dev-env/actions/runs/38422135458">38422135458</a>, 2026-10-14)<a class="headerlink" href="#the-whole-pipeline-m1-run-38518924669-and-38422135458-2026-10-14" title="Permanent link">&para;</a></h2>
+<p><code>openimport-dev-env/ci/pipeline-benchmark.php</code>: a profile that maps every column 1:1 with transforms on sku, url_key
+and name, delta on; every pass in its <strong>own PHP process</strong> (<code>bin/magento openimport:run</code>), so peak memory is
+comparable. Core's own CSV import of the same file runs the same way as the reference.</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Pass</th>
+<th>Read</th>
+<th>Created</th>
+<th>Updated</th>
+<th>Unchanged</th>
+<th>Seconds</th>
+<th>Peak MB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>products-10k</td>
+<td>core CSV create (reference)</td>
+<td>11,000</td>
+<td>10,000</td>
+<td>10</td>
+<td>–</td>
+<td>127.0</td>
+<td>123</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>core CSV update (reference)</td>
+<td>11,000</td>
+<td>0</td>
+<td>11,000</td>
+<td>–</td>
+<td>138.8</td>
+<td>171</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>dry run</td>
+<td>11,000</td>
+<td>11,000 would be new</td>
+<td></td>
+<td></td>
+<td>10.0</td>
+<td>119</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>import (create)</td>
+<td>11,000</td>
+<td>10,000</td>
+<td>10</td>
+<td>0</td>
+<td>126.7</td>
+<td>183</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>same file again (delta)</td>
+<td>11,000</td>
+<td>0</td>
+<td>0</td>
+<td>11,000</td>
+<td>1.4</td>
+<td>87</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>same file, <code>--full</code></td>
+<td>11,000</td>
+<td>0</td>
+<td>11,000</td>
+<td>0</td>
+<td>144.1</td>
+<td>231</td>
+</tr>
+<tr>
+<td>products-10k</td>
+<td>1 % changed (100 rows, delta)</td>
+<td>11,000</td>
+<td>0</td>
+<td>100</td>
+<td>10,900</td>
+<td>3.1</td>
+<td>121</td>
+</tr>
+<tr>
+<td>products-50k</td>
+<td>core CSV create (reference)</td>
+<td>55,000</td>
+<td>50,000</td>
+<td>50</td>
+<td>–</td>
+<td>560.8</td>
+<td>344</td>
+</tr>
+<tr>
+<td>products-50k</td>
+<td>core CSV update (reference)</td>
+<td>55,000</td>
+<td>0</td>
+<td>55,000</td>
+<td>–</td>
+<td>643.2</td>
+<td>553</td>
+</tr>
+<tr>
+<td>products-50k</td>
+<td>dry run</td>
+<td>55,000</td>
+<td>55,000 would be new</td>
+<td></td>
+<td></td>
+<td>38.2</td>
+<td>180</td>
+</tr>
+<tr>
+<td>products-50k</td>
+<td>import (create)</td>
+<td>55,000</td>
+<td>50,000</td>
+<td>50</td>
+<td>0</td>
+<td>586.9</td>
+<td>425</td>
+</tr>
+<tr>
+<td>products-50k</td>
+<td>same file again (delta)</td>
+<td>55,000</td>
+<td>0</td>
+<td>0</td>
+<td>55,000</td>
+<td>4.8</td>
+<td>89</td>
+</tr>
+<tr>
+<td>products-50k</td>
+<td>same file, <code>--full</code></td>
+<td>55,000</td>
+<td>0</td>
+<td>55,000</td>
+<td>0</td>
+<td>679.8</td>
+<td>625</td>
+</tr>
+<tr>
+<td>products-50k</td>
+<td>1 % changed (500 rows, delta)</td>
+<td>55,000</td>
+<td>0</td>
+<td>500</td>
+<td>54,500</td>
+<td>12.6</td>
+<td>140</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Overhead of the whole pipeline</strong> (read CSV, map, transform, spool, delta hashes, error mapping) against core's
+  own CSV import: create −0.2 % (10k) / +4.7 % (50k), update +3.8 % / +5.7 %. Budget: 15 %.</li>
+<li><strong>Delta:</strong> a nightly file with 1 % changed rows takes 2.1 % (10k) / 1.9 % (50k) of a full re-import. Target: 10 %.
+  An unchanged file costs 1–5 seconds instead of 2–11 minutes. (A first run found that store-view lines were always
+  resent: each line now has its own hash.)</li>
+<li><strong>Memory:</strong> OpenImport's own part is flat: the delta pass needs 87 MB at 10k and 89 MB at 50k, the dry run 119 and
+  180 MB. The live import's peak follows core's import model (123 → 344 MB for core's own CSV import, 183 → 425 MB
+  through OpenImport, a steady 60–80 MB on top); that growth is core's catalog cache, not the pipeline's.</li>
+<li><strong>Dry run:</strong> 10 s / 38 s, including core validation of every row and the change comparison.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../core-facts/" class="btn btn-neutral float-left" title="Core facts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../core-facts/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

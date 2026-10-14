@@ -316,7 +316,12 @@ class AdminTest extends AbstractBackendController
 
         $this->fresh();
         $this->dispatch('backend/openimport/run/download/id/' . $dryId);
-        self::assertSame(200, $this->getResponse()->getHttpResponseCode());
+        $header = $this->getResponse()->getHeader('Location');
+        self::assertSame(200, $this->getResponse()->getHttpResponseCode(), sprintf(
+            'Download answered with a redirect to %s; messages: %s',
+            $header ? $header->getFieldValue() : '-',
+            implode(' | ', $this->getMessages(MessageInterface::TYPE_ERROR))
+        ));
     }
 
     public function testDeleteNeedsTheTypedWord(): void

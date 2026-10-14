@@ -15,6 +15,7 @@ use Magento\Framework\App\Area;
 use Magento\Framework\Escaper;
 use Magento\Framework\Mail\Template\TransportBuilder;
 use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\User\Model\ResourceModel\User\CollectionFactory as UserCollectionFactory;
 use Psr\Log\LoggerInterface;
 
@@ -36,13 +37,15 @@ class RunMailer
      * @param BackendUrl $backendUrl
      * @param Escaper $escaper
      * @param LoggerInterface $logger
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         private readonly TransportBuilder $transportBuilder,
         private readonly UserCollectionFactory $users,
         private readonly BackendUrl $backendUrl,
         private readonly Escaper $escaper,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly StoreManagerInterface $storeManager
     ) {
     }
 
@@ -103,7 +106,8 @@ class RunMailer
         try {
             $transport = $this->transportBuilder
                 ->setTemplateIdentifier('openimport_notify_run_finished')
-                ->setTemplateOptions(['area' => Area::AREA_ADMINHTML, 'store' => Store::DEFAULT_STORE_ID])
+                // Header and footer templates live in the frontend area (as every core e-mail does).
+                ->setTemplateOptions(['area' => Area::AREA_FRONTEND, 'store' => $this->storeId()])
                 ->setTemplateVars($this->vars($profile, $run))
                 ->setFromByScope('general')
                 ->addTo($recipients)

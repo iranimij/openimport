@@ -305,6 +305,15 @@ class AdminTest extends AbstractBackendController
         self::assertStringContainsString('What would change', (string) $this->getResponse()->getBody());
 
         $this->fresh();
+        $this->dispatch('backend/openimport/run/download/id/' . $dryId);
+        $header = $this->getResponse()->getHeader('Location');
+        self::assertSame(200, $this->getResponse()->getHttpResponseCode(), sprintf(
+            'Download answered with a redirect to %s; messages: %s',
+            $header ? $header->getFieldValue() : '-',
+            implode(' | ', $this->getMessages(MessageInterface::TYPE_ERROR))
+        ));
+
+        $this->fresh();
         $this->post('backend/openimport/run/confirm', ['id' => $dryId]);
         $live = $runs->getById($this->redirectedRunId());
         self::assertFalse($live->isDryRun());
@@ -313,15 +322,6 @@ class AdminTest extends AbstractBackendController
         $this->fresh();
         $this->post('backend/openimport/run/cancel', ['id' => $live->getRunId()]);
         self::assertSame(RunInterface::STATUS_CANCELLED, $runs->getById((int) $live->getRunId())->getStatus());
-
-        $this->fresh();
-        $this->dispatch('backend/openimport/run/download/id/' . $dryId);
-        $header = $this->getResponse()->getHeader('Location');
-        self::assertSame(200, $this->getResponse()->getHttpResponseCode(), sprintf(
-            'Download answered with a redirect to %s; messages: %s',
-            $header ? $header->getFieldValue() : '-',
-            implode(' | ', $this->getMessages(MessageInterface::TYPE_ERROR))
-        ));
     }
 
     public function testDeleteNeedsTheTypedWord(): void

@@ -108,18 +108,32 @@ class AdminTest extends AbstractBackendController
         return (array) json_decode((string) $this->getResponse()->getBody(), true);
     }
 
+    /**
+     * Dispatches a page and returns its body; a redirect or an empty page is reported with its status and target.
+     *
+     * @param string $uri
+     * @return string
+     */
+    private function page(string $uri): string
+    {
+        $this->fresh();
+        $this->dispatch($uri);
+        $response = $this->getResponse();
+        $body = (string) $response->getBody();
+        if ($body === '') {
+            $header = $response instanceof \Magento\Framework\HTTP\PhpEnvironment\Response ? $response->getHeader('Location') : false;
+            $location = $header ? (string) $header->getFieldValue() : '';
+            self::fail(sprintf('%s answered with HTTP %d and no body (Location: %s).', $uri, (int) $response->getHttpResponseCode(), $location));
+        }
+
+        return $body;
+    }
+
     public function testGridsAndForm(): void
     {
-        $this->dispatch('backend/openimport/profile/index');
-        self::assertStringContainsString('openimport_profile_listing', (string) $this->getResponse()->getBody());
-
-        $this->fresh();
-        $this->dispatch('backend/openimport/run/index');
-        self::assertStringContainsString('openimport_run_listing', (string) $this->getResponse()->getBody());
-
-        $this->fresh();
-        $this->dispatch('backend/openimport/profile/new');
-        $body = (string) $this->getResponse()->getBody();
+        self::assertStringContainsString('openimport_profile_listing', $this->page('backend/openimport/profile/index'));
+        self::assertStringContainsString('openimport_run_listing', $this->page('backend/openimport/run/index'));
+        $body = $this->page('backend/openimport/profile/new');
         self::assertStringContainsString('openimport_profile_form', $body);
         self::assertStringNotContainsString('<script>alert', $body);
     }

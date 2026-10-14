@@ -16,7 +16,7 @@
                disable="uploading"/>
         <div class="admin__field-note" attr="id: uid + '-note'">
             <!-- ko if: fileName -->
-            <span translate="'Current file:'"></span> <strong text="fileName"></strong>
+            <span text="$t('Current file:')"></span> <strong text="fileName"></strong>
             <!-- /ko -->
             <!-- ko ifnot: fileName -->
             <span translate="'CSV, Excel (.xlsx), JSON or XML. The first rows appear in step 3.'"></span>

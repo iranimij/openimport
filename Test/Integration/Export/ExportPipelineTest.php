@@ -35,7 +35,7 @@ use PHPUnit\Framework\TestCase;
 #[AppIsolation(true)]
 class ExportPipelineTest extends TestCase
 {
-    private string $prefix = '';
+    private ?string $prefix = ''; // nullable: PHPUnit 9 (2.4.7) nulls typed test properties between tests
 
     protected function setUp(): void
     {

@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Model\Profile;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
+use Iranimij\OpenImport\Model\Execution\Source\FileSelector;
 use Iranimij\OpenImport\Model\Filter\FilterException;
 use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
 use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
@@ -60,7 +61,7 @@ class ProfileValidator
         } elseif (!in_array($entity, $this->entityCodes->codes($direction), true)) {
             $problems[] = sprintf('Magento has no %s entity "%s".', $direction, $entity);
         }
-        $problems = array_merge($problems, $this->choices($profile, $import));
+        $problems = array_merge($problems, $this->choices($profile, $import), $this->source($profile));
         $threshold = $profile->getSafetyThreshold();
         if ($threshold !== null && ($threshold < 1 || $threshold > 100)) {
             $problems[] = 'The safety threshold must be between 1 and 100 percent.';
@@ -95,6 +96,57 @@ class ProfileValidator
             } catch (FilterException $exception) {
                 $problems = array_merge($problems, explode("\n", $exception->getMessage()));
             }
+        }
+
+        return $problems;
+    }
+
+    /**
+     * What each source type needs; connections themselves are checked by "Test connection", not at save.
+     *
+     * @param ProfileInterface $profile
+     * @return string[]
+     */
+    private function source(ProfileInterface $profile): array
+    {
+        $config = $profile->getSourceConfig();
+        $text = static fn (string $key): string => is_scalar($config[$key] ?? null) ? trim((string) $config[$key]) : '';
+        $problems = [];
+        switch ($profile->getSourceType()) {
+            case 'folder':
+                if ($text('path') === '') {
+                    $problems[] = 'Enter the server folder to read from.';
+                } elseif (str_contains('/' . $text('path') . '/', '/../')) {
+                    $problems[] = 'The folder may not contain "..".';
+                }
+                break;
+            case 'url':
+                if ($text('url') === '') {
+                    $problems[] = 'Enter the web address of the file.';
+                } elseif (preg_match('#^https?://#i', $text('url')) !== 1) {
+                    $problems[] = 'The web address must start with https:// or http://.';
+                }
+                if ($text('auth') === 'basic' && $text('username') === '') {
+                    $problems[] = 'Enter the user name for the login.';
+                }
+                break;
+            case 'sftp':
+            case 'ftp':
+                if ($text('host') === '') {
+                    $problems[] = 'Enter the server (host name).';
+                }
+                if ($text('username') === '') {
+                    $problems[] = 'Enter the user name for the server.';
+                }
+                $port = $text('port');
+                if ($port !== '' && (!ctype_digit($port) || (int) $port < 1 || (int) $port > 65535)) {
+                    $problems[] = 'The port must be a number between 1 and 65535.';
+                }
+                break;
+        }
+        $pick = $text('pick');
+        if ($pick !== '' && !in_array($pick, FileSelector::PICKS, true)) {
+            $problems[] = sprintf('"%s" is not a way to choose the file.', $pick);
         }
 
         return $problems;

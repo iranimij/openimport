@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Model\Admin;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\JsonField;
+use Iranimij\OpenImport\Model\Security\Secrets;
 
 /**
  * Moves a profile into the admin form's data and the posted form back into the profile.
@@ -28,9 +29,11 @@ class ProfileFormMapper
 
     /**
      * @param JsonField $json
+     * @param Secrets $secrets
      */
     public function __construct(
-        private readonly JsonField $json
+        private readonly JsonField $json,
+        private readonly Secrets $secrets
     ) {
     }
 
@@ -67,8 +70,10 @@ class ProfileFormMapper
                 'value' => (string) ($condition['expression'] ?? $condition['value'] ?? ''),
             ];
         }
-        $source = $profile->getSourceConfig();
-        unset($source['secrets']);
+        $source = $this->secrets->strip($profile->getSourceConfig());
+        foreach ($this->secrets->stored($profile->getSourceConfig()) as $name => $stored) {
+            $source[$name . '_stored'] = $stored ? '1' : '0';
+        }
 
         return [
             'profile_id' => $profile->getProfileId(),
@@ -128,12 +133,13 @@ class ProfileFormMapper
         $profile->setSchedule($preset === self::SCHEDULE_CUSTOM ? $text('schedule_custom') : $preset);
 
         $source = is_array($data['source_config'] ?? null) ? $data['source_config'] : [];
-        $secrets = $profile->getSourceConfig()['secrets'] ?? null;
         $source = array_map(static fn ($value) => is_scalar($value) ? trim((string) $value) : $value, $source);
-        if ($secrets !== null) {
-            $source['secrets'] = $secrets;
+        foreach (array_keys($source) as $key) {
+            if (str_ends_with((string) $key, '_stored')) {
+                unset($source[$key]);
+            }
         }
-        $profile->setSourceConfig($source);
+        $profile->setSourceConfig($this->secrets->merge($source, $profile->getSourceConfig()));
 
         $options = is_array($data['format_options'] ?? null) ? $data['format_options'] : [];
         $profile->setFormatOptions(array_filter(

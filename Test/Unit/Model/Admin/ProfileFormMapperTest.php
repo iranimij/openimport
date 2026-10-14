@@ -10,6 +10,8 @@ namespace Iranimij\OpenImport\Test\Unit\Model\Admin;
 
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
 use Iranimij\OpenImport\Model\JsonField;
+use Iranimij\OpenImport\Model\Security\Secrets;
+use Iranimij\OpenImport\Test\Unit\Model\Security\FakeEncryptor;
 use Iranimij\OpenImport\Test\Unit\Model\ProfileStub;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +19,7 @@ class ProfileFormMapperTest extends TestCase
 {
     public function testFormRoundTrip(): void
     {
-        $mapper = new ProfileFormMapper(new JsonField());
+        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()));
         $posted = [
             'name' => '  Supplier A ',
             'direction' => 'import',
@@ -81,7 +83,12 @@ class ProfileFormMapperTest extends TestCase
         $form = $mapper->toForm($profile);
         self::assertSame('Supplier A', $form['name']);
         self::assertSame('0 2 * * *', $form['schedule_preset']);
-        self::assertSame(['file' => 'abc.csv', 'file_name' => 'a.csv'], $form['source_config'], 'secrets never reach the form');
+        self::assertSame(
+            ['file' => 'abc.csv', 'file_name' => 'a.csv', 'password_stored' => '1', 'private_key_stored' => '0',
+                'passphrase_stored' => '0', 'token_stored' => '0'],
+            $form['source_config'],
+            'secrets never reach the form, only whether one is stored'
+        );
         self::assertSame("ja => 1\nnein => 2", $form['mapping'][1]['value_map']);
         self::assertSame('1', $form['mapping'][1]['value_map_strict']);
         self::assertSame('["trim"]', $form['mapping'][0]['transforms']);
@@ -91,7 +98,7 @@ class ProfileFormMapperTest extends TestCase
 
     public function testCustomScheduleAndNoFilters(): void
     {
-        $mapper = new ProfileFormMapper(new JsonField());
+        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()));
         $profile = $mapper->fromForm(
             ['schedule_preset' => 'custom', 'schedule_custom' => ' 30 5 * * 1-6 ', 'row_filters' => []],
             new ProfileStub()

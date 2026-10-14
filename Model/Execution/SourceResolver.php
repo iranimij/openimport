@@ -30,10 +30,10 @@ class SourceResolver
      * @param ProfileInterface $profile
      * @param RunInterface $run
      * @param string $folder the run folder (downloads go there)
-     * @return array{0: string, 1: string} absolute path and original file name
+     * @return FetchedFile
      * @throws PipelineException
      */
-    public function fetch(ProfileInterface $profile, RunInterface $run, string $folder): array
+    public function fetch(ProfileInterface $profile, RunInterface $run, string $folder): FetchedFile
     {
         $options = $run->getOptions();
         $file = isset($options['file']) && is_string($options['file']) ? $options['file'] : '';
@@ -45,8 +45,22 @@ class SourceResolver
             $name = isset($options['original_name']) && is_string($options['original_name'])
                 ? $options['original_name']
                 : $info->getFilename();
-            return [$file, $name];
+
+            return new FetchedFile($file, $name);
         }
+
+        return $this->source($profile)->fetch($profile, $folder);
+    }
+
+    /**
+     * The profile's source.
+     *
+     * @param ProfileInterface $profile
+     * @return SourceInterface
+     * @throws PipelineException
+     */
+    public function source(ProfileInterface $profile): SourceInterface
+    {
         $source = $this->sources[$profile->getSourceType()] ?? null;
         if ($source === null) {
             throw new PipelineException(
@@ -56,6 +70,6 @@ class SourceResolver
             );
         }
 
-        return $source->fetch($profile, $folder);
+        return $source;
     }
 }

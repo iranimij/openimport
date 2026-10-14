@@ -54,6 +54,7 @@
                 <item name="openimport_run_status" xsi:type="object">Iranimij\OpenImport\Console\Command\RunStatusCommand</item>
                 <item name="openimport_profile_list" xsi:type="object">Iranimij\OpenImport\Console\Command\ProfileListCommand</item>
                 <item name="openimport_queue_run" xsi:type="object">Iranimij\OpenImport\Console\Command\QueueRunCommand</item>
+                <item name="openimport_secrets_reencrypt" xsi:type="object">Iranimij\OpenImport\Console\Command\SecretsReencryptCommand</item>
             </argument>
         </arguments>
     </type>
@@ -75,6 +76,11 @@
         <arguments>
             <argument name="runs" xsi:type="object">Iranimij\OpenImport\Api\RunRepositoryInterface\Proxy</argument>
             <argument name="report" xsi:type="object">Iranimij\OpenImport\Console\Command\RunReport\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Console\Command\SecretsReencryptCommand">
+        <arguments>
+            <argument name="profiles" xsi:type="object">Iranimij\OpenImport\Api\ProfileRepositoryInterface\Proxy</argument>
         </arguments>
     </type>
     <type name="Iranimij\OpenImport\Console\Command\ProfileListCommand">
@@ -111,6 +117,28 @@
         <arguments>
             <argument name="sources" xsi:type="array">
                 <item name="upload" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\UploadSource</item>
+                <item name="folder" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\FolderSource</item>
+                <item name="url" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\UrlSource</item>
+                <item name="sftp" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\SftpSource</item>
+                <item name="ftp" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\FtpSource</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Iranimij\OpenImport\Model\Execution\Source\SftpSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
+        <arguments>
+            <argument name="protocol" xsi:type="string">sftp</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Execution\Source\FtpSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
+        <arguments>
+            <argument name="protocol" xsi:type="string">ftp</argument>
+        </arguments>
+    </virtualType>
+    <type name="Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteClientFactory">
+        <arguments>
+            <argument name="clients" xsi:type="array">
+                <item name="sftp" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\SftpClient</item>
+                <item name="ftp" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\FtpClient</item>
             </argument>
         </arguments>
     </type>

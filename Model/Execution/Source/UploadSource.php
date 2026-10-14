@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Model\Execution\Source;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Admin\UploadStore;
+use Iranimij\OpenImport\Model\Execution\FetchedFile;
 use Iranimij\OpenImport\Model\Execution\SourceInterface;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 
@@ -29,7 +30,7 @@ class UploadSource implements SourceInterface
     /**
      * @inheritDoc
      */
-    public function fetch(ProfileInterface $profile, string $folder): array
+    public function fetch(ProfileInterface $profile, string $folder): FetchedFile
     {
         $config = $profile->getSourceConfig();
         $path = $this->uploads->path((string) ($config['file'] ?? ''));
@@ -37,6 +38,28 @@ class UploadSource implements SourceInterface
             throw new PipelineException('Upload a file to run this profile.');
         }
 
-        return [$path, (string) ($config['file_name'] ?? 'upload')];
+        return new FetchedFile($path, (string) ($config['file_name'] ?? 'upload'));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function test(ProfileInterface $profile): string
+    {
+        $config = $profile->getSourceConfig();
+        if ($this->uploads->path((string) ($config['file'] ?? '')) === null) {
+            throw new PipelineException('No file is uploaded yet.');
+        }
+
+        return sprintf('The uploaded file %s is ready.', (string) ($config['file_name'] ?? 'upload'));
+    }
+
+    /**
+     * Uploaded files stay: the next run of the profile reads the same file until another one is uploaded.
+     *
+     * @inheritDoc
+     */
+    public function finish(ProfileInterface $profile, string $reference): void
+    {
     }
 }

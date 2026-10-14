@@ -42,7 +42,7 @@ class ProfileRepositoryTest extends TestCase
             ->setDirection('import')
             ->setEntity('catalog_product')
             ->setSourceType('sftp')
-            ->setSourceConfig(['host' => 'sftp', 'path' => '/in/stock.csv'])
+            ->setSourceConfig(['host' => 'sftp', 'username' => 'shop', 'path' => '/in/stock.csv'])
             ->setFormat('csv')
             ->setFormatOptions(['delimiter' => ';'])
             ->setBehavior('only_update')
@@ -66,7 +66,7 @@ class ProfileRepositoryTest extends TestCase
         $loaded = $this->repository()->getById((int) $saved->getProfileId());
 
         self::assertSame('Nightly stock', $loaded->getName());
-        self::assertSame(['host' => 'sftp', 'path' => '/in/stock.csv'], $loaded->getSourceConfig());
+        self::assertSame(['host' => 'sftp', 'username' => 'shop', 'path' => '/in/stock.csv'], $loaded->getSourceConfig());
         self::assertSame(['delimiter' => ';'], $loaded->getFormatOptions());
         self::assertSame('only_update', $loaded->getBehavior());
         self::assertTrue($loaded->isDelta());

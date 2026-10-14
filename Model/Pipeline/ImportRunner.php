@@ -47,6 +47,11 @@ class ImportRunner
     private const BATCH = 500;
     private const PROGRESS_EVERY = 2000;
     private const PREVIEW_SAMPLE = 200;
+    /**
+     * Required core attributes an existing-only entity may carry; empty cells are filled from the record.
+     */
+    private const REQUIRED_COLUMNS = ['price'];
+
     private const DELTA_BEHAVIORS = [ProfileInterface::BEHAVIOR_ADD_UPDATE, ProfileInterface::BEHAVIOR_ONLY_ADD,
         ProfileInterface::BEHAVIOR_ONLY_UPDATE];
     private const DESTRUCTIVE_BEHAVIORS = [ProfileInterface::BEHAVIOR_DELETE, ProfileInterface::BEHAVIOR_REPLACE];
@@ -99,7 +104,10 @@ class ImportRunner
      * The behaviour this run applies (own entities that only change existing records turn Add/Update into Only
      * update).
      */
-    private string $behavior = ProfileInterface::BEHAVIOR_ADD_UPDATE;
+    private string $behavior = '';
+
+    private bool $existingOnly = false;
+
 
     /**
      * @param ReaderFactory $readerFactory
@@ -213,6 +221,7 @@ class ImportRunner
     private function behavior(ProfileInterface $profile, EntityInfo $entity): string
     {
         $behavior = $profile->getBehavior();
+        $this->existingOnly = $entity->existingOnly;
         if (!$entity->existingOnly) {
             return $this->behavior = $behavior;
         }
@@ -372,13 +381,63 @@ class ImportRunner
                 $this->existingAffected++;
             }
             $accepted[] = [$line, $mapped, $exists];
-            foreach ($mapped->rows as $row) {
+        }
+        $fill = $this->existingOnly && $reader !== null ? $this->currentRequired($accepted, $reader, $mapping) : [];
+        foreach ($accepted as [$line, $mapped]) {
+            foreach ($mapped->rows as $index => $row) {
+                if ($index === 0 && isset($fill[mb_strtolower($mapped->identifier)])) {
+                    $row = array_merge($row, $fill[mb_strtolower($mapped->identifier)]);
+                }
                 $spool->add($row, $line, $mapped->identifier);
             }
         }
         if ($dryRun && $accepted !== []) {
             $this->preview($accepted, $behavior, $reader, $mapping);
         }
+    }
+
+    /**
+     * Existing-only entities (Stock & prices): an empty cell means "leave unchanged", but Magento refuses an empty
+     * required attribute (price) when its column is in the file. Such cells get the record's current value.
+     *
+     * @param array<int, array{0: int, 1: MappedRow, 2: bool}> $accepted
+     * @param RecordReaderInterface $reader
+     * @param CompiledMapping $mapping
+     * @return array<string, array<string, string>> lower-cased identifier => column => current value
+     */
+    private function currentRequired(array $accepted, RecordReaderInterface $reader, CompiledMapping $mapping): array
+    {
+        $columns = array_values(array_intersect(self::REQUIRED_COLUMNS, $mapping->columns()));
+        if ($columns === []) {
+            return [];
+        }
+        $identifiers = [];
+        foreach ($accepted as [, $mapped]) {
+            foreach ($columns as $column) {
+                if (($mapped->main()[$column] ?? '') === '') {
+                    $identifiers[] = $mapped->identifier;
+                    break;
+                }
+            }
+        }
+        if ($identifiers === []) {
+            return [];
+        }
+        $fill = [];
+        foreach ($reader->current($identifiers, $columns) as $key => $current) {
+            foreach ($accepted as [, $mapped]) {
+                if (mb_strtolower($mapped->identifier) !== (string) $key) {
+                    continue;
+                }
+                foreach ($columns as $column) {
+                    if (($mapped->main()[$column] ?? '') === '' && ($current[$column] ?? '') !== '') {
+                        $fill[(string) $key][$column] = (string) $current[$column];
+                    }
+                }
+            }
+        }
+
+        return $fill;
     }
 
     /**

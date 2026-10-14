@@ -78,7 +78,7 @@ class ExportPipelineTest extends TestCase
         return Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save($profile);
     }
 
-    private function run(ProfileInterface $profile, string $mode = RunInterface::MODE_LIVE): RunInterface
+    private function process(ProfileInterface $profile, string $mode = RunInterface::MODE_LIVE): RunInterface
     {
         $run = Bootstrap::getObjectManager()->get(RunQueue::class)->queue($profile, $mode, RunInterface::TRIGGER_CLI);
 
@@ -101,7 +101,7 @@ class ExportPipelineTest extends TestCase
 
     public function testProductsAreExportedAsCoreExportsThemWithFiltersAndMapping(): void
     {
-        $plain = $this->run($this->profile());
+        $plain = $this->process($this->profile());
         self::assertSame(RunInterface::STATUS_SUCCESS, $plain->getStatus(), $plain->getMessage());
         self::assertSame(3, $plain->getCount('exported'));
         self::assertStringContainsString('Download it from the run page', $plain->getMessage());
@@ -111,7 +111,7 @@ class ExportPipelineTest extends TestCase
         self::assertSame(10.0, (float) $rows[0]['price']);
         self::assertArrayHasKey('product_websites', $rows[0]);
 
-        $mapped = $this->run($this->profile([
+        $mapped = $this->process($this->profile([
             'format' => 'xlsx',
             'row_filters' => ['mode' => 'include', 'match' => 'all', 'conditions' => [['column' => 'price', 'operator' => 'greater_than', 'value' => '15']]],
             'mapping' => [
@@ -134,10 +134,10 @@ class ExportPipelineTest extends TestCase
 
     public function testJsonXmlAndDryRun(): void
     {
-        $json = $this->run($this->profile(['format' => 'json']));
+        $json = $this->process($this->profile(['format' => 'json']));
         self::assertSame(3, count($this->rowsOf($json, 'json')));
 
-        $xml = $this->run($this->profile(['format' => 'xml', 'format_options' => ['root' => 'catalog', 'record' => 'product']]), RunInterface::MODE_DRY_RUN);
+        $xml = $this->process($this->profile(['format' => 'xml', 'format_options' => ['root' => 'catalog', 'record' => 'product']]), RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $xml->getStatus(), $xml->getMessage());
         self::assertStringContainsString('Dry run:', $xml->getMessage());
         self::assertStringContainsString('not delivered', $xml->getMessage());
@@ -149,7 +149,7 @@ class ExportPipelineTest extends TestCase
     public function testNothingMatching(): void
     {
         $profile = $this->profile(['row_filters' => ['mode' => 'include', 'match' => 'all', 'conditions' => [['column' => 'sku', 'operator' => 'equals', 'value' => 'nope']]]]);
-        $run = $this->run($profile);
+        $run = $this->process($profile);
 
         self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
         self::assertStringContainsString('all 3 skipped by the row filters', $run->getMessage());

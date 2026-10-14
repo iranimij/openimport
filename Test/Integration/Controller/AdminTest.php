@@ -275,8 +275,10 @@ class AdminTest extends AbstractBackendController
         self::assertStringContainsString($prefix . '-2', $body);
         self::assertStringContainsString('Download error report', $body);
 
-        // File downloads (FileResponse) do not reach the test response; the report is read from the run folder.
-        // The download links themselves are covered by the Playwright E2E tests in openimport-dev-env.
+        // The controller writes the report; the file answer (FileResponse) does not reach the test response, so
+        // the file is read from the run folder. Downloads themselves are covered by the Playwright E2E tests.
+        $this->fresh();
+        $this->dispatch('backend/openimport/run/errorReport/id/' . $runId);
         $report = (string) file_get_contents(Bootstrap::getObjectManager()->get(Filesystem::class)
             ->getDirectoryRead(DirectoryList::VAR_DIR)->getAbsolutePath('openimport/runs/' . $runId . '/errors.csv'));
         self::assertStringContainsString('Row,Record,Field,Error', $report);

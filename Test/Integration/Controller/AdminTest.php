@@ -64,13 +64,30 @@ class AdminTest extends AbstractBackendController
     }
 
     /**
-     * A fresh request and an empty response body (Magento appends every rendered page to the shared response).
+     * The same request object, emptied, and an empty response body: every shared service (contexts, layout,
+     * URL model, session) keeps the request it was built with, so a new object would leave them on the old page.
      */
     private function fresh(): void
     {
-        $this->resetRequest();
-        // The application object keeps the request it was built with: a new one for the new request.
-        $this->_objectManager->removeSharedInstance(\Magento\Framework\App\Http::class);
+        $request = $this->getRequest();
+        if ($request instanceof HttpRequest) {
+            $request->setDispatched(false)
+                ->clearParams()
+                ->setPostValue([])
+                ->setMethod(HttpRequest::METHOD_GET)
+                ->setRouteName(null)
+                ->setModuleName(null)
+                ->setControllerName(null)
+                ->setActionName(null)
+                ->setPathInfo('');
+            // The path is cached from the first dispatch; dispatch() sets the new URI, this makes it parse again.
+            \Closure::bind(function (): void {
+                $this->originalPathInfo = '';
+                $this->pathInfo = '';
+                $this->requestString = '';
+                $this->beforeForwardInfo = [];
+            }, $request, HttpRequest::class)();
+        }
         // Building any admin URL turns the secret key back on (Url::_setRouteParams); the next request must not need it.
         $this->_objectManager->get(\Magento\Backend\Model\UrlInterface::class)->turnOffSecretKey();
         $response = $this->getResponse();

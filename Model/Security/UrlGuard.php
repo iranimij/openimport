@@ -77,6 +77,13 @@ class UrlGuard
      */
     public function isPublic(string $address): bool
     {
+        // IPv4-mapped IPv6 (::ffff:a.b.c.d) is judged as the IPv4 address it carries.
+        if (str_contains($address, ':')) {
+            $packed = inet_pton($address);
+            if ($packed !== false && substr($packed, 0, 12) === str_repeat("\0", 10) . "\xff\xff") {
+                return $this->isPublic((string) inet_ntop(substr($packed, 12)) ?: '');
+            }
+        }
         if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
             return false;
         }
@@ -95,9 +102,6 @@ class UrlGuard
         $packed = inet_pton($address);
         if ($packed === false) {
             return false;
-        }
-        if (substr($packed, 0, 12) === str_repeat("\0", 10) . "\xff\xff") {
-            return $this->isPublic((string) inet_ntop(substr($packed, 12)) ?: '');
         }
         $first = ord($packed[0]);
 

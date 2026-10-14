@@ -27,6 +27,10 @@ class ProfileJsonTest extends TestCase
     /** @var string[] */
     private array $saved = [];
 
+    /**
+     * @param array<string, string[]> $problems validator problems by profile name
+     * @return ProfileJson
+     */
     private function json(array $problems = []): ProfileJson
     {
         $repository = $this->createMock(ProfileRepositoryInterface::class);

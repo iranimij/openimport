@@ -61,6 +61,37 @@
     padding: 0 .5rem;
 }
 
+/* Remove-row button: the trash icon, with the label kept for screen readers (the grid has no .action-delete style). */
+.openimport-mapping-table .action-delete {
+    background: none;
+    border: 0;
+    color: #514943;
+    cursor: pointer;
+    padding: .3rem;
+}
+
+.openimport-mapping-table .action-delete:hover {
+    color: #e22626;
+}
+
+.openimport-mapping-table .action-delete:before {
+    content: '\e630';
+    font-family: 'Admin Icons', sans-serif;
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.openimport-mapping-table .action-delete > span {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
 .openimport-add-transform {
     display: flex;
     flex-wrap: wrap;

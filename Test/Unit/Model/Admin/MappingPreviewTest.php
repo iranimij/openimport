@@ -81,7 +81,11 @@ class MappingPreviewTest extends TestCase
         $result = $this->preview()->preview($profile, $this->file, 'feed.csv');
 
         self::assertSame([], $result['rows']);
-        self::assertSame(['The mapping does not fit this file:', 'sku: the file has no column "Nope"'], $result['problems']);
+        self::assertSame([
+            'The mapping does not fit this file:',
+            'sku: the file has no column "Nope"',
+            'The file\'s columns are: "sku", "name", "name_de", "price", "status"',
+        ], $result['problems']);
         self::assertSame(['The profile has no mapping yet.'], $this->preview()->preview(new ProfileStub(), $this->file, 'x.csv')['problems']);
     }
 

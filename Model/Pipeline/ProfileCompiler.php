@@ -66,7 +66,11 @@ class ProfileCompiler
         try {
             return [$this->mappingCompiler->compile($fields, $entity, $maps, $columns), $entity];
         } catch (MappingException $exception) {
-            throw new PipelineException("The mapping does not fit this file:\n" . $exception->getMessage(), 0, $exception);
+            $found = $columns === null ? '' : sprintf(
+                "\nThe file's columns are: %s",
+                $columns === [] ? '(none)' : implode(', ', array_map(static fn (string $c): string => '"' . $c . '"', $columns))
+            );
+            throw new PipelineException("The mapping does not fit this file:\n" . $exception->getMessage() . $found, 0, $exception);
         }
     }
 

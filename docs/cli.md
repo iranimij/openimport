@@ -35,3 +35,8 @@ Lists all profiles with direction, entity, source, schedule, whether the schedul
 
 Runs the queued runs now, oldest first (runs started in the admin wait in the queue). OpenImport's cron does the
 same every minute; the command is for stores without cron, deployments and tests.
+
+## `openimport:secrets:reencrypt`
+
+After `bin/magento encryption:key:change`: encrypts every stored source password, private key and token again
+with the current key. Run it while the old key is still in `app/etc/env.php`.

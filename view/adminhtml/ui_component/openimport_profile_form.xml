@@ -144,6 +144,422 @@
                 <dataScope>source_config</dataScope>
             </settings>
         </field>
+        <field name="source_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">url</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Web address</label>
+                <dataScope>source_config.url</dataScope>
+                <notice translate="true">https://… to a CSV, Excel, JSON or XML file, or a Google Sheets link (shared or published): the sheet is read as CSV.</notice>
+                <placeholder translate="true">https://example.com/feed.csv</placeholder>
+            </settings>
+        </field>
+        <field name="source_auth" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="31">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">url</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Login</label>
+                <dataScope>source_config.auth</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">none</item>
+                                <item name="label" xsi:type="string" translate="true">None</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">basic</item>
+                                <item name="label" xsi:type="string" translate="true">User name and password</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">token</item>
+                                <item name="label" xsi:type="string" translate="true">Token (Bearer)</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="source_username_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">url</item>
+                    </item>
+                    <item name="forAuth" xsi:type="array">
+                        <item name="0" xsi:type="string">basic</item>
+                    </item>
+                    <item name="authField" xsi:type="string">auth</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">User name</label>
+                <dataScope>source_config.username</dataScope>
+            </settings>
+        </field>
+        <field name="source_password_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="33">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">url</item>
+                    </item>
+                    <item name="forAuth" xsi:type="array">
+                        <item name="0" xsi:type="string">basic</item>
+                    </item>
+                    <item name="authField" xsi:type="string">auth</item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Password</label>
+                <dataScope>source_config.password</dataScope>
+                <notice translate="true">Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="source_token" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="34">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">url</item>
+                    </item>
+                    <item name="forAuth" xsi:type="array">
+                        <item name="0" xsi:type="string">token</item>
+                    </item>
+                    <item name="authField" xsi:type="string">auth</item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Token</label>
+                <dataScope>source_config.token</dataScope>
+                <notice translate="true">Sent as "Authorization: Bearer …". Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="source_sheet_gid" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="35">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">url</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Sheet (gid)</label>
+                <dataScope>source_config.sheet_gid</dataScope>
+                <notice translate="true">Google Sheets only: the gid from the sheet link; empty = the first sheet.</notice>
+            </settings>
+        </field>
+        <field name="source_host" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Server</label>
+                <dataScope>source_config.host</dataScope>
+                <placeholder translate="true">files.example.com</placeholder>
+            </settings>
+        </field>
+        <field name="source_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="31">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Port</label>
+                <dataScope>source_config.port</dataScope>
+                <notice translate="true">Empty = 22 for SFTP, 21 for FTP.</notice>
+            </settings>
+        </field>
+        <field name="source_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">User name</label>
+                <dataScope>source_config.username</dataScope>
+            </settings>
+        </field>
+        <field name="source_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="33">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Login</label>
+                <dataScope>source_config.auth_sftp</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">password</item>
+                                <item name="label" xsi:type="string" translate="true">Password</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">key</item>
+                                <item name="label" xsi:type="string" translate="true">Private key</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="source_password" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="34">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Password</label>
+                <dataScope>source_config.password</dataScope>
+                <notice translate="true">Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="source_private_key" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="35">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                    </item>
+                    <item name="forAuth" xsi:type="array">
+                        <item name="0" xsi:type="string">key</item>
+                    </item>
+                    <item name="authField" xsi:type="string">auth_sftp</item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Private key</label>
+                <dataScope>source_config.private_key</dataScope>
+                <notice translate="true">OpenSSH or PEM private key for key login. Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="source_passphrase" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="36">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                    </item>
+                    <item name="forAuth" xsi:type="array">
+                        <item name="0" xsi:type="string">key</item>
+                    </item>
+                    <item name="authField" xsi:type="string">auth_sftp</item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Key passphrase</label>
+                <dataScope>source_config.passphrase</dataScope>
+            </settings>
+        </field>
+        <field name="source_ssl" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="37">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">ftp</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Encryption (FTPS)</label>
+                <dataScope>source_config.ssl</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string" translate="true">Explicit TLS (FTPS)</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="source_passive" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="38">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">ftp</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Passive mode</label>
+                <dataScope>source_config.passive</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string" translate="true">Yes (usual)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="source_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">folder</item>
+                        <item name="1" xsi:type="string">sftp</item>
+                        <item name="2" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Folder</label>
+                <dataScope>source_config.path</dataScope>
+                <notice translate="true">Server folder: a folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety. SFTP/FTP: the remote folder, empty = where the login lands.</notice>
+                <placeholder translate="true">supplier/incoming</placeholder>
+            </settings>
+        </field>
+        <field name="source_pattern" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="41">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">folder</item>
+                        <item name="1" xsi:type="string">sftp</item>
+                        <item name="2" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">File name pattern</label>
+                <dataScope>source_config.pattern</dataScope>
+                <notice translate="true">* and ? as in a file browser, several patterns separated by commas. Empty = every file.</notice>
+                <placeholder translate="true">stock-*.csv</placeholder>
+            </settings>
+        </field>
+        <field name="source_pick" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="42">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">folder</item>
+                        <item name="1" xsi:type="string">sftp</item>
+                        <item name="2" xsi:type="string">ftp</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Which file</label>
+                <dataScope>source_config.pick</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">newest</item>
+                                <item name="label" xsi:type="string" translate="true">The newest</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">oldest</item>
+                                <item name="label" xsi:type="string" translate="true">The oldest</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">first_name</item>
+                                <item name="label" xsi:type="string" translate="true">First by name</item>
+                            </option>
+                            <option name="3" xsi:type="array">
+                                <item name="value" xsi:type="string">last_name</item>
+                                <item name="label" xsi:type="string" translate="true">Last by name</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="source_move_to" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="44">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">folder</item>
+                        <item name="1" xsi:type="string">sftp</item>
+                        <item name="2" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Move processed files to</label>
+                <dataScope>source_config.move_to</dataScope>
+                <notice translate="true">Subfolder of the source folder, used when "Source file after a successful run" is "Move". Empty = "processed".</notice>
+                <placeholder translate="true">processed</placeholder>
+            </settings>
+        </field>
+        <field name="source_test" component="Iranimij_OpenImport/js/form/test-source" formElement="input" sortOrder="90">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="testUrl" xsi:type="url" path="openimport/profile/testSource"/>
+                    <item name="template" xsi:type="string">Iranimij_OpenImport/form/test-source</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Test</label>
+                <dataScope>source_test</dataScope>
+            </settings>
+        </field>
     </fieldset>
 
     <fieldset name="file" sortOrder="30">

@@ -1,0 +1,18 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<div class="admin__field openimport-test-source" visible="visible">
+    <div class="admin__field-label"></div>
+    <div class="admin__field-control">
+        <button type="button" class="action-secondary" click="test" disable="busy">
+            <span translate="'Test connection'"></span>
+        </button>
+        <div class="message message-notice" role="status" if="busy">
+            <span translate="'Testing …'"></span>
+        </div>
+        <div class="message" role="status" if="message" css="{'message-success': ok, 'message-warning': !ok}" text="message"></div>
+    </div>
+</div>

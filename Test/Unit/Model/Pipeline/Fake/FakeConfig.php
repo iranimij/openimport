@@ -18,8 +18,28 @@ class FakeConfig extends Config
     // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock
     public function __construct(
         public int $maxErrors = 10000,
-        public int $threshold = 10
+        public int $threshold = 10,
+        /** @var string[] */
+        public array $allowedHosts = [],
+        /** @var string[] */
+        public array $allowedFolders = []
     ) {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllowedHosts(): array
+    {
+        return $this->allowedHosts;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllowedFolders(): array
+    {
+        return $this->allowedFolders;
     }
 
     /**

@@ -43,3 +43,8 @@ All notable changes to this project are documented here. The format follows
   zone, each due minute exactly once even with overlapping or late cron, up to 10 minutes of catch-up) and queued
   runs are processed within the time budget; hourly housekeeping removes old run files, unused uploads and schedule
   records and fails runs that died. See docs/schedules.md.
+- Sources: server folder (sandboxed to var/openimport and allowed folders), web address (http/https, basic auth or
+  bearer token, Google Sheets links read as CSV, SSRF guard on every redirect hop, 256 MB cap), SFTP (password or
+  private key, phpseclib 3) and FTP/FTPS; file name patterns and newest/oldest/first/last choice; keep, move or
+  delete the file after a successful run; "Test connection" in the form; secrets encrypted with Magento's key and
+  never shown again. See docs/sources.md.

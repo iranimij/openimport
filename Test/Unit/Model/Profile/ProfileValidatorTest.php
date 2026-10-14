@@ -53,6 +53,7 @@ class ProfileValidatorTest extends TestCase
             'direction' => 'import',
             'entity' => 'catalog_product',
             'source_type' => 'sftp',
+            'source_config' => ['host' => 'files.example.com', 'username' => 'shop', 'port' => '2222', 'pick' => 'newest'],
             'format' => 'csv',
             'behavior' => 'only_update',
             'on_error' => 'skip',
@@ -159,5 +160,25 @@ class ProfileValidatorTest extends TestCase
             'The direction "sideways" is not import or export.',
             'Choose what to import or export.',
         ], $problems);
+    }
+
+    public function testSourceSettingsAreChecked(): void
+    {
+        $validator = $this->validator();
+        $base = $this->valid();
+
+        self::assertSame(
+            ['Enter the server (host name).', 'Enter the user name for the server.', 'The port must be a number between 1 and 65535.'],
+            $validator->validate(new ProfileStub(['source_config' => ['port' => '99999']] + $base))
+        );
+        self::assertSame(
+            ['The web address must start with https:// or http://.', 'Enter the user name for the login.'],
+            $validator->validate(new ProfileStub(['source_type' => 'url', 'source_config' => ['url' => 'ftp://x', 'auth' => 'basic']] + $base))
+        );
+        self::assertSame(
+            ['The folder may not contain "..".', '"best" is not a way to choose the file.'],
+            $validator->validate(new ProfileStub(['source_type' => 'folder', 'source_config' => ['path' => 'a/../b', 'pick' => 'best']] + $base))
+        );
+        self::assertSame([], $validator->validate(new ProfileStub(['source_type' => 'upload', 'source_config' => []] + $base)));
     }
 }

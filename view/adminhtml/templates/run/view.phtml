@@ -34,6 +34,9 @@ $run = $view->run();
             <?php else: ?>
                 <?= $escaper->escapeHtml($run->getProfileName()) ?>
             <?php endif; ?>
+            <?php if (!empty($run->getOptions()['original_name'])): ?>
+                · <?= $escaper->escapeHtml(__('file %1', (string) $run->getOptions()['original_name'])) ?>
+            <?php endif; ?>
             · <?= $escaper->escapeHtml(__('started by %1', $run->getRequestedBy() ?? $run->getTrigger())) ?>
             <?php if ($view->duration() !== ''): ?>
                 · <?= $escaper->escapeHtml(__('took %1', $view->duration())) ?>

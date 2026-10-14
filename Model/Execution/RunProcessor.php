@@ -158,6 +158,10 @@ class RunProcessor
         $fetched = $this->sources->fetch($profile, $run, $folder);
         $staged = $this->runFiles->stageSource($runId, $fetched->path, $fetched->name);
         $run->setSourceFile($this->runFiles->relative($staged));
+        if (empty($run->getOptions()['original_name']) && $fetched->name !== '') {
+            // The run page and the download show the file by its own name (uploads set it when queued).
+            $run->setOptions($run->getOptions() + ['original_name' => $fetched->name]);
+        }
         $this->runRepository->save($run);
         $heartbeat = function () use ($locks, $runId): void {
             foreach ($locks as $name) {

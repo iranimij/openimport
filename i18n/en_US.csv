@@ -163,6 +163,7 @@
 "Status","Status"
 "Live run","Live run"
 "started by %1","started by %1"
+"file %1","file %1"
 "took %1","took %1"
 "peak memory %1 MB","peak memory %1 MB"
 "Waiting for OpenImport's cron (runs every minute). This page updates by itself.","Waiting for OpenImport's cron (runs every minute). This page updates by itself."

@@ -40,7 +40,11 @@ class RunStatus extends Column
      */
     public function prepareDataSource(array $dataSource)
     {
-        foreach ($dataSource['data']['items'] ?? [] as &$item) {
+        if (!isset($dataSource['data']['items']) || !is_array($dataSource['data']['items'])) {
+            return $dataSource;
+        }
+        // By reference into the array itself: a "?? []" expression would be a copy and the grid would keep raw values.
+        foreach ($dataSource['data']['items'] as &$item) {
             $item['status'] = $this->chip->html((string) ($item['status'] ?? ''));
         }
 

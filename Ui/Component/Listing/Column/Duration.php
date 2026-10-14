@@ -21,7 +21,11 @@ class Duration extends Column
      */
     public function prepareDataSource(array $dataSource)
     {
-        foreach ($dataSource['data']['items'] ?? [] as &$item) {
+        if (!isset($dataSource['data']['items']) || !is_array($dataSource['data']['items'])) {
+            return $dataSource;
+        }
+        // By reference into the array itself: a "?? []" expression would be a copy and the grid would keep raw values.
+        foreach ($dataSource['data']['items'] as &$item) {
             $started = isset($item['started_at']) ? strtotime((string) $item['started_at'] . ' UTC') : false;
             $finished = isset($item['finished_at']) ? strtotime((string) $item['finished_at'] . ' UTC') : false;
             if ($started === false || $finished === false || $finished < $started) {

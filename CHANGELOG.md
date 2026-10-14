@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-15
+
+First release.
+
 ### Added
 - Module skeleton on `iranimij/module-base`: settings under Stores › Configuration › iranimij › OpenImport, ACL
   under System › Data Transfer, English and German translations, CI.
@@ -62,3 +66,5 @@ All notable changes to this project are documented here. The format follows
   `openimport:doctor` (cron, indexers, PHP, folders, stuck runs).
 - Two sample profiles on first install (schedules off), a first-run notice on the profiles page, and an admin
   system message while runs wait but cron has not run OpenImport's job.
+- Uninstall class (`module:uninstall --remove-data` drops every table, setting, cron row and run folder), security
+  documentation (docs/security.md), README for 1.0.

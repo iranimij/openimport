@@ -57,11 +57,13 @@ orders to CSV, XLSX, JSON or XML, downloaded, dropped in a folder, pushed to SFT
 | **Schedules** | Cron expressions and presets, each due minute runs exactly once, catch-up after a missed window, one run per profile at a time. |
 | **Exports** | Core entities and orders (one row per order or per line, only new or changed orders), renamed and transformed columns, to CSV, XLSX, JSON, XML and five destinations. |
 | **Operations** | Run history, e-mail on failure or always, a system message when cron stops, `openimport:doctor`, housekeeping of old run files. |
+| **REST API** | `POST /V1/openimport/profiles/{id}/runs` starts a profile, `GET /V1/openimport/runs/{id}` reports on it; order exports can run after every placed order. |
 | **CLI** | `openimport:run`, `openimport:run:status`, `openimport:profile:list`, `openimport:queue:run`, `openimport:profiles:export`, `openimport:profiles:import`, `openimport:secrets:reencrypt`, `openimport:doctor`. |
 
-Entities in 1.0: products (every type, with images, categories, related products and custom options exactly as core
+Entities: products (every type, with images, categories, related products and custom options exactly as core
 import supports them), advanced pricing, customers, customer addresses, customers with addresses, MSI stock sources,
-the fast *Stock & prices* update (existing products only), and order export. Anything Magento's own import can do
+the fast *Stock & prices* update (existing products only), categories, product attributes and attribute sets, CMS
+pages and blocks (import and export), and order export. Anything Magento's own import can do
 with a CSV, OpenImport does with a mapped file.
 
 ## How it compares
@@ -84,9 +86,12 @@ From the vendors' public docs as of 2026-10-13; details and sources in [docs/com
 | Products, prices, customers, addresses, MSI stock | ✓ via Magento's own importer | ✓ | ✓ | ✓ | ✓ | ○ |
 | Fast stock & price update | ✓ | ✗ | ✗ | ○ | ○ | ✓ |
 | Order export (only new or changed) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
-| Categories, attributes, CMS, rules | **1.1** | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Categories, attributes and attribute sets, CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Cart and catalog price rules, URL rewrites | **1.2** | ✗ | ✗ | ✓ | ✓ | ✗ |
 | Order import, tracking import | **1.2** | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Export to download, folder, SFTP, FTP, e-mail | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |
+| Export right after an order is placed | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Start profiles over REST, read run status | ✓ | ○ raw CSV import | ○ | ○ | ○ | ✗ |
 | Error report with your file's own line numbers and rows | ✓ | ○ | ○ | ✓ | ✓ | ✓ |
 | CLI, profiles as JSON for version control | ✓ | ✗ | ✗ | ○ | ✗ | ○ |
 | Health check and cron watchdog (`doctor`) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |

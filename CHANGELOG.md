@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-15
+
+Categories, product attributes and attribute sets, CMS pages and blocks, a REST trigger, and order exports right after every order.
+
 ### Added
 - Categories import and export (`openimport_category`): paths by names, parents created on the way, store-view
   values, dry-run preview, delete with children; own importers plug into the pipeline through `ImporterInterface`

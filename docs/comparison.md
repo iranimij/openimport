@@ -17,7 +17,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Features
 
-| Feature | OpenImport 1.0 | Open Source | Commerce | Firebear | Amasty Premium | Xtento |
+| Feature | OpenImport 1.1 | Open Source | Commerce | Firebear | Amasty Premium | Xtento |
 |---|---|---|---|---|---|---|
 | Saved profiles | ✓ | ✗ | ○ scheduled jobs | ✓ | ✓ (Premium) | ✓ |
 | Schedules (cron) | ✓ presets and cron expressions, each due minute exactly once | ✗ | ✓ | ✓ | ○ (Pro and up) | ✓ |
@@ -34,7 +34,10 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | Fast stock & price update of existing products | ✓ | ✗ | ✗ | ○ | ○ | ✓ |
 | Order export (per order or per line, only new or changed) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Order import, tracking import | ✗ (1.2) | ✗ | ✗ | ✓ | ✓ with invoice/ship actions | ✓ |
-| Categories, attributes, CMS, URL rewrites, rules | ✗ (1.1) | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Categories (paths, store views) | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
+| Product attributes and attribute sets (options, store labels) | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
+| CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
+| URL rewrites, cart and catalog price rules | ✗ (1.2) | ✗ | ✗ | ✓ | ✓ | ✗ |
 | Export destinations | ✓ download, folder, SFTP, FTP, e-mail | ✗ | ○ | ✓ | ✓ | ✓ |
 | Run history, error report with your file's line numbers | ✓ original rows in the report | ○ history | ○ last outcome | ✓ | ✓ | ✓ |
 | E-mail on failure or always | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |
@@ -43,8 +46,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | Health check (`doctor`) and cron watchdog | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | Spreadsheet formula-injection guard | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | Encrypted credentials, never shown again | ✓ | — | — | ○ | ○ | ○ |
-| Event-triggered export (order placed → file) | ○ schedule every minute with "only new" (1.1: events) | ✗ | ✗ | ✓ | ✓ | ✓ |
-| Trigger profiles by REST | ✗ (1.1) | ○ raw CSV/JSON import API | ○ | ○ | ○ | ✗ |
+| Event-triggered export (order placed → file) | ✓ debounced, one run per minute | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Trigger profiles by REST, read run status | ✓ | ○ raw CSV/JSON import API | ○ | ○ | ○ | ✗ |
 | B2B entities | ✗ | ✗ | ○ | ✓ (add-on) | ✗ | ✗ |
 
 ## Where OpenImport is different by design
@@ -60,9 +63,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Where the paid tools still have more
 
-Entity breadth (categories, attributes, CMS, orders import, rules, URL rewrites), cloud drives (Google Drive, Dropbox,
-OneDrive) and REST API sources, event-driven exports, image download helpers, B2B. These are the 1.1 and 1.2
-milestones; see the [roadmap](https://github.com/iranimij/openimport/milestones).
+Order and tracking import, price rules and URL rewrites, cloud drives (Google Drive, Dropbox, OneDrive) and REST
+API sources, image download helpers, B2B. These are the 1.2 milestone and later; see the [roadmap](https://github.com/iranimij/openimport/milestones).
 
 ## Free alternatives for developers
 

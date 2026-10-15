@@ -55,7 +55,7 @@ class StatusChip
     public function chip(string $status): string
     {
         return sprintf(
-            '<span class="openimport-chip openimport-chip-%s">%s</span>',
+            '<span class="openimport-status openimport-status-%s">%s</span>',
             self::SEVERITY[$status] ?? 'minor',
             $this->escaper->escapeHtml($this->label($status))
         );

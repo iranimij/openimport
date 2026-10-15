@@ -65,9 +65,41 @@
     background: #f8f8f8;
 }
 
+.openimport-chip > span {
+    white-space: nowrap;
+}
+
 .openimport-chip-button {
     min-width: 2.4rem;
     padding: 0 .5rem;
+}
+
+/* Chip buttons appear on hover and keyboard focus, so the chips stay one short line (D4). */
+.openimport-chip .openimport-chip-button {
+    opacity: 0;
+    transition: opacity .1s;
+}
+
+.openimport-chip:hover .openimport-chip-button,
+.openimport-chip:focus-within .openimport-chip-button {
+    opacity: 1;
+}
+
+@media (hover: none) {
+    .openimport-chip .openimport-chip-button {
+        opacity: 1;
+    }
+}
+
+/* Plain links for secondary row actions (value map), not grey buttons (D3). */
+.openimport-link,
+.openimport-link:hover,
+.openimport-link:focus {
+    background: none;
+    border: 0;
+    color: #1a5a96;
+    padding: 0;
+    text-decoration: underline;
 }
 
 /* Remove-row button: the trash icon, with the label kept for screen readers (the grid has no .action-delete style). */
@@ -223,7 +255,7 @@
     margin-bottom: 1.5rem;
 }
 
-.openimport-chip {
+.openimport-status {
     border: 1px solid;
     border-radius: 1em;
     display: inline-block;
@@ -236,25 +268,25 @@
     white-space: nowrap;
 }
 
-.openimport-chip-notice {
+.openimport-status-notice {
     background: #e5f7e0;
     border-color: #79a22e;
     color: #185b00;
 }
 
-.openimport-chip-major {
+.openimport-status-major {
     background: #fff4d6;
     border-color: #e8a400;
     color: #6f4400;
 }
 
-.openimport-chip-critical {
+.openimport-status-critical {
     background: #fde8e6;
     border-color: #e22626;
     color: #a30d0d;
 }
 
-.openimport-chip-minor {
+.openimport-status-minor {
     background: #f1f1f1;
     border-color: #a6a6a6;
     color: #303030;
@@ -293,4 +325,95 @@
 .openimport-changes summary {
     color: #1a5a96;
     cursor: pointer;
+}
+
+/* Small numbers get small fields (port, errors allowed, safety limit). */
+.openimport-narrow .admin__control-text,
+.openimport-narrow .admin__control-addon {
+    max-width: 16rem;
+}
+
+/* Upload: a drop zone that shows the current file and offers to replace it (D9). */
+.openimport-dropzone {
+    position: relative;
+    align-items: center;
+    border: 2px dashed #adadad;
+    border-radius: .4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    padding: 1.5rem;
+}
+
+.openimport-dropzone._has-file {
+    border-style: solid;
+    border-color: #79a22e;
+}
+
+.openimport-dropzone._dragging {
+    background: #f1f8ff;
+    border-color: #1a5a96;
+}
+
+.openimport-dropzone .admin__field-note {
+    flex-basis: 100%;
+    margin: 0;
+}
+
+.openimport-dropzone-hint {
+    color: #514943;
+}
+
+/* The file input stays focusable for the keyboard; its label is the visible button. */
+.openimport-dropzone-input {
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+}
+
+.openimport-dropzone-input:focus + label {
+    box-shadow: 0 0 0 1px #007bdb;
+}
+
+/* Step navigation: stays on top while scrolling, below the sticky page actions (D12). */
+.openimport-steps {
+    background: #fff;
+    border-bottom: 1px solid #e3e3e3;
+    margin-bottom: 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.openimport-steps ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1.5rem;
+    list-style: none;
+    margin: 0;
+    padding: .8rem 0;
+}
+
+.openimport-step-link {
+    background: none;
+    border: 0;
+    color: #1a5a96;
+    cursor: pointer;
+    font-weight: 600;
+    padding: .2rem 0;
+}
+
+.openimport-step-link:hover,
+.openimport-step-link:focus {
+    text-decoration: underline;
+}
+
+/* One-line summary in a step's header: what the collapsed step holds. */
+.openimport-step-summary {
+    color: #6b6b6b;
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-left: 1.5rem;
 }

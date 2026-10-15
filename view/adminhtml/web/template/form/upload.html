@@ -9,18 +9,25 @@
         <span translate="'File'"></span>
     </label>
     <div class="admin__field-control">
-        <input type="file" class="admin__control-file"
-               accept=".csv,.tsv,.txt,.xlsx,.json,.xml"
-               attr="id: uid, 'aria-describedby': uid + '-note'"
-               event="change: upload"
-               disable="uploading">
-        <div class="admin__field-note" attr="id: uid + '-note'">
-            <!-- ko if: fileName -->
-            <span text="$t('Current file\:')"></span> <strong text="fileName"></strong>
-            <!-- /ko -->
-            <!-- ko ifnot: fileName -->
-            <span translate="'CSV, Excel (.xlsx), JSON or XML. The first rows appear in step 3.'"></span>
-            <!-- /ko -->
+        <div class="openimport-dropzone" css="{'_dragging': dragging, '_has-file': fileName}"
+             event="dragover: dragOver, dragenter: dragOver, dragleave: dragLeave, drop: drop">
+            <input type="file" class="openimport-dropzone-input"
+                   accept=".csv,.tsv,.txt,.xlsx,.json,.xml"
+                   attr="id: uid, 'aria-describedby': uid + '-note'"
+                   event="change: upload"
+                   disable="uploading">
+            <label class="action-secondary" attr="for: uid">
+                <span text="fileName ? $t('Replace the file') : $t('Choose a file')"></span>
+            </label>
+            <span class="openimport-dropzone-hint" translate="'or drop it here'"></span>
+            <div class="admin__field-note" attr="id: uid + '-note'">
+                <!-- ko if: fileName -->
+                <span text="$t('Current file\:')"></span> <strong text="fileName"></strong>
+                <!-- /ko -->
+                <!-- ko ifnot: fileName -->
+                <span translate="'CSV, Excel (.xlsx), JSON or XML. The first rows appear in step 3.'"></span>
+                <!-- /ko -->
+            </div>
         </div>
         <div class="message message-notice" role="status" if="uploading">
             <span translate="'Uploading and reading the file …'"></span>

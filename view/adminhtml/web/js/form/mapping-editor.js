@@ -50,6 +50,11 @@ define([
     var DECIMAL_DOT = /^-?\d+\.\d+$/;
 
     /**
+     * Select value of "Other field …": the code is typed in the field next to it.
+     */
+    var OTHER = '__other';
+
+    /**
      * @param {String} target
      * @returns {{field: String, store: String}}
      */
@@ -149,15 +154,43 @@ define([
                 strict: ko.observable(data.value_map_strict === '1' || data.value_map_strict === true),
                 showMap: ko.observable(!!data.value_map),
                 addName: ko.observable(''),
-                addArgs: ko.observableArray([])
+                addArgs: ko.observableArray([]),
+                other: ko.observable(false)
             };
+            // The code field shows for "Other field …" and for codes the list does not have (D2).
+            row.showCode = ko.pureComputed(function () {
+                var code = row.field();
+
+                return this.isExport() || row.other() || (code !== '' && !this.loadingFields
+                    && this.fields.length > 0 && !_.findWhere(this.fields, {code: code}));
+            }, this);
+            row.fieldChoice = ko.pureComputed({
+                read: function () {
+                    return row.showCode() ? OTHER : row.field();
+                },
+                write: function (choice) {
+                    if (choice === OTHER) {
+                        row.other(true);
+
+                        return;
+                    }
+                    row.other(false);
+                    row.field(choice || '');
+                }
+            }, this);
             row.addName.subscribe(function (name) {
                 var entry = _.findWhere(CATALOGUE, {name: name});
 
                 row.addArgs(_.map(entry ? entry.args : [], function (label) {
                     return {label: label, value: ko.observable('')};
                 }));
-            });
+                // A transform without settings is added at once (D4).
+                if (entry && entry.args.length === 0) {
+                    _.defer(function () {
+                        this.addTransform(row);
+                    }.bind(this));
+                }
+            }, this);
             _.each(['field', 'store', 'source', 'staticValue', 'required', 'valueMap', 'caseSensitive', 'strict'],
                 function (key) {
                     row[key].subscribe(this.sync, this);
@@ -238,7 +271,7 @@ define([
                     label: field.code + (field.label !== field.code ? ' – ' + field.label : '') +
                         (field.identifier ? ' (' + $t('identifier') + ')' : field.required ? ' *' : '')
                 };
-            });
+            }).concat([{value: OTHER, label: $t('Other field (type its code) …')}]);
         },
 
         /**

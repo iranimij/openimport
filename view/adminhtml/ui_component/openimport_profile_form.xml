@@ -54,6 +54,14 @@
         </argument>
     </container>
 
+    <container name="steps" component="Iranimij_OpenImport/js/form/steps" sortOrder="2">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="provider" xsi:type="string">openimport_profile_form.openimport_profile_form_data_source</item>
+            </item>
+        </argument>
+    </container>
+
     <fieldset name="what" sortOrder="10">
         <settings>
             <label translate="true">1 · What</label>
@@ -146,7 +154,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="order_on_place" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="40">
+        <field name="order_on_place" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -162,20 +170,15 @@
                 <dataScope>export_options.order.on_place</dataScope>
             </settings>
             <formElements>
-                <select>
+                <checkbox>
                     <settings>
-                        <options>
-                            <option name="0" xsi:type="array">
-                                <item name="value" xsi:type="string">0</item>
-                                <item name="label" xsi:type="string" translate="true">No</item>
-                            </option>
-                            <option name="1" xsi:type="array">
-                                <item name="value" xsi:type="string">1</item>
-                                <item name="label" xsi:type="string" translate="true">Yes</item>
-                            </option>
-                        </options>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
                     </settings>
-                </select>
+                </checkbox>
             </formElements>
         </field>
         <field name="order_only" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="41">
@@ -499,6 +502,9 @@
                 </item>
             </argument>
             <settings>
+                <additionalClasses>
+                    <class name="openimport-narrow">true</class>
+                </additionalClasses>
                 <label translate="true">Port</label>
                 <dataScope>source_config.port</dataScope>
                 <notice translate="true">Empty = 22 for SFTP, 21 for FTP.</notice>
@@ -651,9 +657,10 @@
                 </select>
             </formElements>
         </field>
-        <field name="source_passive" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="38">
+        <field name="source_passive" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="38">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">1</item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">ftp</item>
                     </item>
@@ -664,20 +671,15 @@
                 <dataScope>source_config.passive</dataScope>
             </settings>
             <formElements>
-                <select>
+                <checkbox>
                     <settings>
-                        <options>
-                            <option name="0" xsi:type="array">
-                                <item name="value" xsi:type="string">1</item>
-                                <item name="label" xsi:type="string" translate="true">Yes (usual)</item>
-                            </option>
-                            <option name="1" xsi:type="array">
-                                <item name="value" xsi:type="string">0</item>
-                                <item name="label" xsi:type="string" translate="true">No</item>
-                            </option>
-                        </options>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
                     </settings>
-                </select>
+                </checkbox>
             </formElements>
         </field>
         <field name="source_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="40">
@@ -916,6 +918,9 @@
                 </item>
             </argument>
             <settings>
+                <additionalClasses>
+                    <class name="openimport-narrow">true</class>
+                </additionalClasses>
                 <label translate="true">Port</label>
                 <dataScope>export_options.port</dataScope>
                 <notice translate="true">Empty = 22 for SFTP, 21 for FTP.</notice>
@@ -1082,9 +1087,10 @@
                 </select>
             </formElements>
         </field>
-        <field name="dest_passive" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="30">
+        <field name="dest_passive" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">1</item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">ftp</item>
                     </item>
@@ -1097,20 +1103,15 @@
                 <dataScope>export_options.passive</dataScope>
             </settings>
             <formElements>
-                <select>
+                <checkbox>
                     <settings>
-                        <options>
-                            <option name="0" xsi:type="array">
-                                <item name="value" xsi:type="string">1</item>
-                                <item name="label" xsi:type="string" translate="true">Yes (usual)</item>
-                            </option>
-                            <option name="1" xsi:type="array">
-                                <item name="value" xsi:type="string">0</item>
-                                <item name="label" xsi:type="string" translate="true">No</item>
-                            </option>
-                        </options>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
                     </settings>
-                </select>
+                </checkbox>
             </formElements>
         </field>
         <field name="dest_path_remote" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="31">
@@ -1335,7 +1336,7 @@
                 <notice translate="true">JSON: data.items · XML: /catalog/product or //product. Empty = detect.</notice>
             </settings>
         </field>
-        <field name="out_bom" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="32">
+        <field name="out_bom" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="32">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1351,20 +1352,15 @@
                 <dataScope>format_options.bom</dataScope>
             </settings>
             <formElements>
-                <select>
+                <checkbox>
                     <settings>
-                        <options>
-                            <option name="0" xsi:type="array">
-                                <item name="value" xsi:type="string">0</item>
-                                <item name="label" xsi:type="string" translate="true">No</item>
-                            </option>
-                            <option name="1" xsi:type="array">
-                                <item name="value" xsi:type="string">1</item>
-                                <item name="label" xsi:type="string" translate="true">Yes</item>
-                            </option>
-                        </options>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
                     </settings>
-                </select>
+                </checkbox>
             </formElements>
         </field>
         <field name="out_line_ending" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="33">
@@ -1436,7 +1432,7 @@
                 <placeholder>item</placeholder>
             </settings>
         </field>
-        <field name="out_pretty" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="63">
+        <field name="out_pretty" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="63">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1451,20 +1447,15 @@
                 <dataScope>format_options.pretty</dataScope>
             </settings>
             <formElements>
-                <select>
+                <checkbox>
                     <settings>
-                        <options>
-                            <option name="0" xsi:type="array">
-                                <item name="value" xsi:type="string">0</item>
-                                <item name="label" xsi:type="string" translate="true">No</item>
-                            </option>
-                            <option name="1" xsi:type="array">
-                                <item name="value" xsi:type="string">1</item>
-                                <item name="label" xsi:type="string" translate="true">Yes</item>
-                            </option>
-                        </options>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
                     </settings>
-                </select>
+                </checkbox>
             </formElements>
         </field>
         <container name="sample" component="Iranimij_OpenImport/js/form/sample-table" sortOrder="70">
@@ -1544,6 +1535,7 @@
         <field name="allowed_errors" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="addafter" xsi:type="string" translate="true">rows</item>
                     <item name="forDirection" xsi:type="string">import</item>
                     <item name="showWhen" xsi:type="array">
                         <item name="on_error" xsi:type="array">
@@ -1555,6 +1547,9 @@
                 </item>
             </argument>
             <settings>
+                <additionalClasses>
+                    <class name="openimport-narrow">true</class>
+                </additionalClasses>
                 <label translate="true">Errors allowed</label>
                 <dataScope>allowed_errors</dataScope>
                 <notice translate="true">This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run.</notice>
@@ -1589,11 +1584,15 @@
         <field name="safety_threshold" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="addafter" xsi:type="string" translate="true">% of the records</item>
                     <item name="forDirection" xsi:type="string">import</item>
                 </item>
             </argument>
             <settings>
-                <label translate="true">Safety limit (%)</label>
+                <additionalClasses>
+                    <class name="openimport-narrow">true</class>
+                </additionalClasses>
+                <label translate="true">Safety limit</label>
                 <dataScope>safety_threshold</dataScope>
                 <notice translate="true">Empty = the limit in Stores › Configuration › iranimij › OpenImport.</notice>
                 <validation>

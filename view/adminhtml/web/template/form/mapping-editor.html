@@ -34,7 +34,7 @@
             <th class="data-grid-th" scope="col" translate="'Store view'" if="stores.length"></th>
             <th class="data-grid-th" scope="col" text="isExport() ? $t('From Magento') \: $t('From the file')"></th>
             <th class="data-grid-th" scope="col" translate="'Transforms'"></th>
-            <th class="data-grid-th" scope="col" translate="'Required'" ifnot="isExport()"></th>
+            <th class="data-grid-th" scope="col" translate="'Empty is an error'" ifnot="isExport()"></th>
             <th class="data-grid-th" scope="col"><span class="admin__visually-hidden" translate="'Actions'"></span></th>
         </tr>
         </thead>
@@ -44,9 +44,10 @@
             <td>
                 <select class="admin__control-select" ifnot="$parent.isExport()"
                         attr="'aria-label': $t('Magento field')"
-                        options="$parent.fieldOptions(), optionsText\: 'label', optionsValue\: 'value', optionsCaption\: $t('Choose …'), value\: row.field, valueAllowUnset\: true"></select>
+                        options="$parent.fieldOptions(), optionsText\: 'label', optionsValue\: 'value', optionsCaption\: $t('Choose …'), value\: row.fieldChoice, valueAllowUnset\: true"></select>
                 <input type="text" class="admin__control-text openimport-mapping-other"
-                       attr="'aria-label': $parent.isExport() ? $t('Column in the file') : $t('Other Magento field (code)'), placeholder: $parent.isExport() ? $t('Column name') : $t('or type a field code')"
+                       visible="row.showCode()"
+                       attr="'aria-label': $parent.isExport() ? $t('Column in the file') : $t('Other Magento field (code)'), placeholder: $parent.isExport() ? $t('Column name') : $t('Field code, e.g. color')"
                        ko-value="row.field">
             </td>
             <td if="$parent.stores.length">
@@ -93,8 +94,9 @@
                         <span translate="'Add'"></span>
                     </button>
                 </div>
-                <button type="button" class="action-link" click="function () { row.showMap(!row.showMap()); }">
-                    <span translate="'Value map'"></span>
+                <button type="button" class="action-link openimport-link" click="function () { row.showMap(!row.showMap()); }"
+                        attr="'aria-expanded': row.showMap() ? 'true' : 'false'">
+                    <span text="row.showMap() ? $t('− Value map') : $t('+ Value map')"></span>
                 </button>
                 <div class="openimport-value-map" if="row.showMap()">
                     <textarea class="admin__control-textarea" rows="4"

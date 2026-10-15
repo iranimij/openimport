@@ -21,6 +21,7 @@ define([
             uploading: false,
             message: '',
             detected: '',
+            dragging: false,
             sample: null,
             direction: 'import',
             imports: {
@@ -35,6 +36,7 @@ define([
                 uploading: true,
                 message: true,
                 detected: true,
+                dragging: true,
                 sample: true
             }
         },
@@ -67,8 +69,44 @@ define([
          * @param {Event} event
          */
         upload: function (component, event) {
-            var file = event.target.files && event.target.files[0],
-                data = new FormData(),
+            this.send(event.target.files && event.target.files[0], event.target);
+        },
+
+        /**
+         * A file dropped on the drop zone.
+         *
+         * @param {Object} component
+         * @param {Event} event
+         */
+        drop: function (component, event) {
+            var files = event.dataTransfer && event.dataTransfer.files;
+
+            this.dragging = false;
+            if (!this.uploading) {
+                this.send(files && files[0], null);
+            }
+        },
+
+        /**
+         * Keeps the browser from opening the dragged file.
+         */
+        dragOver: function () {
+            this.dragging = true;
+        },
+
+        /**
+         * The dragged file left the drop zone.
+         */
+        dragLeave: function () {
+            this.dragging = false;
+        },
+
+        /**
+         * @param {File|undefined} file
+         * @param {HTMLInputElement|null} input cleared after the upload, so the same file can be chosen again
+         */
+        send: function (file, input) {
+            var data = new FormData(),
                 self = this;
 
             if (!file) {
@@ -104,7 +142,9 @@ define([
                 self.message = $t('The file could not be uploaded. Try again.');
             }).always(function () {
                 self.uploading = false;
-                event.target.value = '';
+                if (input) {
+                    input.value = '';
+                }
             });
         }
     });

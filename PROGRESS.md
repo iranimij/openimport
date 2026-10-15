@@ -26,7 +26,18 @@ Iman's Mac (`~/Projects/openimport-dev-env`, Warden) whenever the laptop is open
 or create releases; Actions › Release › Run workflow does it). Dev-env: 14 Playwright scenarios green on 2.4.9
 (dev-env #3, #4 merged; `.github/ci/openimport-ref` back to `main`).
 
-Open for Iman: Packagist submission and GitHub hook, repository settings (squash only, delete branch on merge,
+**1.1.0 (2026-10-15), M5:** own importers behind `ImporterPool` for categories (#26, fixes #31 and #32), product
+attributes and sets (#27), CMS pages and blocks (#28); REST API to start runs and read their status, order exports
+after every placed order (#29); comparison tables, README and changelog (#30). Release `v1.1.0` through the Release
+workflow, docs redeployed, Packagist shows 1.1.0. Dev-env: E2E for German categories and CMS blocks (dev-env #5),
+green against `main`.
+
+Lessons from M5: the pipeline pads every row to the same columns, so an own importer must treat an empty cell as
+"leave unchanged"; Magento saves store-view values in the default scope when the shop has one store view; category
+URL clashes need the taken URLs in the message to be debuggable.
+
+Open for Iman: delete the temporary branch `ci/m5-all` (shows as a dev version on Packagist; cloud sessions cannot
+delete branches), repository settings (squash only, delete branch on merge,
 `main` protected with `ci-ok`), a look at the admin on the Mac. Next product work: Notion "12 · Roadmap 1.x".
 
 ## Lessons kept (also in Notion)

@@ -259,6 +259,9 @@ class AttributeImporter implements ImporterInterface
             $changed = $this->mergeOptions($attribute, (string) $row['options']) || $changed;
         }
         if ($created || $changed) {
+            if (!$created) {
+                $this->keepStoreLabels($attribute);
+            }
             $attribute = $this->attributes->save($attribute);
         }
         $assigned = $this->assign($attribute, $row);
@@ -298,6 +301,26 @@ class AttributeImporter implements ImporterInterface
         $attribute->setOptions($this->options->build($existing, $new));
 
         return true;
+    }
+
+    /**
+     * Saving an attribute rewrites its store-view labels from what the object carries; hand it the stored ones.
+     *
+     * @param ProductAttributeInterface $attribute
+     * @return void
+     */
+    private function keepStoreLabels(ProductAttributeInterface $attribute): void
+    {
+        if (!$attribute instanceof AbstractAttribute) {
+            return;
+        }
+        $current = $this->options->attributeLabels((int) $attribute->getAttributeId());
+        $attribute->setData('store_labels', $current);
+        $frontendLabels = [];
+        foreach ($current as $storeId => $value) {
+            $frontendLabels[] = $this->frontendLabelFactory->create()->setStoreId($storeId)->setLabel($value);
+        }
+        $attribute->setFrontendLabels($frontendLabels);
     }
 
     /**

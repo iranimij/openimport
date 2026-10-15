@@ -147,6 +147,7 @@ class AttributeImportTest extends TestCase
         self::assertSame(['Cotton', 'Wool', 'Silk'], array_keys($after));
         self::assertSame($before['Cotton'], $after['Cotton'], 'existing options keep their ids');
         self::assertSame(['Baumwolle', 'Wolle', ''], $options->storeLabels((int) $material->getAttributeId(), 1), 'adding an option keeps the store labels');
+        self::assertSame('Stoff', $options->attributeLabels((int) $material->getAttributeId())[1] ?? null, 'an update keeps the store-view label');
 
         // Export the two attributes and read them back.
         $export = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class)->create()

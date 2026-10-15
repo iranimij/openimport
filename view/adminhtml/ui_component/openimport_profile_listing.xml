@@ -53,6 +53,18 @@
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="openimport_profile_columns">
+        <settings>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">openimport_profile_listing.openimport_profile_listing.openimport_profile_columns.actions</item>
+                    <item name="target" xsi:type="string">applyAction</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">edit</item>
+                        <item name="1" xsi:type="string">${ $.$data.rowIndex }</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
         <column name="profile_id" sortOrder="10">
             <settings>
                 <filter>textRange</filter>
@@ -99,9 +111,17 @@
             </settings>
         </column>
         <column name="last_run" class="Iranimij\OpenImport\Ui\Component\Listing\Column\LastRun" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldAction" xsi:type="boolean">false</item>
+                </item>
+            </argument>
             <settings>
                 <label translate="true">Last run</label>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <fieldClass>
+                    <class name="openimport-nowrap">true</class>
+                </fieldClass>
                 <sortable>false</sortable>
             </settings>
         </column>
@@ -111,6 +131,9 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <label translate="true">Changed</label>
+                <fieldClass>
+                    <class name="openimport-nowrap">true</class>
+                </fieldClass>
             </settings>
         </column>
         <actionsColumn name="actions" class="Iranimij\OpenImport\Ui\Component\Listing\Column\ProfileActions"

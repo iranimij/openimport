@@ -143,10 +143,13 @@ class OrderEntitySource implements EntitySourceInterface
     {
         $raw = $profile->getExportOptions()['order'] ?? [];
         $raw = is_array($raw) ? $raw : [];
+        // A list is a comma-separated text (CLI, JSON) or an array (the admin's multiselect).
         $list = static fn (string $key): array => array_values(array_filter(array_map(
-            'trim',
-            explode(',', is_scalar($raw[$key] ?? null) ? (string) $raw[$key] : '')
-        )));
+            static fn ($value): string => trim(is_scalar($value) ? (string) $value : ''),
+            is_array($raw[$key] ?? null)
+                ? $raw[$key]
+                : explode(',', is_scalar($raw[$key] ?? null) ? (string) $raw[$key] : '')
+        ), static fn (string $value): bool => $value !== ''));
 
         return [
             'rows' => ($raw['rows'] ?? 'item') === 'order' ? 'order' : 'item',

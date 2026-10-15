@@ -181,95 +181,6 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="order_only" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="41">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="forTypes" xsi:type="array">
-                        <item name="0" xsi:type="string">openimport_order</item>
-                    </item>
-                    <item name="forDirection" xsi:type="string">export</item>
-                    <item name="typeField" xsi:type="string">entity</item>
-                </item>
-            </argument>
-            <settings>
-                <label translate="true">Which orders</label>
-                <dataScope>export_options.order.only</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <options>
-                            <option name="0" xsi:type="array">
-                                <item name="value" xsi:type="string">all</item>
-                                <item name="label" xsi:type="string" translate="true">All that match</item>
-                            </option>
-                            <option name="1" xsi:type="array">
-                                <item name="value" xsi:type="string">new</item>
-                                <item name="label" xsi:type="string" translate="true">Only orders not exported before by this profile</item>
-                            </option>
-                            <option name="2" xsi:type="array">
-                                <item name="value" xsi:type="string">new_or_changed</item>
-                                <item name="label" xsi:type="string" translate="true">New orders and orders changed since their export</item>
-                            </option>
-                        </options>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
-        <field name="order_statuses" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="42">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="forTypes" xsi:type="array">
-                        <item name="0" xsi:type="string">openimport_order</item>
-                    </item>
-                    <item name="forDirection" xsi:type="string">export</item>
-                    <item name="typeField" xsi:type="string">entity</item>
-                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
-                </item>
-            </argument>
-            <settings>
-                <label translate="true">Statuses</label>
-                <dataScope>export_options.order.statuses</dataScope>
-                <notice translate="true">Comma-separated status codes. Empty = every status.</notice>
-                <placeholder>pending, processing</placeholder>
-            </settings>
-        </field>
-        <field name="order_from" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="43">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="forTypes" xsi:type="array">
-                        <item name="0" xsi:type="string">openimport_order</item>
-                    </item>
-                    <item name="forDirection" xsi:type="string">export</item>
-                    <item name="typeField" xsi:type="string">entity</item>
-                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
-                </item>
-            </argument>
-            <settings>
-                <label translate="true">Created from</label>
-                <dataScope>export_options.order.from</dataScope>
-                <notice translate="true">Date or date and time, in the time zone of Stores › Configuration › General › Locale. Empty = no limit.</notice>
-                <placeholder>2026-01-01</placeholder>
-            </settings>
-        </field>
-        <field name="order_to" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="44">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="forTypes" xsi:type="array">
-                        <item name="0" xsi:type="string">openimport_order</item>
-                    </item>
-                    <item name="forDirection" xsi:type="string">export</item>
-                    <item name="typeField" xsi:type="string">entity</item>
-                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
-                </item>
-            </argument>
-            <settings>
-                <label translate="true">Created until</label>
-                <notice translate="true">Date or date and time, in the time zone of Stores › Configuration › General › Locale; a date alone counts the whole day. Empty = no limit.</notice>
-                <dataScope>export_options.order.to</dataScope>
-                <placeholder>2026-12-31 23:59:59</placeholder>
-            </settings>
-        </field>
         <field name="order_items" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="45">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -1495,6 +1406,109 @@
             <collapsible>true</collapsible>
             <opened>false</opened>
         </settings>
+        <field name="order_only" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="1">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Which orders</label>
+                <dataScope>export_options.order.only</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">all</item>
+                                <item name="label" xsi:type="string" translate="true">All that match</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">new</item>
+                                <item name="label" xsi:type="string" translate="true">Only orders not exported before by this profile</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">new_or_changed</item>
+                                <item name="label" xsi:type="string" translate="true">New orders and orders changed since their export</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="order_statuses" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="2">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Statuses</label>
+                <dataScope>export_options.order.statuses</dataScope>
+                <notice translate="true">None chosen = every status. Hold Ctrl or ⌘ to choose several.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\OrderStatus"/>
+                        <size>6</size>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="order_from" component="Iranimij_OpenImport/js/form/source-date" formElement="date" sortOrder="3">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="options" xsi:type="array">
+                        <item name="dateFormat" xsi:type="string">yyyy-MM-dd</item>
+                        <item name="showsTime" xsi:type="boolean">false</item>
+                    </item>
+                    <item name="inputDateFormat" xsi:type="string">y-MM-dd</item>
+                    <item name="outputDateFormat" xsi:type="string">y-MM-dd</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Created from</label>
+                <dataScope>export_options.order.from</dataScope>
+                <notice translate="true">A day in the time zone of Stores › Configuration › General › Locale. Empty = no limit.</notice>
+            </settings>
+        </field>
+        <field name="order_to" component="Iranimij_OpenImport/js/form/source-date" formElement="date" sortOrder="4">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="options" xsi:type="array">
+                        <item name="dateFormat" xsi:type="string">yyyy-MM-dd</item>
+                        <item name="showsTime" xsi:type="boolean">false</item>
+                    </item>
+                    <item name="inputDateFormat" xsi:type="string">y-MM-dd</item>
+                    <item name="outputDateFormat" xsi:type="string">y-MM-dd</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Created until</label>
+                <notice translate="true">This day counts in full, in the time zone of Stores › Configuration › General › Locale. Empty = no limit.</notice>
+                <dataScope>export_options.order.to</dataScope>
+            </settings>
+        </field>
         <field name="behavior" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="10">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

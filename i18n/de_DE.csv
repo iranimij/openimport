@@ -495,3 +495,6 @@
 "switched on","eingeschaltet"
 "switched off","ausgeschaltet"
 "Steps of the profile","Schritte des Profils"
+"None chosen = every status. Hold Ctrl or ⌘ to choose several.","Keiner gewählt = jeder Status. Mit Strg oder ⌘ mehrere wählen."
+"A day in the time zone of Stores › Configuration › General › Locale. Empty = no limit.","Ein Tag in der Zeitzone aus Shops › Konfiguration › Allgemein › Gebietsschema. Leer = keine Grenze."
+"This day counts in full, in the time zone of Stores › Configuration › General › Locale. Empty = no limit.","Dieser Tag zählt ganz, in der Zeitzone aus Shops › Konfiguration › Allgemein › Gebietsschema. Leer = keine Grenze."

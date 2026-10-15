@@ -495,3 +495,6 @@
 "switched on","switched on"
 "switched off","switched off"
 "Steps of the profile","Steps of the profile"
+"None chosen = every status. Hold Ctrl or ⌘ to choose several.","None chosen = every status. Hold Ctrl or ⌘ to choose several."
+"A day in the time zone of Stores › Configuration › General › Locale. Empty = no limit.","A day in the time zone of Stores › Configuration › General › Locale. Empty = no limit."
+"This day counts in full, in the time zone of Stores › Configuration › General › Locale. Empty = no limit.","This day counts in full, in the time zone of Stores › Configuration › General › Locale. Empty = no limit."

@@ -74,20 +74,30 @@
     padding: 0 .5rem;
 }
 
-/* Chip buttons appear on hover and keyboard focus, so the chips stay one short line (D4). */
+/* Chip buttons appear on hover and keyboard focus, so the chips stay one short line (D4). They keep no width while
+   hidden but stay focusable, so the keyboard reaches them. */
 .openimport-chip .openimport-chip-button {
-    opacity: 0;
-    transition: opacity .1s;
+    border-width: 0;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0;
+    width: 0;
 }
 
 .openimport-chip:hover .openimport-chip-button,
 .openimport-chip:focus-within .openimport-chip-button {
-    opacity: 1;
+    border-width: 1px;
+    min-width: 2.4rem;
+    padding: 0 .5rem;
+    width: auto;
 }
 
 @media (hover: none) {
     .openimport-chip .openimport-chip-button {
-        opacity: 1;
+        border-width: 1px;
+        min-width: 2.4rem;
+        padding: 0 .5rem;
+        width: auto;
     }
 }
 
@@ -416,4 +426,15 @@
     font-size: 1.3rem;
     font-weight: 400;
     margin-left: 1.5rem;
+}
+
+/* Grid dates on one line (D14). */
+.data-grid td.openimport-nowrap,
+.data-grid th.openimport-nowrap {
+    white-space: nowrap;
+}
+
+/* Grid rows open their profile or run when clicked. */
+.admin__data-grid-wrap .data-row td {
+    cursor: pointer;
 }

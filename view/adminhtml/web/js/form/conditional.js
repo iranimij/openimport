@@ -153,7 +153,7 @@ define([
                 found = paths(this.requiredWhen, paths(this.showWhen, []));
                 // Options from a source class arrive as a list, options written in the form XML as an object.
                 _.each(_.isObject(this.options) ? _.values(this.options) : [], function (option) {
-                    paths(option.showWhen, found);
+                    paths(option && option.showWhen, found);
                 });
                 this.whenPaths = found;
                 _.each(found, function (path, index) {

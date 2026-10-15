@@ -74,6 +74,14 @@ class ProfileFormMapper
         foreach ($this->secrets->stored($profile->getSourceConfig()) as $name => $stored) {
             $source[$name . '_stored'] = $stored ? '1' : '0';
         }
+        $export = $profile->getExportOptions();
+        // The status filter is a multiselect: a stored "pending, processing" becomes a list.
+        if (is_scalar($export['order']['statuses'] ?? null)) {
+            $export['order']['statuses'] = array_values(array_filter(
+                array_map('trim', explode(',', (string) $export['order']['statuses'])),
+                static fn (string $status): bool => $status !== ''
+            ));
+        }
 
         return [
             'profile_id' => $profile->getProfileId(),
@@ -86,7 +94,7 @@ class ProfileFormMapper
             'format' => $profile->getFormat(),
             // An unset has_header means "yes"; the toggle must show (and post) that, not an empty value.
             'format_options' => $profile->getFormatOptions() + ['has_header' => '1'],
-            'export_options' => $this->secrets->strip($profile->getExportOptions())
+            'export_options' => $this->secrets->strip($export)
                 + array_combine(
                     array_map(static fn (string $name): string => $name . '_stored', array_keys($this->secrets->stored($profile->getExportOptions()))),
                     array_map(static fn (bool $stored): string => $stored ? '1' : '0', $this->secrets->stored($profile->getExportOptions()))

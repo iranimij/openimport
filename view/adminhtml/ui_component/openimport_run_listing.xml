@@ -45,6 +45,18 @@
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="openimport_run_columns">
+        <settings>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">openimport_run_listing.openimport_run_listing.openimport_run_columns.actions</item>
+                    <item name="target" xsi:type="string">applyAction</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">view</item>
+                        <item name="1" xsi:type="string">${ $.$data.rowIndex }</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
         <column name="run_id" sortOrder="10">
             <settings>
                 <filter>textRange</filter>
@@ -56,6 +68,23 @@
             <settings>
                 <filter>text</filter>
                 <label translate="true">Profile</label>
+            </settings>
+        </column>
+        <column name="direction" component="Magento_Ui/js/grid/columns/select" sortOrder="22">
+            <settings>
+                <options class="Iranimij\OpenImport\Model\Config\Source\Direction"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Direction</label>
+            </settings>
+        </column>
+        <column name="entity" class="Iranimij\OpenImport\Ui\Component\Listing\Column\EntityName"
+                component="Magento_Ui/js/grid/columns/column" sortOrder="24">
+            <settings>
+                <options class="Iranimij\OpenImport\Model\Config\Source\EntityFilter"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">What</label>
             </settings>
         </column>
         <column name="run_trigger" class="Iranimij\OpenImport\Ui\Component\Listing\Column\StartedBy"
@@ -89,19 +118,44 @@
                 <label translate="true">Rows</label>
             </settings>
         </column>
-        <column name="count_created" sortOrder="70">
+        <column name="count_created" class="Iranimij\OpenImport\Ui\Component\Listing\Column\DirectionCount" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="direction" xsi:type="string">import</item>
+                </item>
+            </argument>
             <settings>
                 <label translate="true">New</label>
             </settings>
         </column>
-        <column name="count_updated" sortOrder="80">
+        <column name="count_updated" class="Iranimij\OpenImport\Ui\Component\Listing\Column\DirectionCount" sortOrder="80">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="direction" xsi:type="string">import</item>
+                </item>
+            </argument>
             <settings>
                 <label translate="true">Updated</label>
             </settings>
         </column>
-        <column name="count_unchanged" sortOrder="90">
+        <column name="count_unchanged" class="Iranimij\OpenImport\Ui\Component\Listing\Column\DirectionCount" sortOrder="90">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="direction" xsi:type="string">import</item>
+                </item>
+            </argument>
             <settings>
                 <label translate="true">Unchanged</label>
+            </settings>
+        </column>
+        <column name="count_exported" class="Iranimij\OpenImport\Ui\Component\Listing\Column\DirectionCount" sortOrder="95">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="direction" xsi:type="string">export</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Exported</label>
             </settings>
         </column>
         <column name="count_errors" sortOrder="100">
@@ -115,6 +169,9 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <label translate="true">Started</label>
+                <fieldClass>
+                    <class name="openimport-nowrap">true</class>
+                </fieldClass>
             </settings>
         </column>
         <column name="duration" class="Iranimij\OpenImport\Ui\Component\Listing\Column\Duration" sortOrder="120">

@@ -81,7 +81,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="entity" formElement="select" sortOrder="30">
+        <field name="entity" component="Iranimij_OpenImport/js/form/entity-select" formElement="select" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filterBy" xsi:type="array">
@@ -96,7 +96,7 @@
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
-                <notice translate="true">"Stock &amp; prices" changes only quantity, stock status and prices of products that already exist.</notice>
+                <notice translate="true">What the profile imports or exports.</notice>
             </settings>
             <formElements>
                 <select>
@@ -760,7 +760,7 @@
                 <label translate="true">File name</label>
                 <dataScope>export_options.file_name</dataScope>
                 <notice translate="true">Placeholders: {entity}, {profile}, {date}, {time}, {datetime}, {run}, {ext}. Empty = {entity}-{datetime}.{ext}</notice>
-                <placeholder translate="true">products-{date}.{ext}</placeholder>
+                <placeholder translate="true">{entity}-{date}.{ext}</placeholder>
             </settings>
         </field>
         <field name="dest_path_folder" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="20">

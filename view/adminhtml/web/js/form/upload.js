@@ -20,6 +20,7 @@ define([
             fileName: '',
             uploading: false,
             message: '',
+            detected: '',
             sample: null,
             direction: 'import',
             imports: {
@@ -33,6 +34,7 @@ define([
                 fileName: true,
                 uploading: true,
                 message: true,
+                detected: true,
                 sample: true
             }
         },
@@ -77,6 +79,7 @@ define([
             data.append('format', this.source.get('data.format') || 'auto');
             this.uploading = true;
             this.message = '';
+            this.detected = '';
             $.ajax({
                 url: this.uploadUrl,
                 type: 'POST',
@@ -94,7 +97,7 @@ define([
                 self.source.set(self.dataScope + '.file_name', response.file.name);
                 self.fileName = response.file.name;
                 if (response.format && self.source.get('data.format') === 'auto') {
-                    self.message = $t('Detected: %1').replace('%1', response.format.toUpperCase());
+                    self.detected = $t('Detected: %1').replace('%1', response.format.toUpperCase());
                 }
                 self.sample = response;
             }).fail(function () {

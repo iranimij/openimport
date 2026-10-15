@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Controller\Adminhtml\Profile;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Export\EntitySourcePool;
 use Iranimij\OpenImport\Model\Entity\FieldList;
+use Iranimij\OpenImport\Model\Entity\RequiredDefaults;
 use Iranimij\OpenImport\Model\Mapping\AutoMatcher;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -33,6 +34,7 @@ class Fields extends Action implements HttpPostActionInterface
      * @param AutoMatcher $autoMatcher
      * @param StoreManagerInterface $storeManager
      * @param EntitySourcePool $exportSources
+     * @param RequiredDefaults $defaults
      */
     public function __construct(
         Context $context,
@@ -40,7 +42,8 @@ class Fields extends Action implements HttpPostActionInterface
         private readonly EntityRegistry $entities,
         private readonly AutoMatcher $autoMatcher,
         private readonly StoreManagerInterface $storeManager,
-        private readonly EntitySourcePool $exportSources
+        private readonly EntitySourcePool $exportSources,
+        private readonly RequiredDefaults $defaults
     ) {
         parent::__construct($context);
     }
@@ -62,6 +65,13 @@ class Fields extends Action implements HttpPostActionInterface
             return $json->setData(['fields' => $fields, 'stores' => [], 'matches' => []]);
         }
         $fields = $this->fields->fields($entity);
+        $defaults = $this->defaults->forEntity($entity);
+        foreach ($fields as &$field) {
+            if ($field['required'] && isset($defaults[$field['code']])) {
+                $field['default'] = $defaults[$field['code']];
+            }
+        }
+        unset($field);
         $info = $this->entities->resolve($entity, []);
         $stores = [];
         if ($info->storeViews) {

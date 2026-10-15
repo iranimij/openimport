@@ -39,6 +39,17 @@ define([
     ];
 
     /**
+     * Number fields whose file values may be written with a decimal comma (German and other European exports).
+     */
+    var NUMBER_FIELD = /(^|_)(price|cost|msrp|weight|qty|quantity|amount|rate)$/;
+
+    /**
+     * "89,90", "1.299,00", "-0,5"; not "1,234" (an English thousands separator).
+     */
+    var DECIMAL_COMMA = /^-?\d{1,3}(\.\d{3})+,\d+$|^-?\d+,\d{1,2}$/;
+    var DECIMAL_DOT = /^-?\d+\.\d+$/;
+
+    /**
      * @param {String} target
      * @returns {{field: String, store: String}}
      */
@@ -62,6 +73,7 @@ define([
             entity: '',
             direction: 'import',
             columns: [],
+            sampleRows: [],
             catalogue: CATALOGUE,
             fields: [],
             stores: [],
@@ -73,7 +85,8 @@ define([
             imports: {
                 entity: '${ $.provider }:data.entity',
                 direction: '${ $.provider }:data.direction',
-                columns: 'openimport_profile_form.openimport_profile_form.file.sample:columns'
+                columns: 'openimport_profile_form.openimport_profile_form.file.sample:columns',
+                sampleRows: 'openimport_profile_form.openimport_profile_form.file.sample:rows'
             },
             listens: {
                 entity: 'loadFields',
@@ -81,6 +94,7 @@ define([
                 columns: 'loadFields'
             },
             tracks: {
+                entity: true,
                 direction: true,
                 fields: true,
                 stores: true,
@@ -297,11 +311,18 @@ define([
             var mapped = _.map(this.value() || [], function (row) {
                     return row.target;
                 }),
-                added = 0;
+                added = 0,
+                commas = [];
 
             _.each(this.matches, function (source, target) {
+                var transforms = [];
+
                 if (mapped.indexOf(target) === -1) {
-                    this.rows.push(this.makeRow({target: target, source: source}));
+                    if (this.hasDecimalCommas(splitTarget(target).field, source)) {
+                        transforms.push('decimal_comma');
+                        commas.push(source);
+                    }
+                    this.rows.push(this.makeRow({target: target, source: source, transforms: transforms}));
                     added++;
                 }
             }, this);
@@ -309,6 +330,34 @@ define([
             this.notice = added
                 ? $t('%1 field(s) matched. Check them, then add transforms where needed.').replace('%1', added)
                 : $t('No further matches. Map the remaining fields by hand.');
+            if (commas.length) {
+                this.notice += ' ' + $t('Decimal commas found in %1: "Decimal comma → dot" was added.')
+                    .replace('%1', commas.join(', '));
+            }
+        },
+
+        /**
+         * Whether the first rows write this number field with decimal commas (and never with a decimal dot).
+         *
+         * @param {String} field
+         * @param {String} column
+         * @returns {Boolean}
+         */
+        hasDecimalCommas: function (field, column) {
+            var values;
+
+            if (!NUMBER_FIELD.test(field)) {
+                return false;
+            }
+            values = _.compact(_.map(this.sampleRows || [], function (row) {
+                return row[column] === undefined || row[column] === null ? '' : String(row[column]).trim();
+            }));
+
+            return _.some(values, function (value) {
+                return DECIMAL_COMMA.test(value);
+            }) && !_.some(values, function (value) {
+                return DECIMAL_DOT.test(value);
+            });
         },
 
         /**
@@ -316,15 +365,22 @@ define([
          */
         addRequired: function () {
             var mapped = _.map(this.rows(), function (row) {
-                return row.store() ? '' : row.field();
-            });
+                    return row.store() ? '' : row.field();
+                }),
+                added = 0;
 
             _.each(this.fields, function (field) {
                 if (field.required && mapped.indexOf(field.code) === -1) {
-                    this.rows.push(this.makeRow({target: field.code}));
+                    // A proposed fixed value (the shop's default attribute set, website …) where there is one.
+                    this.rows.push(this.makeRow({target: field.code, 'static': field['default'] || ''}));
+                    added++;
                 }
             }, this);
             this.sync();
+            this.notice = added
+                ? $t('%1 required field(s) added. Pick a column of the file or check the fixed value.')
+                    .replace('%1', added)
+                : $t('Every required field is mapped.');
         },
 
         /**
@@ -385,9 +441,10 @@ define([
          */
         transformLabel: function (transform) {
             var name = typeof transform === 'string' ? transform : transform.name,
-                args = typeof transform === 'string' ? [] : transform.args || [];
+                args = typeof transform === 'string' ? [] : transform.args || [],
+                entry = _.findWhere(CATALOGUE, {name: name});
 
-            return name + (args.length ? '(' + _.map(args, function (arg) {
+            return (entry ? entry.label : name) + (args.length ? ' (' + _.map(args, function (arg) {
                 return JSON.stringify(String(arg));
             }).join(', ') + ')' : '');
         },

@@ -162,3 +162,24 @@
     color: #1a5a96;
     text-decoration: underline;
 }
+
+/* The mapping editor fills the whole fieldset (it has no label column): same left edge as the other steps. */
+.admin__fieldset > .openimport-mapping {
+    margin-left: 0;
+    width: 100%;
+}
+
+/* Wide tables scroll sideways; the scrollbar stays visible (macOS hides overlay scrollbars until you scroll). */
+.openimport-scroll::-webkit-scrollbar {
+    height: 1rem;
+    width: 1rem;
+}
+
+.openimport-scroll::-webkit-scrollbar-thumb {
+    background: #adadad;
+    border-radius: .5rem;
+}
+
+.openimport-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}

@@ -18,19 +18,40 @@ use Magento\ImportExport\Model\Import\ConfigInterface as ImportConfig;
  */
 class Entity implements OptionSourceInterface
 {
+    /**
+     * Plain names, in the order the form lists them (catalog, customers, sales, content).
+     */
     private const NAMES = [
         'catalog_product' => 'Products',
         EntityRegistry::STOCK_PRICE => 'Stock & prices (existing products)',
         'advanced_pricing' => 'Advanced pricing (tier prices)',
         'stock_sources' => 'Stock per source (MSI)',
+        EntityRegistry::CATEGORY => 'Categories',
+        EntityRegistry::ATTRIBUTE => 'Product attributes and attribute sets',
         'customer' => 'Customers',
         'customer_composite' => 'Customers with addresses',
         'customer_address' => 'Customer addresses',
         EntityRegistry::ORDER => 'Orders',
-        EntityRegistry::CATEGORY => 'Categories',
-        EntityRegistry::ATTRIBUTE => 'Product attributes and attribute sets',
         EntityRegistry::CMS_PAGE => 'CMS pages',
         EntityRegistry::CMS_BLOCK => 'CMS blocks',
+    ];
+
+    /**
+     * One line under "What" for the chosen entity.
+     */
+    private const HINTS = [
+        'catalog_product' => 'Products with attributes, prices, stock, categories and images. New products also need attribute set, type and website ("Add required fields" in step 4).',
+        EntityRegistry::STOCK_PRICE => '"Stock & prices" changes only quantity, stock status and prices of products that already exist.',
+        'advanced_pricing' => 'Tier and customer group prices of existing products.',
+        'stock_sources' => 'Quantity and status per inventory source (MSI).',
+        EntityRegistry::CATEGORY => 'Categories by path, e.g. "Default Category/Men/Shoes"; missing parents are created on the way.',
+        EntityRegistry::ATTRIBUTE => 'Product attributes with options and store labels, assigned to attribute sets. Delete only takes them out of the set.',
+        'customer' => 'Customer accounts by e-mail and website.',
+        'customer_composite' => 'Customer accounts with their billing and shipping address in one row.',
+        'customer_address' => 'Addresses of existing customers.',
+        EntityRegistry::ORDER => 'Orders, one row per order or per item; optionally only orders not exported before.',
+        EntityRegistry::CMS_PAGE => 'CMS pages by URL key (identifier) and store views.',
+        EntityRegistry::CMS_BLOCK => 'CMS blocks by identifier and store views.',
     ];
 
     /**
@@ -63,13 +84,17 @@ class Entity implements OptionSourceInterface
         $export[EntityRegistry::ATTRIBUTE] = ['label' => self::NAMES[EntityRegistry::ATTRIBUTE]];
         $export[EntityRegistry::CMS_PAGE] = ['label' => self::NAMES[EntityRegistry::CMS_PAGE]];
         $export[EntityRegistry::CMS_BLOCK] = ['label' => self::NAMES[EntityRegistry::CMS_BLOCK]];
+        $order = array_flip(array_keys(self::NAMES));
         foreach (['import' => $import, 'export' => $export] as $direction => $entities) {
+            uksort($entities, static fn ($a, $b): int => [$order[$a] ?? PHP_INT_MAX, (string) $a]
+                <=> [$order[$b] ?? PHP_INT_MAX, (string) $b]);
             foreach ($entities as $code => $entity) {
                 $label = self::NAMES[$code] ?? (string) ($entity['label'] ?? $code);
                 $options[] = [
                     'value' => (string) $code,
                     'label' => __($label),
                     'direction' => $direction,
+                    'hint' => isset(self::HINTS[$code]) ? (string) __(self::HINTS[$code]) : '',
                 ];
             }
         }

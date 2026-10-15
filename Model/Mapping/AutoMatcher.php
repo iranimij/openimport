@@ -13,7 +13,7 @@ use Iranimij\OpenImport\Model\Entity\EntityInfo;
 /**
  * Suggests a mapping from the file's column names: exact name, then ignoring case, spaces, underscores, hyphens
  * and dots, then the entity's synonyms (Artikelnummer → sku, Bestand → qty, Preis → price …), then store-view
- * columns written as "name_de", "name (de)" or "name [de]".
+ * columns written as "name_de", "name (de)", "name [de]" or "store:de:name".
  */
 class AutoMatcher
 {
@@ -77,7 +77,8 @@ class AutoMatcher
     }
 
     /**
-     * "name_de", "name-de", "name de", "name (de)", "name [de]" => ["name", "de"]; longest store code first.
+     * "name_de", "name-de", "name de", "name (de)", "name [de]", "store:de:name" => ["name", "de"]; longest store
+     * code first.
      *
      * @param string $source
      * @param string[] $storeCodes
@@ -86,6 +87,19 @@ class AutoMatcher
     private function splitStore(string $source, array $storeCodes): ?array
     {
         $name = mb_strtolower(trim($source));
+        // OpenImport's own notation: "store:de:name".
+        if (str_starts_with($name, FieldMapping::STORE_PREFIX)) {
+            $parts = explode(':', trim($source), 3);
+            $code = strtolower($parts[1] ?? '');
+            $base = trim($parts[2] ?? '');
+            foreach ($storeCodes as $storeCode) {
+                if (strtolower($storeCode) === $code && $base !== '') {
+                    return [$base, $code];
+                }
+            }
+
+            return null;
+        }
         usort($storeCodes, static fn (string $a, string $b): int => strlen($b) <=> strlen($a));
         foreach ($storeCodes as $code) {
             $code = strtolower($code);

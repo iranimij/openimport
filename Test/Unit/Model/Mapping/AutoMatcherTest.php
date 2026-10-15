@@ -69,6 +69,26 @@ class AutoMatcherTest extends TestCase
         );
     }
 
+    public function testOwnStoreNotation(): void
+    {
+        $matches = (new AutoMatcher())->match(
+            ['attribute_code', 'label', 'store:default:label', 'store:DE:label', 'store:xx:label', 'store:de:'],
+            ['attribute_code', 'label', 'options'],
+            (new EntityRegistry())->get(EntityRegistry::ATTRIBUTE) ?? throw new \LogicException(),
+            ['default', 'de']
+        );
+
+        self::assertSame(
+            [
+                'attribute_code' => 'attribute_code',
+                'label' => 'label',
+                'store:default:label' => 'store:default:label',
+                'store:de:label' => 'store:DE:label',
+            ],
+            $matches
+        );
+    }
+
     public function testNoStoreViewColumnsForEntitiesWithoutThem(): void
     {
         $matches = (new AutoMatcher())->match(

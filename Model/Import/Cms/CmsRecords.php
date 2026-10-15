@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\Import\Cms;
 
 use Magento\Cms\Api\BlockRepositoryInterface;
+use Magento\Cms\Api\Data\BlockInterface;
+use Magento\Cms\Api\Data\PageInterface;
 use Magento\Cms\Api\PageRepositoryInterface;
 use Magento\Cms\Model\BlockFactory;
 use Magento\Cms\Model\PageFactory;
@@ -154,9 +156,9 @@ class CmsRecords
         if (!$changed && !$model->hasDataChanges()) {
             return self::UNCHANGED;
         }
-        if ($kind === self::PAGE) {
+        if ($model instanceof PageInterface) {
             $this->pages->save($model);
-        } else {
+        } elseif ($model instanceof BlockInterface) {
             $this->blocks->save($model);
         }
 

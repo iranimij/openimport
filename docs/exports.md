@@ -12,7 +12,7 @@ on a schedule.
 2. **Where**: the destination (download from the run page, server folder, SFTP, FTP, e-mail) and the file name.
    Placeholders in the file name: `{entity}`, `{profile}`, `{date}` (2026-10-14), `{time}` (143000),
    `{datetime}`, `{run}`, `{ext}`. Default `{entity}-{datetime}.{ext}`.
-3. **File**: CSV (delimiter, encoding UTF-8 or Windows-1252, BOM, line ending), Excel (.xlsx, sheet name),
+3. **File**: CSV (delimiter, encoding UTF-8, Windows-1252 or ISO-8859-1/-15, BOM, line ending, header row on or off), Excel (.xlsx, sheet name),
    JSON (root key, pretty) or XML (root and record element names).
 4. **Map**: without a mapping every column is written as Magento exports it. With a mapping, each row is one
    column of the file: its name, the Magento column it comes from (or a fixed value), transforms and value maps —

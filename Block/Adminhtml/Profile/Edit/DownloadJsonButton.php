@@ -26,7 +26,8 @@ class DownloadJsonButton extends GenericButton implements ButtonProviderInterfac
 
         return [
             'label' => __('Download as JSON'),
-            'class' => 'action-secondary',
+            // Plain like Delete: the page has one primary action (Save and dry run).
+            'class' => 'openimport-download',
             'on_click' => sprintf("setLocation('%s')", $this->url('*/*/downloadJson', ['id' => $this->profileId()])),
             'sort_order' => 15,
         ];

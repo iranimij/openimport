@@ -538,6 +538,20 @@
                         <item name="1" xsi:type="string">ftp</item>
                     </item>
                     <item name="secret" xsi:type="boolean">true</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="source_type" xsi:type="array">
+                                <item name="0" xsi:type="string">ftp</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="source_config.auth_sftp" xsi:type="array">
+                                <item name="not" xsi:type="array">
+                                    <item name="0" xsi:type="string">key</item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>
@@ -653,6 +667,16 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                     </item>
+                    <item name="typeGroups" xsi:type="array">
+                        <item name="folder" xsi:type="string">local</item>
+                        <item name="sftp" xsi:type="string">remote</item>
+                        <item name="ftp" xsi:type="string">remote</item>
+                    </item>
+                    <item name="noticeByType" xsi:type="array">
+                        <item name="folder" xsi:type="string" translate="true">A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.</item>
+                        <item name="sftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
+                        <item name="ftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>
@@ -728,6 +752,11 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                     </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="after_success" xsi:type="array">
+                            <item name="0" xsi:type="string">move</item>
+                        </item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>
@@ -778,6 +807,11 @@
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="typeGroups" xsi:type="array">
+                        <item name="folder" xsi:type="string">local</item>
+                        <item name="sftp" xsi:type="string">remote</item>
+                        <item name="ftp" xsi:type="string">remote</item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>
@@ -913,6 +947,20 @@
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
                     <item name="secret" xsi:type="boolean">true</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="export_options.destination" xsi:type="array">
+                                <item name="0" xsi:type="string">ftp</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="export_options.auth_sftp" xsi:type="array">
+                                <item name="not" xsi:type="array">
+                                    <item name="0" xsi:type="string">key</item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>

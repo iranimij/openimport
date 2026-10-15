@@ -457,3 +457,5 @@
 "Leave out the records that match","Die passenden Datensätze weglassen"
 "Default: %1%","Standard: %1%"
 "This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run.","So viele Zeilen dürfen Fehler haben, die übrigen Zeilen werden trotzdem importiert; eine mehr und nichts wird importiert. 0 = jeder Fehler stoppt den Lauf."
+"A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.","Ein Ordner unter var/openimport oder ein absoluter Pfad in einem Ordner, der unter Shops › Konfiguration › iranimij › OpenImport › Sicherheit erlaubt ist."
+"The folder on the server; empty = where the login lands.","Der Ordner auf dem Server; leer = wo die Anmeldung landet."

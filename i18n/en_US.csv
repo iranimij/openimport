@@ -454,3 +454,5 @@
 "Leave out the records that match","Leave out the records that match"
 "Default: %1%","Default: %1%"
 "This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run.","This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run."
+"A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.","A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety."
+"The folder on the server; empty = where the login lands.","The folder on the server; empty = where the login lands."

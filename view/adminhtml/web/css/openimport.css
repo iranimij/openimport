@@ -438,3 +438,42 @@
 .admin__data-grid-wrap .data-row td {
     cursor: pointer;
 }
+
+/* "?" in a step header: the documentation for that step. */
+.openimport-step-help {
+    border: 1px solid #1a5a96;
+    border-radius: 50%;
+    color: #1a5a96;
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    height: 1.8rem;
+    line-height: 1.6rem;
+    margin-left: 1rem;
+    text-align: center;
+    text-decoration: none;
+    width: 1.8rem;
+}
+
+.openimport-step-help:hover,
+.openimport-step-help:focus {
+    background: #1a5a96;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Status line above the profiles grid (P10). */
+.openimport-strip {
+    background: #f8f8f8;
+    border: 1px solid #e3e3e3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 3rem;
+    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+}
+
+.openimport-strip-problem,
+a.openimport-strip-problem {
+    color: #a30d0d;
+}

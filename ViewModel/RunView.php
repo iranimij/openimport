@@ -13,7 +13,9 @@ use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
 use Iranimij\OpenImport\Model\Config\Source\RunTrigger;
+use Iranimij\OpenImport\Model\Execution\RunFiles;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
+use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
 use Iranimij\OpenImport\Model\Storage\ErrorRecord;
 use Iranimij\OpenImport\Model\Storage\PreviewRecord;
@@ -51,6 +53,8 @@ class RunView implements ArgumentInterface
      * @param AuthorizationInterface $authorization
      * @param RunTrigger $triggers
      * @param Escaper $escaper
+     * @param RunFiles $runFiles
+     * @param ReaderFactory $readers
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -62,8 +66,40 @@ class RunView implements ArgumentInterface
         private readonly UrlInterface $urlBuilder,
         private readonly AuthorizationInterface $authorization,
         private readonly RunTrigger $triggers,
-        private readonly Escaper $escaper
+        private readonly Escaper $escaper,
+        private readonly RunFiles $runFiles,
+        private readonly ReaderFactory $readers
     ) {
+    }
+
+    /**
+     * The first rows of the file an export wrote, read back as a merchant's tool would read it.
+     *
+     * @param int $limit
+     * @return array{columns: string[], rows: array<int, array<string, string>>}
+     */
+    public function exportRows(int $limit = 10): array
+    {
+        $run = $this->run();
+        $empty = ['columns' => [], 'rows' => []];
+        if ($run === null || $run->getDirection() !== 'export' || $run->getOutputFile() === null) {
+            return $empty;
+        }
+        try {
+            $reader = $this->readers->create($this->runFiles->absolute((string) $run->getOutputFile()));
+            $rows = [];
+            foreach ($reader->rows() as $row) {
+                $rows[] = array_map(static fn ($value): string => is_scalar($value) ? (string) $value : '', $row);
+                if (count($rows) >= $limit) {
+                    break;
+                }
+            }
+
+            return ['columns' => array_map('strval', $reader->columns()), 'rows' => $rows];
+        } catch (\Throwable $exception) {
+            // A file that cannot be read back (deleted by housekeeping, unknown format) is simply not shown.
+            return $empty;
+        }
     }
 
     /**

@@ -18,6 +18,17 @@ define([
         defaults: {
             template: 'Iranimij_OpenImport/form/steps',
             stepNames: ['what', 'where', 'file', 'map', 'rules', 'when'],
+            docsUrl: 'https://iranimij.github.io/openimport/',
+            // Docs page per step (exports read about destinations on the exports page).
+            docs: {
+                what: 'admin/',
+                where: 'sources/',
+                whereExport: 'exports/',
+                file: 'file-formats/',
+                map: 'mapping/',
+                rules: 'runs/',
+                when: 'schedules/'
+            },
             steps: [],
             data: {},
             imports: {
@@ -161,8 +172,10 @@ define([
                         note = document.createElement('span');
                         note.className = 'openimport-step-summary';
                         header.appendChild(note);
+                        header.appendChild(this.helpLink(name));
                     }
                     note.textContent = summaries[name] || '';
+                    header.querySelector('.openimport-step-help').href = this.docsFor(name);
                 }
 
                 return {
@@ -171,6 +184,40 @@ define([
                     summary: summaries[name] || ''
                 };
             }, this);
+        },
+
+        /**
+         * @param {String} name step
+         * @returns {String} the docs page for the step
+         */
+        docsFor: function (name) {
+            var exporting = this.value('direction') === 'export',
+                page = name === 'where' && exporting ? this.docs.whereExport : this.docs[name];
+
+            return this.docsUrl + (page || '');
+        },
+
+        /**
+         * A "?" link to the docs in a step header; it opens a new tab and leaves the step as it is.
+         *
+         * @param {String} name step
+         * @returns {HTMLElement}
+         */
+        helpLink: function (name) {
+            var link = document.createElement('a');
+
+            link.className = 'openimport-step-help';
+            link.href = this.docsFor(name);
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.textContent = '?';
+            link.title = $t('Help for this step (opens the documentation)');
+            link.setAttribute('aria-label', link.title);
+            link.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+
+            return link;
         },
 
         /**

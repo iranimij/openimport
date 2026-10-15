@@ -13,6 +13,7 @@
                 <keep_files_days>14</keep_files_days>
                 <max_errors_per_run>10000</max_errors_per_run>
                 <cron_time_budget>240</cron_time_budget>
+                <email_identity>general</email_identity>
             </general>
             <security>
                 <allowed_hosts/>

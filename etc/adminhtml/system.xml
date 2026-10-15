@@ -29,6 +29,11 @@
                     <comment>How long one pass of the OpenImport cron group may start new runs. A run that has started always finishes.</comment>
                     <validate>required-entry validate-digits validate-greater-than-zero</validate>
                 </field>
+                <field id="email_identity" translate="label comment" type="select" sortOrder="40" showInDefault="1" canRestore="1">
+                    <label>E-mail sender</label>
+                    <comment>Sends the run e-mails and exports by e-mail. The addresses are set under Stores › Configuration › General › Store Email Addresses.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
             </group>
             <group id="security" translate="label" type="text" sortOrder="20" showInDefault="1">
                 <label>Safety</label>

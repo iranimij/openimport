@@ -17,6 +17,12 @@
                     <argument name="view_model" xsi:type="object">Iranimij\OpenImport\ViewModel\FirstRun</argument>
                 </arguments>
             </block>
+            <block class="Magento\Backend\Block\Template" name="openimport.status_strip"
+                   template="Iranimij_OpenImport::profile/status-strip.phtml" after="openimport.first_run">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Iranimij\OpenImport\ViewModel\StatusStrip</argument>
+                </arguments>
+            </block>
             <uiComponent name="openimport_profile_listing"/>
         </referenceContainer>
     </body>

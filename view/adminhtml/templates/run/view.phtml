@@ -139,6 +139,35 @@ $run = $view->run();
         </div>
     </section>
 
+    <?php $export = $view->exportRows(); ?>
+    <?php if ($export['columns'] !== []): ?>
+        <section class="admin__page-section">
+            <div class="admin__page-section-title">
+                <strong class="title"><?= $escaper->escapeHtml(__('First rows of the file')) ?></strong>
+            </div>
+            <div class="openimport-wide">
+                <table class="data-grid">
+                    <thead>
+                    <tr>
+                        <?php foreach ($export['columns'] as $column): ?>
+                            <th class="data-grid-th" scope="col"><?= $escaper->escapeHtml($column) ?></th>
+                        <?php endforeach; ?>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($export['rows'] as $row): ?>
+                        <tr>
+                            <?php foreach ($export['columns'] as $column): ?>
+                                <td><?= $escaper->escapeHtml($row[$column] ?? '') ?></td>
+                            <?php endforeach; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    <?php endif; ?>
+
     <?php $records = $view->previewRecords(); ?>
     <?php if ($records !== []): ?>
         <section class="admin__page-section">

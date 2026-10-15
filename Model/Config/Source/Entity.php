@@ -90,11 +90,12 @@ class Entity implements OptionSourceInterface
                 <=> [$order[$b] ?? PHP_INT_MAX, (string) $b]);
             foreach ($entities as $code => $entity) {
                 $label = self::NAMES[$code] ?? (string) ($entity['label'] ?? $code);
+                $hint = self::HINTS[$code] ?? '';
                 $options[] = [
                     'value' => (string) $code,
                     'label' => __($label),
                     'direction' => $direction,
-                    'hint' => isset(self::HINTS[$code]) ? (string) __(self::HINTS[$code]) : '',
+                    'hint' => $hint === '' ? '' : (string) __($hint),
                 ];
             }
         }

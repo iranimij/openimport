@@ -161,6 +161,23 @@ class CategoryImportTest extends TestCase
         self::assertSame(RunInterface::STATUS_SUCCESS, $live2->getStatus(), $live2->getMessage());
         self::assertSame('Every shoe', $this->category($shoesId, Store::DEFAULT_STORE_ID)->getData('description'));
 
+        // A file with only a store-view name column (no default name): the default name stays, nothing is created twice.
+        $germanOnly = $this->profile(ProfileInterface::BEHAVIOR_ADD_UPDATE, [
+            ['target' => 'path', 'source' => 'Kategoriepfad'],
+            ['target' => 'is_active', 'source' => 'Aktiv'],
+            ['target' => 'store:de:name', 'source' => 'name_de'],
+        ]);
+        $german2 = $this->process($germanOnly, $this->file("Kategoriepfad,Aktiv,name_de\n{$root}/{$tag} Men/Shoes,1,Schuhe neu\n{$root}/{$tag} Men/Boots,1,Stiefel\n"));
+        self::assertSame(RunInterface::STATUS_SUCCESS, $german2->getStatus(), $german2->getMessage());
+        self::assertSame(1, $german2->getCount('created'), 'only Boots is new');
+        $tree->reset();
+        self::assertSame($shoesId, $tree->id("{$root}/{$tag} Men/Shoes"), 'the default name is kept, so the path still matches');
+        self::assertSame('Shoes', $this->category($shoesId, Store::DEFAULT_STORE_ID)->getData('name'));
+        self::assertSame('Schuhe neu', $this->category($shoesId, $german)->getData('name'));
+        $bootsId = (int) $tree->id("{$root}/{$tag} Men/Boots");
+        self::assertSame('Boots', $this->category($bootsId, Store::DEFAULT_STORE_ID)->getData('name'));
+        self::assertSame('Stiefel', $this->category($bootsId, $german)->getData('name'));
+
         // Export: the branch comes back as paths, with the store-view name as its own row.
         $export = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class)->create()
             ->setName('Category export ' . uniqid())
@@ -178,15 +195,15 @@ class CategoryImportTest extends TestCase
         foreach (Bootstrap::getObjectManager()->get(ReaderFactory::class)->create($path, 'csv')->rows() as $row) {
             $rows[$row['path'] . '|' . $row['store_view_code']] = $row;
         }
-        self::assertSame(4, count($rows), 'Men, Shoes, Shirts and the German Shoes row: ' . implode(', ', array_keys($rows)));
+        self::assertSame(6, count($rows), 'Men, Shoes, Shirts, Boots and the German Shoes and Boots rows: ' . implode(', ', array_keys($rows)));
         self::assertSame('Every shoe', $rows["{$root}/{$tag} Men/Shoes|"]['description']);
-        self::assertSame('Schuhe', $rows["{$root}/{$tag} Men/Shoes|de"]['name']);
+        self::assertSame('Schuhe neu', $rows["{$root}/{$tag} Men/Shoes|de"]['name']);
 
         // Delete the branch: the parent takes its children with it.
         $delete = $this->profile(ProfileInterface::BEHAVIOR_DELETE, [['target' => 'path', 'source' => 'path']]);
         $gone = $this->process($delete, $this->file("path\n{$root}/{$tag} Men\n"), RunInterface::MODE_LIVE, ['confirmed' => true]);
         self::assertSame(RunInterface::STATUS_SUCCESS, $gone->getStatus(), $gone->getMessage());
-        self::assertSame(3, $gone->getCount('deleted'));
+        self::assertSame(4, $gone->getCount('deleted'));
         $tree->reset();
         self::assertNull($tree->id("{$root}/{$tag} Men/Shoes"));
     }

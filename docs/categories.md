@@ -18,7 +18,8 @@ delete and recreate the categories with new ids).
 | `position` | whole number |
 | `display_mode` | `PRODUCTS`, `PAGE` or `PRODUCTS_AND_PAGE` |
 
-Only the columns a row has are changed. Store-view values are saved one attribute at a time, so a German name does
+Only the columns a row has are changed, and an empty cell leaves the value as it is (`__EMPTY__VALUE__` clears a
+default value, as in Magento's import; a name or URL key cannot be cleared). Store-view values are saved one attribute at a time, so a German name does
 not regenerate the category's URL rewrites (change `url_key` for that). Store-view values work like everywhere in OpenImport: map a file column to
 `store:<store view code>:<field>` (`name_de` → *Store view* `de`, field `name`) and the row sets that store view's
 value. A shop with only one store view keeps every value in the default scope (that is how Magento saves), so there

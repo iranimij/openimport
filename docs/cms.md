@@ -12,6 +12,8 @@ Since 1.1. Entities **CMS pages** (`openimport_cms_page`) and **CMS blocks** (`o
 | `is_active` | ✓ | ✓ | `1`/`0` |
 | `content_heading`, `page_layout`, `meta_title`, `meta_keywords`, `meta_description`, `layout_update_xml`, `custom_theme`, `sort_order` | ✓ | | page settings |
 
+An empty cell leaves the value as it is; `__EMPTY__VALUE__` clears it (as in Magento's import).
+
 Magento allows the same identifier once per store view; OpenImport matches a row to the record with that identifier
 that is assigned to one of the row's store views (or to all store views).
 

@@ -17,6 +17,7 @@ use Magento\Cms\Model\PageFactory;
 use Magento\Cms\Model\ResourceModel\Block\CollectionFactory as BlockCollectionFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
 use Magento\Framework\Model\AbstractModel;
+use Magento\ImportExport\Model\Import;
 use Magento\Store\Model\StoreManagerInterface;
 
 /**
@@ -134,8 +135,12 @@ class CmsRecords
         }
         $changed = $created;
         foreach ($row as $column => $value) {
-            if (in_array($column, ['identifier', 'stores'], true) || $value === null) {
+            // An empty cell leaves the value as it is; __EMPTY__VALUE__ clears it, as in Magento's import.
+            if (in_array($column, ['identifier', 'stores'], true) || $value === null || trim((string) $value) === '') {
                 continue;
+            }
+            if ((string) $value === Import::DEFAULT_EMPTY_ATTRIBUTE_VALUE_CONSTANT) {
+                $value = '';
             }
             if ($column === 'is_active') {
                 if (trim((string) $value) === '') {

@@ -66,10 +66,33 @@ with a CSV, OpenImport does with a mapped file.
 
 ## How it compares
 
-A feature-by-feature table against Firebear Improved Import & Export, Amasty Import and Export, Xtento and Magento's
-built-in import, from their public docs: [docs/comparison.md](docs/comparison.md). In short: the paid tools have
-more entities and cloud drives today (that is 1.1 and 1.2); OpenImport has the dry run with a field-level preview,
-the typed safety confirmation, delta mode, schedules on Open Source, and no price.
+✓ yes · ○ partly or higher tier · ✗ no · **1.1** / **1.2** planned ([roadmap](https://github.com/iranimij/openimport/milestones)).
+From the vendors' public docs as of 2026-10-13; details and sources in [docs/comparison.md](docs/comparison.md).
+
+| | **OpenImport** | Magento Open Source | Adobe Commerce | Firebear Improved I/E | Amasty Import & Export | Xtento |
+|---|---|---|---|---|---|---|
+| Price | **free, MIT** | free | Commerce licence | $599 + add-ons | $209–$739 or subscription | ~$199 per module |
+| **Dry run with a field-level preview of every change** | **✓** | ○ validate only | ○ | ✗ roadmap | ○ validate only | ○ |
+| **Typed confirmation above a delete/replace threshold** | **✓** | ✗ | ✗ | ✗ | ✗ | ✗ |
+| Delta: only changed rows go to Magento | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
+| Schedules (cron) | ✓ | ✗ | ✓ | ✓ | ○ | ✓ |
+| Column mapping with auto-match, store-view columns | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Transforms and a safe expression language | ✓ | ✗ | ✗ | ✓ | ✓ | ○ |
+| CSV, XLSX, JSON, XML, streamed | ✓ | CSV | CSV | ✓ | ○ | ✓ |
+| Upload, folder, URL, SFTP, FTP, Google Sheets | ✓ | ✗ | ○ | ✓ | ○ | ✓ |
+| Google Drive, Dropbox, OneDrive | **1.2** | ✗ | ✗ | ✓ | ○ | ✗ |
+| Products, prices, customers, addresses, MSI stock | ✓ via Magento's own importer | ✓ | ✓ | ✓ | ✓ | ○ |
+| Fast stock & price update | ✓ | ✗ | ✗ | ○ | ○ | ✓ |
+| Order export (only new or changed) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Categories, attributes, CMS, rules | **1.1** | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Order import, tracking import | **1.2** | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Export to download, folder, SFTP, FTP, e-mail | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |
+| Error report with your file's own line numbers and rows | ✓ | ○ | ○ | ✓ | ✓ | ✓ |
+| CLI, profiles as JSON for version control | ✓ | ✗ | ✗ | ○ | ✗ | ○ |
+| Health check and cron watchdog (`doctor`) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| SSRF guard, no XML entities, zip-bomb limit, formula guard | ✓ | ○ | ○ | ✗ found | ✗ found | ✗ found |
+| Measured overhead vs core import (<6 %), flat memory | ✓ [baseline](docs/baseline.md) | — | — | claims only | claims only | — |
+| Telemetry, licence keys, subscription | none | none | — | key | key, yearly | key |
 
 ## Why not Magento's built-in import?
 

@@ -103,7 +103,7 @@ class CategoryImporter implements ImporterInterface
                     $updated += $u;
                 }
             } catch (\Throwable $exception) {
-                $this->logger->error('OpenImport category import: ' . $exception->getMessage(), ['exception' => $exception]);
+                $this->logger->error('OpenImport category import: ' . $exception->getMessage() . "\n" . $exception->getTraceAsString(), ['exception' => $exception]);
                 $errors[] = new RowError($index, 'save', $exception->getMessage(), null, !$request->skipErrors);
                 $invalid++;
                 if (!$request->skipErrors) {

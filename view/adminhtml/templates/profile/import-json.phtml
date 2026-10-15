@@ -12,7 +12,8 @@
     <form method="post" enctype="multipart/form-data"
           action="<?= $escaper->escapeUrl($block->getUrl('openimport/profile/importJson')) ?>">
         <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
-        <div class="admin__field">
+        <fieldset class="admin__fieldset">
+        <div class="admin__field _required">
             <label class="admin__field-label" for="openimport-json-file">
                 <span><?= $escaper->escapeHtml(__('JSON file')) ?></span>
             </label>
@@ -20,6 +21,7 @@
                 <input id="openimport-json-file" type="file" name="file" accept=".json,application/json" required="required"/>
             </div>
         </div>
+        </fieldset>
         <div class="openimport-run-actions">
             <button type="submit" class="action-primary"><span><?= $escaper->escapeHtml(__('Import profiles')) ?></span></button>
             <a class="action-secondary" href="<?= $escaper->escapeUrl($block->getUrl('openimport/profile/index')) ?>"><?= $escaper->escapeHtml(__('Back')) ?></a>

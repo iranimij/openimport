@@ -53,7 +53,7 @@ class AttributeImportTest extends TestCase
             ->setFormat('csv')
             ->setSourceType('upload')
             ->setBehavior($behavior)
-            ->setSafetyThreshold(1000)
+            ->setSafetyThreshold(100)
             ->setMapping([
                 ['target' => 'attribute_code', 'source' => 'code'],
                 ['target' => 'label', 'source' => 'label'],

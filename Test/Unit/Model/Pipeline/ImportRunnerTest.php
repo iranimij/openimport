@@ -27,6 +27,7 @@ use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeConfig;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeCoreImporter;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeErrorLog;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakePreviewStore;
+use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeCascadingRecordReader;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRecordReader;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRowHashStore;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRunResource;
@@ -389,6 +390,18 @@ class ImportRunnerTest extends TestCase
         $this->shop->total = 100;
         $below = $this->execute($profile, $this->newRun(), $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $below->status);
+    }
+
+    public function testDeleteCountsWhatGoesAlong(): void
+    {
+        $this->shop = new FakeCascadingRecordReader(['a-1' => ['name' => 'One']], [], 10);
+        $this->shop->children = ['a-1' => 3];
+        $profile = $this->profile(['behavior' => 'delete', 'safety_threshold' => 20]);
+
+        $dry = $this->execute($profile, $this->newRun(RunInterface::MODE_DRY_RUN), $this->file("sku,name,name_de,price\nA-1,,,\n"));
+
+        self::assertSame(4, $dry->counts['deleted'], 'the record and its three children');
+        self::assertStringContainsString('This run would delete 4 of 10 records (40%, limit 20%)', $dry->message);
     }
 
     public function testReplaceOnAnEntityWithoutReaderAlwaysAsks(): void

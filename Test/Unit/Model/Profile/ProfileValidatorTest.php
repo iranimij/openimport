@@ -217,4 +217,23 @@ class ProfileValidatorTest extends TestCase
             $validator->validate(new ProfileStub(['format' => 'csv', 'export_options' => ['destination' => 'email', 'emails' => 'a@example.com, nope']] + $base))
         );
     }
+
+    public function testScheduleNeedsAChangingSourceAndADestination(): void
+    {
+        $upload = $this->validator()->validate(new ProfileStub(['source_type' => 'upload', 'is_active' => true] + $this->valid()));
+        self::assertNotEmpty(array_filter($upload, static fn (string $p): bool => str_contains($p, 'uploaded file cannot run on a schedule')));
+
+        $off = $this->validator()->validate(new ProfileStub(['source_type' => 'upload', 'is_active' => false] + $this->valid()));
+        self::assertSame([], array_values(array_filter($off, static fn (string $p): bool => str_contains($p, 'schedule'))));
+
+        $export = $this->validator()->validate(new ProfileStub([
+            'direction' => 'export',
+            'entity' => 'catalog_product',
+            'is_active' => true,
+            'export_options' => ['destination' => 'download'],
+            'mapping' => [],
+            'row_filters' => [],
+        ] + $this->valid()));
+        self::assertNotEmpty(array_filter($export, static fn (string $p): bool => str_contains($p, 'scheduled export needs a destination')));
+    }
 }

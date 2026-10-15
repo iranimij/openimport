@@ -202,6 +202,8 @@ class CategoryImportTest extends TestCase
 
         // Delete the branch: the parent takes its children with it.
         $delete = $this->profile(ProfileInterface::BEHAVIOR_DELETE, [['target' => 'path', 'source' => 'path']]);
+        $preview = $this->process($delete, $this->file("path\n{$root}/{$tag} Men\n"), RunInterface::MODE_DRY_RUN);
+        self::assertSame(4, $preview->getCount('deleted'), 'the dry run counts the children that go with the branch');
         $gone = $this->process($delete, $this->file("path\n{$root}/{$tag} Men\n"), RunInterface::MODE_LIVE, ['confirmed' => true]);
         self::assertSame(RunInterface::STATUS_SUCCESS, $gone->getStatus(), $gone->getMessage());
         self::assertSame(4, $gone->getCount('deleted'));

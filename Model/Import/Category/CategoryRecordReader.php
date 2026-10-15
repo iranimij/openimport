@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Model\Import\Category;
 
+use Iranimij\OpenImport\Model\Entity\CascadingRecordsInterface;
 use Iranimij\OpenImport\Model\Entity\RecordReaderInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Store\Model\Store;
@@ -16,7 +17,7 @@ use Magento\Store\Model\StoreManagerInterface;
 /**
  * What the shop's categories look like now, by path, for the dry-run preview and the safety threshold.
  */
-class CategoryRecordReader implements RecordReaderInterface
+class CategoryRecordReader implements RecordReaderInterface, CascadingRecordsInterface
 {
     private const BATCH = 500;
 
@@ -45,6 +46,32 @@ class CategoryRecordReader implements RecordReaderInterface
         }
 
         return $existing;
+    }
+
+    /**
+     * A category goes with all its children.
+     *
+     * @inheritDoc
+     */
+    public function affectedByDelete(array $identifiers): int
+    {
+        $all = $this->tree->all();
+        $ids = [];
+        foreach ($identifiers as $identifier) {
+            $id = $this->tree->id((string) $identifier);
+            if ($id === null) {
+                continue;
+            }
+            $ids[$id] = true;
+            $prefix = mb_strtolower((string) ($all[$id] ?? '')) . CategoryTree::SEPARATOR;
+            foreach ($all as $childId => $path) {
+                if (str_starts_with(mb_strtolower($path), $prefix)) {
+                    $ids[$childId] = true;
+                }
+            }
+        }
+
+        return count($ids);
     }
 
     /**

@@ -166,18 +166,32 @@
             </argument>
         </arguments>
     </type>
-    <virtualType name="Iranimij\OpenImport\Model\ResourceModel\Profile\Grid\Collection"
-                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+    <type name="Iranimij\OpenImport\Model\ResourceModel\Profile\Grid\Collection">
         <arguments>
             <argument name="mainTable" xsi:type="string">openimport_profile</argument>
             <argument name="resourceModel" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Profile</argument>
         </arguments>
-    </virtualType>
-    <virtualType name="Iranimij\OpenImport\Model\ResourceModel\Run\Grid\Collection"
-                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+    </type>
+    <type name="Iranimij\OpenImport\Model\ResourceModel\Run\Grid\Collection">
         <arguments>
             <argument name="mainTable" xsi:type="string">openimport_run</argument>
             <argument name="resourceModel" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Run</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Iranimij\OpenImport\Ui\DataProvider\GridFilterPool"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\FilterPool">
+        <arguments>
+            <argument name="appliers" xsi:type="array">
+                <item name="regular" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\RegularFilter</item>
+                <item name="fulltext" xsi:type="object">Iranimij\OpenImport\Ui\DataProvider\KeywordFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Ui\DataProvider\GridDataProvider"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+        <arguments>
+            <argument name="filterPool" xsi:type="object">Iranimij\OpenImport\Ui\DataProvider\GridFilterPool</argument>
         </arguments>
     </virtualType>
 

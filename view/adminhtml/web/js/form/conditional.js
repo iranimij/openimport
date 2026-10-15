@@ -149,7 +149,8 @@ define([
                 imports = _.extend({}, this.imports);
                 listens = _.extend({}, this.listens);
                 found = paths(this.showWhen, []);
-                _.each(_.isArray(this.options) ? this.options : [], function (option) {
+                // Options from a source class arrive as a list, options written in the form XML as an object.
+                _.each(_.isObject(this.options) ? _.values(this.options) : [], function (option) {
                     paths(option.showWhen, found);
                 });
                 this.whenPaths = found;

@@ -546,3 +546,6 @@
 "has not run OpenImport yet — set up cron (bin/magento cron:run every minute).","has not run OpenImport yet — set up cron (bin/magento cron:run every minute)."
 "last ran OpenImport %1 minutes ago — check that cron runs every minute.","last ran OpenImport %1 minutes ago — check that cron runs every minute."
 "runs (last %1 minute(s) ago)","runs (last %1 minute(s) ago)"
+"Choose %1","Choose %1"
+"Choose all on this page","Choose all on this page"
+"Options","Options"

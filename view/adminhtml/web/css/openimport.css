@@ -468,3 +468,8 @@
 a.openimport-strip-problem {
     color: #a30d0d;
 }
+
+/* A link in the line is underlined, not only red (WCAG: not by colour alone). */
+a.openimport-strip-problem {
+    text-decoration: underline;
+}

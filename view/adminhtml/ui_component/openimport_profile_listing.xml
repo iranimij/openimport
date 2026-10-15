@@ -108,6 +108,9 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="fieldAction" xsi:type="boolean">false</item>
+                    <!-- Core's templates with names for screen readers. -->
+                    <item name="bodyTmpl" xsi:type="string">Iranimij_OpenImport/grid/select-cell</item>
+                    <item name="headerTmpl" xsi:type="string">Iranimij_OpenImport/grid/select-header</item>
                 </item>
             </argument>
             <settings>

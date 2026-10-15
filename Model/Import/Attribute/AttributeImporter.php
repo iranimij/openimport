@@ -17,6 +17,7 @@ use Magento\Catalog\Api\Data\ProductAttributeInterfaceFactory;
 use Magento\Catalog\Api\ProductAttributeManagementInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Eav\Api\Data\AttributeFrontendLabelInterfaceFactory;
+use Magento\Eav\Model\Entity\Attribute\AbstractAttribute;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -311,24 +312,19 @@ class AttributeImporter implements ImporterInterface
     {
         $changed = false;
         $label = trim((string) ($row['label'] ?? ''));
-        if ($label !== '') {
-            $labels = [];
-            $found = false;
-            foreach ($attribute->getFrontendLabels() ?? [] as $frontendLabel) {
-                if ((int) $frontendLabel->getStoreId() === $storeId) {
-                    $found = true;
-                    if ((string) $frontendLabel->getLabel() !== $label) {
-                        $frontendLabel->setLabel($label);
-                        $changed = true;
-                    }
-                }
-                $labels[] = $frontendLabel;
-            }
-            if (!$found) {
-                $labels[] = $this->frontendLabelFactory->create()->setStoreId($storeId)->setLabel($label);
+        if ($label !== '' && $attribute instanceof AbstractAttribute) {
+            // Magento saves store labels from "store_labels" (store id => label); every store's label is kept.
+            $current = $this->options->attributeLabels((int) $attribute->getAttributeId());
+            if (($current[$storeId] ?? null) !== $label) {
+                $current[$storeId] = $label;
                 $changed = true;
             }
-            $attribute->setFrontendLabels($labels);
+            $attribute->setData('store_labels', $current);
+            $frontendLabels = [];
+            foreach ($current as $labelStore => $value) {
+                $frontendLabels[] = $this->frontendLabelFactory->create()->setStoreId($labelStore)->setLabel($value);
+            }
+            $attribute->setFrontendLabels($frontendLabels);
         }
         $storeOptions = isset($row['options']) ? explode(self::OPTION_SEPARATOR, (string) $row['options']) : [];
         $existing = $this->options->load((int) $attribute->getAttributeId());

@@ -73,13 +73,9 @@ class AttributeEntitySource implements EntitySourceInterface
                     $row[$column] = $this->reader->value($attribute, $column) ?? '';
                 }
                 $onRow($row);
+                $attributeLabels = $this->options->attributeLabels((int) $attribute->getAttributeId());
                 foreach ($stores as $storeId => $code) {
-                    $label = '';
-                    foreach ($attribute->getFrontendLabels() ?? [] as $frontendLabel) {
-                        if ((int) $frontendLabel->getStoreId() === $storeId) {
-                            $label = (string) $frontendLabel->getLabel();
-                        }
-                    }
+                    $label = $attributeLabels[$storeId] ?? '';
                     $optionLabels = $this->options->storeLabels((int) $attribute->getAttributeId(), $storeId);
                     $any = array_filter($optionLabels, static fn (string $l): bool => $l !== '') !== [];
                     if ($label === '' && !$any) {

@@ -71,6 +71,31 @@ class AttributeOptions
     }
 
     /**
+     * The attribute's own store-view labels (not the options').
+     *
+     * @param int $attributeId
+     * @return array<int, string> store id => label
+     */
+    public function attributeLabels(int $attributeId): array
+    {
+        if ($attributeId <= 0) {
+            return [];
+        }
+        $connection = $this->resource->getConnection();
+        $pairs = $connection->fetchPairs(
+            $connection->select()
+                ->from($this->resource->getTableName('eav_attribute_label'), ['store_id', 'value'])
+                ->where('attribute_id = ?', $attributeId)
+        );
+        $labels = [];
+        foreach ($pairs as $storeId => $value) {
+            $labels[(int) $storeId] = (string) $value;
+        }
+
+        return $labels;
+    }
+
+    /**
      * @param int $attributeId
      * @return string[] admin labels in sort order
      */
@@ -105,7 +130,9 @@ class AttributeOptions
         $sort = 0;
         foreach ($existing as $id => $data) {
             $option = $this->optionFactory->create();
-            $option->setValue((string) $id)->setLabel($data['label'])->setSortOrder($data['sort']);
+            $option->setValue((string) $id);
+            $option->setLabel($data['label']);
+            $option->setSortOrder($data['sort']);
             $labels = [];
             foreach ($data['stores'] as $storeId => $label) {
                 if ($label !== '') {
@@ -118,7 +145,9 @@ class AttributeOptions
         }
         foreach ($newLabels as $label) {
             $option = $this->optionFactory->create();
-            $option->setLabel($label)->setSortOrder(++$sort)->setStoreLabels([]);
+            $option->setLabel($label);
+            $option->setSortOrder(++$sort);
+            $option->setStoreLabels([]);
             $options[] = $option;
         }
 

@@ -128,11 +128,7 @@ class AttributeImportTest extends TestCase
         $options = Bootstrap::getObjectManager()->get(AttributeOptions::class);
         self::assertSame(['Cotton', 'Wool'], $options->labels((int) $material->getAttributeId()));
         self::assertSame(['Baumwolle', 'Wolle'], $options->storeLabels((int) $material->getAttributeId(), 1), 'store labels of the default store view');
-        $frontendLabels = [];
-        foreach ($material->getFrontendLabels() ?? [] as $frontendLabel) {
-            $frontendLabels[(int) $frontendLabel->getStoreId()] = $frontendLabel->getLabel();
-        }
-        self::assertSame('Stoff', $frontendLabels[1] ?? null);
+        self::assertSame('Stoff', $options->attributeLabels((int) $material->getAttributeId())[1] ?? null, 'store-view label');
         self::assertTrue((bool) $attributes->get($code . '_note')->getIsRequired());
         $sets = Bootstrap::getObjectManager()->get(AttributeSets::class);
         $sets->reset();

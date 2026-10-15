@@ -1,0 +1,28 @@
+<?php
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+
+/** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<section class="admin__page-section">
+    <p><?= $escaper->escapeHtml(__('A file from "Download as JSON" on a profile, or from bin/magento openimport:profile:export. Profiles with the same name are updated; passwords, keys and tokens are not in the file and stay as they are. When one profile has a problem, nothing is saved.')) ?></p>
+    <form method="post" enctype="multipart/form-data"
+          action="<?= $escaper->escapeUrl($block->getUrl('openimport/profile/importJson')) ?>">
+        <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+        <div class="admin__field">
+            <label class="admin__field-label" for="openimport-json-file">
+                <span><?= $escaper->escapeHtml(__('JSON file')) ?></span>
+            </label>
+            <div class="admin__field-control">
+                <input id="openimport-json-file" type="file" name="file" accept=".json,application/json" required="required"/>
+            </div>
+        </div>
+        <div class="openimport-run-actions">
+            <button type="submit" class="action-primary"><span><?= $escaper->escapeHtml(__('Import profiles')) ?></span></button>
+            <a class="action-secondary" href="<?= $escaper->escapeUrl($block->getUrl('openimport/profile/index')) ?>"><?= $escaper->escapeHtml(__('Back')) ?></a>
+        </div>
+    </form>
+</section>

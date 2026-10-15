@@ -18,6 +18,7 @@
         <buttons>
             <button name="back" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\BackButton"/>
             <button name="delete" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\DeleteButton"/>
+            <button name="download_json" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\DownloadJsonButton"/>
             <button name="save" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\SaveButton"/>
             <button name="save_dry_run" class="Iranimij\OpenImport\Block\Adminhtml\Profile\Edit\SaveDryRunButton"/>
         </buttons>

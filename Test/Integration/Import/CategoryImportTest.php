@@ -23,6 +23,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Store\Model\Store;
 use Magento\Store\Test\Fixture\Store as StoreFixture;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\TestFramework\Fixture\DataFixture;
 use Magento\TestFramework\Fixture\DataFixtureStorageManager;
 use Magento\TestFramework\Fixture\AppArea;
@@ -234,9 +235,12 @@ class CategoryImportTest extends TestCase
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('only one store view', $run->getMessage());
 
-        $replace = $this->profile(ProfileInterface::BEHAVIOR_REPLACE, $mapping);
-        $run = $this->process($replace, $this->file("path,name,active,store\n{$root}/X,X,1,\n"));
-        self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
-        self::assertStringContainsString('Replace', $run->getMessage());
+        // Replace is refused when the profile is saved (and by the importer, should a profile come in another way).
+        try {
+            $this->profile(ProfileInterface::BEHAVIOR_REPLACE, $mapping);
+            self::fail('A category profile with Replace was saved.');
+        } catch (CouldNotSaveException $exception) {
+            self::assertStringContainsString('cannot be imported with "Replace"', $exception->getMessage());
+        }
     }
 }

@@ -23,7 +23,7 @@ class Collection extends SearchResult
     {
         $value = trim($value);
         if ($value !== '') {
-            $this->addFieldToFilter('main_table.name', ['like' => '%' . addcslashes($value, '%_\\') . '%']);
+            $this->addFieldToFilter('main_table.name', ['like' => '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value) . '%']);
         }
 
         return $this;

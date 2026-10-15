@@ -171,8 +171,8 @@ class ProfileActions extends Column
             ->where('profile_id IN (?)', $profileIds)
             ->group('profile_id');
         $rows = $connection->fetchAll($connection->select()
-            ->from($table, ['profile_id', 'status', 'finished_at', 'created_at'])
-            ->where('run_id IN (?)', $latest));
+            ->from(['r' => $table], ['profile_id', 'status', 'finished_at', 'created_at'])
+            ->join(['l' => $latest], 'l.run_id = r.run_id', []));
         $runs = [];
         foreach ($rows as $row) {
             $runs[(int) $row['profile_id']] = array_map('strval', $row);

@@ -202,7 +202,12 @@ have are skipped and counted as <em>skipped by behaviour</em>; they are never cr
 <p>The mapping editor suggests a mapping from the file's column names, in this order: the exact name; the name ignoring
 case, spaces, underscores, hyphens and dots (<code>Special Price</code> → <code>special_price</code>); known synonyms (<code>Artikelnummer</code> →
 <code>sku</code>, <code>Bestand</code> / <code>Menge</code> → <code>qty</code>, <code>Preis</code> → <code>price</code>, <code>Bezeichnung</code> → <code>name</code>, <code>E-Mail</code> → <code>email</code>, <code>Vorname</code> →
-<code>firstname</code> …); and store-view columns (<code>name_de</code>, <code>name (de)</code>, <code>name [de]</code>). Each column is used once.</p>
+<code>firstname</code> …); and store-view columns (<code>name_de</code>, <code>name (de)</code>, <code>name [de]</code>, <code>store:de:name</code>). Each column is used
+once. When the first rows of a number field (price, cost, weight, qty …) are written with decimal commas (<code>89,90</code>,
+<code>1.299,00</code>), Auto-match adds the transform <em>Decimal comma → dot</em> to that field.</p>
+<p><strong>Add required fields</strong> adds the fields Magento needs for new records with a proposed fixed value where there is a
+sensible one: the shop's default attribute set and website, product type <code>simple</code>, the default customer group, the
+default inventory source. Pick a column of the file instead, or change the value.</p>
 <h2 id="store-view-values-products">Store-view values (products)<a class="headerlink" href="#store-view-values-products" title="Permanent link">&para;</a></h2>
 <p>Map a field as <code>store:&lt;store view code&gt;:&lt;field&gt;</code>, for example <code>store:de:name</code>. One row of the file then becomes the
 default row plus one row per store view that has at least one non-empty value. Store-view rows carry the SKU, the

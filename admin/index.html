@@ -159,7 +159,8 @@ and error reports are kept).</p>
    shown and read again when an option changes.</li>
 <li><strong>Map</strong>: one row per Magento field: the column of the file (or a fixed value), the store view, transforms
    (add, move up and down, remove), <em>required</em>, and a value map. <strong>Auto-match</strong> proposes a mapping from the column
-   names, <strong>Add required fields</strong> adds what Magento needs for new records, <strong>Preview the first rows</strong> shows what
+   names (and adds <em>Decimal comma → dot</em> where the file writes numbers with commas), <strong>Add required fields</strong> adds what
+   Magento needs for new records with proposed fixed values, <strong>Preview the first rows</strong> shows what
    Magento will receive, row by row, with any problems.</li>
 <li><strong>Rules</strong>: behaviour, rows with errors, allowed errors, <em>skip unchanged rows</em> (delta), safety limit, row filters.</li>
 <li><strong>When</strong>: manual or a schedule (presets or a cron expression), schedule on/off, e-mails, what happens to the source

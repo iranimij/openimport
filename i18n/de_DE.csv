@@ -459,3 +459,7 @@
 "This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run.","So viele Zeilen dürfen Fehler haben, die übrigen Zeilen werden trotzdem importiert; eine mehr und nichts wird importiert. 0 = jeder Fehler stoppt den Lauf."
 "A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.","Ein Ordner unter var/openimport oder ein absoluter Pfad in einem Ordner, der unter Shops › Konfiguration › iranimij › OpenImport › Sicherheit erlaubt ist."
 "The folder on the server; empty = where the login lands.","Der Ordner auf dem Server; leer = wo die Anmeldung landet."
+"%1 row(s) had errors. The run page has the first ones and the error report.","%1 Zeile(n) hatten Fehler. Die Seite des Laufs zeigt die ersten und den Fehlerbericht."
+"OpenImport export: %1","OpenImport-Export: %1"
+"The attribute ""%1"" does not exist (its default row failed?).","Das Attribut ""%1"" existiert nicht (ist seine Standardzeile fehlgeschlagen?)."
+"The category ""%1"" could not be loaded.","Die Kategorie ""%1"" konnte nicht geladen werden."

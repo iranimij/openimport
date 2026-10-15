@@ -109,6 +109,7 @@ class CronExpressionTest extends TestCase
             'zero step' => ['*/0 * * * *', 'step must be at least 1'],
             'backwards' => ['0 5-1 * * *', 'runs backwards'],
             'garbage' => ['0 0 * * @', 'The day of week field "@" is not valid'],
+            'every wrong field is named' => ['61 25 * * *', 'The minute "61" is outside 0-59. The hour "25" is outside 0-23.'],
         ];
     }
 

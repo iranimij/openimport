@@ -72,6 +72,7 @@ class ProfileFormDataProvider extends AbstractDataProvider
             $data = $this->mapper->toForm($profile);
             $data['profile_id'] = $profileId > 0 ? $profileId : null;
             $data['source_config'] = is_array($posted['source_config'] ?? null) ? $posted['source_config'] : [];
+            $data[Save::FIELD_ERRORS] = is_array($posted[Save::FIELD_ERRORS] ?? null) ? $posted[Save::FIELD_ERRORS] : [];
             return [$profileId > 0 ? $profileId : '' => $data];
         }
         if ($profileId > 0) {

@@ -51,8 +51,17 @@ class CronExpression
                 count(array_filter($parts, static fn (string $part): bool => $part !== ''))
             ));
         }
+        $problems = [];
         foreach ($parts as $index => $part) {
-            $this->sets[$index] = $this->parseField(strtoupper($part), $index);
+            try {
+                $this->sets[$index] = $this->parseField(strtoupper($part), $index);
+            } catch (\InvalidArgumentException $exception) {
+                $problems[] = $exception->getMessage();
+            }
+        }
+        if ($problems !== []) {
+            // Name every wrong field at once, not one per save.
+            throw new \InvalidArgumentException(implode(' ', $problems));
         }
         if (isset($this->sets[4][7])) {
             $this->sets[4][0] = true;

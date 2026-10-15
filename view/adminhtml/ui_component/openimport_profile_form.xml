@@ -46,6 +46,14 @@
         </dataProvider>
     </dataSource>
 
+    <container name="form_helper" component="Iranimij_OpenImport/js/form/form-helper" sortOrder="1">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="provider" xsi:type="string">openimport_profile_form.openimport_profile_form_data_source</item>
+            </item>
+        </argument>
+    </container>
+
     <fieldset name="what" sortOrder="10">
         <settings>
             <label translate="true">1 · What</label>
@@ -220,7 +228,7 @@
                 <label translate="true">Statuses</label>
                 <dataScope>export_options.order.statuses</dataScope>
                 <notice translate="true">Comma-separated status codes. Empty = every status.</notice>
-                <placeholder translate="true">pending, processing</placeholder>
+                <placeholder>pending, processing</placeholder>
             </settings>
         </field>
         <field name="order_from" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="43">
@@ -238,7 +246,7 @@
                 <label translate="true">Created from</label>
                 <dataScope>export_options.order.from</dataScope>
                 <notice translate="true">Date or date and time (UTC). Empty = no limit.</notice>
-                <placeholder translate="true">2026-01-01</placeholder>
+                <placeholder>2026-01-01</placeholder>
             </settings>
         </field>
         <field name="order_to" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="44">
@@ -255,7 +263,7 @@
             <settings>
                 <label translate="true">Created until</label>
                 <dataScope>export_options.order.to</dataScope>
-                <placeholder translate="true">2026-12-31 23:59:59</placeholder>
+                <placeholder>2026-12-31 23:59:59</placeholder>
             </settings>
         </field>
         <field name="order_items" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="45">
@@ -340,7 +348,7 @@
                 <label translate="true">Web address</label>
                 <dataScope>source_config.url</dataScope>
                 <notice translate="true">https://… to a CSV, Excel, JSON or XML file, or a Google Sheets link (shared or published): the sheet is read as CSV.</notice>
-                <placeholder translate="true">https://example.com/feed.csv</placeholder>
+                <placeholder>https://example.com/feed.csv</placeholder>
             </settings>
         </field>
         <field name="source_auth" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="31">
@@ -467,7 +475,7 @@
             <settings>
                 <label translate="true">Server</label>
                 <dataScope>source_config.host</dataScope>
-                <placeholder translate="true">files.example.com</placeholder>
+                <placeholder>files.example.com</placeholder>
             </settings>
         </field>
         <field name="source_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="31">
@@ -684,7 +692,7 @@
                 <label translate="true">Folder</label>
                 <dataScope>source_config.path</dataScope>
                 <notice translate="true">Server folder: a folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety. SFTP/FTP: the remote folder, empty = where the login lands.</notice>
-                <placeholder translate="true">supplier/incoming</placeholder>
+                <placeholder>supplier/incoming</placeholder>
             </settings>
         </field>
         <field name="source_pattern" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="41">
@@ -702,7 +710,7 @@
                 <label translate="true">File name pattern</label>
                 <dataScope>source_config.pattern</dataScope>
                 <notice translate="true">* and ? as in a file browser, several patterns separated by commas. Empty = every file.</notice>
-                <placeholder translate="true">stock-*.csv</placeholder>
+                <placeholder>stock-*.csv</placeholder>
             </settings>
         </field>
         <field name="source_pick" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="42">
@@ -764,7 +772,7 @@
                 <label translate="true">Move processed files to</label>
                 <dataScope>source_config.move_to</dataScope>
                 <notice translate="true">Subfolder of the source folder, used when "Source file after a successful run" is "Move". Empty = "processed".</notice>
-                <placeholder translate="true">processed</placeholder>
+                <placeholder>processed</placeholder>
             </settings>
         </field>
         <field name="export_destination" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="12">
@@ -796,7 +804,7 @@
                 <label translate="true">File name</label>
                 <dataScope>export_options.file_name</dataScope>
                 <notice translate="true">Placeholders: {entity}, {profile}, {date}, {time}, {datetime}, {run}, {ext}. Empty = {entity}-{datetime}.{ext}</notice>
-                <placeholder translate="true">{entity}-{date}.{ext}</placeholder>
+                <placeholder>{entity}-{date}.{ext}</placeholder>
             </settings>
         </field>
         <field name="dest_path_folder" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="20">
@@ -819,7 +827,7 @@
                 <label translate="true">Folder</label>
                 <dataScope>export_options.path</dataScope>
                 <notice translate="true">Under var/openimport, or an absolute path inside a folder allowed in the settings. Created when missing.</notice>
-                <placeholder translate="true">exports</placeholder>
+                <placeholder>exports</placeholder>
             </settings>
         </field>
         <field name="dest_overwrite" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="21">
@@ -868,7 +876,7 @@
             <settings>
                 <label translate="true">Server</label>
                 <dataScope>export_options.host</dataScope>
-                <placeholder translate="true">files.example.com</placeholder>
+                <placeholder>files.example.com</placeholder>
             </settings>
         </field>
         <field name="dest_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="23">
@@ -1094,7 +1102,7 @@
                 <label translate="true">Remote folder</label>
                 <dataScope>export_options.path</dataScope>
                 <notice translate="true">Empty = where the login lands.</notice>
-                <placeholder translate="true">/incoming</placeholder>
+                <placeholder>/incoming</placeholder>
             </settings>
         </field>
         <field name="dest_emails" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
@@ -1112,7 +1120,7 @@
                 <label translate="true">Send to</label>
                 <dataScope>export_options.emails</dataScope>
                 <notice translate="true">Comma-separated e-mail addresses.</notice>
-                <placeholder translate="true">erp@example.com, buyer@example.com</placeholder>
+                <placeholder>erp@example.com, buyer@example.com</placeholder>
             </settings>
         </field>
         <field name="dest_subject" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="33">
@@ -1377,7 +1385,7 @@
                 <label translate="true">Root element / key</label>
                 <dataScope>format_options.root</dataScope>
                 <notice translate="true">XML: the root element (default "export"). JSON: wrap the rows in an object under this key (default: a plain array).</notice>
-                <placeholder translate="true">export</placeholder>
+                <placeholder>export</placeholder>
             </settings>
         </field>
         <field name="out_record" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="62">
@@ -1395,7 +1403,7 @@
                 <label translate="true">Record element</label>
                 <dataScope>format_options.record</dataScope>
                 <notice translate="true">Default "item".</notice>
-                <placeholder translate="true">item</placeholder>
+                <placeholder>item</placeholder>
             </settings>
         </field>
         <field name="out_pretty" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="63">

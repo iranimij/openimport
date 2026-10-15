@@ -27,7 +27,7 @@ use Magento\ImportExport\Model\ResourceModel\Import\Data as ImportData;
  * imports in one process (cron, CLI), so it is cleared before every run; otherwise errors of earlier runs count
  * against this run's allowed errors (M0 spike finding).
  */
-class CoreImporter
+class CoreImporter implements ImporterInterface
 {
     /**
      * Validations at most per run when rows with critical errors are left out (the first one included).

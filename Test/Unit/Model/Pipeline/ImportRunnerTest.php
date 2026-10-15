@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Test\Unit\Model\Pipeline;
 
 use Iranimij\OpenImport\Api\Data\RunInterface;
+use Iranimij\OpenImport\Model\Bridge\ImporterPool;
 use Iranimij\OpenImport\Model\Bridge\RowError;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Entity\RecordReaderPool;
@@ -89,7 +90,7 @@ class ImportRunnerTest extends TestCase
                 'catalog_product' => $this->shop,
                 'openimport_stock_price' => $this->shop,
             ]),
-            $this->core,
+            new ImporterPool($this->core),
             $this->errors,
             $this->preview,
             $this->hashes,

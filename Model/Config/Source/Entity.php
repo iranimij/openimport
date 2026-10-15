@@ -27,6 +27,7 @@ class Entity implements OptionSourceInterface
         'customer_composite' => 'Customers with addresses',
         'customer_address' => 'Customer addresses',
         EntityRegistry::ORDER => 'Orders',
+        EntityRegistry::CATEGORY => 'Categories',
     ];
 
     /**
@@ -49,8 +50,10 @@ class Entity implements OptionSourceInterface
         if (isset($import['catalog_product'])) {
             $import[EntityRegistry::STOCK_PRICE] = ['label' => self::NAMES[EntityRegistry::STOCK_PRICE]];
         }
+        $import[EntityRegistry::CATEGORY] = ['label' => self::NAMES[EntityRegistry::CATEGORY]];
         $export = $this->exportConfig->getEntities();
         $export[EntityRegistry::ORDER] = ['label' => self::NAMES[EntityRegistry::ORDER]];
+        $export[EntityRegistry::CATEGORY] = ['label' => self::NAMES[EntityRegistry::CATEGORY]];
         foreach (['import' => $import, 'export' => $export] as $direction => $entities) {
             foreach ($entities as $code => $entity) {
                 $label = self::NAMES[$code] ?? (string) ($entity['label'] ?? $code);

@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Model\Entity;
 
+use Iranimij\OpenImport\Model\Import\Category\CategoryImporter;
+
 /**
  * The import entities OpenImport supports, with their identifier columns. More can be added through di.xml
  * (argument "entities"); an entity that is not listed is identified by its first mapped column.
@@ -22,6 +24,7 @@ class EntityRegistry
     public const STOCK_SOURCES = 'stock_sources';
     public const STOCK_PRICE = 'openimport_stock_price';
     public const ORDER = 'openimport_order';
+    public const CATEGORY = 'openimport_category';
 
     /**
      * What a Stock & prices profile may change (through core's product import, only existing products).
@@ -55,7 +58,23 @@ class EntityRegistry
             'strasse' => 'street', 'straße' => 'street', 'plz' => 'postcode', 'zip' => 'postcode', 'ort' => 'city',
             'stadt' => 'city', 'land' => 'country_id', 'country' => 'country_id', 'firma' => 'company',
         ];
+        $categorySynonyms = [
+            'kategorie' => 'path', 'kategoriepfad' => 'path', 'category' => 'path', 'category path' => 'path',
+            'pfad' => 'path', 'name' => 'name', 'bezeichnung' => 'name', 'beschreibung' => 'description',
+            'aktiv' => 'is_active', 'active' => 'is_active', 'im menü' => 'include_in_menu', 'in menu' => 'include_in_menu',
+            'url key' => 'url_key', 'url' => 'url_key', 'meta titel' => 'meta_title', 'meta title' => 'meta_title',
+            'store view' => 'store_view_code', 'storeview' => 'store_view_code',
+        ];
         $builtIn = [
+            new EntityInfo(
+                self::CATEGORY,
+                ['path'],
+                true,
+                ['path'],
+                $categorySynonyms,
+                null,
+                CategoryImporter::COLUMNS
+            ),
             new EntityInfo(self::PRODUCT, ['sku'], true, ['sku', 'attribute_set_code', 'product_type'], $productSynonyms),
             new EntityInfo(self::ADVANCED_PRICING, ['sku', 'tier_price_website', 'tier_price_customer_group',
                 'tier_price_qty'], false, [], $productSynonyms),

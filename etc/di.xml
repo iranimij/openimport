@@ -36,6 +36,14 @@
         </arguments>
     </type>
 
+    <!-- OpenImport's own importers; every other entity goes through core's import engine. -->
+    <type name="Iranimij\OpenImport\Model\Bridge\ImporterPool">
+        <arguments>
+            <argument name="importers" xsi:type="array">
+                <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryImporter</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Iranimij\OpenImport\Model\Entity\RecordReaderPool">
         <arguments>
             <argument name="readers" xsi:type="array">
@@ -43,6 +51,7 @@
                 <item name="openimport_stock_price" xsi:type="object">Iranimij\OpenImport\Model\Entity\Reader\ProductRecordReader</item>
                 <item name="customer" xsi:type="object">Iranimij\OpenImport\Model\Entity\Reader\CustomerRecordReader</item>
                 <item name="customer_composite" xsi:type="object">Iranimij\OpenImport\Model\Entity\Reader\CustomerRecordReader</item>
+                <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryRecordReader</item>
             </argument>
         </arguments>
     </type>
@@ -168,6 +177,7 @@
         <arguments>
             <argument name="sources" xsi:type="array">
                 <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Export\Order\OrderEntitySource</item>
+                <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryEntitySource</item>
             </argument>
         </arguments>
     </type>

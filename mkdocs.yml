@@ -14,6 +14,7 @@ nav:
   - Runs, dry runs and safety: runs.md
   - Sources: sources.md
   - Exports: exports.md
+  - Categories: categories.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
   - Admin: admin.md

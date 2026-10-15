@@ -10,7 +10,7 @@ namespace Iranimij\OpenImport\Model\Pipeline;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
-use Iranimij\OpenImport\Model\Bridge\CoreImporter;
+use Iranimij\OpenImport\Model\Bridge\ImporterPool;
 use Iranimij\OpenImport\Model\Bridge\ImportRequest;
 use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\Entity\EntityInfo;
@@ -118,7 +118,7 @@ class ImportRunner
      * @param ReaderFactory $readerFactory
      * @param ProfileCompiler $profileCompiler
      * @param RecordReaderPool $recordReaders
-     * @param CoreImporter $coreImporter
+     * @param ImporterPool $importers
      * @param ErrorLog $errorLog
      * @param PreviewStore $previewStore
      * @param RowHashStore $rowHashes
@@ -130,7 +130,7 @@ class ImportRunner
         private readonly ReaderFactory $readerFactory,
         private readonly ProfileCompiler $profileCompiler,
         private readonly RecordReaderPool $recordReaders,
-        private readonly CoreImporter $coreImporter,
+        private readonly ImporterPool $importers,
         private readonly ErrorLog $errorLog,
         private readonly PreviewStore $previewStore,
         private readonly RowHashStore $rowHashes,
@@ -538,7 +538,7 @@ class ImportRunner
             max(0, $allowed - $ownErrors),
             historyLabel: sprintf('openimport-run-%d.csv', $this->runId)
         );
-        $result = $this->coreImporter->run(
+        $result = $this->importers->get($entity->importEntity())->run(
             $request,
             new MappedSource($spool->columns(), static fn (): \Generator => $spool->rows())
         );

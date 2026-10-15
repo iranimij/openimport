@@ -43,6 +43,8 @@ class EntityCodes
             // OpenImport's own order export (core has none).
             $codes[] = EntityRegistry::ORDER;
         }
+        // OpenImport's own category import and export (core has none).
+        $codes[] = EntityRegistry::CATEGORY;
 
         return $codes;
     }

@@ -27,6 +27,7 @@ class FieldList
         'customer_address' => ['_email', '_website', 'firstname', 'lastname', 'street', 'city', 'country_id',
             'postcode', 'telephone'],
         'stock_sources' => ['sku', 'source_code', 'status', 'quantity'],
+        'openimport_category' => ['path'],
     ];
 
     /**

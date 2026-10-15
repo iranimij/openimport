@@ -32,6 +32,9 @@ The admin, reworked from the second hands-on review (design items D1–D15, prod
 - Order exports: statuses from a list, dates with a date picker, the order filters in step 5.
 - Grid dates do not wrap.
 
+### Fixed
+- *Auto-match* right after an upload could use an older answer without the file's columns and match nothing.
+
 ## [1.1.2] - 2026-10-15
 
 Fixes from the second hands-on review (QA items Q1–Q21 of the review page).

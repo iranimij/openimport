@@ -84,11 +84,27 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../categories/">Categories</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../attributes/">Attributes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cms/">CMS pages and blocks</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
                 </li>
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">REST API and triggers</a>
                 </li>
               </ul>
               <ul>
@@ -194,7 +210,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 <thead>
 <tr>
 <th>Feature</th>
-<th>OpenImport 1.0</th>
+<th>OpenImport 1.1</th>
 <th>Open Source</th>
 <th>Commerce</th>
 <th>Firebear</th>
@@ -339,8 +355,35 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 <td>✓</td>
 </tr>
 <tr>
-<td>Categories, attributes, CMS, URL rewrites, rules</td>
-<td>✗ (1.1)</td>
+<td>Categories (paths, store views)</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Product attributes and attribute sets (options, store labels)</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>CMS pages and blocks</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>URL rewrites, cart and catalog price rules</td>
+<td>✗ (1.2)</td>
 <td>✗</td>
 <td>✗</td>
 <td>✓</td>
@@ -421,7 +464,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 </tr>
 <tr>
 <td>Event-triggered export (order placed → file)</td>
-<td>○ schedule every minute with "only new" (1.1: events)</td>
+<td>✓ debounced, one run per minute</td>
 <td>✗</td>
 <td>✗</td>
 <td>✓</td>
@@ -429,8 +472,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 <td>✓</td>
 </tr>
 <tr>
-<td>Trigger profiles by REST</td>
-<td>✗ (1.1)</td>
+<td>Trigger profiles by REST, read run status</td>
+<td>✓</td>
 <td>○ raw CSV/JSON import API</td>
 <td>○</td>
 <td>○</td>
@@ -460,9 +503,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
   credentials never leave the database. See <a href="../security/">Security</a>.</li>
 </ul>
 <h2 id="where-the-paid-tools-still-have-more">Where the paid tools still have more<a class="headerlink" href="#where-the-paid-tools-still-have-more" title="Permanent link">&para;</a></h2>
-<p>Entity breadth (categories, attributes, CMS, orders import, rules, URL rewrites), cloud drives (Google Drive, Dropbox,
-OneDrive) and REST API sources, event-driven exports, image download helpers, B2B. These are the 1.1 and 1.2
-milestones; see the <a href="https://github.com/iranimij/openimport/milestones">roadmap</a>.</p>
+<p>Order and tracking import, price rules and URL rewrites, cloud drives (Google Drive, Dropbox, OneDrive) and REST
+API sources, image download helpers, B2B. These are the 1.2 milestone and later; see the <a href="https://github.com/iranimij/openimport/milestones">roadmap</a>.</p>
 <h2 id="free-alternatives-for-developers">Free alternatives for developers<a class="headerlink" href="#free-alternatives-for-developers" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

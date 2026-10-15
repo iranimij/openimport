@@ -17,7 +17,7 @@ Fixes from the second hands-on review (QA items Q1–Q21 of the review page).
   no behaviour, error rules, *skip unchanged* or safety limit in step 5; row filters say *Export only the records
   that match*.
 - Fields show only where they matter: delimiter and encoding for CSV, sheet for Excel, record path for JSON/XML,
-  *Errors allowed* with *Stop*, the cron field with *Custom*, the schedule switch with a schedule, the sheet gid for
+  the cron field with *Custom*, the schedule switch with a schedule, the sheet gid for
   Google Sheets links, the password unless SFTP logs in with a key, the file handling for folder/SFTP/FTP sources.
 - *Behaviour* lists only what the chosen entity can do; *Replace* for categories, attributes and CMS is refused on
   save instead of at run time.

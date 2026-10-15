@@ -1551,13 +1551,6 @@
                 <item name="config" xsi:type="array">
                     <item name="addafter" xsi:type="string" translate="true">rows</item>
                     <item name="forDirection" xsi:type="string">import</item>
-                    <item name="showWhen" xsi:type="array">
-                        <item name="on_error" xsi:type="array">
-                            <item name="not" xsi:type="array">
-                                <item name="0" xsi:type="string">skip</item>
-                            </item>
-                        </item>
-                    </item>
                 </item>
             </argument>
             <settings>
@@ -1566,7 +1559,7 @@
                 </additionalClasses>
                 <label translate="true">Errors allowed</label>
                 <dataScope>allowed_errors</dataScope>
-                <notice translate="true">This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run.</notice>
+                <notice translate="true">How many rows may have errors before nothing is imported. With "Stop" the other rows are imported up to this number; with "Skip" it only matters when no row is left. 0 = no errors allowed.</notice>
                 <validation>
                     <rule name="validate-digits" xsi:type="boolean">true</rule>
                 </validation>

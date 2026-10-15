@@ -16,6 +16,7 @@ nav:
   - Exports: exports.md
   - Categories: categories.md
   - Attributes: attributes.md
+  - CMS pages and blocks: cms.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
   - Admin: admin.md

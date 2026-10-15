@@ -29,6 +29,8 @@ class FieldList
         'stock_sources' => ['sku', 'source_code', 'status', 'quantity'],
         'openimport_category' => ['path'],
         'openimport_attribute' => ['attribute_code', 'label', 'frontend_input'],
+        'openimport_cms_page' => ['identifier', 'title'],
+        'openimport_cms_block' => ['identifier', 'title'],
     ];
 
     /**

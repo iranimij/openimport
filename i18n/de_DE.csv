@@ -420,3 +420,5 @@
 "OpenImport: runs are waiting, but Magento's cron has not run OpenImport's job in the last 10 minutes. Set up cron (bin/magento cron:run every minute) or run bin/magento openimport:queue:run. <a href=""%1"">Runs</a>","OpenImport: Läufe warten, aber Magentos Cron hat OpenImports Job in den letzten 10 Minuten nicht ausgeführt. Cron einrichten (bin/magento cron:run jede Minute) oder bin/magento openimport:queue:run ausführen. <a href=""%1"">Läufe</a>"
 "Categories","Kategorien"
 "Product attributes and attribute sets","Produktattribute und Attributsets"
+"CMS pages","CMS-Seiten"
+"CMS blocks","CMS-Blöcke"

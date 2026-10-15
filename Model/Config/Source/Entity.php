@@ -29,6 +29,8 @@ class Entity implements OptionSourceInterface
         EntityRegistry::ORDER => 'Orders',
         EntityRegistry::CATEGORY => 'Categories',
         EntityRegistry::ATTRIBUTE => 'Product attributes and attribute sets',
+        EntityRegistry::CMS_PAGE => 'CMS pages',
+        EntityRegistry::CMS_BLOCK => 'CMS blocks',
     ];
 
     /**
@@ -53,10 +55,14 @@ class Entity implements OptionSourceInterface
         }
         $import[EntityRegistry::CATEGORY] = ['label' => self::NAMES[EntityRegistry::CATEGORY]];
         $import[EntityRegistry::ATTRIBUTE] = ['label' => self::NAMES[EntityRegistry::ATTRIBUTE]];
+        $import[EntityRegistry::CMS_PAGE] = ['label' => self::NAMES[EntityRegistry::CMS_PAGE]];
+        $import[EntityRegistry::CMS_BLOCK] = ['label' => self::NAMES[EntityRegistry::CMS_BLOCK]];
         $export = $this->exportConfig->getEntities();
         $export[EntityRegistry::ORDER] = ['label' => self::NAMES[EntityRegistry::ORDER]];
         $export[EntityRegistry::CATEGORY] = ['label' => self::NAMES[EntityRegistry::CATEGORY]];
         $export[EntityRegistry::ATTRIBUTE] = ['label' => self::NAMES[EntityRegistry::ATTRIBUTE]];
+        $export[EntityRegistry::CMS_PAGE] = ['label' => self::NAMES[EntityRegistry::CMS_PAGE]];
+        $export[EntityRegistry::CMS_BLOCK] = ['label' => self::NAMES[EntityRegistry::CMS_BLOCK]];
         foreach (['import' => $import, 'export' => $export] as $direction => $entities) {
             foreach ($entities as $code => $entity) {
                 $label = self::NAMES[$code] ?? (string) ($entity['label'] ?? $code);

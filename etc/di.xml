@@ -36,12 +36,45 @@
         </arguments>
     </type>
 
+    <!-- CMS pages and blocks: one importer, reader and export source per kind. -->
+    <virtualType name="OpenImportCmsPageImporter" type="Iranimij\OpenImport\Model\Import\Cms\CmsImporter">
+        <arguments>
+            <argument name="kind" xsi:type="string">page</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCmsPageReader" type="Iranimij\OpenImport\Model\Import\Cms\CmsRecordReader">
+        <arguments>
+            <argument name="kind" xsi:type="string">page</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCmsPageSource" type="Iranimij\OpenImport\Model\Import\Cms\CmsEntitySource">
+        <arguments>
+            <argument name="kind" xsi:type="string">page</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCmsBlockImporter" type="Iranimij\OpenImport\Model\Import\Cms\CmsImporter">
+        <arguments>
+            <argument name="kind" xsi:type="string">block</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCmsBlockReader" type="Iranimij\OpenImport\Model\Import\Cms\CmsRecordReader">
+        <arguments>
+            <argument name="kind" xsi:type="string">block</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCmsBlockSource" type="Iranimij\OpenImport\Model\Import\Cms\CmsEntitySource">
+        <arguments>
+            <argument name="kind" xsi:type="string">block</argument>
+        </arguments>
+    </virtualType>
     <!-- OpenImport's own importers; every other entity goes through core's import engine. -->
     <type name="Iranimij\OpenImport\Model\Bridge\ImporterPool">
         <arguments>
             <argument name="importers" xsi:type="array">
                 <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryImporter</item>
                 <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter</item>
+                <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageImporter</item>
+                <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockImporter</item>
             </argument>
         </arguments>
     </type>
@@ -54,6 +87,8 @@
                 <item name="customer_composite" xsi:type="object">Iranimij\OpenImport\Model\Entity\Reader\CustomerRecordReader</item>
                 <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryRecordReader</item>
                 <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeRecordReader</item>
+                <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageReader</item>
+                <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockReader</item>
             </argument>
         </arguments>
     </type>
@@ -181,6 +216,8 @@
                 <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Export\Order\OrderEntitySource</item>
                 <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryEntitySource</item>
                 <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeEntitySource</item>
+                <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageSource</item>
+                <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockSource</item>
             </argument>
         </arguments>
     </type>

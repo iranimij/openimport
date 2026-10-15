@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Model\Entity;
 
 use Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter;
 use Iranimij\OpenImport\Model\Import\Category\CategoryImporter;
+use Iranimij\OpenImport\Model\Import\Cms\CmsImporter;
 
 /**
  * The import entities OpenImport supports, with their identifier columns. More can be added through di.xml
@@ -27,6 +28,8 @@ class EntityRegistry
     public const ORDER = 'openimport_order';
     public const CATEGORY = 'openimport_category';
     public const ATTRIBUTE = 'openimport_attribute';
+    public const CMS_PAGE = 'openimport_cms_page';
+    public const CMS_BLOCK = 'openimport_cms_block';
 
     /**
      * What a Stock & prices profile may change (through core's product import, only existing products).
@@ -67,6 +70,12 @@ class EntityRegistry
             'url key' => 'url_key', 'url' => 'url_key', 'meta titel' => 'meta_title', 'meta title' => 'meta_title',
             'store view' => 'store_view_code', 'storeview' => 'store_view_code',
         ];
+        $cmsSynonyms = [
+            'kennung' => 'identifier', 'url key' => 'identifier', 'key' => 'identifier', 'titel' => 'title',
+            'inhalt' => 'content', 'html' => 'content', 'body' => 'content', 'aktiv' => 'is_active', 'active' => 'is_active',
+            'store views' => 'stores', 'store view' => 'stores', 'shops' => 'stores', 'überschrift' => 'content_heading',
+            'heading' => 'content_heading', 'layout' => 'page_layout',
+        ];
         $builtIn = [
             new EntityInfo(
                 self::CATEGORY,
@@ -91,6 +100,8 @@ class EntityRegistry
                 null,
                 AttributeImporter::COLUMNS
             ),
+            new EntityInfo(self::CMS_PAGE, ['identifier'], false, [], $cmsSynonyms, null, CmsImporter::PAGE_COLUMNS),
+            new EntityInfo(self::CMS_BLOCK, ['identifier'], false, [], $cmsSynonyms, null, CmsImporter::BLOCK_COLUMNS),
             new EntityInfo(self::PRODUCT, ['sku'], true, ['sku', 'attribute_set_code', 'product_type'], $productSynonyms),
             new EntityInfo(self::ADVANCED_PRICING, ['sku', 'tier_price_website', 'tier_price_customer_group',
                 'tier_price_qty'], false, [], $productSynonyms),

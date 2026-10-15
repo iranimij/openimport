@@ -35,6 +35,7 @@
         "magento/module-admin-notification": "^100.4.6",
         "magento/module-backend": "^102.0.7",
         "magento/module-catalog": "^104.0.7",
+        "magento/module-cms": "^104.0.6",
         "magento/module-config": "^101.2.7",
         "magento/module-cron": "^100.4.7",
         "magento/module-customer": "^103.0.7",

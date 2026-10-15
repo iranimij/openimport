@@ -12,6 +12,8 @@ All notable changes to this project are documented here. The format follows
 - Product attributes and attribute sets import and export (`openimport_attribute`): create attributes with input
   type, options, flags and scope, assign to sets and groups, store-view labels and option labels; Delete only
   unassigns. See docs/attributes.md.
+- CMS pages and blocks import and export (`openimport_cms_page`, `openimport_cms_block`) by identifier and store
+  views, dry-run preview, delete. See docs/cms.md. New dependency: `magento/module-cms` (core).
 
 ## [1.0.0] - 2026-10-15
 

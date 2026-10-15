@@ -14,6 +14,7 @@
             <module name="Magento_Catalog"/>
             <module name="Magento_Customer"/>
             <module name="Magento_Eav"/>
+            <module name="Magento_Cms"/>
             <module name="Magento_Config"/>
             <module name="Magento_Cron"/>
             <module name="Magento_Email"/>

@@ -473,3 +473,9 @@ a.openimport-strip-problem {
 a.openimport-strip-problem {
     text-decoration: underline;
 }
+
+/* Links in OpenImport's own panels: dark enough to read (WCAG AA). */
+.openimport-recent-runs a,
+.openimport-next-runs a {
+    color: #1a5a96;
+}

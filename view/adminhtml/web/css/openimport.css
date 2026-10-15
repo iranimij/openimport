@@ -164,7 +164,7 @@
 }
 
 /* The mapping editor fills the whole fieldset (it has no label column): same left edge as the other steps. */
-.admin__fieldset > .openimport-mapping {
+.admin__fieldset > .admin__field.openimport-mapping {
     margin-left: 0;
     width: 100%;
 }

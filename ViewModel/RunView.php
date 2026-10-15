@@ -21,6 +21,7 @@ use Iranimij\OpenImport\Model\Storage\PreviewStore;
 use Iranimij\OpenImport\Ui\Component\Listing\Column\StatusChip;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\AuthorizationInterface;
+use Magento\Framework\Escaper;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -49,6 +50,7 @@ class RunView implements ArgumentInterface
      * @param UrlInterface $urlBuilder
      * @param AuthorizationInterface $authorization
      * @param RunTrigger $triggers
+     * @param Escaper $escaper
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -59,7 +61,8 @@ class RunView implements ArgumentInterface
         private readonly StatusChip $chip,
         private readonly UrlInterface $urlBuilder,
         private readonly AuthorizationInterface $authorization,
-        private readonly RunTrigger $triggers
+        private readonly RunTrigger $triggers,
+        private readonly Escaper $escaper
     ) {
     }
 
@@ -113,6 +116,34 @@ class RunView implements ArgumentInterface
     public function statusHtml(): string
     {
         return $this->chip->html((string) $this->run()?->getStatus());
+    }
+
+    /**
+     * @return string HTML
+     */
+    public function statusChipHtml(): string
+    {
+        return $this->chip->chip((string) $this->run()?->getStatus());
+    }
+
+    /**
+     * One changed field of the dry-run preview: "field: before → after", or "field = value" for a new value.
+     *
+     * @param string $field
+     * @param mixed $before
+     * @param mixed $after
+     * @return string HTML
+     */
+    public function changeHtml(string $field, mixed $before, mixed $after): string
+    {
+        $text = static fn (mixed $value): string => is_scalar($value) ? (string) $value : '';
+        $name = '<code>' . $this->escaper->escapeHtml($field) . '</code>';
+        if ($text($before) === '') {
+            return $name . ' = ' . $this->escaper->escapeHtml($text($after));
+        }
+
+        return $name . ': <del>' . $this->escaper->escapeHtml($text($before)) . '</del> → <ins>'
+            . $this->escaper->escapeHtml($text($after)) . '</ins>';
     }
 
     /**

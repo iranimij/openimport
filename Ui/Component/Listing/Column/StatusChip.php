@@ -47,6 +47,21 @@ class StatusChip
     }
 
     /**
+     * The status as a compact chip for page headers (the grid style is a full-width bar outside a grid).
+     *
+     * @param string $status
+     * @return string HTML
+     */
+    public function chip(string $status): string
+    {
+        return sprintf(
+            '<span class="openimport-chip openimport-chip-%s">%s</span>',
+            self::SEVERITY[$status] ?? 'minor',
+            $this->escaper->escapeHtml($this->label($status))
+        );
+    }
+
+    /**
      * @param string $status
      * @return string
      */

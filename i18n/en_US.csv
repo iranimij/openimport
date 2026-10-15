@@ -475,3 +475,5 @@
 "Delete profile","Delete profile"
 "Date or date and time, in the time zone of Stores › Configuration › General › Locale. Empty = no limit.","Date or date and time, in the time zone of Stores › Configuration › General › Locale. Empty = no limit."
 "Date or date and time, in the time zone of Stores › Configuration › General › Locale; a date alone counts the whole day. Empty = no limit.","Date or date and time, in the time zone of Stores › Configuration › General › Locale; a date alone counts the whole day. Empty = no limit."
+"Fields","Fields"
+"%1 more fields","%1 more fields"

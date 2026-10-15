@@ -22,7 +22,7 @@
 }
 
 /* Error messages are read in full: they wrap instead of being cut. */
-.openimport-scroll td.openimport-wrap {
+.openimport-wrap {
     max-width: 48rem;
     min-width: 24rem;
     overflow: visible;
@@ -202,4 +202,95 @@
 
 .openimport-secret-text:not(:focus):not(:placeholder-shown) {
     -webkit-text-security: disc;
+}
+
+/* Run page: a status chip next to a one-line headline, then the details. */
+.openimport-run-head {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: .5rem;
+}
+
+.openimport-headline {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.openimport-run-meta {
+    color: #514943;
+    margin-bottom: 1.5rem;
+}
+
+.openimport-chip {
+    border: 1px solid;
+    border-radius: 1em;
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    line-height: 1.6;
+    padding: 0 .9em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.openimport-chip-notice {
+    background: #e5f7e0;
+    border-color: #79a22e;
+    color: #185b00;
+}
+
+.openimport-chip-major {
+    background: #fff4d6;
+    border-color: #e8a400;
+    color: #6f4400;
+}
+
+.openimport-chip-critical {
+    background: #fde8e6;
+    border-color: #e22626;
+    color: #a30d0d;
+}
+
+.openimport-chip-minor {
+    background: #f1f1f1;
+    border-color: #a6a6a6;
+    color: #303030;
+}
+
+/* Tables that scroll sideways when wide; the page scrolls down. */
+.openimport-wide {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.openimport-changes td {
+    vertical-align: top;
+}
+
+.openimport-change-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.openimport-change-list li {
+    margin: 0 0 .3rem;
+    overflow-wrap: anywhere;
+}
+
+.openimport-change-list del {
+    color: #a30d0d;
+}
+
+.openimport-change-list ins {
+    color: #185b00;
+    text-decoration: none;
+}
+
+.openimport-changes summary {
+    color: #1a5a96;
+    cursor: pointer;
 }

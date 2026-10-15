@@ -28,6 +28,7 @@ class FieldList
             'postcode', 'telephone'],
         'stock_sources' => ['sku', 'source_code', 'status', 'quantity'],
         'openimport_category' => ['path'],
+        'openimport_attribute' => ['attribute_code', 'label', 'frontend_input'],
     ];
 
     /**

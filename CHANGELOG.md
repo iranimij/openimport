@@ -9,6 +9,9 @@ All notable changes to this project are documented here. The format follows
 - Categories import and export (`openimport_category`): paths by names, parents created on the way, store-view
   values, dry-run preview, delete with children; own importers plug into the pipeline through `ImporterInterface`
   and `ImporterPool` (core's import engine stays the default). See docs/categories.md.
+- Product attributes and attribute sets import and export (`openimport_attribute`): create attributes with input
+  type, options, flags and scope, assign to sets and groups, store-view labels and option labels; Delete only
+  unassigns. See docs/attributes.md.
 
 ## [1.0.0] - 2026-10-15
 

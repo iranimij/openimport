@@ -15,6 +15,7 @@ nav:
   - Sources: sources.md
   - Exports: exports.md
   - Categories: categories.md
+  - Attributes: attributes.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
   - Admin: admin.md

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Model\Entity;
 
+use Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter;
 use Iranimij\OpenImport\Model\Import\Category\CategoryImporter;
 
 /**
@@ -25,6 +26,7 @@ class EntityRegistry
     public const STOCK_PRICE = 'openimport_stock_price';
     public const ORDER = 'openimport_order';
     public const CATEGORY = 'openimport_category';
+    public const ATTRIBUTE = 'openimport_attribute';
 
     /**
      * What a Stock & prices profile may change (through core's product import, only existing products).
@@ -74,6 +76,20 @@ class EntityRegistry
                 $categorySynonyms,
                 null,
                 CategoryImporter::COLUMNS
+            ),
+            new EntityInfo(
+                self::ATTRIBUTE,
+                ['attribute_code'],
+                true,
+                ['attribute_code'],
+                ['code' => 'attribute_code', 'attributcode' => 'attribute_code', 'attribute' => 'attribute_code',
+                    'attribut' => 'attribute_code', 'label' => 'label', 'bezeichnung' => 'label', 'typ' => 'frontend_input',
+                    'type' => 'frontend_input', 'input' => 'frontend_input', 'optionen' => 'options', 'werte' => 'options',
+                    'values' => 'options', 'pflicht' => 'is_required', 'required' => 'is_required',
+                    'attributset' => 'attribute_set', 'set' => 'attribute_set', 'gruppe' => 'attribute_group',
+                    'group' => 'attribute_group', 'store view' => 'store_view_code'],
+                null,
+                AttributeImporter::COLUMNS
             ),
             new EntityInfo(self::PRODUCT, ['sku'], true, ['sku', 'attribute_set_code', 'product_type'], $productSynonyms),
             new EntityInfo(self::ADVANCED_PRICING, ['sku', 'tier_price_website', 'tier_price_customer_group',

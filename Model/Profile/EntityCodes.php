@@ -45,6 +45,7 @@ class EntityCodes
         }
         // OpenImport's own category import and export (core has none).
         $codes[] = EntityRegistry::CATEGORY;
+        $codes[] = EntityRegistry::ATTRIBUTE;
 
         return $codes;
     }

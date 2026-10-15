@@ -41,6 +41,7 @@
         <arguments>
             <argument name="importers" xsi:type="array">
                 <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryImporter</item>
+                <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter</item>
             </argument>
         </arguments>
     </type>
@@ -52,6 +53,7 @@
                 <item name="customer" xsi:type="object">Iranimij\OpenImport\Model\Entity\Reader\CustomerRecordReader</item>
                 <item name="customer_composite" xsi:type="object">Iranimij\OpenImport\Model\Entity\Reader\CustomerRecordReader</item>
                 <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryRecordReader</item>
+                <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeRecordReader</item>
             </argument>
         </arguments>
     </type>
@@ -178,6 +180,7 @@
             <argument name="sources" xsi:type="array">
                 <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Export\Order\OrderEntitySource</item>
                 <item name="openimport_category" xsi:type="object">Iranimij\OpenImport\Model\Import\Category\CategoryEntitySource</item>
+                <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeEntitySource</item>
             </argument>
         </arguments>
     </type>

@@ -28,6 +28,7 @@ class Entity implements OptionSourceInterface
         'customer_address' => 'Customer addresses',
         EntityRegistry::ORDER => 'Orders',
         EntityRegistry::CATEGORY => 'Categories',
+        EntityRegistry::ATTRIBUTE => 'Product attributes and attribute sets',
     ];
 
     /**
@@ -51,9 +52,11 @@ class Entity implements OptionSourceInterface
             $import[EntityRegistry::STOCK_PRICE] = ['label' => self::NAMES[EntityRegistry::STOCK_PRICE]];
         }
         $import[EntityRegistry::CATEGORY] = ['label' => self::NAMES[EntityRegistry::CATEGORY]];
+        $import[EntityRegistry::ATTRIBUTE] = ['label' => self::NAMES[EntityRegistry::ATTRIBUTE]];
         $export = $this->exportConfig->getEntities();
         $export[EntityRegistry::ORDER] = ['label' => self::NAMES[EntityRegistry::ORDER]];
         $export[EntityRegistry::CATEGORY] = ['label' => self::NAMES[EntityRegistry::CATEGORY]];
+        $export[EntityRegistry::ATTRIBUTE] = ['label' => self::NAMES[EntityRegistry::ATTRIBUTE]];
         foreach (['import' => $import, 'export' => $export] as $direction => $entities) {
             foreach ($entities as $code => $entity) {
                 $label = self::NAMES[$code] ?? (string) ($entity['label'] ?? $code);

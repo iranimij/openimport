@@ -17,7 +17,8 @@ The profile form has six steps:
    shown and read again when an option changes.
 4. **Map**: one row per Magento field: the column of the file (or a fixed value), the store view, transforms
    (add, move up and down, remove), *required*, and a value map. **Auto-match** proposes a mapping from the column
-   names, **Add required fields** adds what Magento needs for new records, **Preview the first rows** shows what
+   names (and adds *Decimal comma → dot* where the file writes numbers with commas), **Add required fields** adds what
+   Magento needs for new records with proposed fixed values, **Preview the first rows** shows what
    Magento will receive, row by row, with any problems.
 5. **Rules**: behaviour, rows with errors, allowed errors, *skip unchanged rows* (delta), safety limit, row filters.
 6. **When**: manual or a schedule (presets or a cron expression), schedule on/off, e-mails, what happens to the source

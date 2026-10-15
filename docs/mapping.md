@@ -34,7 +34,13 @@ have are skipped and counted as *skipped by behaviour*; they are never created. 
 The mapping editor suggests a mapping from the file's column names, in this order: the exact name; the name ignoring
 case, spaces, underscores, hyphens and dots (`Special Price` → `special_price`); known synonyms (`Artikelnummer` →
 `sku`, `Bestand` / `Menge` → `qty`, `Preis` → `price`, `Bezeichnung` → `name`, `E-Mail` → `email`, `Vorname` →
-`firstname` …); and store-view columns (`name_de`, `name (de)`, `name [de]`). Each column is used once.
+`firstname` …); and store-view columns (`name_de`, `name (de)`, `name [de]`, `store:de:name`). Each column is used
+once. When the first rows of a number field (price, cost, weight, qty …) are written with decimal commas (`89,90`,
+`1.299,00`), Auto-match adds the transform *Decimal comma → dot* to that field.
+
+**Add required fields** adds the fields Magento needs for new records with a proposed fixed value where there is a
+sensible one: the shop's default attribute set and website, product type `simple`, the default customer group, the
+default inventory source. Pick a column of the file instead, or change the value.
 
 ## Store-view values (products)
 

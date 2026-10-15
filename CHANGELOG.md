@@ -5,6 +5,29 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-15
+
+Fixes and small improvements from a hands-on review of 1.1.0 in the admin.
+
+### Added
+- Auto-match adds *Decimal comma → dot* to number fields whose first rows use decimal commas, and understands
+  `store:<code>:<field>` column names.
+- *Add required fields* proposes fixed values (default attribute set and website, `simple`, default customer group,
+  default source) and says what it added.
+- The note under *What* explains the chosen entity; entities are listed in a sensible order.
+- Records skipped by the behaviour (for example SKUs that are not in the shop) are named in the run message.
+
+### Fixed
+- New products without type or attribute set get a plain message with the column instead of core's "Product Type is
+  invalid or not supported", once per row.
+- Dry-run totals leave out records Magento refuses, and count the parent categories a category import creates; new
+  categories are no longer also counted as updated.
+- The profiles grid shows where an export goes (*Source / destination*); the runs grid and the run page show how and
+  by whom a run started.
+- Mapping step: the "choose what to import" note no longer stays visible, the editor lines up with the other steps,
+  transforms show their names, wide first-rows tables show a scrollbar; the detected file format is no longer shown
+  as a warning; store-view rows in the preview no longer repeat attribute set and product type.
+
 ## [1.1.0] - 2026-10-15
 
 Categories, product attributes and attribute sets, CMS pages and blocks, a REST trigger, and order exports right after every order.

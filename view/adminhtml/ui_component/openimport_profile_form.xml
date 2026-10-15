@@ -1803,6 +1803,8 @@
         <field name="schedule_time" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="15">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <!-- The next runs follow while typing. -->
+                    <item name="valueUpdate" xsi:type="string">input</item>
                     <item name="forDirection" xsi:type="string">any</item>
                     <item name="showWhen" xsi:type="array">
                         <item name="schedule_preset" xsi:type="array">
@@ -1827,6 +1829,8 @@
         <field name="schedule_custom" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="20">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <!-- The next runs follow while typing. -->
+                    <item name="valueUpdate" xsi:type="string">input</item>
                     <item name="forDirection" xsi:type="string">any</item>
                     <item name="showWhen" xsi:type="array">
                         <item name="schedule_preset" xsi:type="array">

@@ -226,6 +226,8 @@ define([
         loadFields: function () {
             this.matches = {};
             this.loadingFields = true;
+            // An answer to an earlier request (other entity, no columns yet) must not end this wait.
+            this.fieldsTicket = (this.fieldsTicket || 0) + 1;
             this.fetchLater();
         },
 
@@ -233,7 +235,8 @@ define([
          * Loads the entity's fields and an auto-match proposal for the file's columns.
          */
         fetchFields: function () {
-            var self = this;
+            var self = this,
+                ticket;
 
             if (!this.entity) {
                 this.fields = [];
@@ -242,6 +245,8 @@ define([
                 return;
             }
             this.loadingFields = true;
+            this.fieldsTicket = (this.fieldsTicket || 0) + 1;
+            ticket = this.fieldsTicket;
             $.ajax({
                 url: this.fieldsUrl,
                 type: 'POST',
@@ -253,11 +258,16 @@ define([
                     columns: this.columns || []
                 }
             }).done(function (response) {
+                if (ticket !== self.fieldsTicket) {
+                    return;
+                }
                 self.fields = response.fields || [];
                 self.stores = response.stores || [];
                 self.matches = response.matches || {};
             }).always(function () {
-                self.loadingFields = false;
+                if (ticket === self.fieldsTicket) {
+                    self.loadingFields = false;
+                }
             });
         },
 

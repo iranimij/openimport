@@ -191,7 +191,7 @@ class AttributeImportTest extends TestCase
         self::assertStringContainsString('lower-case', $run->getMessage());
 
         // A dry run does not count a refused row as "will be created".
-        $this->created = ['oi_good_' . substr(md5((string) microtime()), 0, 6)];
+        $this->created = ['oi_good_' . bin2hex(random_bytes(3))];
         $dry = $this->process($profile, $this->file($header . $this->created[0] . ",Good,text,,0,,,\nBad Code,X,text,,0,,,\n"), RunInterface::MODE_DRY_RUN);
         self::assertSame(1, $dry->getCount('created'), $dry->getMessage());
 

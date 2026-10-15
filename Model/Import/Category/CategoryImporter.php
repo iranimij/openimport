@@ -104,7 +104,7 @@ class CategoryImporter implements ImporterInterface
                 }
             } catch (\Throwable $exception) {
                 $this->logger->error('OpenImport category import: ' . $exception->getMessage() . "\n" . $exception->getTraceAsString(), ['exception' => $exception]);
-                $errors[] = new RowError($index, 'save', $exception->getMessage(), null, !$request->skipErrors);
+                $errors[] = new RowError($index, 'save', $this->message($exception), null, !$request->skipErrors);
                 $invalid++;
                 if (!$request->skipErrors) {
                     return $this->result(false, $created + $updated + $deleted > 0, $position, $invalid, $created, $updated, $deleted, $errors, $started);
@@ -287,6 +287,32 @@ class CategoryImporter implements ImporterInterface
         }
 
         return $values;
+    }
+
+    /**
+     * The exception's message; for a URL clash with the URLs that are taken (Magento only says "URL key for specified
+     * store already exists").
+     *
+     * @param \Throwable $exception
+     * @return string
+     */
+    public function message(\Throwable $exception): string
+    {
+        $message = $exception->getMessage();
+        if (!method_exists($exception, 'getUrls')) {
+            return $message;
+        }
+        $taken = [];
+        foreach ((array) $exception->getUrls() as $url) {
+            $url = is_object($url) && method_exists($url, 'toArray') ? $url->toArray() : (array) $url;
+            $taken[] = sprintf('"%s" in store view %s', $url['request_path'] ?? '?', $url['store_id'] ?? '?');
+        }
+        if ($taken === []) {
+            return $message;
+        }
+
+        return rtrim($message, '.') . ': ' . implode(', ', array_slice(array_unique($taken), 0, 5))
+            . '. Give the category another url_key, or change the page that uses this URL.';
     }
 
     /**

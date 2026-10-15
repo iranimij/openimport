@@ -453,3 +453,7 @@
 "There is no website with this code; use website codes such as ""base"", separated by commas.","Es gibt keine Website mit diesem Code; Website-Codes wie „base“ verwenden, durch Kommas getrennt."
 "An uploaded file cannot run on a schedule (it would import the same file again and again): choose a server folder, web address, SFTP or FTP as the source, or set the schedule to ""Manual only"".","Eine hochgeladene Datei kann nicht nach Zeitplan laufen (sie würde immer wieder dieselbe Datei importieren): Wählen Sie einen Serverordner, eine Webadresse, SFTP oder FTP als Quelle, oder stellen Sie den Zeitplan auf ""Nur manuell""."
 "A scheduled export needs a destination: choose a server folder, SFTP, FTP or e-mail, or set the schedule to ""Manual only"".","Ein geplanter Export braucht ein Ziel: Wählen Sie einen Serverordner, SFTP, FTP oder E-Mail, oder stellen Sie den Zeitplan auf ""Nur manuell""."
+"Export only the records that match","Nur die passenden Datensätze exportieren"
+"Leave out the records that match","Die passenden Datensätze weglassen"
+"Default: %1%","Standard: %1%"
+"This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run.","So viele Zeilen dürfen Fehler haben, die übrigen Zeilen werden trotzdem importiert; eine mehr und nichts wird importiert. 0 = jeder Fehler stoppt den Lauf."

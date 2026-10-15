@@ -37,7 +37,7 @@ class ProfileValidatorTest extends TestCase
             {
                 return $direction === 'export'
                     ? ['catalog_product', 'openimport_order']
-                    : ['catalog_product', 'customer', 'openimport_stock_price'];
+                    : ['catalog_product', 'customer', 'openimport_stock_price', 'openimport_category'];
             }
         };
 
@@ -140,6 +140,21 @@ class ProfileValidatorTest extends TestCase
             'openimport_stock_price only updates existing records: use Add/Update or Only update.',
             'name: openimport_stock_price can only set ' . implode(', ', EntityRegistry::STOCK_PRICE_COLUMNS),
         ], $this->validator()->validate($profile));
+    }
+
+    public function testCategoriesCannotBeReplaced(): void
+    {
+        $profile = new ProfileStub([
+            'name' => 'Categories',
+            'entity' => 'openimport_category',
+            'behavior' => 'replace',
+            'mapping' => [['target' => 'path', 'source' => 'Pfad']],
+        ]);
+
+        self::assertContains(
+            'openimport_category cannot be imported with "Replace": use Add/Update.',
+            $this->validator()->validate($profile)
+        );
     }
 
     public function testExportProfilesSkipImportRules(): void

@@ -450,3 +450,7 @@
 "There is no website with this code; use website codes such as ""base"", separated by commas.","There is no website with this code; use website codes such as ""base"", separated by commas."
 "An uploaded file cannot run on a schedule (it would import the same file again and again): choose a server folder, web address, SFTP or FTP as the source, or set the schedule to ""Manual only"".","An uploaded file cannot run on a schedule (it would import the same file again and again): choose a server folder, web address, SFTP or FTP as the source, or set the schedule to ""Manual only""."
 "A scheduled export needs a destination: choose a server folder, SFTP, FTP or e-mail, or set the schedule to ""Manual only"".","A scheduled export needs a destination: choose a server folder, SFTP, FTP or e-mail, or set the schedule to ""Manual only""."
+"Export only the records that match","Export only the records that match"
+"Leave out the records that match","Leave out the records that match"
+"Default: %1%","Default: %1%"
+"This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run.","This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run."

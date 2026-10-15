@@ -9,8 +9,9 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\Writer;
 
 /**
- * CSV: delimiter (default comma; "tab" for TSV), enclosure, line ending, optional UTF-8 BOM (Excel opens it with
- * the right encoding), optional Windows-1252 encoding. Every cell is quoted when it needs to be.
+ * CSV: delimiter (default comma; "tab" for TSV), enclosure, line ending, header row (has_header, default on),
+ * optional UTF-8 BOM (Excel opens it with the right encoding), optional Windows-1252 or ISO-8859-1/-15 encoding.
+ * Every cell is quoted when it needs to be.
  */
 class CsvWriter extends AbstractWriter
 {
@@ -38,7 +39,9 @@ class CsvWriter extends AbstractWriter
         if (!empty($this->options['bom']) && $this->encoding() === 'UTF-8') {
             $this->append("\xEF\xBB\xBF");
         }
-        $this->line($this->columns);
+        if ($this->option('has_header', '1') !== '0') {
+            $this->line($this->columns);
+        }
     }
 
     /**
@@ -96,10 +99,15 @@ class CsvWriter extends AbstractWriter
     }
 
     /**
-     * @return string UTF-8 or Windows-1252
+     * @return string UTF-8, Windows-1252, ISO-8859-1 or ISO-8859-15
      */
     private function encoding(): string
     {
-        return strtolower($this->option('encoding', 'utf-8')) === 'windows-1252' ? 'Windows-1252' : 'UTF-8';
+        return match (strtolower($this->option('encoding', 'utf-8'))) {
+            'windows-1252' => 'Windows-1252',
+            'iso-8859-1' => 'ISO-8859-1',
+            'iso-8859-15' => 'ISO-8859-15',
+            default => 'UTF-8',
+        };
     }
 }

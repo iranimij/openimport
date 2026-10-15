@@ -113,6 +113,15 @@ class WritersTest extends TestCase
         self::assertSame('Ümlaut, Straße', $this->readBack($path, 'csv')[1]['name'], 'the reader detects the encoding');
     }
 
+    public function testCsvWithoutHeaderInIso885915(): void
+    {
+        $path = $this->writeAll(new CsvWriter($this->cells()), ['has_header' => '0', 'encoding' => 'ISO-8859-15']);
+        $text = (string) file_get_contents($path);
+
+        self::assertFalse(str_starts_with($text, 'sku,'), 'no header row');
+        self::assertStringContainsString(mb_convert_encoding('Straße', 'ISO-8859-15', 'UTF-8'), $text);
+    }
+
     public function testXlsxRoundTrip(): void
     {
         $writer = new XlsxWriter($this->cells(), new NumberParser());

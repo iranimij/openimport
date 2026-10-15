@@ -33,7 +33,7 @@ class SftpClient implements RemoteClientInterface
             $credential = $settings->password;
             if ($settings->privateKey !== '') {
                 $credential = PublicKeyLoader::load(
-                    $settings->privateKey,
+                    (new PrivateKeyText())->normalize($settings->privateKey),
                     $settings->passphrase === '' ? false : $settings->passphrase
                 );
             }

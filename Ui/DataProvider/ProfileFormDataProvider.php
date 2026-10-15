@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Controller\Adminhtml\Profile\Save;
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
+use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\ResourceModel\Profile\CollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\App\RequestInterface;
@@ -35,6 +36,7 @@ class ProfileFormDataProvider extends AbstractDataProvider
      * @param DataPersistorInterface $dataPersistor
      * @param RequestInterface $request
      * @param AuthorizationInterface $authorization
+     * @param Config $config
      * @param array<string, mixed> $meta
      * @param array<string, mixed> $data
      */
@@ -49,6 +51,7 @@ class ProfileFormDataProvider extends AbstractDataProvider
         private readonly DataPersistorInterface $dataPersistor,
         private readonly RequestInterface $request,
         private readonly AuthorizationInterface $authorization,
+        private readonly Config $config,
         array $meta = [],
         array $data = []
     ) {
@@ -90,6 +93,9 @@ class ProfileFormDataProvider extends AbstractDataProvider
     public function getMeta(): array
     {
         $meta = parent::getMeta();
+        // An empty safety limit means the one in the configuration: say which.
+        $meta['rules']['children']['safety_threshold']['arguments']['data']['config']['placeholder'] =
+            (string) __('Default: %1%', $this->config->getSafetyThresholdPercent());
         if (!$this->authorization->isAllowed('Iranimij_OpenImport::profiles_edit')) {
             foreach (['what', 'where', 'file', 'map', 'rules', 'when'] as $fieldset) {
                 $meta[$fieldset]['arguments']['data']['config']['disabled'] = true;

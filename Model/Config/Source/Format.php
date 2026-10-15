@@ -28,7 +28,9 @@ class Format implements OptionSourceInterface
             'json' => 'JSON',
             'xml' => 'XML',
         ] as $value => $label) {
-            $options[] = ['value' => (string) $value, 'label' => __($label)];
+            $options[] = ['value' => (string) $value, 'label' => __($label)]
+                // "Detect" reads the file: imports only.
+                + ($value === 'auto' ? ['showWhen' => ['direction' => ['import']]] : []);
         }
 
         return $options;

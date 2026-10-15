@@ -32,6 +32,11 @@ class EntityRegistry
     public const CMS_BLOCK = 'openimport_cms_block';
 
     /**
+     * Entities that cannot be imported with "Replace" (their importers refuse it).
+     */
+    public const NO_REPLACE = [self::CATEGORY, self::ATTRIBUTE, self::CMS_PAGE, self::CMS_BLOCK];
+
+    /**
      * What a Stock & prices profile may change (through core's product import, only existing products).
      */
     public const STOCK_PRICE_COLUMNS = ['sku', 'qty', 'is_in_stock', 'price', 'special_price',

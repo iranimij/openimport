@@ -245,7 +245,7 @@
             <settings>
                 <label translate="true">Created from</label>
                 <dataScope>export_options.order.from</dataScope>
-                <notice translate="true">Date or date and time (UTC). Empty = no limit.</notice>
+                <notice translate="true">Date or date and time, in the time zone of Stores › Configuration › General › Locale. Empty = no limit.</notice>
                 <placeholder>2026-01-01</placeholder>
             </settings>
         </field>
@@ -262,6 +262,7 @@
             </argument>
             <settings>
                 <label translate="true">Created until</label>
+                <notice translate="true">Date or date and time, in the time zone of Stores › Configuration › General › Locale; a date alone counts the whole day. Empty = no limit.</notice>
                 <dataScope>export_options.order.to</dataScope>
                 <placeholder>2026-12-31 23:59:59</placeholder>
             </settings>
@@ -349,6 +350,9 @@
                 <dataScope>source_config.url</dataScope>
                 <notice translate="true">https://… to a CSV, Excel, JSON or XML file, or a Google Sheets link (shared or published): the sheet is read as CSV.</notice>
                 <placeholder>https://example.com/feed.csv</placeholder>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
         </field>
         <field name="source_auth" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="31">
@@ -400,6 +404,9 @@
             <settings>
                 <label translate="true">User name</label>
                 <dataScope>source_config.username</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
         </field>
         <field name="source_password_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="33">
@@ -476,6 +483,9 @@
                 <label translate="true">Server</label>
                 <dataScope>source_config.host</dataScope>
                 <placeholder>files.example.com</placeholder>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
         </field>
         <field name="source_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="31">
@@ -507,6 +517,9 @@
             <settings>
                 <label translate="true">User name</label>
                 <dataScope>source_config.username</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
         </field>
         <field name="source_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="33">
@@ -675,6 +688,11 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                     </item>
+                    <item name="requiredWhen" xsi:type="array">
+                        <item name="source_type" xsi:type="array">
+                            <item name="0" xsi:type="string">folder</item>
+                        </item>
+                    </item>
                     <item name="typeGroups" xsi:type="array">
                         <item name="folder" xsi:type="string">local</item>
                         <item name="sftp" xsi:type="string">remote</item>
@@ -828,6 +846,9 @@
                 <dataScope>export_options.path</dataScope>
                 <notice translate="true">Under var/openimport, or an absolute path inside a folder allowed in the settings. Created when missing.</notice>
                 <placeholder>exports</placeholder>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
         </field>
         <field name="dest_overwrite" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="21">
@@ -877,6 +898,9 @@
                 <label translate="true">Server</label>
                 <dataScope>export_options.host</dataScope>
                 <placeholder>files.example.com</placeholder>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
         </field>
         <field name="dest_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="23">
@@ -912,6 +936,9 @@
             <settings>
                 <label translate="true">User name</label>
                 <dataScope>export_options.username</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
         </field>
         <field name="dest_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="25">
@@ -1121,6 +1148,9 @@
                 <dataScope>export_options.emails</dataScope>
                 <notice translate="true">Comma-separated e-mail addresses.</notice>
                 <placeholder>erp@example.com, buyer@example.com</placeholder>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
         </field>
         <field name="dest_subject" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="33">

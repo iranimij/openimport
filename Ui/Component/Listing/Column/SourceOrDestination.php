@@ -55,6 +55,8 @@ class SourceOrDestination extends Column
         $destinations = ['download' => (string) __('Download')] + $this->labels($this->destinations->toOptionArray());
         // By reference into the array itself (a "?? []" expression would be a copy).
         foreach ($dataSource['data']['items'] as &$item) {
+            // The raw type stays available for the row actions.
+            $item['source_type_raw'] = (string) ($item['source_type'] ?? '');
             if (($item['direction'] ?? 'import') === 'export') {
                 $type = (string) ($this->options($item['export_options'] ?? null)['destination'] ?? 'download');
                 $item['source_type'] = '→ ' . ($destinations[$type] ?? $type);

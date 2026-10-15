@@ -21,6 +21,15 @@
     white-space: nowrap;
 }
 
+/* Error messages are read in full: they wrap instead of being cut. */
+.openimport-scroll td.openimport-wrap {
+    max-width: 48rem;
+    min-width: 24rem;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
 .openimport-mapping-toolbar {
     display: flex;
     flex-wrap: wrap;

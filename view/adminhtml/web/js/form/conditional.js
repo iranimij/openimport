@@ -10,6 +10,7 @@
  *  - forAuth / authScope / authField: the field shows for these authentication types
  *  - showWhen: conditions on other form values, {path: spec} (all must hold) or [{...}, {...}] (one must hold).
  *    A spec is a list of values, {not: [...]}, {match: 'regular expression'} or {filled: '1'|'0'}.
+ *  - requiredWhen: conditions (as showWhen) under which the field must be filled.
  *  - options of a select may carry their own showWhen; options whose conditions fail are taken out.
  *
  * Hidden fields are not validated.
@@ -126,6 +127,7 @@ define([
                 authScope: 'source_config',
                 typeField: 'source_type',
                 showWhen: null,
+                requiredWhen: null,
                 sourceType: '',
                 direction: 'import',
                 auth: '',
@@ -148,7 +150,7 @@ define([
                 this._super();
                 imports = _.extend({}, this.imports);
                 listens = _.extend({}, this.listens);
-                found = paths(this.showWhen, []);
+                found = paths(this.requiredWhen, paths(this.showWhen, []));
                 // Options from a source class arrive as a list, options written in the form XML as an object.
                 _.each(_.isObject(this.options) ? _.values(this.options) : [], function (option) {
                     paths(option.showWhen, found);
@@ -203,6 +205,9 @@ define([
                     return;
                 }
                 this.visible(typeOk && authOk && directionOk && this.conditionsHold(this.showWhen));
+                if (this.requiredWhen && typeof this.setValidation === 'function') {
+                    this.setValidation('required-entry', this.conditionsHold(this.requiredWhen));
+                }
             },
 
             /**

@@ -14,14 +14,16 @@ use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Storage\ExportMarkStore;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 /**
  * OpenImport's own order export (Magento has none): one row per order line (or per order), with the order's
  * totals, customer, billing and shipping address, payment, shipments and tracking numbers. Read in pages of
  * orders straight from the sales tables (read only).
  *
- * export_options.order: rows (item | order), statuses (comma-separated), from, to (dates, store time zone is not
- * applied: order created_at is UTC), store_ids (comma-separated), only (all | new | new_or_changed: against the
+ * export_options.order: rows (item | order), statuses (comma-separated), from, to (dates in the time zone of
+ * Stores › Configuration › General › Locale, like the schedules; a date without time as "to" means the whole day),
+ * store_ids (comma-separated), only (all | new | new_or_changed: against the
  * profile's export marks), items (parents | all: child items of configurable/bundle products).
  */
 class OrderEntitySource implements EntitySourceInterface
@@ -56,10 +58,12 @@ class OrderEntitySource implements EntitySourceInterface
     /**
      * @param ResourceConnection $resource
      * @param ExportMarkStore $marks
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
         private readonly ResourceConnection $resource,
-        private readonly ExportMarkStore $marks
+        private readonly ExportMarkStore $marks,
+        private readonly TimezoneInterface $timezone
     ) {
     }
 
@@ -150,25 +154,33 @@ class OrderEntitySource implements EntitySourceInterface
             'only' => in_array($raw['only'] ?? 'all', ['new', 'new_or_changed'], true) ? (string) $raw['only'] : 'all',
             'statuses' => $list('statuses'),
             'store_ids' => array_map('intval', $list('store_ids')),
-            'from' => $this->date($raw['from'] ?? null),
-            'to' => $this->date($raw['to'] ?? null),
+            'from' => $this->date($raw['from'] ?? null, false),
+            'to' => $this->date($raw['to'] ?? null, true),
         ];
     }
 
     /**
-     * @param mixed $value
-     * @return string|null Y-m-d H:i:s or null
+     * @param mixed $value a date (and time) in the store time zone
+     * @param bool $endOfDay a plain date means its last second (for "to")
+     * @return string|null Y-m-d H:i:s in UTC, or null
      */
-    private function date(mixed $value): ?string
+    private function date(mixed $value, bool $endOfDay): ?string
     {
         if (!is_scalar($value) || trim((string) $value) === '') {
             return null;
         }
+        $text = trim((string) $value);
         try {
-            return (new \DateTimeImmutable(trim((string) $value), new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+            $date = new \DateTimeImmutable($text, new \DateTimeZone($this->timezone->getConfigTimezone()));
         } catch (\Exception $exception) {
             throw new PipelineException(sprintf('"%s" is not a date.', (string) $value));
         }
+        if ($endOfDay && preg_match('/^\d{4}-\d{2}-\d{2}$/', $text)) {
+            $date = $date->setTime(23, 59, 59);
+        }
+
+        // Orders store created_at in UTC.
+        return $date->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     }
 
     /**

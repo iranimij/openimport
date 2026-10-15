@@ -176,7 +176,7 @@ $run = $view->run();
                             <td><?= $escaper->escapeHtml($error->sourceRow > 0 ? (string) $error->sourceRow : '–') ?></td>
                             <td><?= $escaper->escapeHtml($error->identifier) ?></td>
                             <td><?= $escaper->escapeHtml($error->field) ?></td>
-                            <td><?= $escaper->escapeHtml($error->message) ?></td>
+                            <td class="openimport-wrap"><?= $escaper->escapeHtml($error->message) ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

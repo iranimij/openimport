@@ -1,0 +1,30 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<div class="openimport-recent-runs">
+    <p class="admin__field-note" if="!runs || !runs.length" translate="'No runs yet. Save the profile and start a dry run.'"></p>
+    <table class="data-grid" if="runs && runs.length">
+        <thead>
+        <tr>
+            <th class="data-grid-th" scope="col" translate="'Run'"></th>
+            <th class="data-grid-th" scope="col" translate="'Status'"></th>
+            <th class="data-grid-th" scope="col" translate="'Started'"></th>
+            <th class="data-grid-th" scope="col" translate="'Result'"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- ko foreach: { data: runs, as: 'run' } -->
+        <tr>
+            <td class="openimport-nowrap"><a attr="href: run.url" text="'#' + run.id + ' · ' + run.mode"></a></td>
+            <td html="run.status_html"></td>
+            <td class="openimport-nowrap" text="run.started"></td>
+            <td class="openimport-wrap" text="run.summary"></td>
+        </tr>
+        <!-- /ko -->
+        </tbody>
+    </table>
+    <p><a attr="href: runsUrl" translate="'All runs'"></a></p>
+</div>

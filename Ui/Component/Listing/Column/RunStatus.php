@@ -45,7 +45,9 @@ class RunStatus extends Column
         }
         // By reference into the array itself: a "?? []" expression would be a copy and the grid would keep raw values.
         foreach ($dataSource['data']['items'] as &$item) {
-            $item['status'] = $this->chip->html((string) ($item['status'] ?? ''));
+            // The raw status stays available for the row actions.
+            $item['status_raw'] = (string) ($item['status'] ?? '');
+            $item['status'] = $this->chip->html($item['status_raw']);
         }
 
         return $dataSource;

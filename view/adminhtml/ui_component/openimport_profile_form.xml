@@ -1890,4 +1890,18 @@
             </formElements>
         </field>
     </fieldset>
+    <fieldset name="runs" sortOrder="70">
+        <settings>
+            <label translate="true">Recent runs</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <container name="recent_runs" component="Iranimij_OpenImport/js/form/recent-runs" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="runsUrl" xsi:type="url" path="openimport/run/index"/>
+                </item>
+            </argument>
+        </container>
+    </fieldset>
 </form>

@@ -168,7 +168,8 @@ class ImportRunner
      * @param string $file absolute path of the staged source file
      * @param string $workDir absolute path of the run folder (spool goes there)
      * @param string $originalName the file's original name (format detection)
-     * @param \Closure|null $heartbeat called with every progress update (keeps locks alive)
+     * @param \Closure|null $heartbeat called with every progress update (keeps locks alive); its argument says
+     *                               whether the run may stop there (it throws to stop)
      * @return RunOutcome
      * @throws PipelineException when the profile or the file cannot be used at all
      */
@@ -227,7 +228,8 @@ class ImportRunner
                     $batch = [];
                 }
                 if ($this->counts['read'] % self::PROGRESS_EVERY === 0) {
-                    $this->progress();
+                    // While reading, nothing is written yet: the run may stop here when it is cancelled.
+                    $this->progress(true);
                 }
             }
             $this->flush($batch, $spool, $profile, $recordReader, $mapping, $useDelta, $dryRun);
@@ -796,13 +798,17 @@ class ImportRunner
         $this->pendingErrors = [];
     }
 
-    private function progress(): void
+    /**
+     * @param bool $canStop the run has written nothing yet, so a cancel may stop it here
+     * @return void
+     */
+    private function progress(bool $canStop = false): void
     {
         if ($this->runId > 0) {
             $this->runResource->updateProgress($this->runId, $this->counts['read'], $this->counts);
         }
         if ($this->heartbeat !== null) {
-            ($this->heartbeat)();
+            ($this->heartbeat)($canStop);
         }
     }
 }

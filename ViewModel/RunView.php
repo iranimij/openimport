@@ -249,7 +249,21 @@ class RunView implements ArgumentInterface
 
     public function canCancel(): bool
     {
-        return $this->run()?->getStatus() === RunInterface::STATUS_QUEUED
+        return in_array($this->run()?->getStatus(), [RunInterface::STATUS_QUEUED, RunInterface::STATUS_RUNNING], true)
+            && $this->authorization->isAllowed('Iranimij_OpenImport::run');
+    }
+
+    /**
+     * "Run again" for a finished run whose profile still exists: the same mode, a fresh read of the source.
+     *
+     * @return bool
+     */
+    public function canRunAgain(): bool
+    {
+        $run = $this->run();
+
+        return $run !== null && $this->profile() !== null
+            && in_array($run->getStatus(), RunInterface::FINAL_STATUSES, true)
             && $this->authorization->isAllowed('Iranimij_OpenImport::run');
     }
 

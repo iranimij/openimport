@@ -13,7 +13,9 @@ use Iranimij\OpenImport\Model\Bridge\ImportRequest;
 use Iranimij\OpenImport\Model\Bridge\ImportResult;
 use Iranimij\OpenImport\Model\Bridge\RowError;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\CategoryFactory;
+use Magento\Catalog\Model\ResourceModel\Category as CategoryResource;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\ImportExport\Model\Import;
 use Magento\ImportExport\Model\Import\AbstractSource;
@@ -46,6 +48,7 @@ class CategoryImporter implements ImporterInterface
      * @param CategoryPath $paths
      * @param CategoryRepositoryInterface $categories
      * @param CategoryFactory $categoryFactory
+     * @param CategoryResource $categoryResource
      * @param StoreManagerInterface $storeManager
      * @param LoggerInterface $logger
      */
@@ -54,6 +57,7 @@ class CategoryImporter implements ImporterInterface
         private readonly CategoryPath $paths,
         private readonly CategoryRepositoryInterface $categories,
         private readonly CategoryFactory $categoryFactory,
+        private readonly CategoryResource $categoryResource,
         private readonly StoreManagerInterface $storeManager,
         private readonly LoggerInterface $logger
     ) {
@@ -123,7 +127,7 @@ class CategoryImporter implements ImporterInterface
         if ($segments === []) {
             return ['path', 'the path is empty (write it as "Default Category/Men/Shoes")'];
         }
-        if (count($segments) === 1 && $behavior !== Import::BEHAVIOR_DELETE && $this->tree->id($segments[0]) === null) {
+        if ($behavior !== Import::BEHAVIOR_DELETE && $this->tree->id($segments[0]) === null) {
             return ['path', sprintf('"%s" is not a root category of this shop; a path starts with the root category\'s name', $segments[0])];
         }
         $store = trim((string) ($row['store_view_code'] ?? ''));
@@ -184,9 +188,8 @@ class CategoryImporter implements ImporterInterface
         if ($values === [] && ($created > 0 || $storeCode !== '')) {
             return [$created, 0];
         }
-        $category = $this->categoryFactory->create();
-        $category->setStoreId($storeId)->load((int) $id);
-        if (!$category->getId()) {
+        $category = $this->categories->get((int) $id, $storeId);
+        if (!$category instanceof Category) {
             throw new LocalizedException(__('The category "%1" could not be loaded.', $row['path']));
         }
         $changed = false;
@@ -197,8 +200,9 @@ class CategoryImporter implements ImporterInterface
             }
         }
         if ($changed) {
+            // The resource model saves the store's own values (the repository only keeps interface fields).
             $category->setStoreId($storeId);
-            $this->categories->save($category);
+            $this->categoryResource->save($category);
             if (isset($values['name']) && $storeId === Store::DEFAULT_STORE_ID) {
                 $this->tree->reset();
             }

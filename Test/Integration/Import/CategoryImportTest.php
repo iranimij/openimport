@@ -19,7 +19,6 @@ use Iranimij\OpenImport\Model\Import\Category\CategoryTree;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\PreviewStore;
 use Iranimij\OpenImport\Model\Execution\RunFiles;
-use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Store\Model\Store;
@@ -50,6 +49,19 @@ class CategoryImportTest extends TestCase
             break;
         }
         self::assertNotNull($this->root, 'the shop has a root category');
+    }
+
+    /**
+     * A fresh read from the database (the repository caches the instances the importer changed).
+     */
+    private function category(int $id, int $storeId): \Magento\Framework\DataObject
+    {
+        $collection = Bootstrap::getObjectManager()->create(\Magento\Catalog\Model\ResourceModel\Category\Collection::class);
+        $collection->setStoreId($storeId)->addAttributeToSelect(['name', 'description', 'is_active'])->addIdFilter([$id]);
+        $category = $collection->getFirstItem();
+        self::assertSame($id, (int) $category->getId());
+
+        return $category;
     }
 
     private function file(string $content): string
@@ -117,15 +129,14 @@ class CategoryImportTest extends TestCase
         $tree->reset();
         $shoesId = $tree->id("{$root}/{$tag} Men/Shoes");
         self::assertNotNull($shoesId);
-        $categories = Bootstrap::getObjectManager()->get(CategoryRepositoryInterface::class);
-        $shoes = $categories->get($shoesId, Store::DEFAULT_STORE_ID);
-        self::assertSame('Shoes', $shoes->getName());
-        self::assertSame('All shoes', $shoes->getDescription());
-        self::assertTrue((bool) $shoes->getIsActive());
-        self::assertSame('Schuhe', $categories->get($shoesId, 1)->getName(), 'store-view name from the store:default column');
-        $shirts = $categories->get((int) $tree->id("{$root}/{$tag} Men/Shirts"), Store::DEFAULT_STORE_ID);
-        self::assertFalse((bool) $shirts->getIsActive());
-        self::assertSame((int) $tree->id("{$root}/{$tag} Men"), (int) $shirts->getParentId());
+        $shoes = $this->category($shoesId, Store::DEFAULT_STORE_ID);
+        self::assertSame('Shoes', $shoes->getData('name'));
+        self::assertSame('All shoes', $shoes->getData('description'));
+        self::assertTrue((bool) $shoes->getData('is_active'));
+        self::assertSame('Schuhe', $this->category($shoesId, 1)->getData('name'), 'store-view name from the store:default column');
+        $shirts = $this->category((int) $tree->id("{$root}/{$tag} Men/Shirts"), Store::DEFAULT_STORE_ID);
+        self::assertFalse((bool) $shirts->getData('is_active'));
+        self::assertSame((int) $tree->id("{$root}/{$tag} Men"), (int) $shirts->getData('parent_id'));
 
         // Update: the preview shows the changed field, the run changes it, an unchanged row counts as unchanged.
         $update = $this->file("path,name,active,description,name_default\n{$root}/{$tag} Men/Shoes,Shoes,1,Every shoe,Schuhe\n{$root}/{$tag} Men/Shirts,Shirts,0,,\n");
@@ -142,7 +153,7 @@ class CategoryImportTest extends TestCase
         self::assertSame(['All shoes', 'Every shoe'], $changes['description'] ?? null, json_encode($changes));
         $live2 = $this->process($profile, $update);
         self::assertSame(RunInterface::STATUS_SUCCESS, $live2->getStatus(), $live2->getMessage());
-        self::assertSame('Every shoe', $categories->get($shoesId, Store::DEFAULT_STORE_ID)->getDescription());
+        self::assertSame('Every shoe', $this->category($shoesId, Store::DEFAULT_STORE_ID)->getData('description'));
 
         // Export: the branch comes back as paths, with the store-view name as its own row.
         $export = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class)->create()

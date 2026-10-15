@@ -80,6 +80,18 @@ class ProfileValidator
                 $problems[] = $exception->getMessage();
             }
         }
+        if ($schedule !== null && $profile->isActive()) {
+            // A schedule needs a file that changes by itself and a place for the result.
+            if ($import && $profile->getSourceType() === 'upload') {
+                $problems[] = 'An uploaded file cannot run on a schedule '
+                    . '(it would import the same file again and again): choose a server folder, web address, '
+                    . 'SFTP or FTP as the source, or set the schedule to "Manual only".';
+            }
+            if (!$import && ($profile->getExportOptions()['destination'] ?? 'download') === 'download') {
+                $problems[] = 'A scheduled export needs a destination: choose a server folder, SFTP, FTP or e-mail, '
+                    . 'or set the schedule to "Manual only".';
+            }
+        }
         foreach (array_filter(array_map('trim', explode(',', $profile->getNotifyEmails()))) as $email) {
             if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
                 $problems[] = sprintf('"%s" is not an e-mail address.', $email);
@@ -93,6 +105,11 @@ class ProfileValidator
                 true
             )) {
                 $problems[] = sprintf('%s only updates existing records: use Add/Update or Only update.', $entity);
+            }
+            if (in_array($entity, EntityRegistry::NO_REPLACE, true)
+                && $profile->getBehavior() === ProfileInterface::BEHAVIOR_REPLACE
+            ) {
+                $problems[] = sprintf('%s cannot be imported with "Replace": use Add/Update.', $entity);
             }
             $problems = array_merge($problems, $this->mapping($profile));
         }

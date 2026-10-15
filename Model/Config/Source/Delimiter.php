@@ -28,7 +28,9 @@ class Delimiter implements OptionSourceInterface
             '\\t' => 'Tab',
             '|' => 'Pipe (|)',
         ] as $value => $label) {
-            $options[] = ['value' => (string) $value, 'label' => __($label)];
+            $options[] = ['value' => (string) $value, 'label' => __($label)]
+                // "Detect" reads the file: imports only.
+                + ($value === 'auto' ? ['showWhen' => ['direction' => ['import']]] : []);
         }
 
         return $options;

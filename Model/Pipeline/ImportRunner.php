@@ -13,6 +13,7 @@ use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Model\Bridge\ImporterPool;
 use Iranimij\OpenImport\Model\Bridge\ImportRequest;
 use Iranimij\OpenImport\Model\Config;
+use Iranimij\OpenImport\Model\Entity\CascadingRecordsInterface;
 use Iranimij\OpenImport\Model\Entity\EntityInfo;
 use Iranimij\OpenImport\Model\Entity\RecordReaderInterface;
 use Iranimij\OpenImport\Model\Entity\RecordReaderPool;
@@ -111,6 +112,11 @@ class ImportRunner
     private array $sampleCounts = [];
 
     private int $existingAffected = 0;
+
+    /**
+     * @var string[] identifiers of existing records a Delete or Replace run hits
+     */
+    private array $affectedIdentifiers = [];
 
     /**
      * @var string[] the first records skipped by the behaviour ("A-1 (row 3)"), named in the run message
@@ -266,6 +272,7 @@ class ImportRunner
         $this->previewKinds = [];
         $this->sampleCounts = [];
         $this->existingAffected = 0;
+        $this->affectedIdentifiers = [];
         $this->skippedNames = [];
         $this->firstError = null;
     }
@@ -362,6 +369,7 @@ class ImportRunner
             }
             if (in_array($behavior, self::DESTRUCTIVE_BEHAVIORS, true) && $exists) {
                 $this->existingAffected++;
+                $this->affectedIdentifiers[] = $mapped->identifier;
             }
             $accepted[] = [$line, $mapped, $exists];
         }
@@ -598,6 +606,11 @@ class ImportRunner
                     unset($this->previewKinds[mb_strtolower((string) $identifier)]);
                 }
             }
+            // A delete that takes children with it: the totals count every record that goes.
+            if ($behavior === ProfileInterface::BEHAVIOR_DELETE && $reader instanceof CascadingRecordsInterface
+                && $this->existingAffected > $this->previewTotals[PreviewRecord::DELETED]) {
+                $this->previewTotals[PreviewRecord::DELETED] = $this->existingAffected;
+            }
             // Own importers know records created on the way (a category's missing parents).
             if ($this->importers->isOwn($entity->importEntity()) && $result->created > $this->previewTotals[PreviewRecord::NEW]) {
                 $this->previewTotals[PreviewRecord::NEW] = $result->created;
@@ -672,6 +685,10 @@ class ImportRunner
                 $verb,
                 count($spool->allIdentifiers())
             );
+        }
+        // A delete that takes other records with it (a category's children) counts all of them.
+        if ($behavior === ProfileInterface::BEHAVIOR_DELETE && $reader instanceof CascadingRecordsInterface) {
+            $this->existingAffected = max($this->existingAffected, $reader->affectedByDelete($this->affectedIdentifiers));
         }
         $total = $reader->total();
         if ($total === 0 || $this->existingAffected * 100 <= $threshold * $total) {

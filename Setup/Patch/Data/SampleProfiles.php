@@ -68,7 +68,8 @@ class SampleProfiles implements DataPatchInterface
             'Sample: products from a supplier file' => static function (ProfileInterface $profile): void {
                 $profile->setDirection(ProfileInterface::DIRECTION_IMPORT)
                     ->setEntity('catalog_product')
-                    ->setSourceType('upload')
+                    ->setSourceType('folder')
+                    ->setSourceConfig(['path' => 'supplier/incoming', 'pattern' => '*.csv', 'pick' => 'newest'])
                     ->setFormat('auto')
                     ->setBehavior(ProfileInterface::BEHAVIOR_ADD_UPDATE)
                     ->setOnError(ProfileInterface::ON_ERROR_SKIP)
@@ -96,7 +97,8 @@ class SampleProfiles implements DataPatchInterface
                     ->setFormatOptions(['delimiter' => ';', 'bom' => '1'])
                     ->setSchedule('*/15 * * * *')
                     ->setExportOptions([
-                        'destination' => 'download',
+                        'destination' => 'folder',
+                        'path' => 'exports/erp',
                         'file_name' => 'orders-{datetime}.{ext}',
                         'order' => ['rows' => 'item', 'only' => 'new', 'statuses' => 'pending, processing'],
                     ])

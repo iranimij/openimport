@@ -22,13 +22,17 @@ define([
             sheets: [],
             error: '',
             loading: false,
+            visible: true,
+            direction: 'import',
             imports: {
+                direction: '${ $.provider }:data.direction',
                 uploaded: 'openimport_profile_form.openimport_profile_form.where.upload:sample',
                 tested: 'openimport_profile_form.openimport_profile_form.where.source_test:sample',
                 format: '${ $.provider }:data.format',
                 options: '${ $.provider }:data.format_options'
             },
             listens: {
+                direction: 'toggle',
                 uploaded: 'apply',
                 tested: 'apply',
                 format: 'reload',
@@ -40,17 +44,26 @@ define([
                 detected: true,
                 sheets: true,
                 error: true,
-                loading: true
+                loading: true,
+                visible: true
             }
         },
 
         /** @inheritdoc */
         initialize: function () {
             this._super();
+            this.toggle();
             this.reload = _.debounce(this.load.bind(this), 400);
             this.load();
 
             return this;
+        },
+
+        /**
+         * Exports write a file: there is nothing to show.
+         */
+        toggle: function () {
+            this.visible = (this.direction || 'import') === 'import';
         },
 
         /**

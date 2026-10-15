@@ -5,10 +5,10 @@ Step 2 of the profile form. Every source delivers one file per run; the run keep
 
 | Source | Settings | Notes |
 |---|---|---|
-| **Upload a file** | the file, uploaded in the form | The same file is read again on every run (also scheduled ones) until another one is uploaded. |
+| **Upload a file** | the file, uploaded in the form | The same file is read again on every run until another one is uploaded; it cannot be scheduled. |
 | **Server folder** | folder, file name pattern, which file, move-to folder | A folder under `var/openimport/` (for example `supplier/incoming`), or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety › *Extra server folders*. Anything else is refused, also through symbolic links. |
 | **Web address (URL)** | address, login (none, user name and password, bearer token), sheet gid | http and https. A Google Sheets link (shared "anyone with the link" or published) is read as CSV; `gid` picks the sheet. |
-| **SFTP** | server, port, user name, password or private key (+ passphrase), remote folder, pattern, which file, move-to | Key login with an OpenSSH or PEM key. |
+| **SFTP** | server, port, user name, password or private key (+ passphrase), remote folder, pattern, which file, move-to | Key login with an OpenSSH or PEM key, pasted into its multi-line field (a key that lost its line breaks is repaired before the login). |
 | **FTP** | server, port, user name, password, explicit TLS (FTPS), passive mode, remote folder, pattern, which file, move-to | |
 
 **Test connection** checks the settings as they are in the form (saved or not) and says what the next run would read,

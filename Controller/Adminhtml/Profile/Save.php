@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Controller\Adminhtml\Profile;
 use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
+use Iranimij\OpenImport\Model\Admin\ProblemLocator;
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
 use Iranimij\OpenImport\Model\Admin\RunStarter;
 use Magento\Backend\App\Action;
@@ -29,6 +30,7 @@ class Save extends Action implements HttpPostActionInterface
 {
     public const ADMIN_RESOURCE = 'Iranimij_OpenImport::profiles_edit';
     public const PERSIST_KEY = 'openimport_profile';
+    public const FIELD_ERRORS = 'field_errors';
 
     /**
      * @param Context $context
@@ -38,6 +40,7 @@ class Save extends Action implements HttpPostActionInterface
      * @param DataPersistorInterface $dataPersistor
      * @param RunStarter $runStarter
      * @param Session $authSession
+     * @param ProblemLocator $problemLocator
      */
     public function __construct(
         Context $context,
@@ -46,7 +49,8 @@ class Save extends Action implements HttpPostActionInterface
         private readonly ProfileFormMapper $mapper,
         private readonly DataPersistorInterface $dataPersistor,
         private readonly RunStarter $runStarter,
-        private readonly Session $authSession
+        private readonly Session $authSession,
+        private readonly ProblemLocator $problemLocator
     ) {
         parent::__construct($context);
     }
@@ -68,10 +72,15 @@ class Save extends Action implements HttpPostActionInterface
             $profile = $this->profiles->save($this->mapper->fromForm($data, $profile));
             $this->dataPersistor->clear(self::PERSIST_KEY);
         } catch (LocalizedException $exception) {
-            foreach (explode("\n", $exception->getMessage()) as $problem) {
+            $problems = explode("\n", $exception->getMessage());
+            foreach ($problems as $problem) {
                 $this->messageManager->addErrorMessage($problem);
             }
-            $this->dataPersistor->set(self::PERSIST_KEY, $data);
+            // The form opens the steps with problems and shows each message at its field.
+            $this->dataPersistor->set(
+                self::PERSIST_KEY,
+                [self::FIELD_ERRORS => $this->problemLocator->locate($problems, $data)] + $data
+            );
             return $profileId > 0
                 ? $redirect->setPath('*/*/edit', ['id' => $profileId])
                 : $redirect->setPath('*/*/new');

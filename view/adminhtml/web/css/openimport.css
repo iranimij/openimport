@@ -21,6 +21,15 @@
     white-space: nowrap;
 }
 
+/* Error messages are read in full: they wrap instead of being cut. */
+.openimport-scroll td.openimport-wrap {
+    max-width: 48rem;
+    min-width: 24rem;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
 .openimport-mapping-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -182,4 +191,15 @@
 
 .openimport-scroll::-webkit-scrollbar-track {
     background: #f1f1f1;
+}
+
+/* Private keys: a real multi-line field in a fixed-width font, hidden while the cursor is elsewhere. */
+.openimport-secret-text {
+    font-family: Menlo, Consolas, monospace;
+    font-size: 1.2rem;
+    min-height: 12rem;
+}
+
+.openimport-secret-text:not(:focus):not(:placeholder-shown) {
+    -webkit-text-security: disc;
 }

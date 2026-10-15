@@ -43,6 +43,8 @@ class SchedulerTest extends TestCase
         $profile = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class)->create()
             ->setName('Scheduled ' . uniqid())
             ->setEntity('catalog_product')
+            ->setSourceType('folder')
+            ->setSourceConfig(['path' => 'scheduler-test'])
             ->setSchedule($schedule)
             ->setIsActive($active)
             ->setMapping([['target' => 'sku', 'source' => 'sku']]);

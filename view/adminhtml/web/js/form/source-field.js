@@ -2,38 +2,26 @@
  * Copyright © Iman Aboheydary. All rights reserved.
  * See LICENSE for license details (MIT).
  *
- * A source setting that is only shown for some source types (config "forTypes") and, for a secret, says whether
- * one is stored already (data "<name>_stored" next to the field; the value itself never reaches the form).
+ * A text field shown only where it matters (see conditional.js) and, for a secret, saying whether one is stored
+ * already (data "<name>_stored" next to the field; the value itself never reaches the form).
+ *
+ * typeGroups {type: group}: the field keeps one value per group, so a local folder does not turn up as the SFTP
+ * folder after switching the source type (and comes back when switching back).
+ * noticeByType {type: text}: help text for the chosen type (the field's own notice otherwise).
  */
 define([
     'Magento_Ui/js/form/element/abstract',
+    'Iranimij_OpenImport/js/form/conditional',
     'mage/translate'
-], function (Abstract, $t) {
+], function (Abstract, conditional, $t) {
     'use strict';
 
-    return Abstract.extend({
+    return conditional(Abstract).extend({
         defaults: {
-            forTypes: [],
-            forAuth: [],
-            forDirection: 'import',
-            authField: 'auth',
-            authScope: 'source_config',
-            typeField: 'source_type',
-            sourceType: '',
-            direction: 'import',
-            auth: '',
             secret: false,
             storedNote: '',
-            imports: {
-                sourceType: '${ $.provider }:data.${ $.typeField }',
-                direction: '${ $.provider }:data.direction',
-                auth: '${ $.provider }:data.${ $.authScope }.${ $.authField }'
-            },
-            listens: {
-                sourceType: 'refresh',
-                direction: 'refresh',
-                auth: 'refresh'
-            },
+            typeGroups: null,
+            noticeByType: null,
             tracks: {
                 storedNote: true
             }
@@ -47,33 +35,39 @@ define([
                     ? $t('A value is stored. Leave the field empty to keep it.')
                     : '';
             }
+            this.defaultNotice = this.notice ? this.notice() : '';
+            this.lastGroup = this.group(this.sourceType);
+            this.groupValues = {};
             this.refresh();
 
             return this;
         },
 
         /**
-         * Shows the field for the chosen direction and source type (and authentication, when "forAuth" is set).
+         * @param {String} type
+         * @returns {String}
          */
-        refresh: function () {
-            var typeOk = this.forTypes.length === 0 || this.forTypes.indexOf(this.sourceType) !== -1,
-                authOk = this.forAuth.length === 0 || this.forAuth.indexOf(this.auth || '') !== -1,
-                directionOk = !this.forDirection || this.forDirection === (this.direction || 'import');
-
-            this.visible(typeOk && authOk && directionOk);
+        group: function (type) {
+            return this.typeGroups ? String(this.typeGroups[type || ''] || type || '') : '';
         },
 
-        /**
-         * Hidden fields are not validated.
-         *
-         * @returns {Object}
-         */
-        validate: function () {
-            if (!this.visible()) {
-                return {valid: true, target: this};
-            }
+        /** @inheritdoc */
+        refresh: function () {
+            var group;
 
-            return this._super();
+            this._super();
+            if (this.noticeByType && typeof this.notice === 'function' && this.defaultNotice !== undefined) {
+                this.notice(this.noticeByType[this.sourceType] || this.defaultNotice);
+            }
+            if (!this.typeGroups || this.lastGroup === undefined) {
+                return;
+            }
+            group = this.group(this.sourceType);
+            if (group !== this.lastGroup) {
+                this.groupValues[this.lastGroup] = this.value();
+                this.lastGroup = group;
+                this.value(this.groupValues[group] !== undefined ? this.groupValues[group] : '');
+            }
         }
     });
 });

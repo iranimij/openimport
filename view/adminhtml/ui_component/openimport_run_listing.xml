@@ -26,7 +26,7 @@
             <updateUrl path="mui/index/render"/>
         </settings>
         <aclResource>Iranimij_OpenImport::runs</aclResource>
-        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+        <dataProvider class="Iranimij\OpenImport\Ui\DataProvider\GridDataProvider"
                       name="openimport_run_listing_data_source">
             <settings>
                 <requestFieldName>id</requestFieldName>
@@ -40,6 +40,7 @@
         </settings>
         <bookmark name="bookmarks"/>
         <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
         <paging name="listing_paging"/>
     </listingToolbar>
@@ -57,10 +58,12 @@
                 <label translate="true">Profile</label>
             </settings>
         </column>
-        <column name="run_trigger" class="Iranimij\OpenImport\Ui\Component\Listing\Column\StartedBy" sortOrder="30">
+        <column name="run_trigger" class="Iranimij\OpenImport\Ui\Component\Listing\Column\StartedBy"
+                component="Magento_Ui/js/grid/columns/column" sortOrder="30">
             <settings>
                 <options class="Iranimij\OpenImport\Model\Config\Source\RunTrigger"/>
                 <filter>select</filter>
+                <dataType>select</dataType>
                 <label translate="true">Started by</label>
             </settings>
         </column>
@@ -120,7 +123,8 @@
                 <sortable>false</sortable>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Iranimij\OpenImport\Ui\Component\Listing\Column\RunActions" sortOrder="200">
+        <actionsColumn name="actions" class="Iranimij\OpenImport\Ui\Component\Listing\Column\RunActions"
+                       component="Iranimij_OpenImport/js/grid/columns/actions" sortOrder="200">
             <settings>
                 <indexField>run_id</indexField>
             </settings>

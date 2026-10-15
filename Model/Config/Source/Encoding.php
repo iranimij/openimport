@@ -28,7 +28,9 @@ class Encoding implements OptionSourceInterface
             'ISO-8859-1' => 'ISO-8859-1',
             'ISO-8859-15' => 'ISO-8859-15',
         ] as $value => $label) {
-            $options[] = ['value' => (string) $value, 'label' => __($label)];
+            $options[] = ['value' => (string) $value, 'label' => __($label)]
+                // "Detect" reads the file: imports only.
+                + ($value === 'auto' ? ['showWhen' => ['direction' => ['import']]] : []);
         }
 
         return $options;

@@ -32,6 +32,10 @@ Locale Options › Timezone), so `0 2 * * *` means 02:00 local time, also across
 A schedule only fires while the profile's **Schedule is on** switch is on. New and duplicated profiles start with it
 off: run a dry run first, then switch it on.
 
+A schedule needs a source that changes by itself: a profile that reads an **uploaded file** cannot be switched on
+(it would import the same file again and again; use a server folder, web address, SFTP or FTP), and a scheduled
+export needs a destination other than *Download* (a server folder, SFTP, FTP or e-mail).
+
 Scheduled runs are live runs. The safety threshold still applies: a scheduled Delete or Replace run that would
 remove more than the threshold stops with "needs confirmation" and waits for someone to confirm it on the run page.
 

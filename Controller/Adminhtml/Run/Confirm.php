@@ -58,7 +58,7 @@ class Confirm extends Action implements HttpPostActionInterface
                     throw new LocalizedException(__('Your role may not confirm runs above the safety limit.'));
                 }
                 $word = $profile->getBehavior() === ProfileInterface::BEHAVIOR_DELETE ? 'DELETE' : 'REPLACE';
-                if (trim((string) $this->getRequest()->getParam('confirmation')) !== $word) {
+                if (strcasecmp(trim((string) $this->getRequest()->getParam('confirmation')), $word) !== 0) {
                     throw new LocalizedException(__('Type %1 to confirm.', $word));
                 }
                 $confirmed = true;

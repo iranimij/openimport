@@ -2,53 +2,62 @@
  * Copyright © Iman Aboheydary. All rights reserved.
  * See LICENSE for license details (MIT).
  *
- * A select among the source settings, shown for some source types only (see source-field.js).
+ * A select shown only where it matters (see conditional.js). Options with their own "showWhen" are offered only
+ * while their conditions hold; a value that is no longer offered moves to the first option that is.
  */
 define([
-    'Magento_Ui/js/form/element/select'
-], function (Select) {
+    'underscore',
+    'Magento_Ui/js/form/element/select',
+    'Iranimij_OpenImport/js/form/conditional'
+], function (_, Select, conditional) {
     'use strict';
 
-    return Select.extend({
-        defaults: {
-            forTypes: [],
-            forAuth: [],
-            forDirection: 'import',
-            authField: 'auth',
-            authScope: 'source_config',
-            typeField: 'source_type',
-            sourceType: '',
-            direction: 'import',
-            auth: '',
-            imports: {
-                sourceType: '${ $.provider }:data.${ $.typeField }',
-                direction: '${ $.provider }:data.direction',
-                auth: '${ $.provider }:data.${ $.authScope }.${ $.authField }'
-            },
-            listens: {
-                sourceType: 'refresh',
-                direction: 'refresh',
-                auth: 'refresh'
-            }
-        },
-
+    return conditional(Select).extend({
         /** @inheritdoc */
         initialize: function () {
+            var options;
+
+            this.allOptions = null;
             this._super();
+            options = _.isArray(this.initialOptions) ? this.initialOptions : this.options();
+            this.allOptions = _.some(options, function (option) {
+                return !!option.showWhen;
+            }) ? options : null;
             this.refresh();
 
             return this;
         },
 
         /**
-         * Shows the field for the chosen direction and source type (and authentication, when "forAuth" is set).
+         * @param {Array} options
+         * @returns {String}
          */
-        refresh: function () {
-            var typeOk = this.forTypes.length === 0 || this.forTypes.indexOf(this.sourceType) !== -1,
-                authOk = this.forAuth.length === 0 || this.forAuth.indexOf(this.auth || '') !== -1,
-                directionOk = !this.forDirection || this.forDirection === (this.direction || 'import');
+        optionKey: function (options) {
+            return _.map(options || [], function (option) {
+                return option.value + '=' + option.label;
+            }).join('\n');
+        },
 
-            this.visible(typeOk && authOk && directionOk);
+        /** @inheritdoc */
+        refresh: function () {
+            var offered, value;
+
+            this._super();
+            if (!this.allOptions) {
+                return;
+            }
+            offered = _.filter(this.allOptions, function (option) {
+                return this.conditionsHold(option.showWhen);
+            }, this);
+            if (this.optionKey(offered) !== this.optionKey(this.options())) {
+                value = this.value();
+                this.setOptions(offered);
+                if (offered.length && !_.findWhere(offered, {value: value})) {
+                    this.value(offered[0].value);
+                } else {
+                    this.value(value);
+                }
+            }
         }
     });
 });

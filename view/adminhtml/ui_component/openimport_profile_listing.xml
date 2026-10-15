@@ -34,7 +34,7 @@
             <updateUrl path="mui/index/render"/>
         </settings>
         <aclResource>Iranimij_OpenImport::profiles</aclResource>
-        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+        <dataProvider class="Iranimij\OpenImport\Ui\DataProvider\GridDataProvider"
                       name="openimport_profile_listing_data_source">
             <settings>
                 <requestFieldName>id</requestFieldName>
@@ -74,16 +74,21 @@
                 <label translate="true">Direction</label>
             </settings>
         </column>
-        <column name="entity" class="Iranimij\OpenImport\Ui\Component\Listing\Column\EntityName" sortOrder="40">
+        <column name="entity" class="Iranimij\OpenImport\Ui\Component\Listing\Column\EntityName"
+                component="Magento_Ui/js/grid/columns/column" sortOrder="40">
             <settings>
-                <filter>text</filter>
+                <options class="Iranimij\OpenImport\Model\Config\Source\EntityFilter"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
                 <label translate="true">What</label>
             </settings>
         </column>
-        <column name="source_type" class="Iranimij\OpenImport\Ui\Component\Listing\Column\SourceOrDestination" sortOrder="50">
+        <column name="source_type" class="Iranimij\OpenImport\Ui\Component\Listing\Column\SourceOrDestination"
+                component="Magento_Ui/js/grid/columns/column" sortOrder="50">
             <settings>
                 <options class="Iranimij\OpenImport\Model\Config\Source\SourceType"/>
                 <filter>select</filter>
+                <dataType>select</dataType>
                 <label translate="true">Source / destination</label>
             </settings>
         </column>
@@ -109,7 +114,7 @@
             </settings>
         </column>
         <actionsColumn name="actions" class="Iranimij\OpenImport\Ui\Component\Listing\Column\ProfileActions"
-                       sortOrder="200">
+                       component="Iranimij_OpenImport/js/grid/columns/actions" sortOrder="200">
             <settings>
                 <indexField>profile_id</indexField>
             </settings>

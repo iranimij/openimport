@@ -72,7 +72,9 @@ $run = $view->run();
 
         <div class="openimport-run-actions">
             <?php if ($view->canConfirm()): ?>
-                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/confirm')) ?>">
+                <?php $confirmInit = ['Iranimij_OpenImport/js/run/confirmation' => ['word' => $view->confirmationWord()]]; ?>
+                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/confirm')) ?>"
+                      data-mage-init="<?= $escaper->escapeHtmlAttr((string) json_encode($confirmInit)) ?>">
                     <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
                     <label class="admin__field-label" for="openimport-confirmation">
                         <?= $escaper->escapeHtml(__('Type %1 to run it for real', $view->confirmationWord())) ?>
@@ -174,7 +176,7 @@ $run = $view->run();
                             <td><?= $escaper->escapeHtml($error->sourceRow > 0 ? (string) $error->sourceRow : '–') ?></td>
                             <td><?= $escaper->escapeHtml($error->identifier) ?></td>
                             <td><?= $escaper->escapeHtml($error->field) ?></td>
-                            <td><?= $escaper->escapeHtml($error->message) ?></td>
+                            <td class="openimport-wrap"><?= $escaper->escapeHtml($error->message) ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

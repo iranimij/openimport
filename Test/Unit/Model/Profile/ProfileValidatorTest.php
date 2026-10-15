@@ -37,7 +37,7 @@ class ProfileValidatorTest extends TestCase
             {
                 return $direction === 'export'
                     ? ['catalog_product', 'openimport_order']
-                    : ['catalog_product', 'customer', 'openimport_stock_price'];
+                    : ['catalog_product', 'customer', 'openimport_stock_price', 'openimport_category'];
             }
         };
 
@@ -142,6 +142,21 @@ class ProfileValidatorTest extends TestCase
         ], $this->validator()->validate($profile));
     }
 
+    public function testCategoriesCannotBeReplaced(): void
+    {
+        $profile = new ProfileStub([
+            'name' => 'Categories',
+            'entity' => 'openimport_category',
+            'behavior' => 'replace',
+            'mapping' => [['target' => 'path', 'source' => 'Pfad']],
+        ]);
+
+        self::assertContains(
+            'openimport_category cannot be imported with "Replace": use Add/Update.',
+            $this->validator()->validate($profile)
+        );
+    }
+
     public function testExportProfilesSkipImportRules(): void
     {
         $problems = $this->validator()->validate(new ProfileStub([
@@ -216,5 +231,24 @@ class ProfileValidatorTest extends TestCase
             ['"nope" is not an e-mail address.'],
             $validator->validate(new ProfileStub(['format' => 'csv', 'export_options' => ['destination' => 'email', 'emails' => 'a@example.com, nope']] + $base))
         );
+    }
+
+    public function testScheduleNeedsAChangingSourceAndADestination(): void
+    {
+        $upload = $this->validator()->validate(new ProfileStub(['source_type' => 'upload', 'is_active' => true] + $this->valid()));
+        self::assertNotEmpty(array_filter($upload, static fn (string $p): bool => str_contains($p, 'uploaded file cannot run on a schedule')));
+
+        $off = $this->validator()->validate(new ProfileStub(['source_type' => 'upload', 'is_active' => false] + $this->valid()));
+        self::assertSame([], array_values(array_filter($off, static fn (string $p): bool => str_contains($p, 'schedule'))));
+
+        $export = $this->validator()->validate(new ProfileStub([
+            'direction' => 'export',
+            'entity' => 'catalog_product',
+            'is_active' => true,
+            'export_options' => ['destination' => 'download'],
+            'mapping' => [],
+            'row_filters' => [],
+        ] + $this->valid()));
+        self::assertNotEmpty(array_filter($export, static fn (string $p): bool => str_contains($p, 'scheduled export needs a destination')));
     }
 }

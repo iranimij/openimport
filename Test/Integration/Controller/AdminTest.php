@@ -331,7 +331,7 @@ class AdminTest extends AbstractBackendController
         $run->setStatus(RunInterface::STATUS_NEEDS_CONFIRMATION)->setSourceFile('openimport/runs/x/source.csv');
         $runs->save($run);
 
-        $this->post('backend/openimport/run/confirm', ['id' => $run->getRunId(), 'confirmation' => 'delete']);
+        $this->post('backend/openimport/run/confirm', ['id' => $run->getRunId(), 'confirmation' => 'remove']);
         $this->assertSessionMessages(self::containsEqual('Type DELETE to confirm.'), MessageInterface::TYPE_ERROR);
     }
 }

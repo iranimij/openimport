@@ -5,6 +5,33 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-15
+
+The admin, reworked from the second hands-on review (design items D1–D15, product items P1–P10).
+
+### Added
+- Profile page: step navigation, a one-line summary in each step header, a **?** per step that opens the docs,
+  **Recent runs** (the last five), **Download as JSON**.
+- Profiles grid: a status line (runs of the last 24 hours, waiting runs, cron health), mass actions (switch schedules
+  on or off, delete), **Import profiles from JSON**, a click on a row opens the profile.
+- Runs: **Cancel** also stops a running run while it still reads the file; **Run again** / **Dry run again** on the
+  run page and in the runs grid; the runs grid has *What* and *Direction* columns and filters, shows *Exported* for
+  exports and no import counts there; a click on a row opens the run.
+- Schedules every 15 or 30 minutes and every day at a chosen time; the form shows the next three run times.
+- An export's run page shows the first ten rows of the file it wrote.
+- Setting *E-mail sender* for run e-mails and exports by e-mail.
+
+### Changed
+- Run page: a status chip next to a one-line headline; *What would change* has one row per record with the changed
+  fields inline (`field: before → after`), more behind a toggle; tables scroll sideways only.
+- One primary action per page (*Download the export* is secondary while *Run for real* is offered).
+- Mapping: the field-code box only shows for *Other field …*; *+ Value map* link; column *Empty is an error*;
+  transforms without settings are added when chosen; chips stay on one line with their buttons on hover or focus.
+- Yes/No settings are switches; port, errors allowed and safety limit are narrow fields with units; the upload is a
+  drop zone that shows the current file with *Replace the file*.
+- Order exports: statuses from a list, dates with a date picker, the order filters in step 5.
+- Grid dates do not wrap.
+
 ## [1.1.2] - 2026-10-15
 
 Fixes from the second hands-on review (QA items Q1–Q21 of the review page).

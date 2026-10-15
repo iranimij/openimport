@@ -24,8 +24,8 @@ Without cron, queued runs wait. `bin/magento openimport:queue:run` does the same
 
 ## Profile schedules
 
-A profile's schedule is a preset (every hour, every day at 02:00, weekdays at 06:00, …) or a 5-field cron
-expression: minute, hour, day of month, month, day of week. Lists (`1,15`), ranges (`8-18`), steps (`*/15`) and
+A profile's schedule is a preset (every 15 or 30 minutes, every hour, every day at a time you choose, every night
+at 02:00, weekdays at 06:00) or a 5-field cron expression, and the form shows the next three run times: minute, hour, day of month, month, day of week. Lists (`1,15`), ranges (`8-18`), steps (`*/15`) and
 names (`mon-fri`, `jan`) work. Times are read in the store's time zone (Stores › Configuration › General ›
 Locale Options › Timezone), so `0 2 * * *` means 02:00 local time, also across daylight-saving changes.
 
@@ -65,5 +65,7 @@ time (products and Stock & prices share the product entity).
 Each profile says when to send an e-mail (step 6): never, on failure (failed, finished with errors, needs
 confirmation) or always, to the comma-separated addresses, or, when empty, to the admin who created the profile.
 The e-mail carries the result, the counts, the run message, a note on errors and a link to the run page. It uses
-the store's e-mail settings (Stores › Configuration › General › Store Email Addresses, "General Contact" as sender)
-and the template *OpenImport: a run finished*, which can be customised under Marketing › Email Templates.
+the store's e-mail settings (Stores › Configuration › General › Store Email Addresses) and the template *OpenImport: a run finished*, which can be customised under Marketing › Email Templates.
+
+The sender is set under Stores › Configuration › iranimij › OpenImport › Runs › *E-mail sender* (one of the store
+e-mail addresses); it also sends exports by e-mail.

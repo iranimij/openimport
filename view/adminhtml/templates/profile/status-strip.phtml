@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+
+/** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Iranimij\OpenImport\ViewModel\StatusStrip $strip */
+$strip = $block->getData('view_model');
+$counts = $strip->lastDay();
+$age = $strip->cronAge();
+$waiting = ($counts['queued'] ?? 0) + ($counts['running'] ?? 0);
+?>
+<div class="openimport-strip" role="status">
+    <span>
+        <strong><?= $escaper->escapeHtml(__('Last 24 hours:')) ?></strong>
+        <?= $escaper->escapeHtml(__('%1 succeeded', $counts['success'] ?? 0)) ?> ·
+        <?php if ($strip->problems() > 0): ?>
+            <a class="openimport-strip-problem" href="<?= $escaper->escapeUrl($strip->runsUrl()) ?>"><?= $escaper->escapeHtml(__('%1 failed or with errors', $strip->problems())) ?></a>
+        <?php else: ?>
+            <?= $escaper->escapeHtml(__('none failed')) ?>
+        <?php endif; ?>
+        <?php if ($waiting > 0): ?>
+            · <?= $escaper->escapeHtml(__('%1 waiting or running', $waiting)) ?>
+        <?php endif; ?>
+    </span>
+    <span class="<?= $escaper->escapeHtmlAttr($strip->cronStale() ? 'openimport-strip-problem' : '') ?>">
+        <strong><?= $escaper->escapeHtml(__('Cron:')) ?></strong>
+        <?php if ($age === null): ?>
+            <?= $escaper->escapeHtml(__('has not run OpenImport yet — set up cron (bin/magento cron:run every minute).')) ?>
+        <?php elseif ($strip->cronStale()): ?>
+            <?= $escaper->escapeHtml(__('last ran OpenImport %1 minutes ago — check that cron runs every minute.', (int) floor($age / 60))) ?>
+        <?php else: ?>
+            <?= $escaper->escapeHtml(__('runs (last %1 minute(s) ago)', (int) floor($age / 60))) ?>
+        <?php endif; ?>
+    </span>
+</div>

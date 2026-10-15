@@ -14,6 +14,7 @@ use Iranimij\OpenImport\Model\Export\DestinationInterface;
 use Iranimij\OpenImport\Model\Notification\AttachmentTransportBuilder;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Writer\WriterInterface;
+use Iranimij\OpenImport\Model\Config;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
@@ -32,11 +33,13 @@ class EmailDestination implements DestinationInterface
      * @param AttachmentTransportBuilder $transportBuilder
      * @param Filesystem $filesystem
      * @param StoreManagerInterface $storeManager
+     * @param Config $config
      */
     public function __construct(
         private readonly AttachmentTransportBuilder $transportBuilder,
         private readonly Filesystem $filesystem,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly Config $config
     ) {
     }
 
@@ -70,7 +73,7 @@ class EmailDestination implements DestinationInterface
                     'rows' => number_format($run->getCount('exported')),
                     'subject' => $subject !== '' ? $subject : (string) __('OpenImport export: %1', $profile->getName()),
                 ])
-                ->setFromByScope('general')
+                ->setFromByScope($this->config->getEmailIdentity())
                 ->addTo($recipients)
                 ->addAttachment((string) $driver->fileGetContents($path), $name, $writer->contentType())
                 ->getTransport()

@@ -23,6 +23,7 @@ class Config
     public const XML_ALLOWED_FOLDERS = 'openimport/security/allowed_folders';
     public const XML_FORMULA_GUARD = 'openimport/security/formula_guard';
     public const XML_SAFETY_THRESHOLD = 'openimport/security/safety_threshold_percent';
+    public const XML_EMAIL_IDENTITY = 'openimport/general/email_identity';
 
     /**
      * @param TypedReader $reader
@@ -92,6 +93,18 @@ class Config
     public function isFormulaGuardEnabled(): bool
     {
         return $this->reader->getBool(self::XML_FORMULA_GUARD, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
+    }
+
+    /**
+     * Store e-mail address that sends run e-mails and exports by e-mail (general, sales, support, custom1, custom2).
+     *
+     * @return string
+     */
+    public function getEmailIdentity(): string
+    {
+        $identity = trim($this->reader->getString(self::XML_EMAIL_IDENTITY, ScopeConfigInterface::SCOPE_TYPE_DEFAULT));
+
+        return $identity !== '' ? $identity : 'general';
     }
 
     /**

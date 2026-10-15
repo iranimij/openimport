@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Model\Notification;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
+use Iranimij\OpenImport\Model\Config;
 use Magento\Backend\Model\UrlInterface as BackendUrl;
 use Magento\Framework\App\Area;
 use Magento\Framework\Escaper;
@@ -50,6 +51,7 @@ class RunMailer
      * @param Escaper $escaper
      * @param LoggerInterface $logger
      * @param StoreManagerInterface $storeManager
+     * @param Config $config
      */
     public function __construct(
         private readonly TransportBuilder $transportBuilder,
@@ -57,7 +59,8 @@ class RunMailer
         private readonly BackendUrl $backendUrl,
         private readonly Escaper $escaper,
         private readonly LoggerInterface $logger,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly Config $config
     ) {
     }
 
@@ -122,7 +125,7 @@ class RunMailer
                 // Header and footer templates live in the frontend area (as every core e-mail does).
                 ->setTemplateOptions(['area' => Area::AREA_FRONTEND, 'store' => $this->storeId()])
                 ->setTemplateVars($this->vars($profile, $run))
-                ->setFromByScope('general')
+                ->setFromByScope($this->config->getEmailIdentity())
                 ->addTo($recipients)
                 ->getTransport();
             $transport->sendMessage();

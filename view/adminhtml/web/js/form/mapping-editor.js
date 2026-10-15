@@ -50,6 +50,11 @@ define([
     var DECIMAL_DOT = /^-?\d+\.\d+$/;
 
     /**
+     * Select value of "Other field …": the code is typed in the field next to it.
+     */
+    var OTHER = '__other';
+
+    /**
      * @param {String} target
      * @returns {{field: String, store: String}}
      */
@@ -149,15 +154,43 @@ define([
                 strict: ko.observable(data.value_map_strict === '1' || data.value_map_strict === true),
                 showMap: ko.observable(!!data.value_map),
                 addName: ko.observable(''),
-                addArgs: ko.observableArray([])
+                addArgs: ko.observableArray([]),
+                other: ko.observable(false)
             };
+            // The code field shows for "Other field …" and for codes the list does not have (D2).
+            row.showCode = ko.pureComputed(function () {
+                var code = row.field();
+
+                return this.isExport() || row.other() || (code !== '' && !this.loadingFields
+                    && this.fields.length > 0 && !_.findWhere(this.fields, {code: code}));
+            }, this);
+            row.fieldChoice = ko.pureComputed({
+                read: function () {
+                    return row.showCode() ? OTHER : row.field();
+                },
+                write: function (choice) {
+                    if (choice === OTHER) {
+                        row.other(true);
+
+                        return;
+                    }
+                    row.other(false);
+                    row.field(choice || '');
+                }
+            }, this);
             row.addName.subscribe(function (name) {
                 var entry = _.findWhere(CATALOGUE, {name: name});
 
                 row.addArgs(_.map(entry ? entry.args : [], function (label) {
                     return {label: label, value: ko.observable('')};
                 }));
-            });
+                // A transform without settings is added at once (D4).
+                if (entry && entry.args.length === 0) {
+                    _.defer(function () {
+                        this.addTransform(row);
+                    }.bind(this));
+                }
+            }, this);
             _.each(['field', 'store', 'source', 'staticValue', 'required', 'valueMap', 'caseSensitive', 'strict'],
                 function (key) {
                     row[key].subscribe(this.sync, this);
@@ -193,6 +226,8 @@ define([
         loadFields: function () {
             this.matches = {};
             this.loadingFields = true;
+            // An answer to an earlier request (other entity, no columns yet) must not end this wait.
+            this.fieldsTicket = (this.fieldsTicket || 0) + 1;
             this.fetchLater();
         },
 
@@ -200,7 +235,8 @@ define([
          * Loads the entity's fields and an auto-match proposal for the file's columns.
          */
         fetchFields: function () {
-            var self = this;
+            var self = this,
+                ticket;
 
             if (!this.entity) {
                 this.fields = [];
@@ -209,6 +245,8 @@ define([
                 return;
             }
             this.loadingFields = true;
+            this.fieldsTicket = (this.fieldsTicket || 0) + 1;
+            ticket = this.fieldsTicket;
             $.ajax({
                 url: this.fieldsUrl,
                 type: 'POST',
@@ -220,11 +258,16 @@ define([
                     columns: this.columns || []
                 }
             }).done(function (response) {
+                if (ticket !== self.fieldsTicket) {
+                    return;
+                }
                 self.fields = response.fields || [];
                 self.stores = response.stores || [];
                 self.matches = response.matches || {};
             }).always(function () {
-                self.loadingFields = false;
+                if (ticket === self.fieldsTicket) {
+                    self.loadingFields = false;
+                }
             });
         },
 
@@ -238,7 +281,7 @@ define([
                     label: field.code + (field.label !== field.code ? ' – ' + field.label : '') +
                         (field.identifier ? ' (' + $t('identifier') + ')' : field.required ? ' *' : '')
                 };
-            });
+            }).concat([{value: OTHER, label: $t('Other field (type its code) …')}]);
         },
 
         /**

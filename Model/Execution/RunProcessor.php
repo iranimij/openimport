@@ -100,6 +100,10 @@ class RunProcessor
                 $held[] = $name;
             }
             $outcome = $this->runProfile($profile, $run, $held);
+        } catch (RunCancelledException $exception) {
+            // The counts so far, as the run wrote them while reading.
+            $counts = $this->runRepository->getById($runId)->getCounts();
+            $outcome = new RunOutcome(RunInterface::STATUS_CANCELLED, $counts, $exception->getMessage());
         } catch (PipelineException $exception) {
             $outcome = new RunOutcome(RunInterface::STATUS_FAILED, $run->getCounts(), $exception->getMessage());
         } catch (\Throwable $exception) {
@@ -164,9 +168,12 @@ class RunProcessor
     {
         $runId = (int) $run->getRunId();
         $folder = $this->runFiles->folder($runId);
-        $heartbeat = function () use ($locks, $runId): void {
+        $heartbeat = function (bool $canStop = false) use ($locks, $runId): void {
             foreach ($locks as $name) {
                 $this->locks->heartbeat($name, $runId);
+            }
+            if ($canStop && $this->runFiles->cancelRequested($runId)) {
+                throw new RunCancelledException('Cancelled while running, before anything was written or sent.');
             }
         };
         if ($profile->getDirection() === ProfileInterface::DIRECTION_EXPORT) {

@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Model\Admin;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\JsonField;
+use Iranimij\OpenImport\Model\Schedule\DailyTime;
 use Iranimij\OpenImport\Model\Security\Secrets;
 
 /**
@@ -21,19 +22,24 @@ class ProfileFormMapper
 {
     public const SCHEDULE_PRESETS = [
         '' => 'Manual only',
+        '*/15 * * * *' => 'Every 15 minutes',
+        '*/30 * * * *' => 'Every 30 minutes',
         '0 * * * *' => 'Every hour',
         '0 2 * * *' => 'Every night at 02:00',
         '0 6 * * 1-5' => 'Weekdays at 06:00',
     ];
     public const SCHEDULE_CUSTOM = 'custom';
+    public const SCHEDULE_DAILY = 'daily';
 
     /**
      * @param JsonField $json
      * @param Secrets $secrets
+     * @param DailyTime $dailyTime
      */
     public function __construct(
         private readonly JsonField $json,
-        private readonly Secrets $secrets
+        private readonly Secrets $secrets,
+        private readonly DailyTime $dailyTime
     ) {
     }
 
@@ -74,6 +80,14 @@ class ProfileFormMapper
         foreach ($this->secrets->stored($profile->getSourceConfig()) as $name => $stored) {
             $source[$name . '_stored'] = $stored ? '1' : '0';
         }
+        $export = $profile->getExportOptions();
+        // The status filter is a multiselect: a stored "pending, processing" becomes a list.
+        if (is_scalar($export['order']['statuses'] ?? null)) {
+            $export['order']['statuses'] = array_values(array_filter(
+                array_map('trim', explode(',', (string) $export['order']['statuses'])),
+                static fn (string $status): bool => $status !== ''
+            ));
+        }
 
         return [
             'profile_id' => $profile->getProfileId(),
@@ -86,7 +100,7 @@ class ProfileFormMapper
             'format' => $profile->getFormat(),
             // An unset has_header means "yes"; the toggle must show (and post) that, not an empty value.
             'format_options' => $profile->getFormatOptions() + ['has_header' => '1'],
-            'export_options' => $this->secrets->strip($profile->getExportOptions())
+            'export_options' => $this->secrets->strip($export)
                 + array_combine(
                     array_map(static fn (string $name): string => $name . '_stored', array_keys($this->secrets->stored($profile->getExportOptions()))),
                     array_map(static fn (bool $stored): string => $stored ? '1' : '0', $this->secrets->stored($profile->getExportOptions()))
@@ -96,8 +110,9 @@ class ProfileFormMapper
             'allowed_errors' => (string) $profile->getAllowedErrors(),
             'delta' => $profile->isDelta() ? '1' : '0',
             'safety_threshold' => $profile->getSafetyThreshold() === null ? '' : (string) $profile->getSafetyThreshold(),
-            'schedule_preset' => array_key_exists($schedule, self::SCHEDULE_PRESETS) ? $schedule : self::SCHEDULE_CUSTOM,
-            'schedule_custom' => array_key_exists($schedule, self::SCHEDULE_PRESETS) ? '' : $schedule,
+            'schedule_preset' => $this->schedulePreset($schedule),
+            'schedule_custom' => $this->schedulePreset($schedule) === self::SCHEDULE_CUSTOM ? $schedule : '',
+            'schedule_time' => $this->dailyTime->timeOf($schedule) ?? '',
             'after_success' => $profile->getAfterSuccess(),
             'notify' => $profile->getNotify(),
             'notify_emails' => $profile->getNotifyEmails(),
@@ -135,7 +150,11 @@ class ProfileFormMapper
             ->setNotifyEmails($text('notify_emails'));
 
         $preset = $text('schedule_preset');
-        $profile->setSchedule($preset === self::SCHEDULE_CUSTOM ? $text('schedule_custom') : $preset);
+        $profile->setSchedule(match ($preset) {
+            self::SCHEDULE_CUSTOM => $text('schedule_custom'),
+            self::SCHEDULE_DAILY => $this->dailyTime->cronOf($text('schedule_time', '02:00')),
+            default => $preset,
+        });
 
         $source = is_array($data['source_config'] ?? null) ? $data['source_config'] : [];
         $source = array_map(static fn ($value) => is_scalar($value) ? trim((string) $value) : $value, $source);
@@ -263,5 +282,18 @@ class ProfileFormMapper
         }
 
         return $map;
+    }
+
+    /**
+     * @param string $schedule cron expression ('' = manual)
+     * @return string the form's preset: a listed one, "daily" (every day at a time) or "custom"
+     */
+    private function schedulePreset(string $schedule): string
+    {
+        if (array_key_exists($schedule, self::SCHEDULE_PRESETS)) {
+            return $schedule;
+        }
+
+        return $this->dailyTime->timeOf($schedule) !== null ? self::SCHEDULE_DAILY : self::SCHEDULE_CUSTOM;
     }
 }

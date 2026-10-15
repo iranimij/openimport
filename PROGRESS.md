@@ -39,6 +39,23 @@ URL clashes need the taken URLs in the message to be debuggable.
 **1.1.1 (2026-10-15):** fixes from a hands-on browser review of 1.1.0 (Notion "13 · Browser review 1.1.0"): #34 form
 and mapping, #35 grids and run page, #36 counts and messages, #37 changelog and docs; dev-env E2E updated.
 
+**1.1.2 (2026-10-15):** every QA item (Q1–Q21) and P11/P12 of the second browser review (Notion "14 · Browser review
+2"): grid row actions post (no 404), filters and keyword search, cascading category deletes counted, no schedules on
+uploads, form fields per direction and setting (shared `conditional.js`), private key field and repair, save problems
+at their fields, leave guard, dialogs, translations CI check (#39). Release `v1.1.2`. Dev-env #7: E2E for every grid
+row action, export-only settings, save errors, SFTP key login (the workflow makes a key pair).
+
+**1.2.0 (in review, #40):** the design (D1–D15) and product (P1–P10) items of the same review: run page chip and
+headline, one row per record in the preview, mapping rows, toggles, drop zone, step navigation with summaries and
+docs links, order filters in Rules, row click, recent runs, cancel running runs, run again, mass actions, schedules
+every 15/30 min and every day at a time with next runs, profile JSON in the admin, e-mail sender, first rows of
+exports, status line above the grid. Dev-env #8 for the E2E.
+
+Lessons from the second review: Magento grid actions with `post` but no confirm are plain links (a POST-only
+controller answers 404), so the actions column needs its own handler; a grid select filter needs `dataType select`
+on the column; `FulltextFilter` does nothing without a fulltext index; in Knockout attribute bindings (`text="…"`) a
+colon must be written `\:`, also inside strings.
+
 Open for Iman: delete the temporary branch `ci/m5-all` (shows as a dev version on Packagist; cloud sessions cannot
 delete branches), repository settings (squash only, delete branch on merge,
 `main` protected with `ci-ok`), a look at the admin on the Mac. Next product work: Notion "12 · Roadmap 1.x".
@@ -57,7 +74,8 @@ delete branches), repository settings (squash only, delete branch on merge,
 
 ## Exact next step
 
-Nothing in flight. Start 1.1 from Notion "12 · Roadmap 1.x" after Iman picks the order (categories, attributes, CMS, remote images, webhook trigger).
+Merge #40 (1.2.0) and dev-env #8 when green, release `v1.2.0`, redeploy the docs, update Notion page 14 statuses and
+the build log.
 
 ## Open questions
 

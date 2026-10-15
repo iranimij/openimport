@@ -41,10 +41,12 @@ for pattern in ('*.php', '*.phtml', '*.js'):
             problems.append(f'{os.path.relpath(path, ROOT)}: a phrase built with "." cannot be translated: '
                             f'{match.group(2)[:60]}...')
 
-ko = re.compile(r"""(?:translate="'((?:[^'\\]|\\.)*)'"|i18n:\s*'((?:[^'\\]|\\.)*)')""")
+ko = re.compile(r"""(?:translate="'((?:[^'\\]|\\.)*)'"|i18n:\s*'((?:[^'\\]|\\.)*)'|\$t\('((?:[^'\\]|\\.)*)'\))""")
 for path in files('*.html'):
     for match in ko.finditer(open(path, encoding='utf-8').read()):
-        phrases.setdefault((match.group(1) or match.group(2)).replace("\\'", "'"), path)
+        # In Knockout attribute bindings a colon is written as "\:".
+        phrase = (match.group(1) or match.group(2) or match.group(3)).replace("\\'", "'").replace('\\:', ':')
+        phrases.setdefault(phrase, path)
 
 for path in files('*.xml'):
     try:

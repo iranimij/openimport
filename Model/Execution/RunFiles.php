@@ -18,6 +18,7 @@ use Magento\Framework\Filesystem;
 class RunFiles
 {
     public const BASE = 'openimport/runs';
+    public const CANCEL_MARKER = 'cancel';
 
     /**
      * @param Filesystem $filesystem
@@ -85,5 +86,28 @@ class RunFiles
     public function absolute(string $relative): string
     {
         return $this->filesystem->getDirectoryRead(DirectoryList::VAR_DIR)->getAbsolutePath($relative);
+    }
+
+    /**
+     * Asks a running run to stop at its next checkpoint (the run looks for this marker while it reads).
+     *
+     * @param int $runId
+     * @return void
+     * @throws FileSystemException
+     */
+    public function requestCancel(int $runId): void
+    {
+        $this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)
+            ->writeFile(self::BASE . '/' . $runId . '/' . self::CANCEL_MARKER, gmdate('c'));
+    }
+
+    /**
+     * @param int $runId
+     * @return bool whether someone asked the run to stop
+     */
+    public function cancelRequested(int $runId): bool
+    {
+        return $this->filesystem->getDirectoryRead(DirectoryList::VAR_DIR)
+            ->isExist(self::BASE . '/' . $runId . '/' . self::CANCEL_MARKER);
     }
 }

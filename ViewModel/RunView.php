@@ -13,7 +13,9 @@ use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
 use Iranimij\OpenImport\Model\Config\Source\RunTrigger;
+use Iranimij\OpenImport\Model\Execution\RunFiles;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
+use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
 use Iranimij\OpenImport\Model\Storage\ErrorRecord;
 use Iranimij\OpenImport\Model\Storage\PreviewRecord;
@@ -21,6 +23,7 @@ use Iranimij\OpenImport\Model\Storage\PreviewStore;
 use Iranimij\OpenImport\Ui\Component\Listing\Column\StatusChip;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\AuthorizationInterface;
+use Magento\Framework\Escaper;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -49,6 +52,9 @@ class RunView implements ArgumentInterface
      * @param UrlInterface $urlBuilder
      * @param AuthorizationInterface $authorization
      * @param RunTrigger $triggers
+     * @param Escaper $escaper
+     * @param RunFiles $runFiles
+     * @param ReaderFactory $readers
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -59,8 +65,41 @@ class RunView implements ArgumentInterface
         private readonly StatusChip $chip,
         private readonly UrlInterface $urlBuilder,
         private readonly AuthorizationInterface $authorization,
-        private readonly RunTrigger $triggers
+        private readonly RunTrigger $triggers,
+        private readonly Escaper $escaper,
+        private readonly RunFiles $runFiles,
+        private readonly ReaderFactory $readers
     ) {
+    }
+
+    /**
+     * The first rows of the file an export wrote, read back as a merchant's tool would read it.
+     *
+     * @param int $limit
+     * @return array{columns: string[], rows: array<int, array<string, string>>}
+     */
+    public function exportRows(int $limit = 10): array
+    {
+        $run = $this->run();
+        $empty = ['columns' => [], 'rows' => []];
+        if ($run === null || $run->getDirection() !== 'export' || $run->getOutputFile() === null) {
+            return $empty;
+        }
+        try {
+            $reader = $this->readers->create($this->runFiles->absolute((string) $run->getOutputFile()));
+            $rows = [];
+            foreach ($reader->rows() as $row) {
+                $rows[] = array_map(static fn ($value): string => is_scalar($value) ? (string) $value : '', $row);
+                if (count($rows) >= $limit) {
+                    break;
+                }
+            }
+
+            return ['columns' => array_map('strval', $reader->columns()), 'rows' => $rows];
+        } catch (\Throwable $exception) {
+            // A file that cannot be read back (deleted by housekeeping, unknown format) is simply not shown.
+            return $empty;
+        }
     }
 
     /**
@@ -113,6 +152,34 @@ class RunView implements ArgumentInterface
     public function statusHtml(): string
     {
         return $this->chip->html((string) $this->run()?->getStatus());
+    }
+
+    /**
+     * @return string HTML
+     */
+    public function statusChipHtml(): string
+    {
+        return $this->chip->chip((string) $this->run()?->getStatus());
+    }
+
+    /**
+     * One changed field of the dry-run preview: "field: before → after", or "field = value" for a new value.
+     *
+     * @param string $field
+     * @param mixed $before
+     * @param mixed $after
+     * @return string HTML
+     */
+    public function changeHtml(string $field, mixed $before, mixed $after): string
+    {
+        $text = static fn (mixed $value): string => is_scalar($value) ? (string) $value : '';
+        $name = '<code>' . $this->escaper->escapeHtml($field) . '</code>';
+        if ($text($before) === '') {
+            return $name . ' = ' . $this->escaper->escapeHtml($text($after));
+        }
+
+        return $name . ': <del>' . $this->escaper->escapeHtml($text($before)) . '</del> → <ins>'
+            . $this->escaper->escapeHtml($text($after)) . '</ins>';
     }
 
     /**
@@ -218,7 +285,21 @@ class RunView implements ArgumentInterface
 
     public function canCancel(): bool
     {
-        return $this->run()?->getStatus() === RunInterface::STATUS_QUEUED
+        return in_array($this->run()?->getStatus(), [RunInterface::STATUS_QUEUED, RunInterface::STATUS_RUNNING], true)
+            && $this->authorization->isAllowed('Iranimij_OpenImport::run');
+    }
+
+    /**
+     * "Run again" for a finished run whose profile still exists: the same mode, a fresh read of the source.
+     *
+     * @return bool
+     */
+    public function canRunAgain(): bool
+    {
+        $run = $this->run();
+
+        return $run !== null && $this->profile() !== null
+            && in_array($run->getStatus(), RunInterface::FINAL_STATUSES, true)
             && $this->authorization->isAllowed('Iranimij_OpenImport::run');
     }
 

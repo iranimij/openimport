@@ -1,0 +1,22 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ *
+ * Row checkbox of the profiles grid, with a name for screen readers ("Choose <profile>").
+ */
+-->
+<!-- ko if: $row() -->
+<label class="data-grid-checkbox-cell-inner">
+    <input class="admin__control-checkbox" type="checkbox" data-action="select-row"
+        data-bind="
+            staticChecked: $col.selected,
+            disable: $col.disabled.indexOf($row()[$col.indexField]) != -1,
+            checkedValue: $row()[$col.indexField],
+            attr: {
+                id: index + 'check' + $row()[$col.indexField],
+                'aria-label': $t('Choose %1').replace('%1', $row().name || $row()[$col.indexField])
+            }">
+    <label attr="for: index + 'check' + $row()[$col.indexField]"></label>
+</label>
+<!-- /ko -->

@@ -63,7 +63,8 @@ class ExportRunner
      * @param ProfileInterface $profile
      * @param RunInterface $run
      * @param string $workDir the run folder
-     * @param \Closure|null $heartbeat called with every progress update (keeps locks alive)
+     * @param \Closure|null $heartbeat called with every progress update (keeps locks alive); its argument says
+     *                               whether the run may stop there (it throws to stop)
      * @return array{0: RunOutcome, 1: string} outcome and the absolute path of the written file ('' when none)
      * @throws PipelineException
      */
@@ -104,7 +105,8 @@ class ExportRunner
                         $this->counts['exported']++;
                     }
                     if ($this->counts['read'] % self::PROGRESS_EVERY === 0) {
-                        $this->progress();
+                        // The file is not delivered yet: the run may stop here when it is cancelled.
+                        $this->progress(true);
                     }
 
                     return $kept;
@@ -143,13 +145,14 @@ class ExportRunner
     }
 
     /**
+     * @param bool $canStop nothing is delivered yet, so a cancel may stop the run here
      * @return void
      */
-    private function progress(): void
+    private function progress(bool $canStop = false): void
     {
         $this->runResource->updateProgress($this->runId, $this->counts['read'], $this->counts);
         if ($this->heartbeat !== null) {
-            ($this->heartbeat)();
+            ($this->heartbeat)($canStop);
         }
     }
 }

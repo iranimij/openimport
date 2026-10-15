@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Controller\Adminhtml\Profile\Save;
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
+use Iranimij\OpenImport\Model\Admin\RecentRuns;
 use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\ResourceModel\Profile\CollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
@@ -37,6 +38,7 @@ class ProfileFormDataProvider extends AbstractDataProvider
      * @param RequestInterface $request
      * @param AuthorizationInterface $authorization
      * @param Config $config
+     * @param RecentRuns $recentRuns
      * @param array<string, mixed> $meta
      * @param array<string, mixed> $data
      */
@@ -52,6 +54,7 @@ class ProfileFormDataProvider extends AbstractDataProvider
         private readonly RequestInterface $request,
         private readonly AuthorizationInterface $authorization,
         private readonly Config $config,
+        private readonly RecentRuns $recentRuns,
         array $meta = [],
         array $data = []
     ) {
@@ -73,11 +76,14 @@ class ProfileFormDataProvider extends AbstractDataProvider
             $data['profile_id'] = $profileId > 0 ? $profileId : null;
             $data['source_config'] = is_array($posted['source_config'] ?? null) ? $posted['source_config'] : [];
             $data[Save::FIELD_ERRORS] = is_array($posted[Save::FIELD_ERRORS] ?? null) ? $posted[Save::FIELD_ERRORS] : [];
+            $data['recent_runs'] = $this->recentRuns->forProfile($profileId);
             return [$profileId > 0 ? $profileId : '' => $data];
         }
         if ($profileId > 0) {
             try {
-                return [$profileId => $this->mapper->toForm($this->profiles->getById($profileId))];
+                $data = $this->mapper->toForm($this->profiles->getById($profileId));
+                $data['recent_runs'] = $this->recentRuns->forProfile($profileId);
+                return [$profileId => $data];
             } catch (NoSuchEntityException $exception) {
                 return [];
             }

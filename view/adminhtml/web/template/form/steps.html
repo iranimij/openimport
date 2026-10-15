@@ -1,0 +1,18 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<nav class="openimport-steps" attr="'aria-label': $t('Steps of the profile')">
+    <ol>
+        <!-- ko foreach: { data: steps, as: 'step' } -->
+        <li>
+            <button type="button" class="openimport-step-link" click="function () { $parent.go(step); }"
+                    attr="title: step.summary">
+                <span class="openimport-step-title" text="step.title"></span>
+            </button>
+        </li>
+        <!-- /ko -->
+    </ol>
+</nav>

@@ -165,6 +165,22 @@ class AdminTest extends AbstractBackendController
         self::assertStringNotContainsString('<script>alert', $body);
     }
 
+    public function testProfileAsJsonAndTheImportPage(): void
+    {
+        $token = $this->upload("sku\nOI-JSON-1\n");
+        $profile = $this->profile($token);
+        $this->fresh();
+        $this->dispatch('backend/openimport/profile/downloadJson/id/' . $profile->getProfileId());
+        $json = (string) $this->getResponse()->getBody();
+        self::assertStringContainsString('"profiles"', $json);
+        self::assertStringContainsString($profile->getName(), $json);
+
+        self::assertStringContainsString('openimport-json-file', $this->page('backend/openimport/profile/importJson'));
+        $this->fresh();
+        $this->post('backend/openimport/profile/importJson', []);
+        $this->assertSessionMessages(self::containsEqual('Choose a JSON file.'), MessageInterface::TYPE_ERROR);
+    }
+
     public function testSaveCreatesAProfileAndKeepsTheFormOnErrors(): void
     {
         $name = 'Saved ' . bin2hex(random_bytes(4));

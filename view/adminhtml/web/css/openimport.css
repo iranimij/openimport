@@ -22,7 +22,7 @@
 }
 
 /* Error messages are read in full: they wrap instead of being cut. */
-.openimport-scroll td.openimport-wrap {
+.openimport-wrap {
     max-width: 48rem;
     min-width: 24rem;
     overflow: visible;
@@ -65,9 +65,42 @@
     background: #f8f8f8;
 }
 
+.openimport-chip > span {
+    white-space: nowrap;
+}
+
 .openimport-chip-button {
     min-width: 2.4rem;
     padding: 0 .5rem;
+}
+
+/* Chip buttons are faint until the chip is hovered or focused, so the chip reads as one short label (D4). They keep
+   their place (no jumping) and stay reachable by keyboard and pointer. */
+.openimport-chip .openimport-chip-button {
+    opacity: .25;
+    transition: opacity .1s;
+}
+
+.openimport-chip:hover .openimport-chip-button,
+.openimport-chip:focus-within .openimport-chip-button {
+    opacity: 1;
+}
+
+@media (hover: none) {
+    .openimport-chip .openimport-chip-button {
+        opacity: 1;
+    }
+}
+
+/* Plain links for secondary row actions (value map), not grey buttons (D3). */
+.openimport-link,
+.openimport-link:hover,
+.openimport-link:focus {
+    background: none;
+    border: 0;
+    color: #1a5a96;
+    padding: 0;
+    text-decoration: underline;
 }
 
 /* Remove-row button: the trash icon, with the label kept for screen readers (the grid has no .action-delete style). */
@@ -202,4 +235,247 @@
 
 .openimport-secret-text:not(:focus):not(:placeholder-shown) {
     -webkit-text-security: disc;
+}
+
+/* Run page: a status chip next to a one-line headline, then the details. */
+.openimport-run-head {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: .5rem;
+}
+
+.openimport-headline {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.openimport-run-meta {
+    color: #514943;
+    margin-bottom: 1.5rem;
+}
+
+.openimport-status {
+    border: 1px solid;
+    border-radius: 1em;
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    line-height: 1.6;
+    padding: 0 .9em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.openimport-status-notice {
+    background: #e5f7e0;
+    border-color: #79a22e;
+    color: #185b00;
+}
+
+.openimport-status-major {
+    background: #fff4d6;
+    border-color: #e8a400;
+    color: #6f4400;
+}
+
+.openimport-status-critical {
+    background: #fde8e6;
+    border-color: #e22626;
+    color: #a30d0d;
+}
+
+.openimport-status-minor {
+    background: #f1f1f1;
+    border-color: #a6a6a6;
+    color: #303030;
+}
+
+/* Tables that scroll sideways when wide; the page scrolls down. */
+.openimport-wide {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.openimport-changes td {
+    vertical-align: top;
+}
+
+.openimport-change-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.openimport-change-list li {
+    margin: 0 0 .3rem;
+    overflow-wrap: anywhere;
+}
+
+.openimport-change-list del {
+    color: #a30d0d;
+}
+
+.openimport-change-list ins {
+    color: #185b00;
+    text-decoration: none;
+}
+
+.openimport-changes summary {
+    color: #1a5a96;
+    cursor: pointer;
+}
+
+/* Small numbers get small fields (port, errors allowed, safety limit). */
+.openimport-narrow .admin__control-text,
+.openimport-narrow .admin__control-addon {
+    max-width: 16rem;
+}
+
+/* Upload: a drop zone that shows the current file and offers to replace it (D9). */
+.openimport-dropzone {
+    position: relative;
+    align-items: center;
+    border: 2px dashed #adadad;
+    border-radius: .4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    padding: 1.5rem;
+}
+
+.openimport-dropzone._has-file {
+    border-style: solid;
+    border-color: #79a22e;
+}
+
+.openimport-dropzone._dragging {
+    background: #f1f8ff;
+    border-color: #1a5a96;
+}
+
+.openimport-dropzone .admin__field-note {
+    flex-basis: 100%;
+    margin: 0;
+}
+
+.openimport-dropzone-hint {
+    color: #514943;
+}
+
+/* The file input stays focusable for the keyboard; its label is the visible button. */
+.openimport-dropzone-input {
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+}
+
+.openimport-dropzone-input:focus + label {
+    box-shadow: 0 0 0 1px #007bdb;
+}
+
+/* Step navigation: stays on top while scrolling, below the sticky page actions (D12). */
+.openimport-steps {
+    background: #fff;
+    border-bottom: 1px solid #e3e3e3;
+    margin-bottom: 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.openimport-steps ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1.5rem;
+    list-style: none;
+    margin: 0;
+    padding: .8rem 0;
+}
+
+.openimport-step-link {
+    background: none;
+    border: 0;
+    color: #1a5a96;
+    cursor: pointer;
+    font-weight: 600;
+    padding: .2rem 0;
+}
+
+.openimport-step-link:hover,
+.openimport-step-link:focus {
+    text-decoration: underline;
+}
+
+/* One-line summary in a step's header: what the collapsed step holds. */
+.openimport-step-summary {
+    color: #6b6b6b;
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-left: 1.5rem;
+}
+
+/* Grid dates on one line (D14). */
+.data-grid td.openimport-nowrap,
+.data-grid th.openimport-nowrap {
+    white-space: nowrap;
+}
+
+/* Grid rows open their profile or run when clicked. */
+.admin__data-grid-wrap .data-row td {
+    cursor: pointer;
+}
+
+/* "?" in a step header: the documentation for that step. */
+.openimport-step-help {
+    border: 1px solid #1a5a96;
+    border-radius: 50%;
+    color: #1a5a96;
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    height: 1.8rem;
+    line-height: 1.6rem;
+    margin-left: 1rem;
+    text-align: center;
+    text-decoration: none;
+    width: 1.8rem;
+}
+
+.openimport-step-help:hover,
+.openimport-step-help:focus {
+    background: #1a5a96;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Status line above the profiles grid (P10). */
+.openimport-strip {
+    background: #f8f8f8;
+    border: 1px solid #e3e3e3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 3rem;
+    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+}
+
+.openimport-strip-problem,
+a.openimport-strip-problem {
+    color: #a30d0d;
+}
+
+/* A link in the line is underlined, not only red (WCAG: not by colour alone). */
+a.openimport-strip-problem {
+    text-decoration: underline;
+}
+
+/* Links in OpenImport's own panels: dark enough to read (WCAG AA). */
+.openimport-recent-runs a,
+.openimport-next-runs a {
+    color: #1a5a96;
 }

@@ -14,6 +14,12 @@
     </argument>
     <settings>
         <buttons>
+            <button name="import_json">
+                <url path="*/*/importJson"/>
+                <class>secondary</class>
+                <label translate="true">Import profiles from JSON</label>
+                <aclResource>Iranimij_OpenImport::profiles_edit</aclResource>
+            </button>
             <button name="add">
                 <url path="*/*/new"/>
                 <class>primary</class>
@@ -50,9 +56,67 @@
         <columnsControls name="columns_controls"/>
         <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="schedule_on">
+                <settings>
+                    <url path="openimport/profile/massSchedule">
+                        <param name="on">1</param>
+                    </url>
+                    <type>schedule_on</type>
+                    <label translate="true">Switch schedules on</label>
+                </settings>
+            </action>
+            <action name="schedule_off">
+                <settings>
+                    <url path="openimport/profile/massSchedule">
+                        <param name="on">0</param>
+                    </url>
+                    <type>schedule_off</type>
+                    <label translate="true">Switch schedules off</label>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Delete the chosen profiles? Their runs and error reports are kept.</message>
+                        <title translate="true">Delete profiles</title>
+                    </confirm>
+                    <url path="openimport/profile/massSchedule">
+                        <param name="delete">1</param>
+                    </url>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                </settings>
+            </action>
+        </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="openimport_profile_columns">
+        <settings>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">openimport_profile_listing.openimport_profile_listing.openimport_profile_columns.actions</item>
+                    <item name="target" xsi:type="string">applyAction</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">edit</item>
+                        <item name="1" xsi:type="string">${ $.$data.rowIndex }</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+        <selectionsColumn name="ids" sortOrder="0">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldAction" xsi:type="boolean">false</item>
+                    <!-- Core's templates with names for screen readers. -->
+                    <item name="bodyTmpl" xsi:type="string">Iranimij_OpenImport/grid/select-cell</item>
+                    <item name="headerTmpl" xsi:type="string">Iranimij_OpenImport/grid/select-header</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>profile_id</indexField>
+            </settings>
+        </selectionsColumn>
         <column name="profile_id" sortOrder="10">
             <settings>
                 <filter>textRange</filter>
@@ -99,9 +163,17 @@
             </settings>
         </column>
         <column name="last_run" class="Iranimij\OpenImport\Ui\Component\Listing\Column\LastRun" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldAction" xsi:type="boolean">false</item>
+                </item>
+            </argument>
             <settings>
                 <label translate="true">Last run</label>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <fieldClass>
+                    <class name="openimport-nowrap">true</class>
+                </fieldClass>
                 <sortable>false</sortable>
             </settings>
         </column>
@@ -111,6 +183,9 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <label translate="true">Changed</label>
+                <fieldClass>
+                    <class name="openimport-nowrap">true</class>
+                </fieldClass>
             </settings>
         </column>
         <actionsColumn name="actions" class="Iranimij\OpenImport\Ui\Component\Listing\Column\ProfileActions"

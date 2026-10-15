@@ -453,7 +453,6 @@
 "Export only the records that match","Export only the records that match"
 "Leave out the records that match","Leave out the records that match"
 "Default: %1%","Default: %1%"
-"This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run.","This many rows may have errors and the other rows are still imported; one more and nothing is imported. 0 = any error stops the run."
 "A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.","A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety."
 "The folder on the server; empty = where the login lands.","The folder on the server; empty = where the login lands."
 "%1 row(s) had errors. The run page has the first ones and the error report.","%1 row(s) had errors. The run page has the first ones and the error report."
@@ -475,3 +474,4 @@
 "Delete profile","Delete profile"
 "Date or date and time, in the time zone of Stores › Configuration › General › Locale. Empty = no limit.","Date or date and time, in the time zone of Stores › Configuration › General › Locale. Empty = no limit."
 "Date or date and time, in the time zone of Stores › Configuration › General › Locale; a date alone counts the whole day. Empty = no limit.","Date or date and time, in the time zone of Stores › Configuration › General › Locale; a date alone counts the whole day. Empty = no limit."
+"How many rows may have errors before nothing is imported. With ""Stop"" the other rows are imported up to this number; with ""Skip"" it only matters when no row is left. 0 = no errors allowed.","How many rows may have errors before nothing is imported. With ""Stop"" the other rows are imported up to this number; with ""Skip"" it only matters when no row is left. 0 = no errors allowed."

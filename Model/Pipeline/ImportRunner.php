@@ -45,6 +45,12 @@ class ImportRunner
     public const CONFIRMATION_NOTE = 'A live run will ask for confirmation';
 
     private const BATCH = 500;
+
+    /**
+     * Records skipped by the behaviour that the run message names (the count covers all of them).
+     */
+    private const SKIPPED_NAMED = 10;
+
     private const PROGRESS_EVERY = 2000;
     private const PREVIEW_SAMPLE = 200;
     /**
@@ -100,6 +106,11 @@ class ImportRunner
     private array $sampleCounts = [];
 
     private int $existingAffected = 0;
+
+    /**
+     * @var string[] the first records skipped by the behaviour ("A-1 (row 3)"), named in the run message
+     */
+    private array $skippedNames = [];
 
     private ?\Closure $heartbeat = null;
 
@@ -249,6 +260,7 @@ class ImportRunner
         $this->previewSample = [];
         $this->sampleCounts = [];
         $this->existingAffected = 0;
+        $this->skippedNames = [];
         $this->firstError = null;
     }
 
@@ -329,6 +341,9 @@ class ImportRunner
             if (($behavior === ProfileInterface::BEHAVIOR_ONLY_ADD && $exists)
                 || ($behavior === ProfileInterface::BEHAVIOR_ONLY_UPDATE && !$exists)) {
                 $this->counts['skipped']++;
+                if (count($this->skippedNames) < self::SKIPPED_NAMED) {
+                    $this->skippedNames[] = sprintf('%s (%s)', $mapped->identifier, __('row %1', $line));
+                }
                 continue;
             }
             if ($useDelta) {
@@ -701,6 +716,16 @@ class ImportRunner
     private function outcome(string $status, string $message, ?int $historyId = null): RunOutcome
     {
         $this->progress();
+        if ($this->skippedNames !== []) {
+            $message .= "\n" . (string) __(
+                $this->behavior === ProfileInterface::BEHAVIOR_ONLY_ADD
+                    ? 'Skipped, already in the shop: %1'
+                    : 'Skipped, not in the shop: %1',
+                implode(', ', $this->skippedNames)
+                . ($this->counts['skipped'] > count($this->skippedNames)
+                    ? ' ' . __('and %1 more', $this->counts['skipped'] - count($this->skippedNames)) : '')
+            );
+        }
 
         return new RunOutcome($status, $this->counts, $message, $historyId);
     }

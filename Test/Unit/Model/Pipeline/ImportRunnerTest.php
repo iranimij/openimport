@@ -299,6 +299,8 @@ class ImportRunnerTest extends TestCase
         $update = $this->execute($this->profile(['behavior' => 'only_update', 'row_filters' => $filters]), $this->newRun(), $file);
         self::assertSame(1, $update->counts['skipped']);
         self::assertSame(['A-1', 'A-2'], array_column($this->core->rows, 'sku'));
+        self::assertStringContainsString('Skipped, already in the shop: A-1 (row 2), A-2 (row 3)', $add->message);
+        self::assertStringContainsString('Skipped, not in the shop: A-3 (row 4)', $update->message);
     }
 
     public function testFilterExpressionErrorsAreRowErrors(): void

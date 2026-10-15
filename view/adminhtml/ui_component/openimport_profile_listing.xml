@@ -80,12 +80,11 @@
                 <label translate="true">What</label>
             </settings>
         </column>
-        <column name="source_type" component="Magento_Ui/js/grid/columns/select" sortOrder="50">
+        <column name="source_type" class="Iranimij\OpenImport\Ui\Component\Listing\Column\SourceOrDestination" sortOrder="50">
             <settings>
                 <options class="Iranimij\OpenImport\Model\Config\Source\SourceType"/>
                 <filter>select</filter>
-                <dataType>select</dataType>
-                <label translate="true">Source</label>
+                <label translate="true">Source / destination</label>
             </settings>
         </column>
         <column name="schedule" class="Iranimij\OpenImport\Ui\Component\Listing\Column\Schedule" sortOrder="60">

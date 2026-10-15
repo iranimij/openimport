@@ -15,22 +15,40 @@ use Magento\Framework\Data\OptionSourceInterface;
  */
 class RunTrigger implements OptionSourceInterface
 {
+    private const LABELS = [
+        'manual' => 'Admin',
+        'schedule' => 'Schedule',
+        'cli' => 'Command line',
+        'api' => 'API',
+        'event' => 'Order placed',
+    ];
+
     /**
      * @return array<int, array<string, mixed>>
      */
     public function toOptionArray(): array
     {
         $options = [];
-        foreach ([
-            'manual' => 'Admin',
-            'schedule' => 'Schedule',
-            'cli' => 'Command line',
-            'api' => 'API',
-            'event' => 'Order placed',
-        ] as $value => $label) {
+        foreach (self::LABELS as $value => $label) {
             $options[] = ['value' => (string) $value, 'label' => __($label)];
         }
 
         return $options;
+    }
+
+    /**
+     * "Admin · openimport", "Schedule", "Command line · deploy" …: how a run was started and by whom.
+     *
+     * @param string $trigger
+     * @param string|null $requestedBy
+     * @return string
+     */
+    public function describe(string $trigger, ?string $requestedBy): string
+    {
+        $labels = array_column($this->toOptionArray(), 'label', 'value');
+        $label = isset($labels[$trigger]) ? (string) $labels[$trigger] : $trigger;
+        $who = trim((string) $requestedBy);
+
+        return $who === '' || $who === $trigger ? $label : $label . ' · ' . $who;
     }
 }

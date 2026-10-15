@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
+use Iranimij\OpenImport\Model\Config\Source\RunTrigger;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
 use Iranimij\OpenImport\Model\Storage\ErrorRecord;
@@ -47,6 +48,7 @@ class RunView implements ArgumentInterface
      * @param StatusChip $chip
      * @param UrlInterface $urlBuilder
      * @param AuthorizationInterface $authorization
+     * @param RunTrigger $triggers
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -56,8 +58,21 @@ class RunView implements ArgumentInterface
         private readonly PreviewStore $preview,
         private readonly StatusChip $chip,
         private readonly UrlInterface $urlBuilder,
-        private readonly AuthorizationInterface $authorization
+        private readonly AuthorizationInterface $authorization,
+        private readonly RunTrigger $triggers
     ) {
+    }
+
+    /**
+     * "Admin · openimport", "Schedule" …, as in the runs grid.
+     *
+     * @return string
+     */
+    public function startedBy(): string
+    {
+        $run = $this->run();
+
+        return $run === null ? '' : $this->triggers->describe($run->getTrigger(), $run->getRequestedBy());
     }
 
     public function run(): ?RunInterface

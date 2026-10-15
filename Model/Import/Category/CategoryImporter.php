@@ -134,6 +134,11 @@ class CategoryImporter implements ImporterInterface
         if ($store !== '' && !isset($stores[$store])) {
             return ['store_view_code', sprintf('there is no store view "%s"', $store)];
         }
+        if ($store !== '' && $this->storeManager->hasSingleStore()) {
+            // Magento saves every store-view value of a one-store-view shop in the default scope: the default name
+            // would change and the next run would no longer find the category by its path.
+            return ['store_view_code', 'this shop has only one store view, so Magento keeps every value in the default scope; map the column to the default field (for example "name" instead of a store-view name)'];
+        }
         foreach (self::FLAGS as $flag) {
             if (isset($row[$flag]) && trim((string) $row[$flag]) !== '' && $this->flag($row[$flag]) === null) {
                 return [$flag, 'use 1 or 0 (also yes/no, true/false)'];

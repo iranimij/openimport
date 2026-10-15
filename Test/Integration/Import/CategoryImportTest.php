@@ -22,6 +22,9 @@ use Iranimij\OpenImport\Model\Execution\RunFiles;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Store\Model\Store;
+use Magento\Store\Test\Fixture\Store as StoreFixture;
+use Magento\TestFramework\Fixture\DataFixture;
+use Magento\TestFramework\Fixture\DataFixtureStorageManager;
 use Magento\TestFramework\Fixture\AppArea;
 use Magento\TestFramework\Fixture\AppIsolation;
 use Magento\TestFramework\Fixture\DbIsolation;
@@ -87,7 +90,7 @@ class CategoryImportTest extends TestCase
                 ['target' => 'name', 'source' => 'name'],
                 ['target' => 'is_active', 'source' => 'active'],
                 ['target' => 'description', 'source' => 'description'],
-                ['target' => 'store:default:name', 'source' => 'name_default'],
+                ['target' => 'store:de:name', 'source' => 'name_de'],
             ]);
 
         return Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save($profile);
@@ -105,15 +108,17 @@ class CategoryImportTest extends TestCase
         return Bootstrap::getObjectManager()->get(RunProcessor::class)->process((int) $run->getRunId());
     }
 
+    #[DataFixture(StoreFixture::class, ['code' => 'de', 'name' => 'Deutsch'], 'de')]
     public function testCreateUpdatePreviewDeleteAndExport(): void
     {
         $tag = 'OI' . bin2hex(random_bytes(2));
         $root = $this->root;
         $file = $this->file(
-            "path,name,active,description,name_default\n"
+            "path,name,active,description,name_de\n"
             . "{$root}/{$tag} Men/Shoes,Shoes,1,All shoes,Schuhe\n"
             . "{$root}/{$tag} Men/Shirts,Shirts,0,,\n"
         );
+        $german = (int) DataFixtureStorageManager::getStorage()->get('de')->getId();
         $profile = $this->profile();
 
         $dry = $this->process($profile, $file, RunInterface::MODE_DRY_RUN);
@@ -133,13 +138,14 @@ class CategoryImportTest extends TestCase
         self::assertSame('Shoes', $shoes->getData('name'));
         self::assertSame('All shoes', $shoes->getData('description'));
         self::assertTrue((bool) $shoes->getData('is_active'));
-        self::assertSame('Schuhe', $this->category($shoesId, 1)->getData('name'), 'store-view name from the store:default column');
+        self::assertSame('Schuhe', $this->category($shoesId, $german)->getData('name'), 'store-view name from the store:de column');
+        self::assertSame('Shoes', $this->category($shoesId, Store::DEFAULT_STORE_ID)->getData('name'), 'the default name stays');
         $shirts = $this->category((int) $tree->id("{$root}/{$tag} Men/Shirts"), Store::DEFAULT_STORE_ID);
         self::assertFalse((bool) $shirts->getData('is_active'));
         self::assertSame((int) $tree->id("{$root}/{$tag} Men"), (int) $shirts->getData('parent_id'));
 
         // Update: the preview shows the changed field, the run changes it, an unchanged row counts as unchanged.
-        $update = $this->file("path,name,active,description,name_default\n{$root}/{$tag} Men/Shoes,Shoes,1,Every shoe,Schuhe\n{$root}/{$tag} Men/Shirts,Shirts,0,,\n");
+        $update = $this->file("path,name,active,description,name_de\n{$root}/{$tag} Men/Shoes,Shoes,1,Every shoe,Schuhe\n{$root}/{$tag} Men/Shirts,Shirts,0,,\n");
         $dry2 = $this->process($profile, $update, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $dry2->getStatus(), $dry2->getMessage());
         self::assertSame(1, $dry2->getCount('updated'), $dry2->getMessage());
@@ -174,7 +180,7 @@ class CategoryImportTest extends TestCase
         }
         self::assertSame(4, count($rows), 'Men, Shoes, Shirts and the German Shoes row: ' . implode(', ', array_keys($rows)));
         self::assertSame('Every shoe', $rows["{$root}/{$tag} Men/Shoes|"]['description']);
-        self::assertSame('Schuhe', $rows["{$root}/{$tag} Men/Shoes|default"]['name']);
+        self::assertSame('Schuhe', $rows["{$root}/{$tag} Men/Shoes|de"]['name']);
 
         // Delete the branch: the parent takes its children with it.
         $delete = $this->profile(ProfileInterface::BEHAVIOR_DELETE, [['target' => 'path', 'source' => 'path']]);
@@ -188,17 +194,28 @@ class CategoryImportTest extends TestCase
     public function testBadRowsAreReportedAndReplaceIsRefused(): void
     {
         $root = $this->root;
-        $profile = $this->profile();
-        $run = $this->process($profile, $this->file("path,name,active,description,name_default\nNope/Men,Men,maybe,,\n"));
+        $mapping = [
+            ['target' => 'path', 'source' => 'path'],
+            ['target' => 'name', 'source' => 'name'],
+            ['target' => 'is_active', 'source' => 'active'],
+            ['target' => 'store_view_code', 'source' => 'store'],
+        ];
+        $profile = $this->profile(ProfileInterface::BEHAVIOR_ADD_UPDATE, $mapping);
+        $run = $this->process($profile, $this->file("path,name,active,store\nNope/Men,Men,maybe,\n"));
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('not a root category', $run->getMessage());
 
-        $run = $this->process($profile, $this->file("path,name,active,description,name_default\n{$root}/OI-new-" . bin2hex(random_bytes(2)) . ",Other name,1,,\n"));
+        $run = $this->process($profile, $this->file("path,name,active,store\n{$root}/OI-new-" . bin2hex(random_bytes(2)) . ",Other name,1,\n"));
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('named after the last part of its path', $run->getMessage());
 
-        $replace = $this->profile(ProfileInterface::BEHAVIOR_REPLACE);
-        $run = $this->process($replace, $this->file("path,name,active,description,name_default\n{$root}/X,X,1,,\n"));
+        // The test shop has one store view: Magento would save a store-view value in the default scope.
+        $run = $this->process($profile, $this->file("path,name,active,store\n{$root},Renamed,1,default\n"));
+        self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
+        self::assertStringContainsString('only one store view', $run->getMessage());
+
+        $replace = $this->profile(ProfileInterface::BEHAVIOR_REPLACE, $mapping);
+        $run = $this->process($replace, $this->file("path,name,active,store\n{$root}/X,X,1,\n"));
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('Replace', $run->getMessage());
     }

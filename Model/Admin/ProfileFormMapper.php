@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Model\Admin;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\JsonField;
+use Iranimij\OpenImport\Model\Schedule\DailyTime;
 use Iranimij\OpenImport\Model\Security\Secrets;
 
 /**
@@ -33,10 +34,12 @@ class ProfileFormMapper
     /**
      * @param JsonField $json
      * @param Secrets $secrets
+     * @param DailyTime $dailyTime
      */
     public function __construct(
         private readonly JsonField $json,
-        private readonly Secrets $secrets
+        private readonly Secrets $secrets,
+        private readonly DailyTime $dailyTime
     ) {
     }
 
@@ -109,7 +112,7 @@ class ProfileFormMapper
             'safety_threshold' => $profile->getSafetyThreshold() === null ? '' : (string) $profile->getSafetyThreshold(),
             'schedule_preset' => $this->schedulePreset($schedule),
             'schedule_custom' => $this->schedulePreset($schedule) === self::SCHEDULE_CUSTOM ? $schedule : '',
-            'schedule_time' => self::dailyTime($schedule) ?? '',
+            'schedule_time' => $this->dailyTime->timeOf($schedule) ?? '',
             'after_success' => $profile->getAfterSuccess(),
             'notify' => $profile->getNotify(),
             'notify_emails' => $profile->getNotifyEmails(),
@@ -149,7 +152,7 @@ class ProfileFormMapper
         $preset = $text('schedule_preset');
         $profile->setSchedule(match ($preset) {
             self::SCHEDULE_CUSTOM => $text('schedule_custom'),
-            self::SCHEDULE_DAILY => $this->dailyCron($text('schedule_time', '02:00')),
+            self::SCHEDULE_DAILY => $this->dailyTime->cronOf($text('schedule_time', '02:00')),
             default => $preset,
         });
 
@@ -291,34 +294,6 @@ class ProfileFormMapper
             return $schedule;
         }
 
-        return self::dailyTime($schedule) !== null ? self::SCHEDULE_DAILY : self::SCHEDULE_CUSTOM;
-    }
-
-    /**
-     * @param string $schedule
-     * @return string|null "HH:MM" when the schedule runs once every day, null otherwise
-     */
-    public static function dailyTime(string $schedule): ?string
-    {
-        if (!preg_match('/^(\d{1,2}) (\d{1,2}) \* \* \*$/', trim($schedule), $match)
-            || (int) $match[1] > 59 || (int) $match[2] > 23
-        ) {
-            return null;
-        }
-
-        return sprintf('%02d:%02d', (int) $match[2], (int) $match[1]);
-    }
-
-    /**
-     * @param string $time "HH:MM" (or "H.MM", "HHMM")
-     * @return string the cron expression; a time that cannot be read is passed on, so the validator names it
-     */
-    private function dailyCron(string $time): string
-    {
-        if (!preg_match('/^(\d{1,2})[:.h]?(\d{2})$/', trim($time), $match)) {
-            return trim($time) . ' * * *';
-        }
-
-        return sprintf('%d %d * * *', (int) $match[2], (int) $match[1]);
+        return $this->dailyTime->timeOf($schedule) !== null ? self::SCHEDULE_DAILY : self::SCHEDULE_CUSTOM;
     }
 }

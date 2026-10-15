@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Test\Unit\Model\Admin;
 
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
 use Iranimij\OpenImport\Model\JsonField;
+use Iranimij\OpenImport\Model\Schedule\DailyTime;
 use Iranimij\OpenImport\Model\Security\Secrets;
 use Iranimij\OpenImport\Test\Unit\Model\Security\FakeEncryptor;
 use Iranimij\OpenImport\Test\Unit\Model\ProfileStub;
@@ -19,7 +20,7 @@ class ProfileFormMapperTest extends TestCase
 {
     public function testFormRoundTrip(): void
     {
-        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()));
+        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()), new DailyTime());
         $posted = [
             'name' => '  Supplier A ',
             'direction' => 'import',
@@ -98,7 +99,7 @@ class ProfileFormMapperTest extends TestCase
 
     public function testEveryDayAtATime(): void
     {
-        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()));
+        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()), new DailyTime());
         $profile = $mapper->fromForm(['schedule_preset' => 'daily', 'schedule_time' => '7:05'], new ProfileStub());
 
         self::assertSame('5 7 * * *', $profile->getSchedule());
@@ -113,7 +114,7 @@ class ProfileFormMapperTest extends TestCase
 
     public function testCustomScheduleAndNoFilters(): void
     {
-        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()));
+        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()), new DailyTime());
         $profile = $mapper->fromForm(
             ['schedule_preset' => 'custom', 'schedule_custom' => ' 30 5 * * 1-6 ', 'row_filters' => []],
             new ProfileStub()

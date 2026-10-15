@@ -45,7 +45,7 @@ class RecentRuns
             return [];
         }
         $collection = $this->collectionFactory->create()
-            ->addFieldToFilter('profile_id', $profileId)
+            ->addFieldToFilter('profile_id', ['eq' => $profileId])
             ->setOrder('run_id', 'DESC')
             ->setPageSize(self::LIMIT);
         $runs = [];

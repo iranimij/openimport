@@ -16,9 +16,8 @@ use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Api\Data\ProductAttributeInterfaceFactory;
 use Magento\Catalog\Api\ProductAttributeManagementInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
-use Magento\Eav\Api\Data\AttributeOptionInterfaceFactory;
-use Magento\Eav\Api\Data\AttributeOptionLabelInterfaceFactory;
 use Magento\Eav\Api\Data\AttributeFrontendLabelInterfaceFactory;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\ImportExport\Model\Import;
@@ -55,22 +54,20 @@ class AttributeImporter implements ImporterInterface
     /**
      * @param ProductAttributeRepositoryInterface $attributes
      * @param ProductAttributeInterfaceFactory $attributeFactory
-     * @param AttributeOptionInterfaceFactory $optionFactory
-     * @param AttributeOptionLabelInterfaceFactory $optionLabelFactory
      * @param AttributeFrontendLabelInterfaceFactory $frontendLabelFactory
      * @param ProductAttributeManagementInterface $management
      * @param AttributeSets $sets
+     * @param AttributeOptions $options
      * @param StoreManagerInterface $storeManager
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ProductAttributeRepositoryInterface $attributes,
         private readonly ProductAttributeInterfaceFactory $attributeFactory,
-        private readonly AttributeOptionInterfaceFactory $optionFactory,
-        private readonly AttributeOptionLabelInterfaceFactory $optionLabelFactory,
         private readonly AttributeFrontendLabelInterfaceFactory $frontendLabelFactory,
         private readonly ProductAttributeManagementInterface $management,
         private readonly AttributeSets $sets,
+        private readonly AttributeOptions $options,
         private readonly StoreManagerInterface $storeManager,
         private readonly LoggerInterface $logger
     ) {
@@ -238,15 +235,18 @@ class AttributeImporter implements ImporterInterface
         foreach (self::FLAGS as $flag) {
             if (isset($row[$flag]) && trim((string) $row[$flag]) !== '') {
                 $value = $this->flag($row[$flag]) ? '1' : '0';
-                if ((string) (int) $attribute->getDataUsingMethod($flag) !== $value) {
-                    $attribute->setDataUsingMethod($flag, $value);
+                if ($attribute instanceof DataObject && (string) (int) $attribute->getData($flag) !== $value) {
+                    $attribute->setData($flag, $value);
                     $changed = true;
                 }
             }
         }
         if (isset($row['is_filterable']) && trim((string) $row['is_filterable']) !== ''
             && (string) (int) $attribute->getIsFilterable() !== trim((string) $row['is_filterable'])) {
-            $attribute->setIsFilterable((int) trim((string) $row['is_filterable']));
+            $attribute->setIsFilterable((bool) (int) trim((string) $row['is_filterable']));
+            if ($attribute instanceof DataObject) {
+                $attribute->setData('is_filterable', (int) trim((string) $row['is_filterable']));
+            }
             $changed = true;
         }
         if (array_key_exists('default_value', $row) && $row['default_value'] !== null
@@ -266,7 +266,8 @@ class AttributeImporter implements ImporterInterface
     }
 
     /**
-     * Adds options the attribute does not have yet (by default label, ignoring case); never removes or reorders.
+     * Adds options the attribute does not have yet (by admin label, ignoring case); never removes or reorders, and
+     * keeps every store view's labels of the existing options.
      *
      * @param ProductAttributeInterface $attribute
      * @param string $list "Red|Green|Blue"
@@ -278,32 +279,24 @@ class AttributeImporter implements ImporterInterface
         if ($wanted === []) {
             return false;
         }
-        $options = [];
+        $existing = $this->options->load((int) $attribute->getAttributeId());
         $have = [];
-        foreach ($attribute->getOptions() ?? [] as $option) {
-            if ((string) $option->getValue() === '') {
-                continue; // the empty "choose" option
-            }
-            $options[] = $option;
-            $have[mb_strtolower((string) $option->getLabel())] = true;
+        foreach ($existing as $data) {
+            $have[mb_strtolower($data['label'])] = true;
         }
-        $added = false;
-        $sort = count($options);
+        $new = [];
         foreach ($wanted as $label) {
-            if (isset($have[mb_strtolower($label)])) {
-                continue;
+            if (!isset($have[mb_strtolower($label)])) {
+                $new[] = $label;
+                $have[mb_strtolower($label)] = true;
             }
-            $option = $this->optionFactory->create();
-            $option->setLabel($label)->setSortOrder(++$sort);
-            $options[] = $option;
-            $have[mb_strtolower($label)] = true;
-            $added = true;
         }
-        if ($added) {
-            $attribute->setOptions($options);
+        if ($new === []) {
+            return false;
         }
+        $attribute->setOptions($this->options->build($existing, $new));
 
-        return $added;
+        return true;
     }
 
     /**
@@ -337,44 +330,29 @@ class AttributeImporter implements ImporterInterface
             }
             $attribute->setFrontendLabels($labels);
         }
-        $storeOptions = isset($row['options']) ? $this->split((string) $row['options']) : [];
-        if ($storeOptions !== []) {
-            $options = [];
-            $index = 0;
-            foreach ($attribute->getOptions() ?? [] as $option) {
-                if ((string) $option->getValue() === '') {
-                    continue;
-                }
-                $storeLabel = $storeOptions[$index] ?? null;
-                $index++;
-                if ($storeLabel !== null && $storeLabel !== '') {
-                    $labels = [];
-                    $found = false;
-                    foreach ($option->getStoreLabels() ?? [] as $existing) {
-                        if ((int) $existing->getStoreId() === $storeId) {
-                            $found = true;
-                            if ((string) $existing->getLabel() !== $storeLabel) {
-                                $existing->setLabel($storeLabel);
-                                $changed = true;
-                            }
-                        }
-                        $labels[] = $existing;
-                    }
-                    if (!$found) {
-                        $labels[] = $this->optionLabelFactory->create()->setStoreId($storeId)->setLabel($storeLabel);
-                        $changed = true;
-                    }
-                    $option->setStoreLabels($labels);
-                }
-                $options[] = $option;
+        $storeOptions = isset($row['options']) ? explode(self::OPTION_SEPARATOR, (string) $row['options']) : [];
+        $existing = $this->options->load((int) $attribute->getAttributeId());
+        $optionsChanged = false;
+        $index = 0;
+        foreach ($existing as $id => $data) {
+            $storeLabel = trim($storeOptions[$index] ?? '');
+            $index++;
+            if ($storeLabel !== '' && ($data['stores'][$storeId] ?? '') !== $storeLabel) {
+                $existing[$id]['stores'][$storeId] = $storeLabel;
+                $optionsChanged = true;
             }
-            $attribute->setOptions($options);
         }
-        if ($changed) {
+        if ($optionsChanged) {
+            $attribute->setOptions($this->options->build($existing));
+        } else {
+            // Without options the repository leaves the option labels alone.
+            $attribute->setOptions(null);
+        }
+        if ($changed || $optionsChanged) {
             $this->attributes->save($attribute);
         }
 
-        return $changed;
+        return $changed || $optionsChanged;
     }
 
     /**

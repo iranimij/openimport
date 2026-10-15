@@ -16,6 +16,7 @@ use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Execution\RunFiles;
 use Iranimij\OpenImport\Model\Execution\RunProcessor;
 use Iranimij\OpenImport\Model\Execution\RunQueue;
+use Iranimij\OpenImport\Model\Import\Attribute\AttributeOptions;
 use Iranimij\OpenImport\Model\Import\Attribute\AttributeSets;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
@@ -81,11 +82,30 @@ class AttributeImportTest extends TestCase
         return Bootstrap::getObjectManager()->get(RunProcessor::class)->process((int) $run->getRunId());
     }
 
+    /**
+     * @var string[] attribute codes to remove after the test, whatever happened
+     */
+    private ?array $created = []; // nullable: PHPUnit 9 nulls typed properties
+
+    protected function tearDown(): void
+    {
+        $attributes = Bootstrap::getObjectManager()->get(ProductAttributeRepositoryInterface::class);
+        foreach ($this->created ?? [] as $code) {
+            try {
+                $attributes->deleteById($code);
+            } catch (\Exception $exception) {
+                // already gone
+            }
+        }
+        $this->created = [];
+    }
+
     public function testCreateUpdateExportAndUnassign(): void
     {
         $code = 'oi_' . bin2hex(random_bytes(3));
+        $this->created = [$code, $code . '_note'];
         $header = "code,label,type,options,required,sets,label_default,options_default\n";
-        $file = $this->file($header . "{$code},Material,select,Cotton|Wool,0,Default,Stoff,Baumwolle|Wolle\n{$code}_note,Note,text,,1,Default,,\n");
+        $file = $this->file($header . "{$code},Material,select,Cotton|Wool,0,Default,Stoff,Baumwolle|Wolle\n{$code}_note,Note,text,,1,,,\n");
         $profile = $this->profile();
 
         $dry = $this->process($profile, $file, RunInterface::MODE_DRY_RUN);
@@ -105,18 +125,9 @@ class AttributeImportTest extends TestCase
         $material = $attributes->get($code);
         self::assertSame('select', $material->getFrontendInput());
         self::assertSame('Material', $material->getDefaultFrontendLabel());
-        $labels = [];
-        $storeLabels = [];
-        foreach ($material->getOptions() as $option) {
-            if ((string) $option->getValue() !== '') {
-                $labels[] = $option->getLabel();
-                foreach ($option->getStoreLabels() ?? [] as $storeLabel) {
-                    $storeLabels[(int) $storeLabel->getStoreId()][] = $storeLabel->getLabel();
-                }
-            }
-        }
-        self::assertSame(['Cotton', 'Wool'], $labels);
-        self::assertSame(['Baumwolle', 'Wolle'], $storeLabels[1] ?? [], 'store labels of the default store view');
+        $options = Bootstrap::getObjectManager()->get(AttributeOptions::class);
+        self::assertSame(['Cotton', 'Wool'], $options->labels((int) $material->getAttributeId()));
+        self::assertSame(['Baumwolle', 'Wolle'], $options->storeLabels((int) $material->getAttributeId(), 1), 'store labels of the default store view');
         $frontendLabels = [];
         foreach ($material->getFrontendLabels() ?? [] as $frontendLabel) {
             $frontendLabels[(int) $frontendLabel->getStoreId()] = $frontendLabel->getLabel();
@@ -133,20 +144,13 @@ class AttributeImportTest extends TestCase
         $dry2 = $this->process($profile, $update, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $dry2->getStatus(), $dry2->getMessage());
         self::assertSame(1, $dry2->getCount('updated'), $dry2->getMessage());
-        $before = [];
-        foreach ($material->getOptions() as $option) {
-            $before[$option->getLabel()] = $option->getValue();
-        }
+        $before = array_flip(array_map(static fn (array $o): string => $o['label'], $options->load((int) $material->getAttributeId())));
         $live2 = $this->process($profile, $update);
         self::assertSame(RunInterface::STATUS_SUCCESS, $live2->getStatus(), $live2->getMessage());
-        $after = [];
-        foreach ($attributes->get($code)->getOptions() as $option) {
-            if ((string) $option->getValue() !== '') {
-                $after[$option->getLabel()] = $option->getValue();
-            }
-        }
+        $after = array_flip(array_map(static fn (array $o): string => $o['label'], $options->load((int) $material->getAttributeId())));
         self::assertSame(['Cotton', 'Wool', 'Silk'], array_keys($after));
         self::assertSame($before['Cotton'], $after['Cotton'], 'existing options keep their ids');
+        self::assertSame(['Baumwolle', 'Wolle', ''], $options->storeLabels((int) $material->getAttributeId(), 1), 'adding an option keeps the store labels');
 
         // Export the two attributes and read them back.
         $export = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class)->create()
@@ -179,9 +183,6 @@ class AttributeImportTest extends TestCase
         self::assertFalse($sets->has($defaultSet, $code));
         self::assertSame('Material', $attributes->get($code)->getDefaultFrontendLabel());
 
-        foreach ([$code, $code . '_note'] as $cleanup) {
-            $attributes->deleteById($cleanup);
-        }
     }
 
     public function testBadRows(): void
@@ -196,6 +197,7 @@ class AttributeImportTest extends TestCase
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('needs a label', $run->getMessage());
 
+        $this->created = ['oi_nolabel', 'oi_badset'];
         $run = $this->process($profile, $this->file($header . "oi_badset,Bad set,text,,0,Nope,,\n"));
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('no attribute set', $run->getMessage());

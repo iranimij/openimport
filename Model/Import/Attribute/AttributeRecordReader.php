@@ -22,11 +22,13 @@ class AttributeRecordReader implements RecordReaderInterface
     /**
      * @param ProductAttributeRepositoryInterface $attributes
      * @param AttributeSets $sets
+     * @param AttributeOptions $options
      * @param SearchCriteriaBuilder $criteria
      */
     public function __construct(
         private readonly ProductAttributeRepositoryInterface $attributes,
         private readonly AttributeSets $sets,
+        private readonly AttributeOptions $options,
         private readonly SearchCriteriaBuilder $criteria
     ) {
     }
@@ -102,13 +104,7 @@ class AttributeRecordReader implements RecordReaderInterface
             case 'is_filterable':
                 return (string) (int) $attribute->getIsFilterable();
             case 'options':
-                $labels = [];
-                foreach ($attribute->getOptions() ?? [] as $option) {
-                    if ((string) $option->getValue() !== '') {
-                        $labels[] = (string) $option->getLabel();
-                    }
-                }
-                return implode(AttributeImporter::OPTION_SEPARATOR, $labels);
+                return implode(AttributeImporter::OPTION_SEPARATOR, $this->options->labels((int) $attribute->getAttributeId()));
             case 'attribute_set':
                 $names = [];
                 foreach ($this->sets->all() as $name => $id) {

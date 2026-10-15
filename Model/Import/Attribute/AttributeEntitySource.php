@@ -27,6 +27,7 @@ class AttributeEntitySource implements EntitySourceInterface
     /**
      * @param ProductAttributeRepositoryInterface $attributes
      * @param AttributeRecordReader $reader
+     * @param AttributeOptions $options
      * @param SearchCriteriaBuilder $criteria
      * @param SortOrderBuilder $sortOrder
      * @param StoreManagerInterface $storeManager
@@ -34,6 +35,7 @@ class AttributeEntitySource implements EntitySourceInterface
     public function __construct(
         private readonly ProductAttributeRepositoryInterface $attributes,
         private readonly AttributeRecordReader $reader,
+        private readonly AttributeOptions $options,
         private readonly SearchCriteriaBuilder $criteria,
         private readonly SortOrderBuilder $sortOrder,
         private readonly StoreManagerInterface $storeManager
@@ -78,21 +80,8 @@ class AttributeEntitySource implements EntitySourceInterface
                             $label = (string) $frontendLabel->getLabel();
                         }
                     }
-                    $optionLabels = [];
-                    $any = false;
-                    foreach ($attribute->getOptions() ?? [] as $option) {
-                        if ((string) $option->getValue() === '') {
-                            continue;
-                        }
-                        $storeLabel = '';
-                        foreach ($option->getStoreLabels() ?? [] as $existing) {
-                            if ((int) $existing->getStoreId() === $storeId) {
-                                $storeLabel = (string) $existing->getLabel();
-                            }
-                        }
-                        $any = $any || $storeLabel !== '';
-                        $optionLabels[] = $storeLabel;
-                    }
+                    $optionLabels = $this->options->storeLabels((int) $attribute->getAttributeId(), $storeId);
+                    $any = array_filter($optionLabels, static fn (string $l): bool => $l !== '') !== [];
                     if ($label === '' && !$any) {
                         continue;
                     }

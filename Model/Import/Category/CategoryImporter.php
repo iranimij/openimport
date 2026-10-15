@@ -177,14 +177,19 @@ class CategoryImporter implements ImporterInterface
             $walked[] = $name;
             $id = $this->tree->id($this->paths->join($walked));
             if ($id === null) {
+                // Created in the default scope as the admin does (the repository would save in the current store's
+                // scope, which in cron and CLI is a store view).
+                $parent = $this->categories->get($parentId, Store::DEFAULT_STORE_ID);
                 $category = $this->categoryFactory->create();
                 $category->setStoreId(Store::DEFAULT_STORE_ID)
                     ->setParentId($parentId)
+                    ->setPath((string) $parent->getPath())
                     ->setName($name)
                     ->setIsActive(true)
                     ->setIncludeInMenu(true);
-                $saved = $this->categories->save($category);
-                $id = (int) $saved->getId();
+                $category->setAttributeSetId($category->getDefaultAttributeSetId());
+                $this->categoryResource->save($category);
+                $id = (int) $category->getId();
                 $this->tree->add($id, $parentId, $name);
                 $created++;
             }

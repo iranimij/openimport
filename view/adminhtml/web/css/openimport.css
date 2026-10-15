@@ -74,30 +74,21 @@
     padding: 0 .5rem;
 }
 
-/* Chip buttons appear on hover and keyboard focus, so the chips stay one short line (D4). They keep no width while
-   hidden but stay focusable, so the keyboard reaches them. */
+/* Chip buttons are faint until the chip is hovered or focused, so the chip reads as one short label (D4). They keep
+   their place (no jumping) and stay reachable by keyboard and pointer. */
 .openimport-chip .openimport-chip-button {
-    border-width: 0;
-    min-width: 0;
-    overflow: hidden;
-    padding: 0;
-    width: 0;
+    opacity: .25;
+    transition: opacity .1s;
 }
 
 .openimport-chip:hover .openimport-chip-button,
 .openimport-chip:focus-within .openimport-chip-button {
-    border-width: 1px;
-    min-width: 2.4rem;
-    padding: 0 .5rem;
-    width: auto;
+    opacity: 1;
 }
 
 @media (hover: none) {
     .openimport-chip .openimport-chip-button {
-        border-width: 1px;
-        min-width: 2.4rem;
-        padding: 0 .5rem;
-        width: auto;
+        opacity: 1;
     }
 }
 

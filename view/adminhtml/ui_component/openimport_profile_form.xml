@@ -138,6 +138,38 @@
                 </select>
             </formElements>
         </field>
+        <field name="order_on_place" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Also run after every order</label>
+                <notice translate="true">Queues this export when an order is placed; cron runs it within a minute. Combine with "Only orders not exported before".</notice>
+                <dataScope>export_options.order.on_place</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string" translate="true">Yes</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="order_only" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="41">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

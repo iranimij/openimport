@@ -422,3 +422,8 @@
 "Product attributes and attribute sets","Produktattribute und Attributsets"
 "CMS pages","CMS-Seiten"
 "CMS blocks","CMS-Blöcke"
+"Order placed","Bestellung aufgegeben"
+"Also run after every order","Auch nach jeder Bestellung ausführen"
+"Queues this export when an order is placed; cron runs it within a minute. Combine with ""Only orders not exported before"".","Stellt diesen Export nach jeder Bestellung in die Warteschlange; Cron führt ihn innerhalb einer Minute aus. Am besten mit ""Nur Bestellungen, die dieses Profil noch nicht exportiert hat""."
+"The mode must be ""dry_run"" or ""live"".","Der Modus muss ""dry_run"" oder ""live"" sein."
+"Profile %1 reads an uploaded file. Give it a folder, URL, SFTP or FTP source to start it through the API.","Profil %1 liest eine hochgeladene Datei. Geben Sie ihm eine Ordner-, URL-, SFTP- oder FTP-Quelle, um es über die API zu starten."

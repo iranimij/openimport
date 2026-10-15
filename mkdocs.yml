@@ -19,6 +19,7 @@ nav:
   - CMS pages and blocks: cms.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
+  - REST API and triggers: api.md
   - Admin: admin.md
   - Security: security.md
   - Developers:

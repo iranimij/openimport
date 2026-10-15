@@ -26,6 +26,7 @@ class RunTrigger implements OptionSourceInterface
             'schedule' => 'Schedule',
             'cli' => 'Command line',
             'api' => 'API',
+            'event' => 'Order placed',
         ] as $value => $label) {
             $options[] = ['value' => (string) $value, 'label' => __($label)];
         }

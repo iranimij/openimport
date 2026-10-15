@@ -9,6 +9,8 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Iranimij\OpenImport\Api\Data\ProfileInterface" type="Iranimij\OpenImport\Model\Profile"/>
     <preference for="Iranimij\OpenImport\Api\Data\RunInterface" type="Iranimij\OpenImport\Model\Run"/>
+    <preference for="Iranimij\OpenImport\Api\RunManagementInterface" type="Iranimij\OpenImport\Model\Api\RunManagement"/>
+    <preference for="Iranimij\OpenImport\Api\Data\RunStartResultInterface" type="Iranimij\OpenImport\Model\Api\RunStartResult"/>
     <preference for="Iranimij\OpenImport\Api\ProfileRepositoryInterface"
                 type="Iranimij\OpenImport\Model\ProfileRepository"/>
     <preference for="Iranimij\OpenImport\Api\RunRepositoryInterface" type="Iranimij\OpenImport\Model\RunRepository"/>

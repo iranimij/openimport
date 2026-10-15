@@ -14,6 +14,9 @@ All notable changes to this project are documented here. The format follows
   unassigns. See docs/attributes.md.
 - CMS pages and blocks import and export (`openimport_cms_page`, `openimport_cms_block`) by identifier and store
   views, dry-run preview, delete. See docs/cms.md. New dependency: `magento/module-cms` (core).
+- REST API: `POST /V1/openimport/profiles/:profileId/runs` starts a profile (dry run or live),
+  `GET /V1/openimport/runs/:runId` reports on it (`RunManagementInterface`). Order exports can run after every
+  placed order (debounced: one waiting run per profile). See docs/api.md.
 
 ## [1.0.0] - 2026-10-15
 

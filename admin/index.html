@@ -149,22 +149,34 @@
 <strong>Stores › Configuration › iranimij › OpenImport</strong>.</p>
 <h2 id="profiles">Profiles<a class="headerlink" href="#profiles" title="Permanent link">&para;</a></h2>
 <p>The profile list shows each profile's direction, what it imports or exports, its source, schedule and last run.
-Row actions: <em>Edit</em>, <em>Dry run</em>, <em>Run now</em>, <em>Duplicate</em> (the copy starts with its schedule off) and <em>Delete</em> (runs
-and error reports are kept).</p>
+Above it, a status line says how the last 24 hours went (failed runs link to the runs), what is waiting, and whether
+the cron runs. A click on a row opens the profile. Row actions: <em>Edit</em>, <em>Dry run</em>, <em>Run now</em> (the dialog names the
+file it imports and how the last dry run went), <em>Duplicate</em> (the copy starts with its schedule off) and <em>Delete</em>
+(runs and error reports are kept). Mass actions: switch schedules on or off, delete. <strong>Import profiles from JSON</strong>
+takes a file from <em>Download as JSON</em> or <code>openimport:profile:export</code>.</p>
+<p>The form has a step navigation at the top; each step header says what the step holds, and its <strong>?</strong> opens the
+matching page of this documentation. Fields show only where they matter (an export has no import rules, a CSV no
+sheet name, the cron field only with <em>Custom</em>), required fields are marked, and a save that fails opens the step with
+the problem and shows the message at the field. Leaving the form with unsaved changes asks first. Below the steps,
+<strong>Recent runs</strong> lists the last five runs of the profile. <strong>Download as JSON</strong> saves the profile without its secrets.</p>
 <p>The profile form has six steps:</p>
 <ol>
 <li><strong>What</strong>: name, import or export, and what (Products, Stock &amp; prices, Customers …).</li>
 <li><strong>Where</strong>: the source. For <em>Upload a file</em>, choose the file; it is read on the server, never in the browser.</li>
 <li><strong>File</strong>: format and its options (delimiter, encoding, sheet, record path). The first 20 rows of the file are
    shown and read again when an option changes.</li>
-<li><strong>Map</strong>: one row per Magento field: the column of the file (or a fixed value), the store view, transforms
-   (add, move up and down, remove), <em>required</em>, and a value map. <strong>Auto-match</strong> proposes a mapping from the column
+<li><strong>Map</strong>: one row per Magento field (pick it from the list, or <em>Other field …</em> to type a code): the column of the
+   file (or a fixed value), the store view, transforms (one without settings is added when chosen; move up and down,
+   remove), <em>empty is an error</em>, and a value map. <strong>Auto-match</strong> proposes a mapping from the column
    names (and adds <em>Decimal comma → dot</em> where the file writes numbers with commas), <strong>Add required fields</strong> adds what
    Magento needs for new records with proposed fixed values, <strong>Preview the first rows</strong> shows what
    Magento will receive, row by row, with any problems.</li>
-<li><strong>Rules</strong>: behaviour, rows with errors, allowed errors, <em>skip unchanged rows</em> (delta), safety limit, row filters.</li>
-<li><strong>When</strong>: manual or a schedule (presets or a cron expression), schedule on/off, e-mails, what happens to the source
-   file after a successful run.</li>
+<li><strong>Rules</strong>: behaviour (only those the entity can do), rows with errors, allowed errors, <em>skip unchanged rows</em>
+   (delta), safety limit (empty = the configured default), row filters. Order exports have their filters here:
+   statuses, created from/until (date pickers) and which orders.</li>
+<li><strong>When</strong>: manual or a schedule (every 15 or 30 minutes, every hour, every day at a chosen time, presets, or a cron
+   expression) with the next three run times, schedule on/off, e-mails, what happens to the source file after a
+   successful run.</li>
 </ol>
 <p><strong>Save and dry run</strong> saves and starts a dry run straight away. New profiles have their schedule off; switch it on
 after a dry run you are happy with.</p>
@@ -180,8 +192,12 @@ run is queued or running.</p>
 <li><strong>Download error report</strong> gives a CSV with the row number, record, field and error, followed by the original row,
   so you can fix the rows and import them again. Cells that a spreadsheet would run as formulas are protected.</li>
 <li><strong>Download the file</strong> gives the file the run read.</li>
-<li>A queued run can be cancelled.</li>
+<li><strong>Cancel</strong> stops a queued run at once, and a running one at its next checkpoint while it still reads the file
+  (before it writes to the shop or sends a file). <strong>Run again</strong> / <strong>Dry run again</strong> start the profile again, also from
+  the runs grid.</li>
+<li>An export's run page shows the first ten rows of the file it wrote.</li>
 </ul>
+<p>The runs grid can be filtered by what and direction, and searched by profile name. A click on a row opens the run.</p>
 <h2 id="permissions">Permissions<a class="headerlink" href="#permissions" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -201,7 +217,7 @@ run is queued or running.</p>
 </tr>
 <tr>
 <td>Run profiles</td>
-<td>dry runs, live runs, cancelling queued runs</td>
+<td>dry runs, live runs, cancelling runs</td>
 </tr>
 <tr>
 <td>Confirm runs above the safety limit</td>

@@ -181,8 +181,8 @@ Magento's default jobs (indexers, e-mails), and they never hold up an import.</p
 <p>Without cron, queued runs wait. <code>bin/magento openimport:queue:run</code> does the same work as the tick by hand
 (see <a href="../cli/">Command line</a>).</p>
 <h2 id="profile-schedules">Profile schedules<a class="headerlink" href="#profile-schedules" title="Permanent link">&para;</a></h2>
-<p>A profile's schedule is a preset (every hour, every day at 02:00, weekdays at 06:00, …) or a 5-field cron
-expression: minute, hour, day of month, month, day of week. Lists (<code>1,15</code>), ranges (<code>8-18</code>), steps (<code>*/15</code>) and
+<p>A profile's schedule is a preset (every 15 or 30 minutes, every hour, every day at a time you choose, every night
+at 02:00, weekdays at 06:00) or a 5-field cron expression, and the form shows the next three run times: minute, hour, day of month, month, day of week. Lists (<code>1,15</code>), ranges (<code>8-18</code>), steps (<code>*/15</code>) and
 names (<code>mon-fri</code>, <code>jan</code>) work. Times are read in the store's time zone (Stores › Configuration › General ›
 Locale Options › Timezone), so <code>0 2 * * *</code> means 02:00 local time, also across daylight-saving changes.</p>
 <p>A schedule only fires while the profile's <strong>Schedule is on</strong> switch is on. New and duplicated profiles start with it
@@ -215,8 +215,9 @@ time (products and Stock &amp; prices share the product entity).</p>
 <p>Each profile says when to send an e-mail (step 6): never, on failure (failed, finished with errors, needs
 confirmation) or always, to the comma-separated addresses, or, when empty, to the admin who created the profile.
 The e-mail carries the result, the counts, the run message, a note on errors and a link to the run page. It uses
-the store's e-mail settings (Stores › Configuration › General › Store Email Addresses, "General Contact" as sender)
-and the template <em>OpenImport: a run finished</em>, which can be customised under Marketing › Email Templates.</p>
+the store's e-mail settings (Stores › Configuration › General › Store Email Addresses) and the template <em>OpenImport: a run finished</em>, which can be customised under Marketing › Email Templates.</p>
+<p>The sender is set under Stores › Configuration › iranimij › OpenImport › Runs › <em>E-mail sender</em> (one of the store
+e-mail addresses); it also sends exports by e-mail.</p>
               
             </div>
           </div><footer>

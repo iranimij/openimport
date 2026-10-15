@@ -187,6 +187,9 @@ names (<code>mon-fri</code>, <code>jan</code>) work. Times are read in the store
 Locale Options › Timezone), so <code>0 2 * * *</code> means 02:00 local time, also across daylight-saving changes.</p>
 <p>A schedule only fires while the profile's <strong>Schedule is on</strong> switch is on. New and duplicated profiles start with it
 off: run a dry run first, then switch it on.</p>
+<p>A schedule needs a source that changes by itself: a profile that reads an <strong>uploaded file</strong> cannot be switched on
+(it would import the same file again and again; use a server folder, web address, SFTP or FTP), and a scheduled
+export needs a destination other than <em>Download</em> (a server folder, SFTP, FTP or e-mail).</p>
 <p>Scheduled runs are live runs. The safety threshold still applies: a scheduled Delete or Replace run that would
 remove more than the threshold stops with "needs confirmation" and waits for someone to confirm it on the run page.</p>
 <h2 id="exactly-once">Exactly once<a class="headerlink" href="#exactly-once" title="Permanent link">&para;</a></h2>

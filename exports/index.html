@@ -158,7 +158,7 @@ on a schedule.</p>
 <li><strong>Where</strong>: the destination (download from the run page, server folder, SFTP, FTP, e-mail) and the file name.
    Placeholders in the file name: <code>{entity}</code>, <code>{profile}</code>, <code>{date}</code> (2026-10-14), <code>{time}</code> (143000),
    <code>{datetime}</code>, <code>{run}</code>, <code>{ext}</code>. Default <code>{entity}-{datetime}.{ext}</code>.</li>
-<li><strong>File</strong>: CSV (delimiter, encoding UTF-8 or Windows-1252, BOM, line ending), Excel (.xlsx, sheet name),
+<li><strong>File</strong>: CSV (delimiter, encoding UTF-8, Windows-1252 or ISO-8859-1/-15, BOM, line ending, header row on or off), Excel (.xlsx, sheet name),
    JSON (root key, pretty) or XML (root and record element names).</li>
 <li><strong>Map</strong>: without a mapping every column is written as Magento exports it. With a mapping, each row is one
    column of the file: its name, the Magento column it comes from (or a fixed value), transforms and value maps —
@@ -184,7 +184,7 @@ nowhere. A live run delivers it and keeps a copy in the run folder for "Keep run
 <p>The <strong>Orders</strong> entity is OpenImport's own (Magento has no order export). One row per order line by default
 (order, customer, totals, billing and shipping address, payment, shipments and tracking numbers repeated on every
 line; child lines of configurable and bundle products left out unless chosen), or one row per order. Filters:
-statuses, created from/until (UTC), store views, and <em>Which orders</em>: all, only orders this profile has not
+statuses, created from/until (in the store time zone of Stores › Configuration › General › Locale, like the schedules; a date alone as "until" counts the whole day), store views, and <em>Which orders</em>: all, only orders this profile has not
 exported before, or new and changed orders (an order whose <code>updated_at</code> moved after its export, for status
 changes). Exported orders are remembered per profile (<code>openimport_export_mark</code>) after a successful live run; dry
 runs remember nothing. Typical use: a nightly "new orders" file for an ERP over SFTP.</p>

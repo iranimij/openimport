@@ -45,11 +45,12 @@ uploads, form fields per direction and setting (shared `conditional.js`), privat
 at their fields, leave guard, dialogs, translations CI check (#39). Release `v1.1.2`. Dev-env #7: E2E for every grid
 row action, export-only settings, save errors, SFTP key login (the workflow makes a key pair).
 
-**1.2.0 (in review, #40):** the design (D1–D15) and product (P1–P10) items of the same review: run page chip and
+**1.2.0 (2026-10-15, #40):** the design (D1–D15) and product (P1–P10) items of the same review: run page chip and
 headline, one row per record in the preview, mapping rows, toggles, drop zone, step navigation with summaries and
 docs links, order filters in Rules, row click, recent runs, cancel running runs, run again, mass actions, schedules
 every 15/30 min and every day at a time with next runs, profile JSON in the admin, e-mail sender, first rows of
-exports, status line above the grid. Dev-env #8 for the E2E.
+exports, status line above the grid. Release `v1.2.0`, docs redeployed. Dev-env #8: E2E for the new form (fields
+from the list, daily schedule with next runs, Download as JSON), a11y names on the grid checkboxes.
 
 Lessons from the second review: Magento grid actions with `post` but no confirm are plain links (a POST-only
 controller answers 404), so the actions column needs its own handler; a grid select filter needs `dataType select`
@@ -74,8 +75,8 @@ delete branches), repository settings (squash only, delete branch on merge,
 
 ## Exact next step
 
-Merge #40 (1.2.0) and dev-env #8 when green, release `v1.2.0`, redeploy the docs, update Notion page 14 statuses and
-the build log.
+Nothing in flight. Next features from Notion "12 · Roadmap 1.x" when Iman picks them. Known flake: the first E2E
+test's Auto-match sometimes needs Playwright's retry (more time given in dev-env #8).
 
 ## Open questions
 

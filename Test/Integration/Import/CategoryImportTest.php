@@ -69,7 +69,7 @@ class CategoryImportTest extends TestCase
             ->setFormat('csv')
             ->setSourceType('upload')
             ->setBehavior($behavior)
-            ->setSafetyThreshold(1000)
+            ->setSafetyThreshold(100)
             ->setMapping($mapping !== [] ? $mapping : [
                 ['target' => 'path', 'source' => 'path'],
                 ['target' => 'name', 'source' => 'name'],

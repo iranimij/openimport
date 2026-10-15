@@ -51,7 +51,8 @@ class SourceOrDestination extends Column
             return $dataSource;
         }
         $sources = $this->labels($this->sources->toOptionArray());
-        $destinations = $this->labels($this->destinations->toOptionArray());
+        // Short in the grid: "→ Download" rather than the form's "Download from the run page".
+        $destinations = ['download' => (string) __('Download')] + $this->labels($this->destinations->toOptionArray());
         // By reference into the array itself (a "?? []" expression would be a copy).
         foreach ($dataSource['data']['items'] as &$item) {
             if (($item['direction'] ?? 'import') === 'export') {

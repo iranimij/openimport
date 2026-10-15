@@ -448,3 +448,6 @@
 "%1 required field(s) added. Pick a column of the file or check the fixed value.","%1 Pflichtfeld(er) hinzugefügt. Wählen Sie eine Spalte der Datei oder prüfen Sie den festen Wert."
 "Every required field is mapped.","Alle Pflichtfelder sind zugeordnet."
 "Download","Herunterladen"
+"A new product needs a product type: map product_type or give it a fixed value such as ""simple"" (""Add required fields"" in step 4).","Ein neues Produkt braucht einen Produkttyp: product_type zuordnen oder einen festen Wert wie „simple“ angeben („Pflichtfelder hinzufügen“ in Schritt 4)."
+"A new product needs an attribute set that exists, e.g. ""Default"": map attribute_set_code or give it a fixed value (""Add required fields"" in step 4).","Ein neues Produkt braucht ein vorhandenes Attributset, z. B. „Default“: attribute_set_code zuordnen oder einen festen Wert angeben („Pflichtfelder hinzufügen“ in Schritt 4)."
+"There is no website with this code; use website codes such as ""base"", separated by commas.","Es gibt keine Website mit diesem Code; Website-Codes wie „base“ verwenden, durch Kommas getrennt."

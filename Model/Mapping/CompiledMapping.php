@@ -52,6 +52,16 @@ class CompiledMapping
     }
 
     /**
+     * Default-row columns repeated on store-view rows (identifier included).
+     *
+     * @return string[]
+     */
+    public function carryColumns(): array
+    {
+        return $this->carry;
+    }
+
+    /**
      * @param array<string, string> $source
      * @return MappedRow
      */

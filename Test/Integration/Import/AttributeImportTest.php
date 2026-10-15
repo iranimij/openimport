@@ -190,6 +190,11 @@ class AttributeImportTest extends TestCase
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('lower-case', $run->getMessage());
 
+        // A dry run does not count a refused row as "will be created".
+        $this->created = ['oi_good_' . substr(md5((string) microtime()), 0, 6)];
+        $dry = $this->process($profile, $this->file($header . $this->created[0] . ",Good,text,,0,,,\nBad Code,X,text,,0,,,\n"), RunInterface::MODE_DRY_RUN);
+        self::assertSame(1, $dry->getCount('created'), $dry->getMessage());
+
         $run = $this->process($profile, $this->file($header . "oi_nolabel,,text,,0,,,\n"));
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('needs a label', $run->getMessage());

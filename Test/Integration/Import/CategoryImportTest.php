@@ -123,7 +123,7 @@ class CategoryImportTest extends TestCase
 
         $dry = $this->process($profile, $file, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $dry->getStatus(), $dry->getMessage());
-        self::assertSame(2, $dry->getCount('created'), 'two new categories in the preview (the parent is created on the way)');
+        self::assertSame(3, $dry->getCount('created'), 'the parent "Men" plus two children, as the live run will create them');
         $tree = Bootstrap::getObjectManager()->get(CategoryTree::class);
         $tree->reset();
         self::assertNull($tree->id("{$root}/{$tag} Men/Shoes"), 'a dry run writes nothing');
@@ -131,6 +131,7 @@ class CategoryImportTest extends TestCase
         $live = $this->process($profile, $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $live->getStatus(), $live->getMessage());
         self::assertSame(3, $live->getCount('created'), 'the parent "Men" plus two children');
+        self::assertSame(0, $live->getCount('updated'), 'store-view names and flags of new categories are part of creating them');
         $tree->reset();
         $shoesId = $tree->id("{$root}/{$tag} Men/Shoes");
         self::assertNotNull($shoesId);

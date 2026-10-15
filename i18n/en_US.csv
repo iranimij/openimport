@@ -445,3 +445,6 @@
 "%1 required field(s) added. Pick a column of the file or check the fixed value.","%1 required field(s) added. Pick a column of the file or check the fixed value."
 "Every required field is mapped.","Every required field is mapped."
 "Download","Download"
+"A new product needs a product type: map product_type or give it a fixed value such as ""simple"" (""Add required fields"" in step 4).","A new product needs a product type: map product_type or give it a fixed value such as ""simple"" (""Add required fields"" in step 4)."
+"A new product needs an attribute set that exists, e.g. ""Default"": map attribute_set_code or give it a fixed value (""Add required fields"" in step 4).","A new product needs an attribute set that exists, e.g. ""Default"": map attribute_set_code or give it a fixed value (""Add required fields"" in step 4)."
+"There is no website with this code; use website codes such as ""base"", separated by commas.","There is no website with this code; use website codes such as ""base"", separated by commas."

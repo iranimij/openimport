@@ -38,11 +38,13 @@ class CoreImporter implements ImporterInterface
      * @param CoreImportFactory $importFactory
      * @param HistoryFactory $historyFactory
      * @param ImportData $importData
+     * @param CoreMessages $messages
      */
     public function __construct(
         private readonly CoreImportFactory $importFactory,
         private readonly HistoryFactory $historyFactory,
-        private readonly ImportData $importData
+        private readonly ImportData $importData,
+        private readonly CoreMessages $messages = new CoreMessages()
     ) {
     }
 
@@ -156,7 +158,7 @@ class CoreImporter implements ImporterInterface
             $errors[] = $row;
         }
 
-        return $errors;
+        return $this->messages->explain($errors);
     }
 
     /**

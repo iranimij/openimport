@@ -44,6 +44,11 @@ class CategoryImporter implements ImporterInterface
     private const DISPLAY_MODES = ['PRODUCTS', 'PAGE', 'PRODUCTS_AND_PAGE'];
 
     /**
+     * @var array<int, true> ids of categories this run created
+     */
+    private array $createdIds = [];
+
+    /**
      * @param CategoryTree $tree
      * @param CategoryPath $paths
      * @param CategoryRepositoryInterface $categories
@@ -90,8 +95,11 @@ class CategoryImporter implements ImporterInterface
         $valid = $errors === [] || ($request->skipErrors && $invalid <= $request->allowedErrors
             && !array_filter($errors, static fn (RowError $error): bool => $error->row === null));
         if ($request->dryRun || !$valid) {
-            return $this->result($valid, false, $position, $invalid, 0, 0, 0, $errors, $started);
+            $planned = $request->behavior === Import::BEHAVIOR_DELETE ? 0 : $this->plannedCreations($rows);
+
+            return $this->result($valid, false, $position, $invalid, $planned, 0, 0, $errors, $started);
         }
+        $this->createdIds = [];
         $created = $updated = $deleted = 0;
         foreach ($rows as $index => $row) {
             try {
@@ -207,6 +215,7 @@ class CategoryImporter implements ImporterInterface
                 $this->categoryResource->save($category);
                 $id = (int) $category->getId();
                 $this->tree->add($id, $parentId, $name);
+                $this->createdIds[$id] = true;
                 $created++;
             }
             $parentId = $id;
@@ -246,7 +255,31 @@ class CategoryImporter implements ImporterInterface
             }
         }
 
-        return [$created, $changed && $created === 0 ? 1 : 0];
+        // A category this run created counts as created only (its store-view names and flags are part of that).
+        return [$created, $changed && $created === 0 && !isset($this->createdIds[(int) $id]) ? 1 : 0];
+    }
+
+    /**
+     * Categories a live run would create for these rows: every missing level of every path, once.
+     *
+     * @param array<int, array<string, mixed>> $rows valid rows
+     * @return int
+     */
+    private function plannedCreations(array $rows): int
+    {
+        $missing = [];
+        foreach ($rows as $row) {
+            $walked = [];
+            foreach ($this->paths->segments((string) ($row['path'] ?? '')) as $segment) {
+                $walked[] = $segment;
+                $path = $this->paths->join($walked);
+                if (count($walked) > 1 && $this->tree->id($path) === null) {
+                    $missing[$this->paths->key($path)] = true;
+                }
+            }
+        }
+
+        return count($missing);
     }
 
     /**

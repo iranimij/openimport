@@ -96,6 +96,11 @@ class ImportRunner
     private array $previewTotals = [];
 
     /**
+     * @var array<string, string> lower-cased identifier => change type of its default record (dry runs)
+     */
+    private array $previewKinds = [];
+
+    /**
      * @var PreviewRecord[]
      */
     private array $previewSample = [];
@@ -258,6 +263,7 @@ class ImportRunner
             0
         );
         $this->previewSample = [];
+        $this->previewKinds = [];
         $this->sampleCounts = [];
         $this->existingAffected = 0;
         $this->skippedNames = [];
@@ -452,18 +458,25 @@ class ImportRunner
         $records = [];
         if ($behavior === ProfileInterface::BEHAVIOR_DELETE) {
             foreach ($accepted as [$line, $mapped, $exists]) {
-                $records[] = [$this->previewBuilder->deletion($mapped->identifier, $exists, $line), true];
+                $records[] = [
+                    $this->previewBuilder->deletion($mapped->identifier, $exists, $line),
+                    true,
+                    mb_strtolower($mapped->identifier),
+                ];
             }
         } else {
             $identifiers = array_map(static fn (array $item): string => $item[1]->identifier, $accepted);
             $skip = array_merge($mapping->identifierColumns(), ['store_view_code']);
             $current = $reader->current($identifiers, $mapping->columns());
             $byStore = [];
+            // Store-view rows repeat the default row's carry columns (attribute set, type …): not changes of their own.
+            $storeSkip = array_merge($skip, $mapping->carryColumns());
             foreach ($accepted as [$line, $mapped]) {
                 $key = mb_strtolower($mapped->identifier);
                 $records[] = [
                     $this->previewBuilder->compare($mapped->identifier, $mapped->main(), $current[$key] ?? null, $skip, $line),
                     true,
+                    $key,
                 ];
                 foreach (array_slice($mapped->rows, 1) as $row) {
                     $byStore[$row['store_view_code']][] = [$line, $mapped, $row];
@@ -479,7 +492,7 @@ class ImportRunner
                             $mapped->identifier . ' [' . $store . ']',
                             $row,
                             isset($current[$key]) ? ($storeCurrent[$key] ?? []) : null,
-                            $skip,
+                            $storeSkip,
                             $line
                         ),
                         false,
@@ -488,9 +501,11 @@ class ImportRunner
             }
         }
         // Totals count records (default rows); store-view rows only appear in the sample.
-        foreach ($records as [$record, $isMain]) {
+        foreach ($records as $entry) {
+            [$record, $isMain] = $entry;
             if ($isMain) {
                 $this->previewTotals[$record->changeType] = ($this->previewTotals[$record->changeType] ?? 0) + 1;
+                $this->previewKinds[$entry[2]] = $record->changeType;
             }
             $limit = $record->changeType === PreviewRecord::UNCHANGED
                 ? (int) (self::PREVIEW_SAMPLE / 4)
@@ -575,6 +590,18 @@ class ImportRunner
         $this->storeErrors(true);
 
         if ($dryRun) {
+            // Records Magento refused will not change: they leave the totals (they are listed under the errors).
+            foreach (array_keys($failedIdentifiers) as $identifier) {
+                $kind = $this->previewKinds[mb_strtolower((string) $identifier)] ?? null;
+                if ($kind !== null && $this->previewTotals[$kind] > 0) {
+                    $this->previewTotals[$kind]--;
+                    unset($this->previewKinds[mb_strtolower((string) $identifier)]);
+                }
+            }
+            // Own importers know records created on the way (a category's missing parents).
+            if ($this->importers->isOwn($entity->importEntity()) && $result->created > $this->previewTotals[PreviewRecord::NEW]) {
+                $this->previewTotals[PreviewRecord::NEW] = $result->created;
+            }
             $this->counts['created'] = $this->previewTotals[PreviewRecord::NEW];
             $this->counts['updated'] = $this->previewTotals[PreviewRecord::CHANGED];
             $this->counts['deleted'] = $this->previewTotals[PreviewRecord::DELETED];

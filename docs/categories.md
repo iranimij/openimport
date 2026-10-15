@@ -12,13 +12,14 @@ delete and recreate the categories with new ids).
 | Column | Meaning |
 |---|---|
 | `path` | identifier; parents that do not exist yet are created on the way (active, in the menu, named after the segment) |
-| `name` | defaults to the last segment of the path |
+| `name` | a new category is named after the last segment of its path (a different name is refused, it would make the next import create a duplicate); for an existing category the name column renames it, and its path changes with it |
 | `url_key`, `description`, `meta_title`, `meta_keywords`, `meta_description`, `custom_design`, `page_layout` | texts |
 | `is_active`, `include_in_menu`, `is_anchor` | `1`/`0`, also `yes`/`no`, `true`/`false`, `ja`/`nein` |
 | `position` | whole number |
 | `display_mode` | `PRODUCTS`, `PAGE` or `PRODUCTS_AND_PAGE` |
 
-Only the columns a row has are changed. Store-view values work like everywhere in OpenImport: map a file column to
+Only the columns a row has are changed. Store-view values are saved one attribute at a time, so a German name does
+not regenerate the category's URL rewrites (change `url_key` for that). Store-view values work like everywhere in OpenImport: map a file column to
 `store:<store view code>:<field>` (`name_de` → *Store view* `de`, field `name`) and the row sets that store view's
 value. The dry run shows the categories that would be created and every field that would change; delete runs
 count the children too and wait for the typed confirmation above the safety threshold.

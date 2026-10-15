@@ -146,6 +146,14 @@ class CategoryImporter implements ImporterInterface
         if ($mode !== '' && !in_array($mode, self::DISPLAY_MODES, true)) {
             return ['display_mode', 'use PRODUCTS, PAGE or PRODUCTS_AND_PAGE'];
         }
+        $name = trim((string) ($row['name'] ?? ''));
+        if ($behavior !== Import::BEHAVIOR_DELETE && $store === '' && $name !== '' && $name !== end($segments)
+            && $this->tree->id((string) $row['path']) === null) {
+            return ['name', sprintf(
+                'a new category is named after the last part of its path ("%s"); use the name in the path, or leave the name column empty',
+                (string) end($segments)
+            )];
+        }
         if ($behavior === Import::BEHAVIOR_DELETE && $this->tree->id((string) $row['path']) === null) {
             return ['path', 'there is no such category'];
         }
@@ -192,17 +200,26 @@ class CategoryImporter implements ImporterInterface
         if (!$category instanceof Category) {
             throw new LocalizedException(__('The category "%1" could not be loaded.', $row['path']));
         }
-        $changed = false;
+        $changedAttributes = [];
         foreach ($values as $attribute => $value) {
             if ((string) $category->getData($attribute) !== (string) $value) {
                 $category->setData($attribute, $value);
-                $changed = true;
+                $changedAttributes[] = $attribute;
             }
         }
+        $changed = $changedAttributes !== [];
         if ($changed) {
-            // The resource model saves the store's own values (the repository only keeps interface fields).
             $category->setStoreId($storeId);
-            $this->categoryResource->save($category);
+            if ($storeId !== Store::DEFAULT_STORE_ID && !in_array('url_key', $changedAttributes, true)) {
+                // A store view's own values (name, description, meta …) are saved one by one: a full save in store
+                // scope regenerates every URL rewrite of the category and its children and can clash with itself.
+                foreach ($changedAttributes as $attribute) {
+                    $this->categoryResource->saveAttribute($category, $attribute);
+                }
+            } else {
+                // The resource model saves the store's values (the repository keeps interface fields only).
+                $this->categoryResource->save($category);
+            }
             if (isset($values['name']) && $storeId === Store::DEFAULT_STORE_ID) {
                 $this->tree->reset();
             }

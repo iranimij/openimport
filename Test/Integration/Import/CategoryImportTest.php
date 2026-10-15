@@ -193,6 +193,10 @@ class CategoryImportTest extends TestCase
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('not a root category', $run->getMessage());
 
+        $run = $this->process($profile, $this->file("path,name,active,description,name_default\n{$root}/OI-new-" . bin2hex(random_bytes(2)) . ",Other name,1,,\n"));
+        self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
+        self::assertStringContainsString('named after the last part of its path', $run->getMessage());
+
         $replace = $this->profile(ProfileInterface::BEHAVIOR_REPLACE);
         $run = $this->process($replace, $this->file("path,name,active,description,name_default\n{$root}/X,X,1,,\n"));
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());

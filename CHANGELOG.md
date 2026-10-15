@@ -5,6 +5,42 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-10-15
+
+Fixes from the second hands-on review (QA items Q1–Q21 of the review page).
+
+### Fixed
+- Profiles grid: *Dry run* and *Duplicate* work again (they opened a 404 page); the *What*, *Source / destination*
+  and *Started by* filters list their choices; the keyword search finds profiles by name, runs by profile name.
+- Deleting categories counts the subcategories that go along, in the dry run and in the safety limit.
+- Export profiles no longer show import settings: no *Detect* choices, sheet, record path or first rows in step 3,
+  no behaviour, error rules, *skip unchanged* or safety limit in step 5; row filters say *Export only the records
+  that match*.
+- Fields show only where they matter: delimiter and encoding for CSV, sheet for Excel, record path for JSON/XML,
+  *Errors allowed* with *Stop*, the cron field with *Custom*, the schedule switch with a schedule, the sheet gid for
+  Google Sheets links, the password unless SFTP logs in with a key, the file handling for folder/SFTP/FTP sources.
+- *Behaviour* lists only what the chosen entity can do; *Replace* for categories, attributes and CMS is refused on
+  save instead of at run time.
+- Private keys go in a multi-line field (hidden while not focused); keys that lost their line breaks are repaired
+  before the login.
+- A failed save opens the step with the problem and shows the message at the field; a wrong cron expression names
+  every wrong part at once.
+- The form asks before leaving with unsaved changes.
+- *Run for real* with a typed confirmation stays disabled until the word is typed; lower case is accepted.
+- *Run now* says which file is imported (or where the export goes) and how the last dry run went; dialog buttons say
+  what they do (*Run now*, *Delete profile*).
+- Required source and destination fields are marked; the server folder is kept apart from the SFTP/FTP folder when
+  switching the source type; help texts per source type.
+- Long error messages wrap on the run page; a failed connection test shows as an error.
+- Order date filters use the store time zone, like the schedules; a date alone as *until* means the whole day.
+- The safety limit field shows the configured default.
+- Five texts were missing in German; CI now checks that every phrase has an English and a German line.
+
+### Changed
+- A schedule needs a source that changes by itself: uploads cannot be scheduled, and scheduled exports need a
+  destination other than *Download*. The sample profiles read from and write to server folders.
+- CSV exports can leave out the header row and write ISO-8859-1/-15.
+
 ## [1.1.1] - 2026-10-15
 
 Fixes and small improvements from a hands-on review of 1.1.0 in the admin.

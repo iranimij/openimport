@@ -36,6 +36,9 @@ Lessons from M5: the pipeline pads every row to the same columns, so an own impo
 "leave unchanged"; Magento saves store-view values in the default scope when the shop has one store view; category
 URL clashes need the taken URLs in the message to be debuggable.
 
+**1.1.1 (2026-10-15):** fixes from a hands-on browser review of 1.1.0 (Notion "13 · Browser review 1.1.0"): #34 form
+and mapping, #35 grids and run page, #36 counts and messages, #37 changelog and docs; dev-env E2E updated.
+
 Open for Iman: delete the temporary branch `ci/m5-all` (shows as a dev version on Packagist; cloud sessions cannot
 delete branches), repository settings (squash only, delete branch on merge,
 `main` protected with `ci-ok`), a look at the admin on the Mac. Next product work: Notion "12 · Roadmap 1.x".

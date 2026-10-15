@@ -29,7 +29,12 @@ class Schedule extends Column
         foreach ($dataSource['data']['items'] as &$item) {
             $schedule = trim((string) ($item['schedule'] ?? ''));
             $label = ProfileFormMapper::SCHEDULE_PRESETS[$schedule] ?? null;
-            $text = $label !== null ? (string) __($label) : $schedule;
+            $daily = ProfileFormMapper::dailyTime($schedule);
+            $text = match (true) {
+                $label !== null => (string) __($label),
+                $daily !== null => (string) __('Every day at %1', $daily),
+                default => $schedule,
+            };
             if ($schedule !== '' && empty($item['is_active'])) {
                 $text = (string) __('%1 (off)', $text);
             }

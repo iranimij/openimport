@@ -50,6 +50,39 @@
         <columnsControls name="columns_controls"/>
         <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="schedule_on">
+                <settings>
+                    <url path="openimport/profile/massSchedule">
+                        <param name="on">1</param>
+                    </url>
+                    <type>schedule_on</type>
+                    <label translate="true">Switch schedules on</label>
+                </settings>
+            </action>
+            <action name="schedule_off">
+                <settings>
+                    <url path="openimport/profile/massSchedule">
+                        <param name="on">0</param>
+                    </url>
+                    <type>schedule_off</type>
+                    <label translate="true">Switch schedules off</label>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Delete the chosen profiles? Their runs and error reports are kept.</message>
+                        <title translate="true">Delete profiles</title>
+                    </confirm>
+                    <url path="openimport/profile/massSchedule">
+                        <param name="delete">1</param>
+                    </url>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                </settings>
+            </action>
+        </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="openimport_profile_columns">
@@ -65,6 +98,16 @@
                 </param>
             </childDefaults>
         </settings>
+        <selectionsColumn name="ids" sortOrder="0">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldAction" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>profile_id</indexField>
+            </settings>
+        </selectionsColumn>
         <column name="profile_id" sortOrder="10">
             <settings>
                 <filter>textRange</filter>

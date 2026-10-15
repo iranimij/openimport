@@ -1,0 +1,18 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<div class="admin__field openimport-next-runs" if="preset">
+    <div class="admin__field-label"><span translate="'Next runs'"></span></div>
+    <div class="admin__field-control">
+        <div class="message message-error" role="alert" if="error" text="error"></div>
+        <ul class="openimport-change-list" if="times.length">
+            <!-- ko foreach: times -->
+            <li text="$data"></li>
+            <!-- /ko -->
+        </ul>
+        <div class="admin__field-note" if="zone" text="$t('Time zone\: %1').replace('%1', zone)"></div>
+    </div>
+</div>

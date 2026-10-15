@@ -21,11 +21,14 @@ class ProfileFormMapper
 {
     public const SCHEDULE_PRESETS = [
         '' => 'Manual only',
+        '*/15 * * * *' => 'Every 15 minutes',
+        '*/30 * * * *' => 'Every 30 minutes',
         '0 * * * *' => 'Every hour',
         '0 2 * * *' => 'Every night at 02:00',
         '0 6 * * 1-5' => 'Weekdays at 06:00',
     ];
     public const SCHEDULE_CUSTOM = 'custom';
+    public const SCHEDULE_DAILY = 'daily';
 
     /**
      * @param JsonField $json
@@ -104,8 +107,9 @@ class ProfileFormMapper
             'allowed_errors' => (string) $profile->getAllowedErrors(),
             'delta' => $profile->isDelta() ? '1' : '0',
             'safety_threshold' => $profile->getSafetyThreshold() === null ? '' : (string) $profile->getSafetyThreshold(),
-            'schedule_preset' => array_key_exists($schedule, self::SCHEDULE_PRESETS) ? $schedule : self::SCHEDULE_CUSTOM,
-            'schedule_custom' => array_key_exists($schedule, self::SCHEDULE_PRESETS) ? '' : $schedule,
+            'schedule_preset' => $this->schedulePreset($schedule),
+            'schedule_custom' => $this->schedulePreset($schedule) === self::SCHEDULE_CUSTOM ? $schedule : '',
+            'schedule_time' => self::dailyTime($schedule) ?? '',
             'after_success' => $profile->getAfterSuccess(),
             'notify' => $profile->getNotify(),
             'notify_emails' => $profile->getNotifyEmails(),
@@ -143,7 +147,11 @@ class ProfileFormMapper
             ->setNotifyEmails($text('notify_emails'));
 
         $preset = $text('schedule_preset');
-        $profile->setSchedule($preset === self::SCHEDULE_CUSTOM ? $text('schedule_custom') : $preset);
+        $profile->setSchedule(match ($preset) {
+            self::SCHEDULE_CUSTOM => $text('schedule_custom'),
+            self::SCHEDULE_DAILY => $this->dailyCron($text('schedule_time', '02:00')),
+            default => $preset,
+        });
 
         $source = is_array($data['source_config'] ?? null) ? $data['source_config'] : [];
         $source = array_map(static fn ($value) => is_scalar($value) ? trim((string) $value) : $value, $source);
@@ -271,5 +279,46 @@ class ProfileFormMapper
         }
 
         return $map;
+    }
+
+    /**
+     * @param string $schedule cron expression ('' = manual)
+     * @return string the form's preset: a listed one, "daily" (every day at a time) or "custom"
+     */
+    private function schedulePreset(string $schedule): string
+    {
+        if (array_key_exists($schedule, self::SCHEDULE_PRESETS)) {
+            return $schedule;
+        }
+
+        return self::dailyTime($schedule) !== null ? self::SCHEDULE_DAILY : self::SCHEDULE_CUSTOM;
+    }
+
+    /**
+     * @param string $schedule
+     * @return string|null "HH:MM" when the schedule runs once every day, null otherwise
+     */
+    public static function dailyTime(string $schedule): ?string
+    {
+        if (!preg_match('/^(\d{1,2}) (\d{1,2}) \* \* \*$/', trim($schedule), $match)
+            || (int) $match[1] > 59 || (int) $match[2] > 23
+        ) {
+            return null;
+        }
+
+        return sprintf('%02d:%02d', (int) $match[2], (int) $match[1]);
+    }
+
+    /**
+     * @param string $time "HH:MM" (or "H.MM", "HHMM")
+     * @return string the cron expression; a time that cannot be read is passed on, so the validator names it
+     */
+    private function dailyCron(string $time): string
+    {
+        if (!preg_match('/^(\d{1,2})[:.h]?(\d{2})$/', trim($time), $match)) {
+            return trim($time) . ' * * *';
+        }
+
+        return sprintf('%d %d * * *', (int) $match[2], (int) $match[1]);
     }
 }

@@ -112,7 +112,9 @@ define([
                 }).length,
                 schedule = this.value('schedule_preset') === 'custom'
                     ? String(this.value('schedule_custom') || '')
-                    : this.chosen('schedule_preset'),
+                    : this.value('schedule_preset') === 'daily'
+                        ? $t('Every day at %1').replace('%1', this.value('schedule_time') || '02:00')
+                        : this.chosen('schedule_preset'),
                 parts;
 
             parts = {

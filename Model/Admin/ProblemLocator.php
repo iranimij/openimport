@@ -51,8 +51,12 @@ class ProblemLocator
     {
         $fields = [];
         $destinationEmails = (string) ($data['export_options']['emails'] ?? '');
+        $daily = ($data['schedule_preset'] ?? '') === ProfileFormMapper::SCHEDULE_DAILY;
         foreach ($problems as $problem) {
             $field = $this->field($problem, $destinationEmails);
+            if ($field === 'schedule_custom' && $daily) {
+                $field = 'schedule_time';
+            }
             if ($field !== '') {
                 $fields[$field] = isset($fields[$field]) ? $fields[$field] . "\n" . $problem : $problem;
             }

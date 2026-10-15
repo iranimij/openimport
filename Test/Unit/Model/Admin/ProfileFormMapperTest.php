@@ -96,6 +96,21 @@ class ProfileFormMapperTest extends TestCase
         self::assertSame('{Qty} > 0', $form['row_filters'][1]['value']);
     }
 
+    public function testEveryDayAtATime(): void
+    {
+        $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()));
+        $profile = $mapper->fromForm(['schedule_preset' => 'daily', 'schedule_time' => '7:05'], new ProfileStub());
+
+        self::assertSame('5 7 * * *', $profile->getSchedule());
+        $form = $mapper->toForm($profile);
+        self::assertSame('daily', $form['schedule_preset']);
+        self::assertSame('07:05', $form['schedule_time']);
+        // A listed preset stays the preset; other daily times come back as "daily".
+        self::assertSame('0 2 * * *', $mapper->toForm(new ProfileStub(['schedule' => '0 2 * * *']))['schedule_preset']);
+        self::assertSame('*/15 * * * *', $mapper->toForm(new ProfileStub(['schedule' => '*/15 * * * *']))['schedule_preset']);
+        self::assertSame('custom', $mapper->toForm(new ProfileStub(['schedule' => '0 25 * * *']))['schedule_preset']);
+    }
+
     public function testCustomScheduleAndNoFilters(): void
     {
         $mapper = new ProfileFormMapper(new JsonField(), new Secrets(new FakeEncryptor()));

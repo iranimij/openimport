@@ -64,7 +64,7 @@ class MissingScope
             (clone $collection->getSelect())->reset(\Magento\Framework\DB\Select::COLUMNS)->columns(['COUNT(*)'])
         );
         if ($only === 'enabled') {
-            $collection->addAttributeToFilter('status', Status::STATUS_ENABLED);
+            $collection->addAttributeToFilter('status', ['eq' => Status::STATUS_ENABLED]);
         } elseif ($only === 'in_stock') {
             $collection->joinField(
                 'openimport_in_stock',
@@ -74,7 +74,7 @@ class MissingScope
                 '{{table}}.stock_id=1',
                 'inner'
             );
-            $collection->addFieldToFilter('openimport_in_stock', 1);
+            $collection->addFieldToFilter('openimport_in_stock', ['eq' => 1]);
         }
         $select = (clone $collection->getSelect())->reset(\Magento\Framework\DB\Select::COLUMNS)->columns(['e.sku']);
 
@@ -127,7 +127,7 @@ class MissingScope
             }
             $collection->addAttributeToFilter(
                 $code,
-                $attribute->getFrontendInput() === 'multiselect' ? ['finset' => $value] : $value
+                $attribute->getFrontendInput() === 'multiselect' ? ['finset' => $value] : ['eq' => $value]
             );
         } elseif ($type !== self::ALL) {
             throw new PipelineException(sprintf('Products missing from the file: unknown scope "%s".', $type));

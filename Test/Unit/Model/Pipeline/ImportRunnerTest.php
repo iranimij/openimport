@@ -438,15 +438,17 @@ class ImportRunnerTest extends TestCase
         $profile = $this->missingProfile('out_of_stock', ['delta' => true]);
         $file = $this->file("sku,name,name_de,price\nA-1,One,,1\nA-2,Two,,2\nA-3,Three,,3\n");
         $this->execute($profile, $this->newRun(), $file);
-        $this->core->history = [];
+        $before = count($this->core->history);
 
         $outcome = $this->execute($profile, $this->newRun(), $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $outcome->status, $outcome->message);
         self::assertStringStartsWith('Nothing to import', $outcome->message);
-        self::assertCount(1, $this->core->history, 'only the missing products');
+        self::assertCount($before + 1, $this->core->history, 'only the missing products');
+        $calls = $this->core->history;
+        $last = end($calls);
         self::assertSame(
             [['sku' => 'A-4', 'qty' => '0', 'is_in_stock' => '0']],
-            $this->core->history[0]['rows'],
+            $last === false ? null : $last['rows'],
             'A-5 and OLD are out of stock already'
         );
     }

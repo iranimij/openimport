@@ -49,6 +49,7 @@ class ImageName
         // phpcs:ignore Magento2.Functions.DiscouragedFunction -- the framework has no URL parser without a request
         $path = (string) parse_url($url, PHP_URL_PATH);
         $slash = strrpos($path, '/');
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- decoding a URL path segment, no framework equivalent
         $last = rawurldecode($slash === false ? $path : substr($path, $slash + 1));
         $dot = strrpos($last, '.');
         if ($dot !== false && $dot > 0) {

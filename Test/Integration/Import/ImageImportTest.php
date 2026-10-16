@@ -155,7 +155,7 @@ class ImageImportTest extends TestCase
      * @param array<string, mixed> $options
      * @return RunInterface
      */
-    private function run(ProfileInterface $profile, string $file, array $options = []): RunInterface
+    private function runImport(ProfileInterface $profile, string $file, array $options = []): RunInterface
     {
         $run = Bootstrap::getObjectManager()->get(RunQueue::class)->queue(
             $profile,
@@ -203,7 +203,7 @@ class ImageImportTest extends TestCase
         ]]);
         $profile = $this->profile();
 
-        $first = $this->run($profile, $file);
+        $first = $this->runImport($profile, $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $first->getStatus(), $first->getMessage());
         self::assertStringContainsString('Pictures: 3 downloaded, 0 unchanged, 0 could not be read.', $first->getMessage());
         [$image, $gallery] = $this->pictures($sku);
@@ -218,7 +218,7 @@ class ImageImportTest extends TestCase
             => str_starts_with($line, '/pic/' . $color . '.png '))));
 
         // Refresh after 0 hours: the next run asks with the ETag and gets 304.
-        $second = $this->run($profile, $file);
+        $second = $this->runImport($profile, $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $second->getStatus(), $second->getMessage());
         self::assertStringContainsString('Pictures: 0 downloaded, 3 unchanged', $second->getMessage());
         self::assertContains('/pic/' . $color . '.png 304', $this->requests());
@@ -227,7 +227,7 @@ class ImageImportTest extends TestCase
         // Within the refresh time no request is made at all.
         $this->config(Config::XML_IMAGE_REFRESH_HOURS, '24');
         $before = count($this->requests());
-        $third = $this->run($profile, $file);
+        $third = $this->runImport($profile, $file);
         self::assertStringContainsString('Pictures: 0 downloaded, 3 unchanged', $third->getMessage());
         self::assertCount($before, $this->requests());
     }
@@ -242,7 +242,7 @@ class ImageImportTest extends TestCase
             ['sku' => $prefix . '-4', 'name' => 'Fine ' . $prefix, 'image' => $this->base . '/pic/fine-' . strtolower($prefix) . '.png', 'more' => ''],
         ];
 
-        $failed = $this->run($this->profile([], 'skip'), $this->csv($rows));
+        $failed = $this->runImport($this->profile([], 'skip'), $this->csv($rows));
         self::assertSame(RunInterface::STATUS_PARTIAL, $failed->getStatus(), $failed->getMessage());
         self::assertSame(3, $failed->getCount('errors'));
         $errors = [];
@@ -255,7 +255,7 @@ class ImageImportTest extends TestCase
         self::assertStringContainsString('The picture is WEBP', $errors[$prefix . '-3']->message);
         self::assertNotSame('', $this->pictures($prefix . '-4')[0]);
 
-        $skipped = $this->run(
+        $skipped = $this->runImport(
             $this->profile(['images_on_error' => 'skip']),
             $this->csv(array_slice($rows, 0, 1))
         );
@@ -268,7 +268,7 @@ class ImageImportTest extends TestCase
     {
         $this->config(Config::XML_ALLOWED_HOSTS, '');
         $sku = 'OI-IMGP-' . bin2hex(random_bytes(3));
-        $run = $this->run($this->profile(), $this->csv([[
+        $run = $this->runImport($this->profile(), $this->csv([[
             'sku' => $sku, 'name' => 'Private ' . $sku, 'image' => $this->base . '/pic/private.png', 'more' => '',
         ]]));
 
@@ -289,7 +289,7 @@ class ImageImportTest extends TestCase
         $this->files[] = $path;
         $sku = 'OI-IMGF-' . bin2hex(random_bytes(3));
 
-        $run = $this->run($this->profile(), $this->csv([[
+        $run = $this->runImport($this->profile(), $this->csv([[
             'sku' => $sku, 'name' => 'Local ' . $sku, 'image' => $name . '.png', 'more' => '',
         ]]));
 
@@ -302,7 +302,7 @@ class ImageImportTest extends TestCase
     {
         $sku = 'OI-IMGH-' . bin2hex(random_bytes(3));
         $url = $this->base . '/pic/h' . bin2hex(random_bytes(3)) . '.png';
-        $run = $this->run($this->profile(), $this->csv([['sku' => $sku, 'name' => 'Old ' . $sku, 'image' => $url, 'more' => '']]));
+        $run = $this->runImport($this->profile(), $this->csv([['sku' => $sku, 'name' => 'Old ' . $sku, 'image' => $url, 'more' => '']]));
         self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
         $cache = Bootstrap::getObjectManager()->get(ImageCache::class);
         $file = $cache->find($url)['file'] ?? '';

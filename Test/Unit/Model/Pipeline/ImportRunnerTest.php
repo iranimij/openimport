@@ -27,6 +27,7 @@ use Iranimij\OpenImport\Model\Transform\TransformPool;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeConfig;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeCoreImporter;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeErrorLog;
+use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeImageFolder;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakePreviewStore;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeCascadingRecordReader;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRecordReader;
@@ -59,6 +60,8 @@ class ImportRunnerTest extends TestCase
     private ?FakeConfig $config = null;
 
     private ?RowStepPool $steps = null;
+
+    private ?FakeImageFolder $images = null;
 
     protected function setUp(): void
     {
@@ -102,7 +105,8 @@ class ImportRunnerTest extends TestCase
             $this->runResource,
             $this->config,
             new PreviewBuilder(),
-            $this->steps
+            $this->steps ?? new RowStepPool(),
+            $this->images ?? new FakeImageFolder()
         );
     }
 
@@ -221,7 +225,7 @@ class ImportRunnerTest extends TestCase
         self::assertSame('bad', $error->sourceData['name'] ?? null, 'the error report keeps the source row');
         self::assertStringEndsWith("\nFake step: 3 seen.", $outcome->message);
         self::assertGreaterThan(0, $heartbeats);
-        self::assertSame('', $this->core->lastRequest()->imagesDirectory, 'no images folder without one');
+        self::assertSame(FakeImageFolder::PATH, $this->core->lastRequest()->imagesDirectory, 'products read pictures there');
         // Only the complete record is remembered: the failed and the incomplete one are tried again next time.
         self::assertCount(1, $this->hashes->hashes[5]);
 

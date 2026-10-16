@@ -156,8 +156,8 @@ class ImportRunner
      * @param RunResource $runResource
      * @param Config $config
      * @param PreviewBuilder $previewBuilder
-     * @param RowStepPool|null $rowSteps
-     * @param ImageFolder|null $imageFolder product runs read pictures from it
+     * @param RowStepPool $rowSteps
+     * @param ImageFolder $imageFolder product runs read pictures from it
      */
     public function __construct(
         private readonly ReaderFactory $readerFactory,
@@ -170,8 +170,8 @@ class ImportRunner
         private readonly RunResource $runResource,
         private readonly Config $config,
         private readonly PreviewBuilder $previewBuilder,
-        private readonly ?RowStepPool $rowSteps = null,
-        private readonly ?ImageFolder $imageFolder = null
+        private readonly RowStepPool $rowSteps,
+        private readonly ImageFolder $imageFolder
     ) {
     }
 
@@ -215,7 +215,7 @@ class ImportRunner
         }
         [$mapping, $entity] = $this->profileCompiler->mapping($profile, $strictColumns);
         $behavior = $this->behavior($profile, $entity);
-        $this->steps = $this->rowSteps?->begin($profile, $behavior, $dryRun) ?? [];
+        $this->steps = $this->rowSteps->begin($profile, $behavior, $dryRun);
         $useDelta = $profile->isDelta() && empty($options['full']) && in_array($behavior, self::DELTA_BEHAVIORS, true);
         $filter = $this->profileCompiler->filter($profile, $strictColumns);
         $recordReader = $this->recordReaders->get($profile->getEntity());
@@ -642,8 +642,7 @@ class ImportRunner
             $dryRun,
             $skipErrors,
             max(0, $allowed - $ownErrors),
-            imagesDirectory: $entity->importEntity() === 'catalog_product' && $this->imageFolder !== null
-                ? $this->imageFolder->absoluteBase() : '',
+            imagesDirectory: $entity->importEntity() === 'catalog_product' ? $this->imageFolder->absoluteBase() : '',
             historyLabel: sprintf('openimport-run-%d.csv', $this->runId)
         );
         $result = $this->importers->get($entity->importEntity())->run(

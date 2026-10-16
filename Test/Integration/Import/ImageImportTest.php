@@ -168,6 +168,22 @@ class ImageImportTest extends TestCase
     }
 
     /**
+     * The run message and its row errors, for assertion messages.
+     *
+     * @param RunInterface $run
+     * @return string
+     */
+    private function describe(RunInterface $run): string
+    {
+        $lines = [$run->getMessage()];
+        foreach (Bootstrap::getObjectManager()->get(ErrorLog::class)->fetch((int) $run->getRunId()) as $error) {
+            $lines[] = sprintf('row %d %s %s: %s', $error->sourceRow, $error->identifier, $error->field, $error->message);
+        }
+
+        return implode("\n", $lines);
+    }
+
+    /**
      * @return string[] "<path> <status>" lines the server logged
      */
     private function requests(): array
@@ -204,7 +220,7 @@ class ImageImportTest extends TestCase
         $profile = $this->profile();
 
         $first = $this->runImport($profile, $file);
-        self::assertSame(RunInterface::STATUS_SUCCESS, $first->getStatus(), $first->getMessage());
+        self::assertSame(RunInterface::STATUS_SUCCESS, $first->getStatus(), $this->describe($first));
         self::assertStringContainsString('Pictures: 3 downloaded, 0 unchanged, 0 could not be read.', $first->getMessage());
         [$image, $gallery] = $this->pictures($sku);
         self::assertMatchesRegularExpression('#/' . $color . '(_\d+)?\.png$#', $image, 'the catalog file keeps the name');
@@ -219,7 +235,7 @@ class ImageImportTest extends TestCase
 
         // Refresh after 0 hours: the next run asks with the ETag and gets 304.
         $second = $this->runImport($profile, $file);
-        self::assertSame(RunInterface::STATUS_SUCCESS, $second->getStatus(), $second->getMessage());
+        self::assertSame(RunInterface::STATUS_SUCCESS, $second->getStatus(), $this->describe($second));
         self::assertStringContainsString('Pictures: 0 downloaded, 3 unchanged', $second->getMessage());
         self::assertContains('/pic/' . $color . '.png 304', $this->requests());
         self::assertCount(3, $this->pictures($sku)[1], 'the same pictures are not added again');
@@ -243,8 +259,8 @@ class ImageImportTest extends TestCase
         ];
 
         $failed = $this->runImport($this->profile([], 'skip'), $this->csv($rows));
-        self::assertSame(RunInterface::STATUS_PARTIAL, $failed->getStatus(), $failed->getMessage());
-        self::assertSame(3, $failed->getCount('errors'));
+        self::assertSame(RunInterface::STATUS_PARTIAL, $failed->getStatus(), $this->describe($failed));
+        self::assertSame(3, $failed->getCount('errors'), $this->describe($failed));
         $errors = [];
         foreach (Bootstrap::getObjectManager()->get(ErrorLog::class)->fetch((int) $failed->getRunId()) as $error) {
             $errors[$error->identifier] = $error;
@@ -259,7 +275,7 @@ class ImageImportTest extends TestCase
             $this->profile(['images_on_error' => 'skip']),
             $this->csv(array_slice($rows, 0, 1))
         );
-        self::assertSame(RunInterface::STATUS_SUCCESS, $skipped->getStatus(), $skipped->getMessage());
+        self::assertSame(RunInterface::STATUS_SUCCESS, $skipped->getStatus(), $this->describe($skipped));
         self::assertStringContainsString('Imported without the picture: ' . $prefix . '-1', $skipped->getMessage());
         self::assertSame(1, $skipped->getCount('created'));
     }
@@ -272,7 +288,7 @@ class ImageImportTest extends TestCase
             'sku' => $sku, 'name' => 'Private ' . $sku, 'image' => $this->base . '/pic/private.png', 'more' => '',
         ]]));
 
-        self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
+        self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus(), $this->describe($run));
         $errors = Bootstrap::getObjectManager()->get(ErrorLog::class)->fetch((int) $run->getRunId());
         self::assertCount(1, $errors);
         self::assertStringContainsString('private or local address', $errors[0]->message);
@@ -293,7 +309,7 @@ class ImageImportTest extends TestCase
             'sku' => $sku, 'name' => 'Local ' . $sku, 'image' => $name . '.png', 'more' => '',
         ]]));
 
-        self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
+        self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $this->describe($run));
         self::assertStringNotContainsString('Pictures:', $run->getMessage(), 'no web addresses, no picture line');
         self::assertMatchesRegularExpression('#/' . $name . '(_\d+)?\.png$#', $this->pictures($sku)[0]);
     }
@@ -303,7 +319,7 @@ class ImageImportTest extends TestCase
         $sku = 'OI-IMGH-' . bin2hex(random_bytes(3));
         $url = $this->base . '/pic/h' . bin2hex(random_bytes(3)) . '.png';
         $run = $this->runImport($this->profile(), $this->csv([['sku' => $sku, 'name' => 'Old ' . $sku, 'image' => $url, 'more' => '']]));
-        self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
+        self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $this->describe($run));
         $cache = Bootstrap::getObjectManager()->get(ImageCache::class);
         $file = $cache->find($url)['file'] ?? '';
         $connection = Bootstrap::getObjectManager()->get(ResourceConnection::class)->getConnection();

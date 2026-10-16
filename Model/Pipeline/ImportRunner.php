@@ -22,6 +22,9 @@ use Iranimij\OpenImport\Model\Filter\RowFilter;
 use Iranimij\OpenImport\Model\Image\ImageFolder;
 use Iranimij\OpenImport\Model\Mapping\CompiledMapping;
 use Iranimij\OpenImport\Model\Mapping\MappedRow;
+use Iranimij\OpenImport\Model\Pipeline\Step\PostImportOutcome;
+use Iranimij\OpenImport\Model\Pipeline\Step\PostImportPlan;
+use Iranimij\OpenImport\Model\Pipeline\Step\PostImportStepInterface;
 use Iranimij\OpenImport\Model\Pipeline\Step\RowStepInterface;
 use Iranimij\OpenImport\Model\Pipeline\Step\RowStepPool;
 use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
@@ -146,6 +149,21 @@ class ImportRunner
     private array $steps = [];
 
     /**
+     * @var string[] identifiers of filtered or invalid rows, for the steps (they are in the file)
+     */
+    private array $unseen = [];
+
+    /**
+     * @var string[] lines post-import steps add to the run message
+     */
+    private array $postLines = [];
+
+    /**
+     * A post-import step takes part: filtered rows are mapped for their identifiers.
+     */
+    private bool $collectUnseen = false;
+
+    /**
      * @param ReaderFactory $readerFactory
      * @param ProfileCompiler $profileCompiler
      * @param RecordReaderPool $recordReaders
@@ -216,6 +234,7 @@ class ImportRunner
         [$mapping, $entity] = $this->profileCompiler->mapping($profile, $strictColumns);
         $behavior = $this->behavior($profile, $entity);
         $this->steps = $this->rowSteps->begin($profile, $behavior, $dryRun);
+        $this->collectUnseen = $this->postImportSteps() !== [];
         $useDelta = $profile->isDelta() && empty($options['full']) && in_array($behavior, self::DELTA_BEHAVIORS, true);
         $filter = $this->profileCompiler->filter($profile, $strictColumns);
         $recordReader = $this->recordReaders->get($profile->getEntity());
@@ -297,6 +316,9 @@ class ImportRunner
         $this->skippedNames = [];
         $this->firstError = null;
         $this->steps = [];
+        $this->unseen = [];
+        $this->postLines = [];
+        $this->collectUnseen = false;
     }
 
     /**
@@ -313,6 +335,9 @@ class ImportRunner
         try {
             if (!$filter->keep($row)) {
                 $this->counts['filtered']++;
+                if ($this->collectUnseen) {
+                    $this->unseen[] = $mapping->map($row)->identifier;
+                }
                 return null;
             }
         } catch (FilterException $exception) {
@@ -324,6 +349,7 @@ class ImportRunner
             foreach ($mapped->errors as $error) {
                 $this->error(new ErrorRecord($line, $error->message, $mapped->identifier, $error->field, $row));
             }
+            $this->unseen[] = $mapped->identifier;
             return null;
         }
 
@@ -423,7 +449,8 @@ class ImportRunner
      */
     private function observeSteps(array $batch): void
     {
-        if ($this->steps === []) {
+        $this->observeUnseen();
+        if ($this->steps === [] || $batch === []) {
             return;
         }
         $records = [];
@@ -432,6 +459,23 @@ class ImportRunner
         }
         foreach ($this->steps as $step) {
             $step->observe($records);
+        }
+    }
+
+    /**
+     * Gives the steps the identifiers of rows that went nowhere.
+     *
+     * @return void
+     */
+    private function observeUnseen(): void
+    {
+        $identifiers = array_values(array_unique(array_filter($this->unseen, static fn (string $id): bool => $id !== '')));
+        $this->unseen = [];
+        if ($identifiers === []) {
+            return;
+        }
+        foreach ($this->steps as $step) {
+            $step->observeIdentifiers($identifiers);
         }
     }
 
@@ -455,12 +499,21 @@ class ImportRunner
         bool $useDelta,
         bool $dryRun
     ): void {
+        $this->observeUnseen();
         $tick = function (): void {
             $this->progress(true);
         };
         foreach ($this->steps as $step) {
             $batch = [];
-            foreach ($step->finish($tick) as $record) {
+            $added = $step->finish($tick);
+            // Records a step adds are in the file for the other steps (a configurable parent is not "missing").
+            $identifiers = array_map(static fn (StepRecord $record): string => $record->identifier, $added);
+            foreach ($this->steps as $other) {
+                if ($other !== $step && $identifiers !== []) {
+                    $other->observeIdentifiers($identifiers);
+                }
+            }
+            foreach ($added as $record) {
                 $batch[] = [$record->line, new MappedRow($record->rows, [], $record->identifier), []];
                 if (count($batch) >= self::BATCH) {
                     $this->flush($batch, $spool, $profile, $reader, $mapping, $useDelta, $dryRun, true);
@@ -693,17 +746,34 @@ class ImportRunner
                 )
             );
         }
-        if ($spool->count() === 0) {
+        $plans = $this->plans();
+        if ($spool->count() === 0 && $plans === []) {
             $this->storeErrors(true);
             return $this->outcome(
                 $ownErrors > 0 ? RunInterface::STATUS_PARTIAL : RunInterface::STATUS_SUCCESS,
                 $this->nothingToDo()
             );
         }
-        $safety = $this->safetyMessage($profile, $reader, $spool);
+        $safety = $this->joinSafety(
+            $spool->count() > 0 ? $this->safetyMessage($profile, $reader, $spool) : null,
+            $this->planSafety($profile, $plans)
+        );
         if ($safety !== null && !$dryRun && empty($run->getOptions()['confirmed'])) {
             $this->storeErrors(true);
             return $this->outcome(RunInterface::STATUS_NEEDS_CONFIRMATION, $safety);
+        }
+        if ($spool->count() === 0) {
+            // Nothing from the file to import, but a post-import step has work (products missing from the file).
+            $this->storeErrors(true);
+            $ok = $this->executePlans($plans, $dryRun);
+            $message = $dryRun
+                ? 'Dry run: nothing to import from the file.' . ($safety === null ? '' : ' ' . self::CONFIRMATION_NOTE . ': ' . $safety)
+                : $this->nothingToDo();
+
+            return $this->outcome(
+                $ok && $this->counts['errors'] === 0 ? RunInterface::STATUS_SUCCESS : RunInterface::STATUS_PARTIAL,
+                $message
+            );
         }
 
         $request = new ImportRequest(
@@ -762,8 +832,9 @@ class ImportRunner
             $this->counts['updated'] = $this->previewTotals[PreviewRecord::CHANGED];
             $this->counts['deleted'] = $this->previewTotals[PreviewRecord::DELETED];
             $this->counts['unchanged'] += $this->previewTotals[PreviewRecord::UNCHANGED];
+            $ok = $result->valid ? $this->executePlans($plans, true) : true;
             $status = $result->valid
-                ? ($this->counts['errors'] > 0 ? RunInterface::STATUS_PARTIAL : RunInterface::STATUS_SUCCESS)
+                ? ($this->counts['errors'] > 0 || !$ok ? RunInterface::STATUS_PARTIAL : RunInterface::STATUS_SUCCESS)
                 : RunInterface::STATUS_FAILED;
             return $this->outcome(
                 $status,
@@ -781,6 +852,7 @@ class ImportRunner
         $this->counts['created'] = $result->created;
         $this->counts['updated'] = $result->updated;
         $this->counts['deleted'] = $result->deleted;
+        $plansOk = $this->executePlans($plans, false);
         $profileId = (int) $profile->getProfileId();
         if ($behavior === ProfileInterface::BEHAVIOR_DELETE) {
             $this->rowHashes->delete($profileId, $spool->allIdentifiers());
@@ -797,7 +869,7 @@ class ImportRunner
         }
 
         return $this->outcome(
-            $this->counts['errors'] > 0 ? RunInterface::STATUS_PARTIAL : RunInterface::STATUS_SUCCESS,
+            $this->counts['errors'] > 0 || !$plansOk ? RunInterface::STATUS_PARTIAL : RunInterface::STATUS_SUCCESS,
             sprintf(
                 'Created %d, updated %d, deleted %d. %d row(s) unchanged, %d skipped by filters, %d with errors.',
                 $this->counts['created'],
@@ -809,6 +881,115 @@ class ImportRunner
             ),
             $result->historyId
         );
+    }
+
+    /**
+     * The row steps that change records after the import.
+     *
+     * @return PostImportStepInterface[]
+     */
+    private function postImportSteps(): array
+    {
+        return array_values(array_filter(
+            $this->steps,
+            static fn (RowStepInterface $step): bool => $step instanceof PostImportStepInterface
+        ));
+    }
+
+    /**
+     * Plans of the post-import steps; none when rows had errors (such a row may name a record the step would change).
+     *
+     * @return array<int, array{0: PostImportStepInterface, 1: PostImportPlan}>
+     */
+    private function plans(): array
+    {
+        $plans = [];
+        foreach ($this->postImportSteps() as $step) {
+            if ($this->counts['errors'] > 0) {
+                $this->postLines[] = (string) __(
+                    '%1: nothing changed because %2 row(s) had errors.',
+                    $step->label(),
+                    $this->counts['errors']
+                );
+                continue;
+            }
+            $plan = $step->plan();
+            if ($plan !== null && $plan->count() > 0) {
+                $plans[] = [$step, $plan];
+            }
+        }
+
+        return $plans;
+    }
+
+    /**
+     * Post-import plans above the safety limit need the typed confirmation too.
+     *
+     * @param ProfileInterface $profile
+     * @param array<int, array{0: PostImportStepInterface, 1: PostImportPlan}> $plans
+     * @return string|null
+     */
+    private function planSafety(ProfileInterface $profile, array $plans): ?string
+    {
+        $threshold = $profile->getSafetyThreshold() ?? $this->config->getSafetyThresholdPercent();
+        $messages = [];
+        foreach ($plans as [$step, $plan]) {
+            if ($plan->total === 0 || $plan->count() * 100 <= $threshold * $plan->total) {
+                continue;
+            }
+            $messages[] = sprintf(
+                'This run would %s %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.',
+                $plan->verb,
+                $plan->count(),
+                $plan->total,
+                $step->label(),
+                (int) round($plan->count() * 100 / $plan->total),
+                $threshold,
+                $plan->word
+            );
+        }
+
+        return $messages === [] ? null : implode(' ', $messages);
+    }
+
+    private function joinSafety(?string $first, ?string $second): ?string
+    {
+        $parts = array_filter([$first, $second], static fn (?string $part): bool => $part !== null);
+
+        return $parts === [] ? null : implode(' ', $parts);
+    }
+
+    /**
+     * Carries out (or, in a dry run, checks) the post-import plans; their lines go to the run message.
+     *
+     * @param array<int, array{0: PostImportStepInterface, 1: PostImportPlan}> $plans
+     * @param bool $dryRun
+     * @return bool false when one of them failed
+     */
+    private function executePlans(array $plans, bool $dryRun): bool
+    {
+        $ok = true;
+        foreach ($plans as [$step, $plan]) {
+            $this->progress();
+            try {
+                $outcome = $step->execute($plan, $dryRun);
+            } catch (PipelineException $exception) {
+                $outcome = new PostImportOutcome($step->label() . ': ' . $exception->getMessage(), 0, 0, false);
+            }
+            $this->postLines[] = $outcome->message;
+            $ok = $ok && $outcome->ok;
+            if (!$dryRun) {
+                $this->counts['updated'] += $outcome->updated;
+                $this->counts['deleted'] += $outcome->deleted;
+            } else {
+                $this->previewTotals[PreviewRecord::CHANGED] += $outcome->updated;
+                $this->previewTotals[PreviewRecord::DELETED] += $outcome->deleted;
+                $this->counts['updated'] += $outcome->updated;
+                $this->counts['deleted'] += $outcome->deleted;
+            }
+        }
+
+        return $ok;
     }
 
     /**
@@ -914,6 +1095,9 @@ class ImportRunner
             );
         }
 
+        foreach ($this->postLines as $line) {
+            $message .= "\n" . $line;
+        }
         foreach ($this->steps as $step) {
             $summary = $step->summary();
             if ($summary !== '') {

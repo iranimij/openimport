@@ -235,6 +235,8 @@ class ProfileFormMapper
             'images_on_error' => 'error',
             'configurable' => '0',
             'configurable_child_visibility' => 'hide',
+            'missing_action' => '',
+            'missing_scope' => 'all',
         ];
         $options['configurable_attributes'] = array_values(array_filter(
             array_map('trim', explode(',', (string) ($options['configurable_attributes'] ?? ''))),

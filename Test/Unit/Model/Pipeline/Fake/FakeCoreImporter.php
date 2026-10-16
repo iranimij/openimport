@@ -54,6 +54,12 @@ class FakeCoreImporter extends CoreImporter
 
     public int $calls = 0;
 
+    /**
+     * @var array<int, array{request: ImportRequest, columns: string[], rows: array<int, array<string, string>>}>
+     *     every call, in order
+     */
+    public array $history = [];
+
     // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock
     public function __construct()
     {
@@ -79,6 +85,7 @@ class FakeCoreImporter extends CoreImporter
         if ($second !== count($this->rows)) {
             throw new \LogicException('The source must be readable twice.');
         }
+        $this->history[] = ['request' => $request, 'columns' => $this->columns, 'rows' => $this->rows];
         $invalid = count(array_unique(array_filter(array_map(static fn (RowError $e): ?int => $e->row, $this->errors), 'is_int')));
         $imported = !$request->dryRun && $this->valid;
         $entities = count(array_unique(array_column($this->rows, 'sku')));

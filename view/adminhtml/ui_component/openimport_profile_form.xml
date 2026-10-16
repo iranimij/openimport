@@ -1566,7 +1566,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="images_on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="35">
+        <field name="images_on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="31">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1598,7 +1598,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="configurable" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="36">
+        <field name="configurable" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="32">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1625,7 +1625,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="configurable_attributes" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="37">
+        <field name="configurable_attributes" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="33">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1659,7 +1659,7 @@
                 </multiselect>
             </formElements>
         </field>
-        <field name="configurable_child_visibility" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="38">
+        <field name="configurable_child_visibility" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="34">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1694,6 +1694,167 @@
                     </settings>
                 </select>
             </formElements>
+        </field>
+        <field name="missing_action" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="35">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Products missing from the file</label>
+                <dataScope>import_options.missing_action</dataScope>
+                <notice translate="true">For a file that is the complete list: products in the scope below that the file does not name are changed after the import. A run with row errors changes nothing; the safety limit applies.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="none" xsi:type="array">
+                                <item name="value" xsi:type="string"></item>
+                                <item name="label" xsi:type="string" translate="true">Leave them</item>
+                            </option>
+                            <option name="disable" xsi:type="array">
+                                <item name="value" xsi:type="string">disable</item>
+                                <item name="label" xsi:type="string" translate="true">Disable them</item>
+                            </option>
+                            <option name="out_of_stock" xsi:type="array">
+                                <item name="value" xsi:type="string">out_of_stock</item>
+                                <item name="label" xsi:type="string" translate="true">Set them out of stock</item>
+                            </option>
+                            <option name="delete" xsi:type="array">
+                                <item name="value" xsi:type="string">delete</item>
+                                <item name="label" xsi:type="string" translate="true">Delete them</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="missing_scope" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="36">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="import_options.missing_action" xsi:type="array">
+                            <item name="0" xsi:type="string">disable</item>
+                            <item name="1" xsi:type="string">out_of_stock</item>
+                            <item name="2" xsi:type="string">delete</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Scope</label>
+                <dataScope>import_options.missing_scope</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="all" xsi:type="array">
+                                <item name="value" xsi:type="string">all</item>
+                                <item name="label" xsi:type="string" translate="true">All products</item>
+                            </option>
+                            <option name="website" xsi:type="array">
+                                <item name="value" xsi:type="string">website</item>
+                                <item name="label" xsi:type="string" translate="true">Products of a website</item>
+                            </option>
+                            <option name="attribute" xsi:type="array">
+                                <item name="value" xsi:type="string">attribute</item>
+                                <item name="label" xsi:type="string" translate="true">Products with an attribute value</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="missing_website" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="37">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="import_options.missing_scope" xsi:type="array">
+                            <item name="0" xsi:type="string">website</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Website</label>
+                <dataScope>import_options.missing_website</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\WebsiteCode"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="missing_attribute" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="38">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="import_options.missing_scope" xsi:type="array">
+                            <item name="0" xsi:type="string">attribute</item>
+                        </item>
+                    </item>
+                    <item name="requiredWhen" xsi:type="array">
+                        <item name="import_options.missing_scope" xsi:type="array">
+                            <item name="0" xsi:type="string">attribute</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Attribute code</label>
+                <dataScope>import_options.missing_attribute</dataScope>
+                <notice translate="true">For example supplier or manufacturer.</notice>
+            </settings>
+        </field>
+        <field name="missing_value" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="39">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="import_options.missing_scope" xsi:type="array">
+                            <item name="0" xsi:type="string">attribute</item>
+                        </item>
+                    </item>
+                    <item name="requiredWhen" xsi:type="array">
+                        <item name="import_options.missing_scope" xsi:type="array">
+                            <item name="0" xsi:type="string">attribute</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Value</label>
+                <dataScope>import_options.missing_value</dataScope>
+                <notice translate="true">The option label for dropdowns, e.g. the supplier's name.</notice>
+            </settings>
         </field>
         <field name="delta" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="40">
             <argument name="data" xsi:type="array">

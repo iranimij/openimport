@@ -83,7 +83,7 @@ parallelism only across runs and for exports).
 
 | Release | Slices | Status |
 |---|---|---|
-| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 on `feat/1.3-add-stock` |
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 `feat/1.3-add-stock`, 5 `feat/1.3-url-keys` (stacked) |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
@@ -95,9 +95,10 @@ code.
 
 ## Exact next step
 
-1.3 slice 3 is PR #46 (`feat/1.3-missing`), slice 4 (quantities as changes) is on `feat/1.3-add-stock`, stacked on
-it: merge #46 when green, rebase slice 4 onto main, open its PR. E2E for slices 3 and 4 in the dev-env. Then slice 5
-(URL keys from a pattern + 301 redirects for changed URL keys) on `feat/1.3-url-keys`.
+Stack: slice 3 PR #46 (`feat/1.3-missing`) ← slice 4 (`feat/1.3-add-stock`) ← slice 5 (`feat/1.3-url-keys`).
+Merge #46 when green, rebase 4 onto main and open its PR, merge, then the same for 5. E2E: dev-env PR #10
+(configurables) and #11 (missing + stock, ref `feat/1.3-add-stock`; set back to main after merge). Then slice 6
+(conditional transforms: "only when" per transform chip) on `feat/1.3-conditional`.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -166,6 +167,16 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: unit (parse/format, step incl. sources and repeated SKUs, validator); integration `StockChangeImportTest`
   (preview 10 → 15/17, live 17 and 7, row error, second file adds again, MSI source +4).
 - Docs `docs/stock-changes.md`.
+
+### 1.3 slice 5 · URL keys and 301 redirects (what was built)
+
+- `Model/UrlKey`: `UrlKeyStep` (pattern for rows with an empty URL key, store views with own values, duplicates in
+  the run or in the shop fail the row naming the other SKU; `save_rewrites_history = 1` on every row when redirects
+  are on: Magento's import then keeps the old URL as a 301), `UrlKeyPattern`, `UrlKeyOwners` (collection read).
+  Runs before the configurable step (which then leaves URL keys alone). Form fields, validator check.
+- Tests: unit (pattern, step), validator; integration `UrlKeyImportTest` (key from pattern, renamed product → old URL
+  301 to the new one, duplicate key error).
+- Docs `docs/url-keys.md`.
 
 ## Open questions
 

@@ -21,6 +21,8 @@ use Iranimij\OpenImport\Model\Missing\MissingScope;
 use Iranimij\OpenImport\Model\Mapping\MappingException;
 use Iranimij\OpenImport\Model\Schedule\CronExpression;
 use Iranimij\OpenImport\Model\Stock\StockChangeStep;
+use Iranimij\OpenImport\Model\UrlKey\UrlKeyPattern;
+use Iranimij\OpenImport\Model\UrlKey\UrlKeyStep;
 use Iranimij\OpenImport\Model\Transform\ValueMap;
 use Iranimij\OpenImport\Model\Writer\WriterFactory;
 
@@ -120,7 +122,8 @@ class ProfileValidator
                 $this->mapping($profile),
                 $this->configurable($profile),
                 $this->missing($profile),
-                $this->quantities($profile)
+                $this->quantities($profile),
+                $this->urlKeyPattern($profile)
             );
         }
         if ($import && $profile->getRowFilters() !== []) {
@@ -316,6 +319,30 @@ class ProfileValidator
         }
 
         return $problems;
+    }
+
+    /**
+     * A URL key pattern needs fields in braces that the mapping sets.
+     *
+     * @param ProfileInterface $profile
+     * @return string[]
+     */
+    private function urlKeyPattern(ProfileInterface $profile): array
+    {
+        $pattern = trim((string) ($profile->getImportOptions()[UrlKeyStep::OPTION_PATTERN] ?? ''));
+        if ($pattern === '' || $profile->getEntity() !== 'catalog_product') {
+            return [];
+        }
+        $fields = (new UrlKeyPattern())->fields($pattern);
+        if ($fields === []) {
+            return ['Write the fields of the URL key pattern in braces, for example {name}-{sku}.'];
+        }
+        $targets = array_map(static fn (array $row): string => (string) ($row['target'] ?? ''), $profile->getMapping());
+        $missing = array_diff($fields, $targets);
+
+        return $missing === [] || $targets === []
+            ? []
+            : [sprintf('The URL key pattern uses %s; map it in step 4.', implode(', ', $missing))];
     }
 
     /**

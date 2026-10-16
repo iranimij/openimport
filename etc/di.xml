@@ -84,6 +84,7 @@
         <arguments>
             <argument name="steps" xsi:type="array">
                 <item name="images" xsi:type="object">Iranimij\OpenImport\Model\Image\ImageStep</item>
+                <item name="url_keys" xsi:type="object">Iranimij\OpenImport\Model\UrlKey\UrlKeyStep</item>
                 <item name="configurable" xsi:type="object">Iranimij\OpenImport\Model\Configurable\ConfigurableStep</item>
                 <item name="stock" xsi:type="object">Iranimij\OpenImport\Model\Stock\StockChangeStep</item>
                 <item name="missing" xsi:type="object">Iranimij\OpenImport\Model\Missing\MissingProductsStep</item>

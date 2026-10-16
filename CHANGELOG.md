@@ -24,6 +24,9 @@ All notable changes to this project are documented here. The format follows
 - Quantities as changes: *Quantities in the file → are changes (+5, -3)* for products, Stock & prices and stock per
   source (MSI); current quantities are read per batch, repeated SKUs add up, the dry run shows the result. See
   [Quantities as changes](https://iranimij.github.io/openimport/stock-changes/).
+- URL keys from a pattern (`{name}-{sku}`) for rows without a URL key, with duplicate keys reported with the other
+  SKU, and *Redirect old URLs (301)* for changed URL keys. See
+  [URL keys and redirects](https://iranimij.github.io/openimport/url-keys/).
 - Row steps (`RowStepInterface`, `AbstractRowStep`): a seam between mapping and Magento's import with `observe`,
   `columns`, `observeIdentifiers`, `apply` and `finish` hooks, and `PostImportStepInterface` for changes after the
   import; pictures, configurable products and missing products are built on it.

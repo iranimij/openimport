@@ -604,3 +604,8 @@
 "Quantities in the file","Mengen in der Datei"
 "are changes (+5, -3)","sind Änderungen (+5, -3)"
 "are the new stock","sind der neue Bestand"
+"For example {name}-{sku}: Magento fields in braces. Used for rows whose URL key is empty; empty = Magento makes the key from the name.","Zum Beispiel {name}-{sku}: Magento-Felder in geschweiften Klammern. Gilt für Zeilen ohne URL-Schlüssel; leer = Magento bildet den Schlüssel aus dem Namen."
+"Redirect old URLs (301)","Alte URLs umleiten (301)"
+"URL keys from a pattern","URL-Schlüssel nach Muster"
+"URL keys made from the pattern: %1.","URL-Schlüssel aus dem Muster gebildet: %1."
+"When a URL key changes, the old address answers with a permanent redirect to the new one, so links and search results keep working.","Ändert sich ein URL-Schlüssel, leitet die alte Adresse dauerhaft auf die neue um, damit Links und Suchergebnisse weiter funktionieren."

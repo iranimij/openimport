@@ -35,6 +35,7 @@ class Destination implements OptionSourceInterface
             'folder' => __('Server folder'),
             'sftp' => __('SFTP'),
             'ftp' => __('FTP'),
+            's3' => __('Amazon S3 / S3-compatible'),
             'email' => __('E-mail attachment'),
         ];
         $options = [];

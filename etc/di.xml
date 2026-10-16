@@ -225,6 +225,7 @@
                 <item name="url" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\UrlSource</item>
                 <item name="sftp" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\SftpSource</item>
                 <item name="ftp" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\FtpSource</item>
+                <item name="s3" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\S3Source</item>
             </argument>
         </arguments>
     </type>
@@ -234,6 +235,11 @@
             <argument name="types" xsi:type="array">
                 <item name="sftp" xsi:type="string">SFTP</item>
                 <item name="ftp" xsi:type="string">FTP</item>
+                <item name="s3" xsi:type="string">Amazon S3 / S3-compatible</item>
+            </argument>
+            <argument name="inline" xsi:type="array">
+                <item name="sftp" xsi:type="string">sftp</item>
+                <item name="ftp" xsi:type="string">ftp</item>
             </argument>
         </arguments>
     </type>
@@ -246,6 +252,11 @@
     <virtualType name="Iranimij\OpenImport\Model\Execution\Source\SftpSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
         <arguments>
             <argument name="protocol" xsi:type="string">sftp</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Execution\Source\S3Source" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
+        <arguments>
+            <argument name="protocol" xsi:type="string">s3</argument>
         </arguments>
     </virtualType>
     <virtualType name="Iranimij\OpenImport\Model\Execution\Source\FtpSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
@@ -279,6 +290,11 @@
             <argument name="protocol" xsi:type="string">sftp</argument>
         </arguments>
     </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Export\Destination\S3Destination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
+        <arguments>
+            <argument name="protocol" xsi:type="string">s3</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="Iranimij\OpenImport\Model\Export\Destination\FtpDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
         <arguments>
             <argument name="protocol" xsi:type="string">ftp</argument>
@@ -291,6 +307,7 @@
                 <item name="folder" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\FolderDestination</item>
                 <item name="sftp" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\SftpDestination</item>
                 <item name="ftp" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\FtpDestination</item>
+                <item name="s3" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\S3Destination</item>
                 <item name="email" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\EmailDestination</item>
             </argument>
         </arguments>
@@ -300,6 +317,7 @@
             <argument name="clients" xsi:type="array">
                 <item name="sftp" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\SftpClient</item>
                 <item name="ftp" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\FtpClient</item>
+                <item name="s3" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\S3Client</item>
             </argument>
         </arguments>
     </type>

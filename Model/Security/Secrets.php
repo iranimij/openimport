@@ -18,7 +18,7 @@ use Magento\Framework\Encryption\EncryptorInterface;
 class Secrets
 {
     public const KEY = 'secrets';
-    public const NAMES = ['password', 'private_key', 'passphrase', 'token'];
+    public const NAMES = ['password', 'private_key', 'passphrase', 'token', 'secret_key'];
 
     /**
      * @param EncryptorInterface $encryptor

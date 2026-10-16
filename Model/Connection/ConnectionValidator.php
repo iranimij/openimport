@@ -47,6 +47,9 @@ class ConnectionValidator
         $settings = $connection->getSettings();
         $text = static fn (string $key): string
             => is_scalar($settings[$key] ?? null) ? trim((string) $settings[$key]) : '';
+        if ($connection->getType() === 's3') {
+            return array_merge($problems, $this->s3($text, isset($settings['secrets']['secret_key'])));
+        }
         if ($text('host') === '') {
             $problems[] = 'Enter the server (host name).';
         }
@@ -59,6 +62,38 @@ class ConnectionValidator
         }
         if (!in_array($text('auth_sftp') ?: 'password', ['password', 'key'], true)) {
             $problems[] = 'Log in with a password or a private key.';
+        }
+
+        return $problems;
+    }
+
+    /**
+     * @param callable $text setting => trimmed text
+     * @param bool $secretStored
+     * @return string[]
+     */
+    private function s3(callable $text, bool $secretStored): array
+    {
+        $problems = [];
+        $endpoint = $text('endpoint');
+        if ($endpoint !== '' && preg_match('#^https?://[^/\s]+/?$#i', $endpoint) !== 1) {
+            $problems[] = 'The endpoint must be a web address such as https://s3.eu-central-1.amazonaws.com.';
+        }
+        if ($endpoint === '' && $text('region') === '') {
+            $problems[] = 'Enter the region of the bucket (e.g. eu-central-1), or the endpoint of an S3-compatible '
+                . 'service.';
+        }
+        $bucket = $text('bucket');
+        if ($bucket === '') {
+            $problems[] = 'Enter the bucket.';
+        } elseif (preg_match('/^[a-z0-9][a-z0-9.\-]{1,61}[a-z0-9]$/', $bucket) !== 1) {
+            $problems[] = 'A bucket name has 3 to 63 lower-case letters, digits, dots and hyphens.';
+        }
+        if ($text('access_key') === '') {
+            $problems[] = 'Enter the access key.';
+        }
+        if (!$secretStored) {
+            $problems[] = 'Enter the secret key.';
         }
 
         return $problems;

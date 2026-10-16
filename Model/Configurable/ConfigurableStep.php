@@ -23,7 +23,8 @@ use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
  *   its name from "Parent name" or from the words all variant names start with, visibility "Catalog, Search".
  * - Variants become "Not Visible Individually" (unless the profile keeps the mapped visibility); new variants get the
  *   URL key "<name>-<sku>" when the mapping has no URL key, so equal names do not collide.
- * - Every variant needs a value for every variation attribute, and no two variants of a parent may share all values.
+ * - Every variant needs an existing option of every variation attribute, and no two variants of a parent may share
+ *   all values.
  * - The parent lists every valid variant in the file, also those "skip unchanged rows" leaves out: Magento drops
  *   links a parent's list does not name.
  * - A file may have the parent's own row (product type "configurable", no parent SKU, as WooCommerce exports
@@ -385,6 +386,16 @@ class ConfigurableStep extends AbstractRowStep
             $value = trim((string) ($main[$attribute] ?? ''));
             if ($value === '') {
                 return [sprintf('The variation attribute "%s" is empty.', $attribute), $attribute];
+            }
+            if (!$this->configurableAttributes->hasOption($attribute, $value)) {
+                return [
+                    sprintf(
+                        '"%s" is not an option of %s; add it first (attribute import or Stores › Attributes).',
+                        $value,
+                        $attribute
+                    ),
+                    $attribute,
+                ];
             }
             $values[$attribute] = mb_strtolower($value);
         }

@@ -11,7 +11,8 @@ namespace Iranimij\OpenImport\Test\Unit\Model\Configurable\Fake;
 use Iranimij\OpenImport\Model\Configurable\ConfigurableAttributes;
 
 /**
- * "color" and "size" can make variants; "material" is store-view scoped; nothing else exists.
+ * "color" (Red, Blue, Green, Black) and "size" (S, M, L) can make variants; "material" is store-view scoped; nothing
+ * else exists.
  */
 class FakeConfigurableAttributes extends ConfigurableAttributes
 {
@@ -26,6 +27,16 @@ class FakeConfigurableAttributes extends ConfigurableAttributes
     public function eligible(): array
     {
         return ['color' => 'Color', 'size' => 'Size'];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasOption(string $code, string $label): bool
+    {
+        $options = ['color' => ['red', 'blue', 'green', 'black'], 'size' => ['s', 'm', 'l']];
+
+        return in_array(mb_strtolower(trim($label)), $options[$code] ?? [], true);
     }
 
     /**

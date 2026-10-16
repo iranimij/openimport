@@ -241,18 +241,24 @@ class ConfigurableStepTest extends TestCase
         $self = $this->row(5, ['sku' => 'B', 'name' => 'B', 'color' => 'Red', 'size' => 'M', 'configurable:parent_sku' => 'b']);
         $parentAsVariant = $this->row(6, ['sku' => 'A', 'name' => 'A', 'color' => 'Blue', 'size' => 'M',
             'configurable:parent_sku' => 'Z']);
-        $this->batch($step, [$good, $empty, $twin, $self, $parentAsVariant]);
+        $purple = $this->row(7, ['sku' => 'A-4', 'name' => 'A 4', 'color' => 'Purple', 'size' => 'M',
+            'configurable:parent_sku' => 'A']);
+        $this->batch($step, [$good, $empty, $twin, $self, $parentAsVariant, $purple]);
 
         self::assertFalse($good->isFailed());
         self::assertSame(['The variation attribute "size" is empty.', 'size'], [$empty->error(), $empty->errorColumn()]);
         self::assertSame('Another variant of A, A-1, has the same color, size.', $twin->error());
         self::assertSame('The parent SKU is the row\'s own SKU; a variant needs another parent.', $self->error());
         self::assertSame('This SKU is the parent of other rows; it cannot be a variant too.', $parentAsVariant->error());
+        self::assertSame(
+            ['"Purple" is not an option of color; add it first (attribute import or Stores › Attributes).', 'color'],
+            [$purple->error(), $purple->errorColumn()]
+        );
         $parents = $step->finish(static function (): void {
         });
         self::assertCount(1, $parents, 'B and Z have no valid variant');
         self::assertSame('sku=A-1,color=Red,size=M', $parents[0]->rows[0]['configurable_variations']);
-        self::assertSame('Configurable products: 1 built from 1 variants. 4 variant(s) left out, see the errors.', $step->summary());
+        self::assertSame('Configurable products: 1 built from 1 variants. 5 variant(s) left out, see the errors.', $step->summary());
     }
 
     public function testTheParentsOwnRowIsTakenOver(): void

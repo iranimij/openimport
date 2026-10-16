@@ -114,6 +114,7 @@ class ConfigurableImportTest extends TestCase
         return $this->profile('catalog_product', [
             ['target' => 'sku', 'source' => 'sku'],
             ['target' => 'name', 'source' => 'name'],
+            ['target' => 'store:default:name', 'source' => 'name_de'],
             ['target' => 'price', 'source' => 'price'],
             ['target' => 'qty', 'source' => null, 'static' => '10'],
             ['target' => 'is_in_stock', 'source' => null, 'static' => '1'],
@@ -186,6 +187,25 @@ class ConfigurableImportTest extends TestCase
     }
 
     /**
+     * @param string $sku
+     * @param string $store
+     * @return string the store view's own name
+     */
+    private function storeName(string $sku, string $store): string
+    {
+        $connection = Bootstrap::getObjectManager()->get(ResourceConnection::class)->getConnection();
+
+        return (string) $connection->fetchOne(
+            'SELECT n.value FROM ' . $connection->getTableName('catalog_product_entity_varchar') . ' n
+            JOIN ' . $connection->getTableName('catalog_product_entity') . ' e ON e.entity_id = n.entity_id
+            JOIN ' . $connection->getTableName('store') . ' s ON s.store_id = n.store_id
+            WHERE e.sku = ? AND s.code = ? AND n.attribute_id = (SELECT attribute_id FROM '
+            . $connection->getTableName('eav_attribute') . ' WHERE attribute_code = \'name\' AND entity_type_id = 4)',
+            [$sku, $store]
+        );
+    }
+
+    /**
      * @param string $parent
      * @return string[] SKUs of the linked variants, sorted
      */
@@ -210,6 +230,7 @@ class ConfigurableImportTest extends TestCase
         $rows = [];
         foreach ([['Red', 'S'], ['Red', 'M'], ['Blue', 'M']] as [$color, $size]) {
             $rows[] = ['sku' => $parent . '-' . $color . '-' . $size, 'name' => 'Polo ' . $parent . ' ' . $color . ' ' . $size,
+                'name_de' => 'Poloshirt ' . $parent . ' ' . $color . ' ' . $size,
                 'price' => '29.90', 'color' => $color, 'size' => $size, 'type' => 'simple', 'parent' => $parent];
         }
         $profile = $this->productProfile([], true);
@@ -223,6 +244,7 @@ class ConfigurableImportTest extends TestCase
         self::assertSame('Polo ' . $parent, $product['name']);
         self::assertSame('4', $product['visibility'], 'Catalog, Search');
         self::assertSame([$parent . '-Blue-M', $parent . '-Red-M', $parent . '-Red-S'], $this->variants($parent));
+        self::assertSame('Poloshirt ' . $parent, $this->storeName($parent, 'default'), 'the store view name too');
         $variant = $this->product($parent . '-Red-S');
         self::assertSame('1', $variant['visibility'] ?? null, 'Not Visible Individually');
         self::assertStringEndsWith(strtolower($parent) . '-red-s', $variant['url_key']);
@@ -232,7 +254,8 @@ class ConfigurableImportTest extends TestCase
         self::assertSame(4, $again->getCount('unchanged'), $this->describe($again));
 
         // One more variant: it is linked and the others stay linked.
-        $rows[] = ['sku' => $parent . '-Green-L', 'name' => 'Polo ' . $parent . ' Green L', 'price' => '29.90',
+        $rows[] = ['sku' => $parent . '-Green-L', 'name' => 'Polo ' . $parent . ' Green L',
+            'name_de' => 'Poloshirt ' . $parent . ' Green L', 'price' => '29.90',
             'color' => 'Green', 'size' => 'L', 'type' => 'simple', 'parent' => $parent];
         $more = $this->runImport($profile, $this->csv($rows));
         self::assertSame(RunInterface::STATUS_SUCCESS, $more->getStatus(), $this->describe($more));
@@ -245,7 +268,9 @@ class ConfigurableImportTest extends TestCase
     public function testTheParentsOwnRowAndBadVariants(): void
     {
         $parent = 'OI-CFGW-' . bin2hex(random_bytes(3));
-        $run = $this->runImport($this->productProfile(), $this->csv([
+        $run = $this->runImport($this->productProfile(), $this->csv(array_map(
+            static fn (array $row): array => $row + ['name_de' => ''],
+            [
             ['sku' => $parent, 'name' => 'Hoodie ' . $parent, 'price' => '49', 'color' => '', 'size' => '',
                 'type' => 'configurable', 'parent' => ''],
             ['sku' => $parent . '-1', 'name' => 'Hoodie black S ' . $parent, 'price' => '49', 'color' => 'Black',
@@ -254,16 +279,20 @@ class ConfigurableImportTest extends TestCase
                 'size' => 'S', 'type' => 'simple', 'parent' => $parent],
             ['sku' => $parent . '-3', 'name' => 'Hoodie no size ' . $parent, 'price' => '49', 'color' => 'Black',
                 'size' => '', 'type' => 'simple', 'parent' => $parent],
-        ]));
+            ['sku' => $parent . '-4', 'name' => 'Hoodie purple ' . $parent, 'price' => '49', 'color' => 'Purple',
+                'size' => 'M', 'type' => 'simple', 'parent' => $parent],
+            ]
+        )));
 
         self::assertSame(RunInterface::STATUS_PARTIAL, $run->getStatus(), $this->describe($run));
-        self::assertSame(2, $run->getCount('errors'), $this->describe($run));
+        self::assertSame(3, $run->getCount('errors'), $this->describe($run));
         $errors = [];
         foreach (Bootstrap::getObjectManager()->get(ErrorLog::class)->fetch((int) $run->getRunId()) as $error) {
             $errors[$error->identifier] = $error;
         }
         self::assertStringContainsString('has the same oi_color, oi_size', $errors[$parent . '-2']->message);
         self::assertSame('oi_size', $errors[$parent . '-3']->field);
+        self::assertStringContainsString('"Purple" is not an option of oi_color', $errors[$parent . '-4']->message);
         $product = $this->product($parent);
         self::assertSame('configurable', $product['type'] ?? null);
         self::assertSame('Hoodie ' . $parent, $product['name'], 'the own row keeps its name');

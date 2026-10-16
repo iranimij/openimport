@@ -22,6 +22,11 @@ class ConfigurableAttributes
     private ?array $attributes = null;
 
     /**
+     * @var array<string, array<string, true>> code => lower-cased admin option labels
+     */
+    private array $options = [];
+
+    /**
      * @param ResourceConnection $resource
      */
     public function __construct(
@@ -63,6 +68,48 @@ class ConfigurableAttributes
         }
 
         return null;
+    }
+
+    /**
+     * Whether a dropdown has the option (by its admin label, as Magento's import matches it: case-insensitive).
+     *
+     * @param string $code
+     * @param string $label
+     * @return bool
+     */
+    public function hasOption(string $code, string $label): bool
+    {
+        if (!isset($this->options[$code])) {
+            $connection = $this->resource->getConnection();
+            $labels = $connection->fetchCol(
+                $connection->select()
+                    ->from(['v' => $this->resource->getTableName('eav_attribute_option_value')], ['value'])
+                    ->join(
+                        ['o' => $this->resource->getTableName('eav_attribute_option')],
+                        'o.option_id = v.option_id',
+                        []
+                    )
+                    ->join(
+                        ['a' => $this->resource->getTableName('eav_attribute')],
+                        'a.attribute_id = o.attribute_id',
+                        []
+                    )
+                    ->join(
+                        ['t' => $this->resource->getTableName('eav_entity_type')],
+                        't.entity_type_id = a.entity_type_id',
+                        []
+                    )
+                    ->where('t.entity_type_code = ?', 'catalog_product')
+                    ->where('a.attribute_code = ?', $code)
+                    ->where('v.store_id = ?', 0)
+            );
+            $this->options[$code] = array_fill_keys(
+                array_map(static fn ($value): string => mb_strtolower(trim((string) $value)), $labels),
+                true
+            );
+        }
+
+        return isset($this->options[$code][mb_strtolower(trim($label))]);
     }
 
     /**

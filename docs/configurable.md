@@ -45,12 +45,13 @@ These rows are row errors (the column is named, the rest of the run goes on):
 | Problem | Message |
 |---|---|
 | A variation attribute is empty | *The variation attribute "size" is empty.* |
+| A value is not an option of the attribute | *"Purple" is not an option of color; add it first …* |
 | Two variants of one parent have the same values | *Another variant of TS, TS-RED-M, has the same color, size.* |
 | A row is its own parent | *The parent SKU is the row's own SKU; a variant needs another parent.* |
 | A parent SKU is also a variant | *This SKU is the parent of other rows; it cannot be a variant too.* |
 
-The values must be existing options of the attributes (as for any dropdown in Magento's import). Create options with
-the [attribute import](attributes.md) first.
+The values must be existing options of the attributes (matched by their admin label, ignoring case, as Magento's
+import does). Create options with the [attribute import](attributes.md) first.
 
 ## Skip unchanged rows
 

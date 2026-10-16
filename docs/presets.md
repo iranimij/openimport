@@ -25,5 +25,8 @@ Things to know:
 - **Magento 1** writes extra categories, pictures and store-view values on rows without a SKU; those rows are
   skipped. Copy Magento 1's `media/catalog/product` folder to `var/import/images` so the picture paths are found.
 
+The Shopify and WooCommerce presets make URL keys from `{name}-{sku}` (see [URL keys](url-keys.md)): variants
+share their product's name, and Magento needs a unique key for each.
+
 All presets read pictures from web addresses safely (see [Product pictures](images.md)) and import a product without
 a picture that cannot be read.

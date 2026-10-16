@@ -3,7 +3,7 @@
   "preset": {
     "code": "shopify",
     "label": "Shopify products",
-    "description": "A product export from Shopify with the current column names (Title, URL handle, SKU, Price, Compare-at price \u2026).",
+    "description": "A product export from Shopify with the current column names (Title, URL handle, SKU, Price, Compare-at price …).",
     "notes": "Variants without a SKU and rows that only add an image are skipped. Map Option1 value / Option2 value to your Magento attributes and switch on \"Build configurable products\" (step 5) to turn variants into configurable products. Additional images and categories are not mapped."
   },
   "profiles": [
@@ -29,7 +29,8 @@
         ]
       },
       "import_options": {
-        "images_on_error": "skip"
+        "images_on_error": "skip",
+        "url_key_pattern": "{name}-{sku}"
       },
       "mapping": [
         {

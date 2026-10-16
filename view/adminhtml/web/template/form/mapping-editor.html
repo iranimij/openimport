@@ -80,10 +80,12 @@
                     </li>
                     <!-- /ko -->
                 </ul>
-                <div class="openimport-add-transform">
-                    <input type="text" class="admin__control-text openimport-only-when"
+                <div class="openimport-only-when">
+                    <input type="text" class="admin__control-text"
                            attr="'aria-label': $t('Only when (optional)'), placeholder: $t('Only when, e.g. {Brand} = \'Acme\'')"
                            ko-value="row.addWhen">
+                </div>
+                <div class="openimport-add-transform">
                     <select class="admin__control-select"
                             attr="'aria-label': $t('Add a transform')"
                             options="$parent.catalogue, optionsText\: 'label', optionsValue\: 'name', optionsCaption\: $t('Add a transform …'), value\: row.addName"></select>

@@ -479,3 +479,8 @@ a.openimport-strip-problem {
 .openimport-next-runs a {
     color: #1a5a96;
 }
+
+.openimport-only-when {
+    margin-bottom: .5rem;
+}
+

@@ -11,8 +11,13 @@ All notable changes to this project are documented here. The format follows
   server with ETag/Last-Modified before downloading again. Profile option *Pictures that cannot be read*: report the
   row or import it without the picture. Settings under *Pictures from web addresses*; housekeeping removes pictures
   no run used for 30 days. See [Product pictures](https://iranimij.github.io/openimport/images/).
-- Row steps (`RowStepInterface`): a seam between mapping and Magento's import for steps that work on batches of
-  mapped records; pictures are the first one.
+- Configurable products from simple rows: map a column to *Parent SKU (configurable products)*, choose the variation
+  attributes; OpenImport builds the parent (name from the variants or a mapped column, values from the first
+  variant), hides the variants, gives new variants unique URL keys and lists every variant in the file even with
+  *Skip unchanged rows*. A parent's own row (product type `configurable`, as WooCommerce exports) is used. See
+  [Configurable products](https://iranimij.github.io/openimport/configurable/).
+- Row steps (`RowStepInterface`, `AbstractRowStep`): a seam between mapping and Magento's import with `observe`,
+  `columns`, `apply` and `finish` hooks; pictures and configurable products are built on it.
 
 ### Changed
 - Product pictures given as file names are read from `var/import/images` (as in Magento's own import), not from

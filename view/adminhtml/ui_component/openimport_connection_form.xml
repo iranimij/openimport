@@ -309,7 +309,127 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="timeout" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="39">
+        <field name="bucket" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">s3</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Bucket</label>
+                <dataScope>settings.bucket</dataScope>
+                <placeholder>shop-feeds</placeholder>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="region" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="41">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">s3</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Region</label>
+                <dataScope>settings.region</dataScope>
+                <placeholder>eu-central-1</placeholder>
+                <notice translate="true">The AWS region of the bucket. S3-compatible services: the region they ask for, often us-east-1 or auto.</notice>
+            </settings>
+        </field>
+        <field name="endpoint" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="42">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">s3</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Endpoint</label>
+                <dataScope>settings.endpoint</dataScope>
+                <placeholder>https://s3.eu-central-1.amazonaws.com</placeholder>
+                <notice translate="true">Empty for Amazon S3. Cloudflare R2, Wasabi, MinIO, Garage and others: the address of the service.</notice>
+            </settings>
+        </field>
+        <field name="path_style" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="43">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">s3</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Path-style addresses</label>
+                <dataScope>settings.path_style</dataScope>
+                <notice translate="true">endpoint/bucket/file instead of bucket.endpoint/file. Most self-hosted services need it.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="access_key" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="44">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">s3</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Access key</label>
+                <dataScope>settings.access_key</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="secret_key" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="45">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">s3</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Secret key</label>
+                <dataScope>settings.secret_key</dataScope>
+                <notice translate="true">Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="timeout" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">any</item>

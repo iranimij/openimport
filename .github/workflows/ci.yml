@@ -108,6 +108,8 @@ jobs:
             -e OPENSEARCH_JAVA_OPTS='-Xms512m -Xmx512m' opensearchproject/opensearch:2.12.0
           for i in $(seq 1 60); do curl -fsS 'localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' && break; sleep 3; done
           curl -fsS localhost:9200
+      - name: S3-compatible server (for the S3 connection tests)
+        run: .github/ci/s3-server.sh
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}

@@ -88,7 +88,7 @@ parallelism only across runs and for exports).
 | Release | Slices | Status |
 |---|---|---|
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
-| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | 1 in review (#53, E2E dev-env #13) |
+| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | 1 done (#53, E2E dev-env #13); 2 in review (#54, E2E dev-env #14) |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
 
@@ -102,12 +102,11 @@ code.
 1.3 released (v1.3.0, #44–#52; E2E dev-env #9–#12). Still open from 1.3: the local browser check on the Mac
 (double-click `claude-upgrade.command` first).
 
-Now: **1.4 slice 1 · saved connections**, PR #53 (`feat/1.4-connections`), E2E dev-env #13 (`e2e/1.4-connections`, ref
-`feat/1.4-connections`). Merge both when green, set the dev-env ref back to `main`. Then slice 2 (S3-compatible storage):
-a third connection type `s3` (endpoint, region, bucket, access key, secret key, path style), own Signature V4 client
-implementing `RemoteClientInterface` (list with ListObjectsV2, get, put, copy+delete for move), unit tests with AWS's
-published SigV4 examples, integration against MinIO in CI (service container), E2E against a MinIO container in the
-dev-env.
+Now: **1.4 slice 2 · S3**, PR #54 (`feat/1.4-s3`), E2E dev-env #14 (`e2e/1.4-s3`, ref `feat/1.4-s3`). Merge both
+when green, set the dev-env ref back to `main`. Then slice 3 (Google Drive and Sheets with login): connection kinds
+for a Google service account (JSON key, JWT bearer grant) and OAuth (user account, PKCE, refresh tokens stored as
+secrets), a Drive client on `RemoteClientInterface` (list a folder by id or path, download, upload, move), private
+Sheets read as CSV through the Drive export endpoint; tests against a mock Google API (recorded answers) in CI.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -239,6 +238,19 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: unit (ConnectionConfig, validator, form mapper, tester, settings builder, profile validator, profile JSON),
   integration `Test/Integration/Connection/ConnectionsTest.php` (fake remote client) and
   `Test/Integration/Controller/ConnectionAdminTest.php`; E2E `connections.spec.ts`. Docs: `docs/connections.md`.
+
+### 1.4 slice 2 · Amazon S3 and S3-compatible storage (what was built)
+
+- Connection kind `s3` (bucket, region, endpoint, path_style, access_key, secret `secret_key`); source type and
+  export destination `s3` (virtual types `S3Source`, `S3Destination`, client `S3Client`); S3 needs a saved connection
+  (`ConnectionTypes` `inline` = sftp, ftp; the "enter the login here" option is hidden for the others).
+- `S3Signer`: Signature V4 (header auth, payload hash); unit tests = AWS's three published examples.
+- `S3Client`: ListObjectsV2 with delimiter and continuation, folders as key prefixes (deeper keys left out), get to
+  file, put from file (SHA-256 of the file signed), move = copy (x-amz-copy-source) + delete, errors from the
+  `<Error>` code in plain words. Every request through `UrlGuard` with the checked address pinned (CURLOPT_RESOLVE).
+- CI: `.github/ci/s3-server.sh` starts RustFS (MinIO images can no longer be pulled) and exports OPENIMPORT_TEST_S3;
+  `Test/Integration/Connection/S3Test.php` runs against it. Lesson: Magento's integration framework sets the
+  properties of a finished test to null, so typed test properties must be nullable.
 
 ## Open questions
 

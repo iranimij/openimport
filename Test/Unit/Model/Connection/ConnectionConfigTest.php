@@ -85,4 +85,15 @@ class ConnectionConfigTest extends TestCase
         self::assertSame('Supplier SFTP', $this->config()->nameById(3));
         self::assertNull($this->config()->nameById(4));
     }
+
+    public function testWhichKindsAProfileCanLogInToItself(): void
+    {
+        $types = new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3'], ['sftp' => 'sftp', 'ftp' => 'ftp']);
+
+        self::assertTrue($types->allowsInline('ftp'));
+        self::assertFalse($types->allowsInline('s3'));
+        self::assertSame(['s3'], $types->connectionOnly());
+        self::assertSame('S3', $types->label('s3'));
+        self::assertSame('dropbox', $types->label('dropbox'));
+    }
 }

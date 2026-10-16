@@ -10,6 +10,10 @@ All notable changes to this project are documented here. The format follows
   by profiles as source or export destination; secrets encrypted and never shown again; a connection in use cannot be
   deleted; profile files name the connection instead of carrying a login. New ACL resource *Manage connections*. See
   [Saved connections](https://iranimij.github.io/openimport/connections/).
+- Amazon S3 and S3-compatible storage (Cloudflare R2, Wasabi, MinIO, Garage, ...) as import source and export
+  destination, through a saved S3 connection: own Signature Version 4 client (no SDK), folders as key prefixes, all
+  matching files, move after success; every request through the URL guard. Tested against AWS's published signature
+  examples and a MinIO server in CI.
 
 ### Fixed
 - `openimport:secrets:reencrypt` now also encrypts the secrets of export destinations again, and goes on when one

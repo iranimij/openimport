@@ -27,6 +27,7 @@ class SourceType implements OptionSourceInterface
             'url' => 'Web address (URL)',
             'sftp' => 'SFTP',
             'ftp' => 'FTP',
+            's3' => 'Amazon S3 / S3-compatible',
         ] as $value => $label) {
             $options[] = ['value' => (string) $value, 'label' => __($label)];
         }

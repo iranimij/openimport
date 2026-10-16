@@ -14,7 +14,7 @@ use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
 /**
- * "user@host:port" of a connection, from its settings (never the secrets).
+ * "user@host:port" (SFTP, FTP) or "bucket @ endpoint or region" (S3) of a connection, never the secrets.
  */
 class ConnectionServer extends Column
 {
@@ -46,10 +46,20 @@ class ConnectionServer extends Column
         }
         foreach ($dataSource['data']['items'] as &$item) {
             $settings = $this->json->decode($item['settings'] ?? null);
+            if (($item['type'] ?? '') === 's3') {
+                $bucket = is_scalar($settings['bucket'] ?? null) ? (string) $settings['bucket'] : '';
+                $where = is_scalar($settings['endpoint'] ?? null) && (string) $settings['endpoint'] !== ''
+                    ? (string) $settings['endpoint']
+                    : (is_scalar($settings['region'] ?? null) ? (string) $settings['region'] : '');
+                $item[$this->getData('name')] = $bucket . ($where !== '' ? ' @ ' . $where : '');
+                unset($item['settings']);
+                continue;
+            }
             $host = is_scalar($settings['host'] ?? null) ? (string) $settings['host'] : '';
             $user = is_scalar($settings['username'] ?? null) ? (string) $settings['username'] : '';
             $port = is_scalar($settings['port'] ?? null) ? (string) $settings['port'] : '';
-            $item[$this->getData('name')] = ($user !== '' ? $user . '@' : '') . $host . ($port !== '' ? ':' . $port : '');
+            $item[$this->getData('name')] = ($user !== '' ? $user . '@' : '') . $host
+                . ($port !== '' ? ':' . $port : '');
             unset($item['settings']);
         }
 

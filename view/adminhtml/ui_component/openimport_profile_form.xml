@@ -390,6 +390,7 @@
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
+                        <item name="2" xsi:type="string">s3</item>
                     </item>
                 </item>
             </argument>
@@ -669,6 +670,7 @@
                         <item name="0" xsi:type="string">folder</item>
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
+                        <item name="3" xsi:type="string">s3</item>
                     </item>
                     <item name="requiredWhen" xsi:type="array">
                         <item name="source_type" xsi:type="array">
@@ -679,11 +681,13 @@
                         <item name="folder" xsi:type="string">local</item>
                         <item name="sftp" xsi:type="string">remote</item>
                         <item name="ftp" xsi:type="string">remote</item>
+                        <item name="s3" xsi:type="string">remote</item>
                     </item>
                     <item name="noticeByType" xsi:type="array">
                         <item name="folder" xsi:type="string" translate="true">A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.</item>
                         <item name="sftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
                         <item name="ftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
+                        <item name="s3" xsi:type="string" translate="true">The folder in the bucket (key prefix), e.g. incoming; empty = the top of the bucket.</item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
@@ -702,6 +706,7 @@
                         <item name="0" xsi:type="string">folder</item>
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
+                        <item name="3" xsi:type="string">s3</item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
@@ -720,6 +725,7 @@
                         <item name="0" xsi:type="string">folder</item>
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
+                        <item name="3" xsi:type="string">s3</item>
                     </item>
                 </item>
             </argument>
@@ -763,6 +769,7 @@
                         <item name="0" xsi:type="string">folder</item>
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
+                        <item name="3" xsi:type="string">s3</item>
                     </item>
                     <item name="showWhen" xsi:type="array">
                         <item name="source_config.pick" xsi:type="array">
@@ -800,6 +807,7 @@
                         <item name="0" xsi:type="string">folder</item>
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
+                        <item name="3" xsi:type="string">s3</item>
                     </item>
                     <item name="showWhen" xsi:type="array">
                         <item name="after_success" xsi:type="array">
@@ -911,6 +919,7 @@
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
+                        <item name="2" xsi:type="string">s3</item>
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
@@ -1211,6 +1220,7 @@
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
+                        <item name="2" xsi:type="string">s3</item>
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
@@ -2467,6 +2477,7 @@
                             <item name="0" xsi:type="string">folder</item>
                             <item name="1" xsi:type="string">sftp</item>
                             <item name="2" xsi:type="string">ftp</item>
+                            <item name="3" xsi:type="string">s3</item>
                         </item>
                     </item>
                 </item>

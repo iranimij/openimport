@@ -23,6 +23,8 @@ class RemoteSettings
      * @param bool $ssl FTP: explicit FTPS
      * @param bool $passive FTP: passive mode
      * @param int $timeout seconds
+     * @param array<string, string> $options settings of other kinds of storage (S3: endpoint, region, bucket,
+     *     path_style, label)
      */
     public function __construct(
         public readonly string $host,
@@ -33,7 +35,8 @@ class RemoteSettings
         public readonly string $passphrase = '',
         public readonly bool $ssl = false,
         public readonly bool $passive = true,
-        public readonly int $timeout = 30
+        public readonly int $timeout = 30,
+        public readonly array $options = []
     ) {
     }
 
@@ -42,6 +45,10 @@ class RemoteSettings
      */
     public function label(): string
     {
+        if (isset($this->options['label'])) {
+            return $this->options['label'];
+        }
+
         return $this->host . ':' . $this->port;
     }
 }

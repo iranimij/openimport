@@ -56,8 +56,9 @@ class ProfileValidatorTest extends TestCase
                 new FakeConnectionRepository([
                     new ConnectionStub(4, 'Supplier SFTP', 'sftp', ['host' => 'sftp.example.com', 'username' => 'shop']),
                     new ConnectionStub(5, 'Old FTP', 'ftp', ['host' => 'ftp.example.com', 'username' => 'shop']),
+                    new ConnectionStub(6, 'Feeds bucket', 's3', ['bucket' => 'feeds']),
                 ]),
-                new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP'])
+                new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3'])
             )
         );
     }
@@ -176,7 +177,7 @@ class ProfileValidatorTest extends TestCase
         self::assertSame([
             'Give the profile a name.',
             'Magento has no import entity "catalog_category".',
-            'The source type "dropbox" is not one of upload, folder, url, sftp, ftp.',
+            'The source type "dropbox" is not one of upload, folder, url, sftp, ftp, s3.',
             'The format "pdf" is not one of auto, csv, xlsx, json, xml.',
             'The after-success action "archive" is not one of keep, move, delete.',
             'The notification setting "sometimes" is not one of never, failure, always.',
@@ -281,6 +282,17 @@ class ProfileValidatorTest extends TestCase
         self::assertSame(
             ['The saved connection 9 no longer exists. Choose another one, or enter the login in the profile.'],
             $validator->validate(new ProfileStub(['source_config' => ['connection_id' => '9']] + $base))
+        );
+        self::assertSame([], $validator->validate(new ProfileStub(
+            ['source_type' => 's3', 'source_config' => ['connection_id' => '6', 'path' => 'feeds']] + $base
+        )));
+        self::assertSame(
+            ['Choose a saved S3 connection.'],
+            $validator->validate(new ProfileStub(['source_type' => 's3', 'source_config' => ['path' => 'feeds']] + $base))
+        );
+        self::assertSame(
+            ['The saved connection "Supplier SFTP" is for SFTP, not for S3.'],
+            $validator->validate(new ProfileStub(['source_type' => 's3', 'source_config' => ['connection_id' => '4']] + $base))
         );
         $export = ['direction' => 'export', 'entity' => 'catalog_product', 'source_type' => 'upload', 'source_config' => [],
             'format' => 'csv'] + $base;

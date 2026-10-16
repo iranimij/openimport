@@ -41,4 +41,43 @@ class RemoteSettingsBuilderTest extends TestCase
         $this->expectException(PipelineException::class);
         $builder->build([], 'sftp');
     }
+
+    public function testS3(): void
+    {
+        $builder = new RemoteSettingsBuilder(new Secrets(new FakeEncryptor()));
+
+        $aws = $builder->build([
+            'region' => 'eu-central-1',
+            'bucket' => 'shop-feeds',
+            'access_key' => 'AKIA',
+            'secrets' => ['secret_key' => 'enc(s3cret)'],
+        ], 's3');
+        self::assertSame('s3.eu-central-1.amazonaws.com', $aws->host);
+        self::assertSame(443, $aws->port);
+        self::assertSame('AKIA', $aws->username);
+        self::assertSame('s3cret', $aws->password);
+        self::assertSame([
+            'endpoint' => 'https://s3.eu-central-1.amazonaws.com',
+            'region' => 'eu-central-1',
+            'bucket' => 'shop-feeds',
+            'path_style' => '0',
+            'label' => 'bucket shop-feeds (s3.eu-central-1.amazonaws.com)',
+        ], $aws->options);
+        self::assertSame('bucket shop-feeds (s3.eu-central-1.amazonaws.com)', $aws->label());
+
+        $minio = $builder->build(['endpoint' => 'http://minio:9000/', 'bucket' => 'b1', 'path_style' => '1'], 's3');
+        self::assertSame(['minio', 9000, 'us-east-1', '1', 'http://minio:9000'], [
+            $minio->host, $minio->port, $minio->options['region'], $minio->options['path_style'], $minio->options['endpoint'],
+        ]);
+
+        try {
+            $builder->build(['endpoint' => 'ftp://x', 'bucket' => 'b'], 's3');
+            self::fail('only web addresses');
+        } catch (PipelineException $exception) {
+            self::assertStringStartsWith('The endpoint must be a web address', $exception->getMessage());
+        }
+        $this->expectException(PipelineException::class);
+        $this->expectExceptionMessage('Enter the bucket.');
+        $builder->build(['region' => 'eu-west-1'], 's3');
+    }
 }

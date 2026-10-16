@@ -15,10 +15,30 @@ class ConnectionTypes
 {
     /**
      * @param array<string, string> $types code => name, e.g. sftp => SFTP
+     * @param string[] $inline the kinds whose login a profile can also hold itself (SFTP, FTP); the others need a
+     *     saved connection
      */
     public function __construct(
-        private readonly array $types = []
+        private readonly array $types = [],
+        private readonly array $inline = []
     ) {
+    }
+
+    /**
+     * @param string $code
+     * @return bool whether a profile can hold this kind of login itself
+     */
+    public function allowsInline(string $code): bool
+    {
+        return in_array($code, $this->inline, true);
+    }
+
+    /**
+     * @return string[] the kinds that need a saved connection
+     */
+    public function connectionOnly(): array
+    {
+        return array_values(array_diff($this->codes(), $this->inline));
     }
 
     /**

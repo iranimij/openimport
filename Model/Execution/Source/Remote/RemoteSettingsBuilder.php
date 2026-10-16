@@ -27,13 +27,17 @@ class RemoteSettingsBuilder
     }
 
     /**
-     * @param array<string, mixed> $config host, port, username, auth_sftp, ssl, passive, timeout, secrets
-     * @param string $protocol sftp or ftp
+     * @param array<string, mixed> $config host, port, username, auth_sftp, ssl, passive, timeout, secrets; for S3:
+     *     endpoint, region, bucket, access_key, path_style and the secret secret_key
+     * @param string $protocol sftp, ftp or s3
      * @return RemoteSettings
      * @throws PipelineException without a host
      */
     public function build(array $config, string $protocol): RemoteSettings
     {
+        if ($protocol === 's3') {
+            return $this->s3($config);
+        }
         $host = trim((string) ($config['host'] ?? ''));
         if ($host === '') {
             throw new PipelineException('Enter the server (host name).');
@@ -51,6 +55,55 @@ class RemoteSettingsBuilder
             !empty($config['ssl']),
             !isset($config['passive']) || !empty($config['passive']),
             max(5, min(300, (int) ($config['timeout'] ?? 30)))
+        );
+    }
+
+    /**
+     * S3: the endpoint defaults to AWS's for the region; host and port come from the endpoint.
+     *
+     * @param array<string, mixed> $config
+     * @return RemoteSettings
+     * @throws PipelineException
+     */
+    private function s3(array $config): RemoteSettings
+    {
+        $text = static fn (string $key): string
+            => is_scalar($config[$key] ?? null) ? trim((string) $config[$key]) : '';
+        $region = $text('region') !== '' ? $text('region') : 'us-east-1';
+        $endpoint = rtrim($text('endpoint'), '/');
+        if ($endpoint === '') {
+            $endpoint = 'https://s3.' . $region . '.amazonaws.com';
+        }
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- the framework has no URL parser without a request
+        $parts = parse_url($endpoint);
+        if (!is_array($parts) || empty($parts['host']) || !in_array($parts['scheme'] ?? '', ['http', 'https'], true)) {
+            throw new PipelineException(
+                'The endpoint must be a web address such as https://s3.eu-central-1.amazonaws.com.'
+            );
+        }
+        $bucket = $text('bucket');
+        if ($bucket === '') {
+            throw new PipelineException('Enter the bucket.');
+        }
+        $https = $parts['scheme'] === 'https';
+
+        return new RemoteSettings(
+            (string) $parts['host'],
+            (int) ($parts['port'] ?? ($https ? 443 : 80)),
+            $text('access_key'),
+            $this->secrets->get($config, 'secret_key'),
+            '',
+            '',
+            $https,
+            true,
+            max(5, min(300, (int) ($config['timeout'] ?? 30))),
+            [
+                'endpoint' => $endpoint,
+                'region' => $region,
+                'bucket' => $bucket,
+                'path_style' => !empty($config['path_style']) ? '1' : '0',
+                'label' => sprintf('bucket %s (%s)', $bucket, $parts['host']),
+            ]
         );
     }
 }

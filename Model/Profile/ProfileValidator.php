@@ -169,6 +169,14 @@ class ProfileValidator
                     $problems[] = 'Enter the user name for the login.';
                 }
                 break;
+            case 's3':
+                $problem = $this->connections->selected($config) > 0
+                    ? $this->connections->problem($config, 's3')
+                    : 'Choose a saved S3 connection.';
+                if ($problem !== null) {
+                    $problems[] = $problem;
+                }
+                break;
             case 'sftp':
             case 'ftp':
                 if ($this->connections->selected($config) > 0) {
@@ -200,7 +208,14 @@ class ProfileValidator
             if ($destination === 'folder' && $out('path') === '') {
                 $problems[] = 'Enter the server folder to write to.';
             }
-            if (in_array($destination, ['sftp', 'ftp'], true) && $this->connections->selected($export) > 0) {
+            if ($destination === 's3') {
+                $problem = $this->connections->selected($export) > 0
+                    ? $this->connections->problem($export, 's3')
+                    : 'Choose a saved S3 connection for the destination.';
+                if ($problem !== null) {
+                    $problems[] = $problem;
+                }
+            } elseif (in_array($destination, ['sftp', 'ftp'], true) && $this->connections->selected($export) > 0) {
                 $problem = $this->connections->problem($export, $destination);
                 if ($problem !== null) {
                     $problems[] = $problem;

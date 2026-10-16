@@ -86,7 +86,7 @@ class ProfileFormMapperTest extends TestCase
         self::assertSame('0 2 * * *', $form['schedule_preset']);
         self::assertSame(
             ['file' => 'abc.csv', 'file_name' => 'a.csv', 'password_stored' => '1', 'private_key_stored' => '0',
-                'passphrase_stored' => '0', 'token_stored' => '0'],
+                'passphrase_stored' => '0', 'token_stored' => '0', 'secret_key_stored' => '0'],
             $form['source_config'],
             'secrets never reach the form, only whether one is stored'
         );

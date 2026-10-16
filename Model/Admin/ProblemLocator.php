@@ -29,6 +29,8 @@ class ProblemLocator
         '/^(Enter the web address|The web address must)/' => 'source_url',
         '/^Enter the user name for the login/' => 'source_username_url',
         '/^The saved connection /' => 'source_connection',
+        '/^Choose a saved S3 connection for the destination/' => 'dest_connection',
+        '/^Choose a saved S3 connection/' => 'source_connection',
         '/^Enter the server \(host name\)\.$/' => 'source_host',
         '/^Enter the user name for the server/' => 'source_username',
         '/^The port must be/' => 'source_port',

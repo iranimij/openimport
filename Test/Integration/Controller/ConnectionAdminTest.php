@@ -154,7 +154,7 @@ class ConnectionAdminTest extends AbstractBackendController
             'type' => 'sftp',
             'settings' => ['host' => 'sftp.example.com', 'username' => 'shop', 'auth_sftp' => 'password', 'password' => 'hunter2'],
         ]);
-        $this->assertRedirect($this->stringEndsWith('openimport/connection/'));
+        $this->assertRedirect($this->matchesRegularExpression('#openimport/connection/(index/)?(key/[0-9a-f]+/)?$#'));
         $connection = $this->_objectManager->get(ConnectionRepositoryInterface::class)->getByName($name);
 
         // Test with the stored password: the form leaves the field empty.
@@ -179,7 +179,7 @@ class ConnectionAdminTest extends AbstractBackendController
         $this->assertRedirect($this->stringContains('openimport/connection/new'));
 
         $this->post('backend/openimport/connection/delete/id/' . $connection->getConnectionId(), []);
-        $this->assertRedirect($this->stringEndsWith('openimport/connection/'));
+        $this->assertRedirect($this->matchesRegularExpression('#openimport/connection/(index/)?(key/[0-9a-f]+/)?$#'));
         $this->expectException(NoSuchEntityException::class);
         $this->_objectManager->get(ConnectionRepositoryInterface::class)->getById((int) $connection->getConnectionId());
     }

@@ -69,3 +69,4 @@ The runs grid can be filtered by what and direction, and searched by profile nam
 | Run profiles | dry runs, live runs, cancelling runs |
 | Confirm runs above the safety limit | the typed confirmation for Delete and Replace |
 | View runs and error reports | the run list, run pages and downloads |
+| Manage connections | the saved connections grid and form, Test connection ([Saved connections](connections.md)) |

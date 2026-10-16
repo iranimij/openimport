@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Model\Profile;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
+use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
 use Iranimij\OpenImport\Model\Security\Secrets;
 use Magento\Framework\Exception\NoSuchEntityException;
 
@@ -23,6 +24,11 @@ class ProfileJson
 {
     public const VERSION = 1;
 
+    /**
+     * Key of a saved connection's name in source_config and export_options of a file.
+     */
+    public const CONNECTION = 'connection';
+
     private const FIELDS = ['name', 'direction', 'entity', 'is_active', 'source_type', 'source_config', 'format',
         'format_options', 'behavior', 'on_error', 'allowed_errors', 'delta', 'safety_threshold', 'schedule',
         'after_success', 'notify', 'notify_emails', 'row_filters', 'export_options', 'import_options', 'mapping',
@@ -33,12 +39,14 @@ class ProfileJson
      * @param ProfileInterfaceFactory $factory
      * @param ProfileValidator $validator
      * @param Secrets $secrets
+     * @param ConnectionConfig $connections
      */
     public function __construct(
         private readonly ProfileRepositoryInterface $profiles,
         private readonly ProfileInterfaceFactory $factory,
         private readonly ProfileValidator $validator,
-        private readonly Secrets $secrets
+        private readonly Secrets $secrets,
+        private readonly ConnectionConfig $connections
     ) {
     }
 
@@ -62,7 +70,7 @@ class ProfileJson
      */
     public function toArray(ProfileInterface $profile): array
     {
-        $source = $this->secrets->strip($profile->getSourceConfig());
+        $source = $this->connectionByName($this->secrets->strip($profile->getSourceConfig()));
         unset($source['file'], $source['file_name']);
 
         return [
@@ -84,7 +92,7 @@ class ProfileJson
             'notify' => $profile->getNotify(),
             'notify_emails' => $profile->getNotifyEmails(),
             'row_filters' => $profile->getRowFilters(),
-            'export_options' => $this->secrets->strip($profile->getExportOptions()),
+            'export_options' => $this->connectionByName($this->secrets->strip($profile->getExportOptions())),
             'import_options' => $profile->getImportOptions(),
             'mapping' => $profile->getMapping(),
             'value_maps' => $profile->getValueMaps(),
@@ -125,6 +133,14 @@ class ProfileJson
                 $problems[] = $label . ': appears twice in the file.';
             }
             $names[strtolower($label)] = true;
+            foreach (['source_config', 'export_options'] as $key) {
+                if (is_array($row[$key] ?? null)) {
+                    [$row[$key], $problem] = $this->connectionById($row[$key]);
+                    if ($problem !== null) {
+                        $problems[] = $label . ': ' . $problem;
+                    }
+                }
+            }
             $existing = null;
             try {
                 $existing = $this->profiles->getByName($label);
@@ -160,6 +176,44 @@ class ProfileJson
         }
 
         return [$created, $updated];
+    }
+
+    /**
+     * Saved connections travel by name: their ids differ between shops.
+     *
+     * @param array<string, mixed> $config
+     * @return array<string, mixed>
+     */
+    private function connectionByName(array $config): array
+    {
+        $id = $this->connections->selected($config);
+        unset($config[ConnectionConfig::ID]);
+        $name = $id > 0 ? $this->connections->nameById($id) : null;
+        if ($name !== null) {
+            $config[self::CONNECTION] = $name;
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param array<string, mixed> $config from a file
+     * @return array{0: array<string, mixed>, 1: string|null} the settings with the connection's id, and a problem
+     */
+    private function connectionById(array $config): array
+    {
+        $name = is_scalar($config[self::CONNECTION] ?? null) ? trim((string) $config[self::CONNECTION]) : '';
+        unset($config[self::CONNECTION], $config[ConnectionConfig::ID]);
+        if ($name === '') {
+            return [$config, null];
+        }
+        $id = $this->connections->idByName($name);
+        if ($id === null) {
+            return [$config, sprintf('there is no saved connection "%s". Create it under OpenImport Connections first.', $name)];
+        }
+        $config[ConnectionConfig::ID] = (string) $id;
+
+        return [$config, null];
     }
 
     /**

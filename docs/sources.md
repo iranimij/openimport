@@ -11,6 +11,9 @@ Step 2 of the profile form. Every source delivers one file per run; the run keep
 | **SFTP** | server, port, user name, password or private key (+ passphrase), remote folder, pattern, which file, move-to | Key login with an OpenSSH or PEM key, pasted into its multi-line field (a key that lost its line breaks is repaired before the login). |
 | **FTP** | server, port, user name, password, explicit TLS (FTPS), passive mode, remote folder, pattern, which file, move-to | |
 
+For SFTP and FTP, **Saved connection** picks a login saved under System › Data Transfer › OpenImport Connections
+instead of entering it in the profile (since 1.4); see [Saved connections](connections.md).
+
 **Test connection** checks the settings as they are in the form (saved or not) and says what the next run would read,
 without importing anything.
 
@@ -46,7 +49,8 @@ successful and its message says what did not work.
 
 Passwords, private keys, passphrases and tokens are encrypted with Magento's key (`app/etc/env.php`) and stored in
 the profile. They are never sent back to the form (it only says that a value is stored; leave the field empty to
-keep it, type a new one to replace it), never exported with a profile and never logged. After
+keep it, type a new one to replace it), never exported with a profile and never logged. Saved connections keep theirs
+the same way. After
 `bin/magento encryption:key:change`, run `bin/magento openimport:secrets:reencrypt`.
 
 ## Safety

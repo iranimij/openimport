@@ -5,6 +5,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Saved connections (System › Data Transfer › OpenImport Connections): SFTP and FTP logins with Test connection, shared
+  by profiles as source or export destination; secrets encrypted and never shown again; a connection in use cannot be
+  deleted; profile files name the connection instead of carrying a login. New ACL resource *Manage connections*. See
+  [Saved connections](https://iranimij.github.io/openimport/connections/).
+
+### Fixed
+- `openimport:secrets:reencrypt` now also encrypts the secrets of export destinations again, and goes on when one
+  profile cannot be saved.
+- Uninstalling removes the `openimport_image` table too.
+
 ## [1.3.0] - 2026-10-16
 
 Catalog helpers: every product helper of the paid import modules (plan 1.3–1.6, release 1.3).

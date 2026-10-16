@@ -13,6 +13,7 @@ nav:
   - Mapping and filters: mapping.md
   - Runs, dry runs and safety: runs.md
   - Sources: sources.md
+  - Saved connections: connections.md
   - Product pictures: images.md
   - Configurable products: configurable.md
   - Products missing from the file: missing-products.md

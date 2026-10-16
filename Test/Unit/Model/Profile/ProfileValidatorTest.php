@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Test\Unit\Model\Profile;
 
+use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
+use Iranimij\OpenImport\Model\Connection\ConnectionTypes;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
 use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
@@ -20,6 +22,8 @@ use Iranimij\OpenImport\Model\Export\DestinationPool;
 use Iranimij\OpenImport\Model\Writer\CsvWriter;
 use Iranimij\OpenImport\Model\Writer\WriterFactory;
 use Iranimij\OpenImport\Model\Writer\XlsxWriter;
+use Iranimij\OpenImport\Test\Unit\Model\Connection\ConnectionStub;
+use Iranimij\OpenImport\Test\Unit\Model\Connection\FakeConnectionRepository;
 use Iranimij\OpenImport\Test\Unit\Model\FakeObjectManager;
 use PHPUnit\Framework\TestCase;
 
@@ -47,7 +51,14 @@ class ProfileValidatorTest extends TestCase
             new EntityRegistry(),
             $codes,
             new DestinationPool(['download' => new DownloadDestination(), 'folder' => new DownloadDestination(), 'sftp' => new DownloadDestination(), 'email' => new DownloadDestination()]),
-            new WriterFactory(new FakeObjectManager(), ['csv' => CsvWriter::class, 'xlsx' => XlsxWriter::class])
+            new WriterFactory(new FakeObjectManager(), ['csv' => CsvWriter::class, 'xlsx' => XlsxWriter::class]),
+            new ConnectionConfig(
+                new FakeConnectionRepository([
+                    new ConnectionStub(4, 'Supplier SFTP', 'sftp', ['host' => 'sftp.example.com', 'username' => 'shop']),
+                    new ConnectionStub(5, 'Old FTP', 'ftp', ['host' => 'ftp.example.com', 'username' => 'shop']),
+                ]),
+                new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP'])
+            )
         );
     }
 
@@ -255,6 +266,31 @@ class ProfileValidatorTest extends TestCase
             $validator->validate(new ProfileStub(['source_type' => 'folder', 'source_config' => ['path' => 'a/../b', 'pick' => 'best']] + $base))
         );
         self::assertSame([], $validator->validate(new ProfileStub(['source_type' => 'upload', 'source_config' => []] + $base)));
+    }
+
+    public function testASavedConnectionReplacesTheLoginFields(): void
+    {
+        $validator = $this->validator();
+        $base = $this->valid();
+
+        self::assertSame([], $validator->validate(new ProfileStub(['source_config' => ['connection_id' => '4']] + $base)));
+        self::assertSame(
+            ['The saved connection "Old FTP" is for FTP, not for SFTP.'],
+            $validator->validate(new ProfileStub(['source_config' => ['connection_id' => '5']] + $base))
+        );
+        self::assertSame(
+            ['The saved connection 9 no longer exists. Choose another one, or enter the login in the profile.'],
+            $validator->validate(new ProfileStub(['source_config' => ['connection_id' => '9']] + $base))
+        );
+        $export = ['direction' => 'export', 'entity' => 'catalog_product', 'source_type' => 'upload', 'source_config' => [],
+            'format' => 'csv'] + $base;
+        self::assertSame([], $validator->validate(new ProfileStub(
+            ['export_options' => ['destination' => 'sftp', 'connection_id' => '4']] + $export
+        )));
+        self::assertSame(
+            ['"ftp" is not an export destination.', 'The saved connection "Supplier SFTP" is for SFTP, not for FTP.'],
+            $validator->validate(new ProfileStub(['export_options' => ['destination' => 'ftp', 'connection_id' => '4']] + $export))
+        );
     }
 
     public function testExportProfilesNeedAWritableFormatAndAKnownDestination(): void

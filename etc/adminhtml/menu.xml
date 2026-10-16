@@ -14,5 +14,8 @@
         <add id="Iranimij_OpenImport::menu_runs" title="OpenImport Runs" translate="title"
              module="Iranimij_OpenImport" sortOrder="60" parent="Magento_Backend::system_convert"
              action="openimport/run/index" resource="Iranimij_OpenImport::runs"/>
+        <add id="Iranimij_OpenImport::menu_connections" title="OpenImport Connections" translate="title"
+             module="Iranimij_OpenImport" sortOrder="70" parent="Magento_Backend::system_convert"
+             action="openimport/connection/index" resource="Iranimij_OpenImport::connections"/>
     </menu>
 </config>

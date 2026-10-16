@@ -11,9 +11,13 @@ namespace Iranimij\OpenImport\Test\Unit\Model\Profile;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
+use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
+use Iranimij\OpenImport\Model\Connection\ConnectionTypes;
 use Iranimij\OpenImport\Model\Profile\ProfileJson;
 use Iranimij\OpenImport\Model\Profile\ProfileValidator;
 use Iranimij\OpenImport\Model\Security\Secrets;
+use Iranimij\OpenImport\Test\Unit\Model\Connection\ConnectionStub;
+use Iranimij\OpenImport\Test\Unit\Model\Connection\FakeConnectionRepository;
 use Iranimij\OpenImport\Test\Unit\Model\ProfileStub;
 use Iranimij\OpenImport\Test\Unit\Model\Security\FakeEncryptor;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -51,7 +55,12 @@ class ProfileJsonTest extends TestCase
         $validator = $this->createMock(ProfileValidator::class);
         $validator->method('validate')->willReturnCallback(static fn (ProfileInterface $profile): array => $problems[$profile->getName()] ?? []);
 
-        return new ProfileJson($repository, $factory, $validator, new Secrets(new FakeEncryptor()));
+        $connections = new ConnectionConfig(
+            new FakeConnectionRepository([new ConnectionStub(7, 'Supplier SFTP', 'sftp', ['host' => 'sftp.example.com'])]),
+            new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP'])
+        );
+
+        return new ProfileJson($repository, $factory, $validator, new Secrets(new FakeEncryptor()), $connections);
     }
 
     public function testExportLeavesSecretsAndUploadTokensOut(): void
@@ -73,6 +82,34 @@ class ProfileJsonTest extends TestCase
         self::assertSame(['destination' => 'email'], $data['profiles'][0]['export_options']);
         self::assertStringNotContainsString('enc(', $json);
         self::assertSame('0 2 * * *', $data['profiles'][0]['schedule']);
+    }
+
+    public function testSavedConnectionsTravelByName(): void
+    {
+        $profile = new ProfileStub([
+            'name' => 'Supplier stock',
+            'entity' => 'catalog_product',
+            'source_type' => 'sftp',
+            'source_config' => ['connection_id' => '7', 'path' => '/out'],
+            'export_options' => ['connection_id' => '99'],
+        ]);
+        $data = json_decode($this->json()->encode([$profile]), true);
+        self::assertSame(['path' => '/out', 'connection' => 'Supplier SFTP'], $data['profiles'][0]['source_config']);
+        self::assertSame([], $data['profiles'][0]['export_options'], 'a deleted connection is left out');
+
+        $prepared = $this->json()->prepare((string) json_encode(['profiles' => [
+            ['name' => 'Supplier stock', 'entity' => 'catalog_product', 'source_type' => 'sftp',
+                'source_config' => ['connection' => 'supplier sftp', 'connection_id' => '1', 'path' => '/out']],
+        ]]));
+        self::assertSame(['path' => '/out', 'connection_id' => '7'], $prepared[0][0]->getSourceConfig());
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Other: there is no saved connection "Gone". Create it under OpenImport Connections first.'
+        );
+        $this->json()->prepare((string) json_encode(['profiles' => [
+            ['name' => 'Other', 'entity' => 'catalog_product', 'export_options' => ['connection' => 'Gone']],
+        ]]));
     }
 
     public function testImportUpdatesByNameKeepsStoredSecretsAndIsAllOrNothing(): void

@@ -13,9 +13,10 @@ use Iranimij\OpenImport\Model\Execution\FetchedFile;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteClientFactory;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteClientInterface;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteSettings;
+use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteSettingsBuilder;
 use Iranimij\OpenImport\Model\Execution\MultiFileSourceInterface;
+use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
-use Iranimij\OpenImport\Model\Security\Secrets;
 
 /**
  * A folder on an SFTP or FTP server (one class, the protocol comes from di.xml).
@@ -26,18 +27,18 @@ use Iranimij\OpenImport\Model\Security\Secrets;
  */
 class RemoteSource implements MultiFileSourceInterface
 {
-    private const DEFAULT_PORTS = ['sftp' => 22, 'ftp' => 21];
-
     /**
      * @param RemoteClientFactory $clients
      * @param FileSelector $selector
-     * @param Secrets $secrets
+     * @param RemoteSettingsBuilder $settingsBuilder
+     * @param ConnectionConfig $connections
      * @param string $protocol sftp | ftp
      */
     public function __construct(
         private readonly RemoteClientFactory $clients,
         private readonly FileSelector $selector,
-        private readonly Secrets $secrets,
+        private readonly RemoteSettingsBuilder $settingsBuilder,
+        private readonly ConnectionConfig $connections,
         private readonly string $protocol = 'sftp'
     ) {
     }
@@ -150,24 +151,7 @@ class RemoteSource implements MultiFileSourceInterface
      */
     public function settings(array $config): RemoteSettings
     {
-        $host = trim((string) ($config['host'] ?? ''));
-        if ($host === '') {
-            throw new PipelineException('Enter the server (host name).');
-        }
-        $port = (int) ($config['port'] ?? 0);
-        $key = ($config['auth_sftp'] ?? 'password') === 'key' ? $this->secrets->get($config, 'private_key') : '';
-
-        return new RemoteSettings(
-            $host,
-            $port > 0 && $port < 65536 ? $port : self::DEFAULT_PORTS[$this->protocol] ?? 22,
-            trim((string) ($config['username'] ?? '')),
-            $this->secrets->get($config, 'password'),
-            $key,
-            $key === '' ? '' : $this->secrets->get($config, 'passphrase'),
-            !empty($config['ssl']),
-            !isset($config['passive']) || !empty($config['passive']),
-            max(5, min(300, (int) ($config['timeout'] ?? 30)))
-        );
+        return $this->settingsBuilder->build($this->connections->resolve($config, $this->protocol), $this->protocol);
     }
 
     /**

@@ -21,7 +21,8 @@ use Magento\Framework\Setup\UninstallInterface;
 class Uninstall implements UninstallInterface
 {
     private const TABLES = ['openimport_export_mark', 'openimport_lock', 'openimport_row_hash', 'openimport_run_preview',
-        'openimport_run_error', 'openimport_run', 'openimport_value_map', 'openimport_mapping', 'openimport_profile'];
+        'openimport_run_error', 'openimport_run', 'openimport_value_map', 'openimport_mapping', 'openimport_profile',
+        'openimport_image', 'openimport_connection'];
 
     /**
      * @param Filesystem $filesystem

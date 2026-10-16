@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Model\Profile;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
+use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Execution\Source\FileSelector;
 use Iranimij\OpenImport\Model\Export\DestinationPool;
@@ -38,6 +39,7 @@ class ProfileValidator
      * @param EntityCodes $entityCodes
      * @param DestinationPool $destinations
      * @param WriterFactory $writers
+     * @param ConnectionConfig $connections
      */
     public function __construct(
         private readonly MappingCompiler $mappingCompiler,
@@ -45,7 +47,8 @@ class ProfileValidator
         private readonly EntityRegistry $entities,
         private readonly EntityCodes $entityCodes,
         private readonly DestinationPool $destinations,
-        private readonly WriterFactory $writers
+        private readonly WriterFactory $writers,
+        private readonly ConnectionConfig $connections
     ) {
     }
 
@@ -168,6 +171,13 @@ class ProfileValidator
                 break;
             case 'sftp':
             case 'ftp':
+                if ($this->connections->selected($config) > 0) {
+                    $problem = $this->connections->problem($config, $profile->getSourceType());
+                    if ($problem !== null) {
+                        $problems[] = $problem;
+                    }
+                    break;
+                }
                 if ($text('host') === '') {
                     $problems[] = 'Enter the server (host name).';
                 }
@@ -190,7 +200,12 @@ class ProfileValidator
             if ($destination === 'folder' && $out('path') === '') {
                 $problems[] = 'Enter the server folder to write to.';
             }
-            if (in_array($destination, ['sftp', 'ftp'], true)) {
+            if (in_array($destination, ['sftp', 'ftp'], true) && $this->connections->selected($export) > 0) {
+                $problem = $this->connections->problem($export, $destination);
+                if ($problem !== null) {
+                    $problems[] = $problem;
+                }
+            } elseif (in_array($destination, ['sftp', 'ftp'], true)) {
                 if ($out('host') === '') {
                     $problems[] = 'Enter the server (host name) of the destination.';
                 }

@@ -28,6 +28,7 @@ class ProblemLocator
         '/^(Enter the server folder to read from|The folder may not contain)/' => 'source_path',
         '/^(Enter the web address|The web address must)/' => 'source_url',
         '/^Enter the user name for the login/' => 'source_username_url',
+        '/^The saved connection /' => 'source_connection',
         '/^Enter the server \(host name\)\.$/' => 'source_host',
         '/^Enter the user name for the server/' => 'source_username',
         '/^The port must be/' => 'source_port',
@@ -56,6 +57,9 @@ class ProblemLocator
             $field = $this->field($problem, $destinationEmails);
             if ($field === 'schedule_custom' && $daily) {
                 $field = 'schedule_time';
+            }
+            if ($field === 'source_connection' && ($data['direction'] ?? '') === 'export') {
+                $field = 'dest_connection';
             }
             if ($field !== '') {
                 $fields[$field] = isset($fields[$field]) ? $fields[$field] . "\n" . $problem : $problem;

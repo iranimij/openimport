@@ -12,7 +12,7 @@ Magento then refuses the second one. **URL keys from a pattern** builds the key 
 | `{name}-{sku}` | Blaue Jacke, J-100 | `blaue-jacke-j-100` |
 | `{manufacturer}-{name}` | Acme, Hammer | `acme-hammer` |
 
-- Fields are Magento fields in braces; they must be mapped in step 4. Text is transliterated (*ä* → *ae*), lower
+- Fields are Magento fields in braces; they must be mapped in step 4. Text is transliterated (*ü* → *u*), lower
   case, words joined by hyphens, as Magento does it.
 - Only rows whose URL key cell is empty get one, so a mapped `url_key` column always wins.
 - A store view gets its own key when it has its own values for the pattern (a German name), otherwise it inherits.

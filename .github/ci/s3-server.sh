@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Starts an S3-compatible server on localhost:9000 for the S3 connection tests and exports OPENIMPORT_TEST_S3
-# ("endpoint|access key|secret key"). MinIO publishes no new images since late 2025, so the last known images are
-# tried first, then other S3 servers that check Signature V4. Without any, the S3 tests are skipped (with a warning).
+# ("endpoint|access key|secret key"). MinIO's images can no longer be pulled (2026-10), so RustFS comes first; the
+# others are fallbacks. Each one checks Signature V4. Without any, the S3 tests are skipped (with a warning).
 set -u
 key=openimport
 secret=openimport-s3-secret
@@ -18,11 +18,8 @@ start_cloudserver() {
 }
 
 for candidate in \
-  "minio minio/minio:RELEASE.2025-04-22T22-12-26Z" \
-  "minio quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z" \
-  "minio minio/minio:latest" \
-  "minio quay.io/minio/minio:latest" \
   "rustfs rustfs/rustfs:latest" \
+  "minio minio/minio:latest" \
   "cloudserver zenko/cloudserver:latest"; do
   kind=${candidate%% *}
   image=${candidate#* }

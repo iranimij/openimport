@@ -71,6 +71,11 @@ define([
     }
 
     return Abstract.extend({
+        /**
+         * Braces in a template attribute confuse Magento's binding syntax, so the example lives here.
+         */
+        whenPlaceholder: $t('Only when, e.g. {Brand} = \'Acme\''),
+
         defaults: {
             template: 'Iranimij_OpenImport/form/mapping-editor',
             fieldsUrl: '',
@@ -155,6 +160,7 @@ define([
                 showMap: ko.observable(!!data.value_map),
                 addName: ko.observable(''),
                 addArgs: ko.observableArray([]),
+                addWhen: ko.observable(''),
                 other: ko.observable(false)
             };
             // The code field shows for "Other field …" and for codes the list does not have (D2).
@@ -433,7 +439,8 @@ define([
             var name = row.addName(),
                 args = _.map(row.addArgs(), function (arg) {
                     return arg.value();
-                });
+                }),
+                when;
 
             if (!name) {
                 return;
@@ -441,8 +448,14 @@ define([
             while (args.length && args[args.length - 1] === '') {
                 args.pop();
             }
-            row.transforms.push(args.length ? {name: name, args: args} : name);
+            when = $.trim(row.addWhen() || '');
+            if (when !== '') {
+                row.transforms.push({name: name, args: args, when: when});
+            } else {
+                row.transforms.push(args.length ? {name: name, args: args} : name);
+            }
             row.addName('');
+            row.addWhen('');
             if (name === 'map') {
                 row.showMap(true);
             }
@@ -489,7 +502,8 @@ define([
 
             return (entry ? entry.label : name) + (args.length ? ' (' + _.map(args, function (arg) {
                 return JSON.stringify(String(arg));
-            }).join(', ') + ')' : '');
+            }).join(', ') + ')' : '') + (typeof transform === 'object' && transform.when
+                ? ' · ' + $t('only when %1').replace('%1', transform.when) : '');
         },
 
         /**

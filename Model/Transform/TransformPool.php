@@ -8,11 +8,16 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Model\Transform;
 
+use Iranimij\OpenImport\Model\Expression\EvaluationException;
+use Iranimij\OpenImport\Model\Expression\ExpressionException;
+use Iranimij\OpenImport\Model\Expression\Parser;
+
 /**
  * All transforms by name. Compiles a field's transform list into one function.
  *
  * A transform definition is a name ("trim") or ["name" => "replace", "args" => ["a", "b"]], as stored in a mapping
- * row's JSON.
+ * row's JSON. A definition may have "when", an expression: the transform then only runs for rows where it is true
+ * ("{Brand} = 'Acme'", "value > 100"); other rows keep the value as it is.
  */
 class TransformPool
 {
@@ -21,11 +26,14 @@ class TransformPool
      */
     private array $byName = [];
 
+    private Parser $parser;
+
     /**
      * @param TransformProviderInterface[] $providers extra transforms; a provider may replace a built-in name
      */
     public function __construct(array $providers = [])
     {
+        $this->parser = new Parser();
         $builtIn = [new TextTransforms(), new NumberTransforms(), new DateTransform(), new LookupTransforms()];
         foreach (array_merge($builtIn, array_values($providers)) as $provider) {
             foreach ($provider->names() as $name) {
@@ -63,10 +71,12 @@ class TransformPool
                 ));
             }
             try {
-                $steps[] = $provider->compile($name, new Arguments($name, $arguments), $scope);
+                $step = $provider->compile($name, new Arguments($name, $arguments), $scope);
             } catch (TransformException $exception) {
                 throw new TransformException(sprintf('Step %d: %s', $position + 1, $exception->getMessage()));
             }
+            $when = is_array($definition) && is_string($definition['when'] ?? null) ? trim($definition['when']) : '';
+            $steps[] = $when === '' ? $step : $this->conditional($step, $when, $position + 1, $name);
         }
 
         return static function (string $value, array $row) use ($steps): string {
@@ -74,6 +84,45 @@ class TransformPool
                 $value = $step($value, $row);
             }
             return $value;
+        };
+    }
+
+    /**
+     * A step that only runs where its "when" expression is true.
+     *
+     * @param \Closure $step
+     * @param string $when
+     * @param int $position
+     * @param string $name
+     * @return \Closure
+     * @throws TransformException
+     */
+    private function conditional(\Closure $step, string $when, int $position, string $name): \Closure
+    {
+        try {
+            $condition = $this->parser->parse($when);
+        } catch (ExpressionException $exception) {
+            throw new TransformException(sprintf(
+                'Step %d (%s): "only when" %s',
+                $position,
+                $name,
+                $exception->getMessage()
+            ));
+        }
+
+        return static function (string $value, array $row) use ($step, $condition, $name): string {
+            try {
+                $applies = $condition->test($row, $value);
+            } catch (EvaluationException $exception) {
+                throw new TransformException(sprintf(
+                    '%s, only when: %s (in %s)',
+                    $name,
+                    $exception->getMessage(),
+                    $condition->source()
+                ));
+            }
+
+            return $applies ? $step($value, $row) : $value;
         };
     }
 

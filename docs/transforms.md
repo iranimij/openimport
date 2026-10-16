@@ -94,3 +94,19 @@ COALESCE({EAN}, {GTIN}, {Supplier SKU})
 Implement `Iranimij\OpenImport\Model\Transform\TransformProviderInterface` and add the class to the `providers`
 argument of `Iranimij\OpenImport\Model\Transform\TransformPool` in your module's `di.xml`. A provider may also
 replace a built-in transform by using its name.
+
+## Only when
+
+Since 1.3. Every transform can have a condition: type it into **Only when** before you add the transform. The
+transform then runs only for rows where the condition is true; other rows keep the value as it is. Conditions are
+expressions (see above) and can use the row's columns and `value`, the value at that step.
+
+| Transform | Only when | Effect |
+|---|---|---|
+| Change price by % (15) | `{Brand} = 'Acme'` | Acme prices +15 %, other brands unchanged |
+| Change price by % (-10) | `CONTAINS({Category}, 'sale')` | 10 % off in the sale category |
+| Round (0, ending, .99) | `value > 20` | only prices above 20 end in .99 |
+
+In the profile JSON a conditional transform is written as
+`{"name": "price_adjust", "args": ["15"], "when": "{Brand} = 'Acme'"}`.
+

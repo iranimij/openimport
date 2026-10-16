@@ -80,6 +80,11 @@
                     </li>
                     <!-- /ko -->
                 </ul>
+                <div class="openimport-only-when">
+                    <input type="text" class="admin__control-text"
+                           attr="'aria-label': $t('Only when (optional)'), placeholder: $parent.whenPlaceholder"
+                           ko-value="row.addWhen">
+                </div>
                 <div class="openimport-add-transform">
                     <select class="admin__control-select"
                             attr="'aria-label': $t('Add a transform')"

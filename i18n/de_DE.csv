@@ -609,3 +609,6 @@
 "URL keys from a pattern","URL-Schlüssel nach Muster"
 "URL keys made from the pattern: %1.","URL-Schlüssel aus dem Muster gebildet: %1."
 "When a URL key changes, the old address answers with a permanent redirect to the new one, so links and search results keep working.","Ändert sich ein URL-Schlüssel, leitet die alte Adresse dauerhaft auf die neue um, damit Links und Suchergebnisse weiter funktionieren."
+"Only when (optional)","Nur wenn (optional)"
+"Only when, e.g. {Brand} = 'Acme'","Nur wenn, z. B. {Marke} = 'Acme'"
+"only when %1","nur wenn %1"

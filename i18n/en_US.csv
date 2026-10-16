@@ -609,3 +609,6 @@
 "URL keys from a pattern","URL keys from a pattern"
 "URL keys made from the pattern: %1.","URL keys made from the pattern: %1."
 "When a URL key changes, the old address answers with a permanent redirect to the new one, so links and search results keep working.","When a URL key changes, the old address answers with a permanent redirect to the new one, so links and search results keep working."
+"Only when (optional)","Only when (optional)"
+"Only when, e.g. {Brand} = 'Acme'","Only when, e.g. {Brand} = 'Acme'"
+"only when %1","only when %1"

@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-16
+
+Catalog helpers: every product helper of the paid import modules (plan 1.3–1.6, release 1.3).
+
 ### Added
 - Product pictures from web addresses: OpenImport downloads them itself (SSRF check on every redirect, JPG/PNG/GIF
   checked by their first bytes, size and time limits), keeps them in `var/import/images/openimport` and asks the

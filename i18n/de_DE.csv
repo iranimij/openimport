@@ -612,3 +612,8 @@
 "Only when (optional)","Nur wenn (optional)"
 "Only when, e.g. {Brand} = 'Acme'","Nur wenn, z. B. {Marke} = 'Acme'"
 "only when %1","nur wenn %1"
+"All matching files, one run each (by name)","Alle passenden Dateien, je ein Lauf (nach Name)"
+"Each file gets its own run, report and move after success. A failed file stays where it is.","Jede Datei bekommt ihren eigenen Lauf, Bericht und ihr Verschieben nach Erfolg. Eine fehlgeschlagene Datei bleibt, wo sie ist."
+"Go on with the next file","Mit der nächsten Datei weitermachen"
+"Stop; the next files wait for the next run","Anhalten; die weiteren Dateien warten auf den nächsten Lauf"
+"When a file fails","Wenn eine Datei fehlschlägt"

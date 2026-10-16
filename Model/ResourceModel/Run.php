@@ -168,4 +168,28 @@ class Run extends AbstractDb
                 ->where('profile_id IS NOT NULL')
         ));
     }
+
+    /**
+     * Options of the profile's queued and running runs (which files "All matching files" already handed out).
+     *
+     * @param int $profileId
+     * @return array<int, array<string, mixed>> run id => options
+     */
+    public function openRunOptions(int $profileId): array
+    {
+        $connection = $this->getConnection();
+        $rows = $connection->fetchPairs(
+            $connection->select()
+                ->from($this->getMainTable(), ['run_id', 'options'])
+                ->where('profile_id = ?', $profileId)
+                ->where('status IN (?)', [RunInterface::STATUS_QUEUED, RunInterface::STATUS_RUNNING])
+        );
+        $options = [];
+        foreach ($rows as $runId => $json) {
+            $decoded = json_decode((string) $json, true);
+            $options[(int) $runId] = is_array($decoded) ? $decoded : [];
+        }
+
+        return $options;
+    }
 }

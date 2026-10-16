@@ -21,7 +21,12 @@ class FileSelector
     public const PICK_OLDEST = 'oldest';
     public const PICK_FIRST_NAME = 'first_name';
     public const PICK_LAST_NAME = 'last_name';
-    public const PICKS = [self::PICK_NEWEST, self::PICK_OLDEST, self::PICK_FIRST_NAME, self::PICK_LAST_NAME];
+    /**
+     * Every matching file, one run each, in name order (the first one when a single file is read).
+     */
+    public const PICK_ALL = 'all';
+    public const PICKS = [self::PICK_NEWEST, self::PICK_OLDEST, self::PICK_FIRST_NAME, self::PICK_LAST_NAME,
+        self::PICK_ALL];
 
     /**
      * @param array<string, int|null> $files name => modification time (null when the server does not tell)
@@ -47,6 +52,21 @@ class FileSelector
 
             return false;
         }, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * The matching files in name order (natural, ignoring case).
+     *
+     * @param array<string, int|null> $files name => modification time
+     * @param string $pattern
+     * @return string[]
+     */
+    public function ordered(array $files, string $pattern): array
+    {
+        $names = array_map('strval', array_keys($this->matching($files, $pattern)));
+        usort($names, 'strnatcasecmp');
+
+        return $names;
     }
 
     /**
@@ -76,6 +96,7 @@ class FileSelector
             }
             $byName = strnatcasecmp($a, $b);
 
+            // PICK_ALL reads the first by name.
             return $pick === self::PICK_LAST_NAME || $pick === self::PICK_NEWEST ? -$byName : $byName;
         });
 

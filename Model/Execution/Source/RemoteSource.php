@@ -13,7 +13,7 @@ use Iranimij\OpenImport\Model\Execution\FetchedFile;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteClientFactory;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteClientInterface;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteSettings;
-use Iranimij\OpenImport\Model\Execution\SourceInterface;
+use Iranimij\OpenImport\Model\Execution\MultiFileSourceInterface;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Security\Secrets;
 
@@ -24,7 +24,7 @@ use Iranimij\OpenImport\Model\Security\Secrets;
  * "processed"), auth_sftp (password | key), ssl and passive (ftp), timeout; secrets: password, private_key,
  * passphrase.
  */
-class RemoteSource implements SourceInterface
+class RemoteSource implements MultiFileSourceInterface
 {
     private const DEFAULT_PORTS = ['sftp' => 22, 'ftp' => 21];
 
@@ -55,6 +55,35 @@ class RemoteSource implements SourceInterface
                 (string) ($config['pattern'] ?? '*'),
                 (string) ($config['pick'] ?? FileSelector::PICK_NEWEST)
             );
+            $local = $folder . '/download-' . preg_replace('/[^A-Za-z0-9._-]+/', '_', $name);
+            $client->download($this->join($path, $name), $local);
+
+            return new FetchedFile($local, $name, $this->join($path, $name));
+        });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function names(ProfileInterface $profile): array
+    {
+        return $this->withClient($profile, function (RemoteClientInterface $client) use ($profile): array {
+            $config = $profile->getSourceConfig();
+
+            return $this->selector->ordered($client->listFiles($this->path($config)), (string) ($config['pattern'] ?? '*'));
+        });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function fetchNamed(ProfileInterface $profile, string $folder, string $name): FetchedFile
+    {
+        return $this->withClient($profile, function (RemoteClientInterface $client) use ($profile, $folder, $name): FetchedFile {
+            $path = $this->path($profile->getSourceConfig());
+            if (!array_key_exists($name, $client->listFiles($path))) {
+                throw new PipelineException(sprintf('The file %s is no longer in %s.', $name, $path));
+            }
             $local = $folder . '/download-' . preg_replace('/[^A-Za-z0-9._-]+/', '_', $name);
             $client->download($this->join($path, $name), $local);
 

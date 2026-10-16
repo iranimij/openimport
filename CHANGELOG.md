@@ -29,6 +29,8 @@ All notable changes to this project are documented here. The format follows
   [URL keys and redirects](https://iranimij.github.io/openimport/url-keys/).
 - Conditional transforms: every transform can have *Only when* (an expression such as `{Brand} = 'Acme'` or
   `value > 20`); other rows keep their value.
+- Several files per run: *Which file → All matching files, one run each (by name)* for folder, SFTP and FTP
+  sources, each file with its own run, report and move; *When a file fails*: go on or stop.
 - Row steps (`RowStepInterface`, `AbstractRowStep`): a seam between mapping and Magento's import with `observe`,
   `columns`, `observeIdentifiers`, `apply` and `finish` hooks, and `PostImportStepInterface` for changes after the
   import; pictures, configurable products and missing products are built on it.

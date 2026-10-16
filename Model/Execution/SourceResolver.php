@@ -49,7 +49,13 @@ class SourceResolver
             return new FetchedFile($file, $name);
         }
 
-        return $this->source($profile)->fetch($profile, $folder);
+        $source = $this->source($profile);
+        $named = isset($options['remote_file']) && is_string($options['remote_file']) ? $options['remote_file'] : '';
+        if ($named !== '' && $source instanceof MultiFileSourceInterface) {
+            return $source->fetchNamed($profile, $folder, $named);
+        }
+
+        return $source->fetch($profile, $folder);
     }
 
     /**

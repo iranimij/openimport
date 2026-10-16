@@ -40,7 +40,7 @@ define([
 
         /** @inheritdoc */
         refresh: function () {
-            var offered, value;
+            var offered, value, blank;
 
             this._super();
             if (!this.allOptions) {
@@ -52,6 +52,13 @@ define([
             if (this.optionKey(offered) !== this.optionKey(this.options())) {
                 value = this.value();
                 this.setOptions(offered);
+                // Magento turns an option without a value into the caption, which then stays: follow its conditions.
+                blank = _.find(this.allOptions, function (option) {
+                    return option.value === '' || option.value === null;
+                });
+                if (blank && typeof this.caption === 'function') {
+                    this.caption(_.contains(offered, blank) ? blank.label : '');
+                }
                 if (offered.length && !_.findWhere(offered, {value: value})) {
                     this.value(offered[0].value);
                 } else {

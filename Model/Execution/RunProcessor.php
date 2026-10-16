@@ -202,7 +202,15 @@ class RunProcessor
             $run->setOptions($run->getOptions() + ['original_name' => $fetched->name]);
         }
         $this->runRepository->save($run);
-        $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $fetched->name, $heartbeat);
+        try {
+            $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $fetched->name, $heartbeat);
+        } catch (PipelineException $exception) {
+            // The run fails, but the note says which file it was and which runs got the others.
+            if ($batchNote === null) {
+                throw $exception;
+            }
+            throw new PipelineException(rtrim($exception->getMessage()) . "\n" . $batchNote, 0, $exception);
+        }
         if ($fetched->reference !== '' && !$run->isDryRun() && empty($run->getOptions()['file'])
             && in_array($outcome->status, [RunInterface::STATUS_SUCCESS, RunInterface::STATUS_PARTIAL], true)) {
             $outcome = $this->afterSuccess($profile, $fetched, $outcome);

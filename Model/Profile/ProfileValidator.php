@@ -16,6 +16,8 @@ use Iranimij\OpenImport\Model\Export\DestinationPool;
 use Iranimij\OpenImport\Model\Filter\FilterException;
 use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
 use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
+use Iranimij\OpenImport\Model\Missing\MissingProductsStep;
+use Iranimij\OpenImport\Model\Missing\MissingScope;
 use Iranimij\OpenImport\Model\Mapping\MappingException;
 use Iranimij\OpenImport\Model\Schedule\CronExpression;
 use Iranimij\OpenImport\Model\Transform\ValueMap;
@@ -112,7 +114,12 @@ class ProfileValidator
             ) {
                 $problems[] = sprintf('%s cannot be imported with "Replace": use Add/Update.', $entity);
             }
-            $problems = array_merge($problems, $this->mapping($profile), $this->configurable($profile));
+            $problems = array_merge(
+                $problems,
+                $this->mapping($profile),
+                $this->configurable($profile),
+                $this->missing($profile)
+            );
         }
         if ($import && $profile->getRowFilters() !== []) {
             try {
@@ -266,6 +273,44 @@ class ProfileValidator
             if (!in_array($attribute, $targets, true)) {
                 $problems[] = sprintf('Map the variation attribute "%s" in step 4.', $attribute);
             }
+        }
+
+        return $problems;
+    }
+
+    /**
+     * "Products missing from the file" needs a scope it can find, and a behaviour that keeps records.
+     *
+     * @param ProfileInterface $profile
+     * @return string[]
+     */
+    private function missing(ProfileInterface $profile): array
+    {
+        $options = $profile->getImportOptions();
+        $action = (string) ($options[MissingProductsStep::OPTION_ACTION] ?? '');
+        if ($profile->getEntity() !== 'catalog_product' || $action === '') {
+            return [];
+        }
+        $actions = [MissingProductsStep::ACTION_DISABLE, MissingProductsStep::ACTION_OUT_OF_STOCK,
+            MissingProductsStep::ACTION_DELETE];
+        if (!in_array($action, $actions, true)) {
+            return [sprintf('Products missing from the file: "%s" is not one of %s.', $action, implode(', ', $actions))];
+        }
+        $problems = [];
+        if (!in_array($profile->getBehavior(), [ProfileInterface::BEHAVIOR_ADD_UPDATE,
+            ProfileInterface::BEHAVIOR_ONLY_UPDATE], true)) {
+            $problems[] = 'Products missing from the file work with Add/Update and Only update.';
+        }
+        $scope = (string) ($options[MissingProductsStep::OPTION_SCOPE] ?? MissingScope::ALL) ?: MissingScope::ALL;
+        if ($scope === MissingScope::WEBSITE && trim((string) ($options[MissingProductsStep::OPTION_WEBSITE] ?? '')) === '') {
+            $problems[] = 'Products missing from the file: choose the website.';
+        } elseif ($scope === MissingScope::ATTRIBUTE && (
+            trim((string) ($options[MissingProductsStep::OPTION_ATTRIBUTE] ?? '')) === ''
+            || trim((string) ($options[MissingProductsStep::OPTION_VALUE] ?? '')) === ''
+        )) {
+            $problems[] = 'Products missing from the file: enter the attribute code and the value.';
+        } elseif (!in_array($scope, [MissingScope::ALL, MissingScope::WEBSITE, MissingScope::ATTRIBUTE], true)) {
+            $problems[] = sprintf('Products missing from the file: unknown scope "%s".', $scope);
         }
 
         return $problems;

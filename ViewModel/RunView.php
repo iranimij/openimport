@@ -13,8 +13,8 @@ use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
 use Iranimij\OpenImport\Model\Config\Source\RunTrigger;
+use Iranimij\OpenImport\Model\Execution\ConfirmationWord;
 use Iranimij\OpenImport\Model\Execution\RunFiles;
-use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
 use Iranimij\OpenImport\Model\Storage\ErrorRecord;
@@ -55,6 +55,7 @@ class RunView implements ArgumentInterface
      * @param Escaper $escaper
      * @param RunFiles $runFiles
      * @param ReaderFactory $readers
+     * @param ConfirmationWord $confirmationWord
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -68,7 +69,8 @@ class RunView implements ArgumentInterface
         private readonly RunTrigger $triggers,
         private readonly Escaper $escaper,
         private readonly RunFiles $runFiles,
-        private readonly ReaderFactory $readers
+        private readonly ReaderFactory $readers,
+        private readonly ConfirmationWord $confirmationWord
     ) {
     }
 
@@ -265,16 +267,8 @@ class RunView implements ArgumentInterface
     {
         $run = $this->run();
         $profile = $this->profile();
-        if ($run === null || $profile === null) {
-            return '';
-        }
-        $needs = $run->getStatus() === RunInterface::STATUS_NEEDS_CONFIRMATION
-            || ($run->isDryRun() && str_contains($run->getMessage(), ImportRunner::CONFIRMATION_NOTE));
-        if (!$needs) {
-            return '';
-        }
 
-        return $profile->getBehavior() === ProfileInterface::BEHAVIOR_REPLACE ? 'REPLACE' : 'DELETE';
+        return $run === null || $profile === null ? '' : $this->confirmationWord->forRun($run, $profile);
     }
 
     public function canConfirm(): bool

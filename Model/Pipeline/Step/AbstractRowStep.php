@@ -32,6 +32,14 @@ abstract class AbstractRowStep implements RowStepInterface
     /**
      * @inheritDoc
      */
+    public function observeIdentifiers(array $identifiers): void
+    {
+        // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock -- nothing to observe by default
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function apply(array $records, \Closure $tick): void
     {
         // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock -- nothing to change by default

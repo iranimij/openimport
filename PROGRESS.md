@@ -83,7 +83,7 @@ parallelism only across runs and for exports).
 
 | Release | Slices | Status |
 |---|---|---|
-| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44); 2 in review (`feat/1.3-configurables`) |
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (`feat/1.3-missing`) |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
@@ -95,9 +95,9 @@ code.
 
 ## Exact next step
 
-1.3 slice 2 (configurables) is on `feat/1.3-configurables`: watch CI, merge, then E2E for it in the dev-env. Then
-slice 3 (products missing from the file: disable, set out of stock or delete products of the profile's scope that a
-full file no longer lists, with the safety limit) on `feat/1.3-missing`.
+1.3 slice 3 (products missing from the file) is on `feat/1.3-missing`: watch CI, merge; E2E for it in the
+dev-env. Then slice 4 (add to stock: "quantities are changes" for Stock & prices and MSI sources) on
+`feat/1.3-add-stock`.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -136,7 +136,25 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: unit (builder, step, runner with the real step and delta), validator; integration `ConfigurableImportTest`
   (attributes created by OpenImport's attribute import, parent + links, delta, added variant keeps old links, own
   parent row, duplicate/empty variants).
-- Docs `docs/configurable.md`.
+- Docs `docs/configurable.md`. Variant values must be options (checked against admin labels, row error otherwise).
+- Merged as #45 (all seven pairs green); E2E dev-env #10 (`configurable.spec.ts`).
+
+### 1.3 slice 3 · products missing from the file (what was built)
+
+- `PostImportStepInterface` (+ `PostImportPlan`, `PostImportOutcome`): plan after the last batch (before core),
+  execute after core imported (dry run: validate). Runner: no plans when rows had own errors, plan safety joins the
+  behaviour's safety (typed word from the plan), runs even when the file itself changes nothing.
+- `observeIdentifiers()` hook: filtered rows (mapped for their identifier only when a post-import step takes part),
+  rows with mapping errors and records other steps added (configurable parents) count as named.
+- `Model/Execution/ConfirmationWord`: the word comes from the run message ("Type DISABLE to confirm."), fallback by
+  behaviour; used by the run page and the Confirm controller.
+- `Model/Missing`: `MissingProductsStep` (disable / out of stock / delete via core import), `MissingScope` (all,
+  website, attribute value through the product collection; disable counts enabled, out of stock counts in-stock).
+  Form fields in step 5, validator checks, source `WebsiteCode`.
+- Tests: unit (step, confirmation word, runner: disable, safety + dry run + confirmed delete, row errors, nothing
+  changed in the file, parents not missing); integration `MissingProductsImportTest` (supplier scope per test,
+  dry run = live, out of stock with the limit, delete, row errors stop it).
+- Docs `docs/missing-products.md`.
 
 ## Open questions
 

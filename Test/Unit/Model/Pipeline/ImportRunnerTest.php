@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Model\Bridge\ImporterPool;
 use Iranimij\OpenImport\Model\Bridge\RowError;
 use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
+use Iranimij\OpenImport\Model\Missing\MissingProductsStep;
 use Iranimij\OpenImport\Model\Configurable\ParentBuilder;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Entity\RecordReaderPool;
@@ -33,6 +34,7 @@ use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeImageFolder;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakePreviewStore;
 use Iranimij\OpenImport\Test\Unit\Model\Configurable\Fake\FakeConfigurableAttributes;
 use Iranimij\OpenImport\Test\Unit\Model\Configurable\Fake\FakeUrlKey;
+use Iranimij\OpenImport\Test\Unit\Model\Missing\Fake\FakeMissingScope;
 use Iranimij\OpenImport\Test\Unit\Model\Image\Fake\FakeImageColumns;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeCascadingRecordReader;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRecordReader;
@@ -304,6 +306,149 @@ class ImportRunnerTest extends TestCase
         $this->execute($profile, $this->newRun(), $this->file($csv . "TS-G,Shirt Green,Green,TS\n"));
         self::assertSame(['TS-G', 'TS'], array_column($this->core->rows, 'sku'));
         self::assertSame('sku=TS-R,color=Red|sku=TS-B,color=Blue|sku=TS-G,color=Green', $this->core->rows[1]['configurable_variations']);
+    }
+
+    /**
+     * @param string $action
+     * @return RowStepPool
+     */
+    private function missingSteps(string $action = 'disable'): RowStepPool
+    {
+        $shop = ['A-1' => [true, true], 'A-2' => [true, true], 'A-3' => [true, true], 'A-4' => [true, true],
+            'A-5' => [true, false], 'OLD' => [false, false]];
+
+        return new RowStepPool(['missing' => new MissingProductsStep(new FakeMissingScope($shop), new ImporterPool($this->core))]);
+    }
+
+    /**
+     * @param string $action
+     * @param array<string, mixed> $data
+     * @return ProfileStub
+     */
+    private function missingProfile(string $action = 'disable', array $data = []): ProfileStub
+    {
+        return $this->profile($data + [
+            'safety_threshold' => 100,
+            'import_options' => ['missing_action' => $action],
+            'row_filters' => ['mode' => 'exclude', 'match' => 'all',
+                'conditions' => [['column' => 'sku', 'operator' => 'equals', 'value' => 'A-3']]],
+        ]);
+    }
+
+    public function testProductsMissingFromTheFileAreDisabledAfterTheImport(): void
+    {
+        $this->steps = $this->missingSteps();
+        $outcome = $this->execute(
+            $this->missingProfile(),
+            $this->newRun(),
+            $this->file("sku,name,name_de,price\nA-1,One,,1\nA-2,Two,,2\nA-3,Three,,3\n")
+        );
+
+        self::assertSame(RunInterface::STATUS_SUCCESS, $outcome->status, $outcome->message);
+        self::assertCount(2, $this->core->history);
+        self::assertSame(['A-1', 'A-2'], array_column($this->core->history[0]['rows'], 'sku'));
+        $missing = $this->core->history[1];
+        self::assertSame('append', $missing['request']->behavior);
+        self::assertSame(['sku', 'product_online'], $missing['columns']);
+        self::assertSame(
+            [['sku' => 'A-4', 'product_online' => '2'], ['sku' => 'A-5', 'product_online' => '2']],
+            $missing['rows'],
+            'A-3 was filtered out but is in the file; OLD is disabled already'
+        );
+        self::assertStringContainsString("\nProducts missing from the file: disabled 2 (A-4, A-5).", $outcome->message);
+        self::assertSame(4, $outcome->counts['updated'] + $outcome->counts['created']);
+    }
+
+    public function testMissingProductsAboveTheSafetyLimitWaitForConfirmation(): void
+    {
+        $this->steps = $this->missingSteps('delete');
+        $profile = $this->missingProfile('delete', ['safety_threshold' => 10]);
+        $file = $this->file("sku,name,name_de,price\nA-1,One,,1\n");
+
+        $waiting = $this->execute($profile, $this->newRun(), $file);
+        self::assertSame(RunInterface::STATUS_NEEDS_CONFIRMATION, $waiting->status);
+        self::assertSame(
+            'This run would delete 5 of 6 records (Products missing from the file, 83%, limit 10%). Type DELETE to confirm.',
+            $waiting->message
+        );
+        self::assertSame(0, $this->core->calls);
+
+        $dry = $this->execute($profile, $this->newRun(RunInterface::MODE_DRY_RUN), $file);
+        self::assertStringContainsString(ImportRunner::CONFIRMATION_NOTE . ': This run would delete 5', $dry->message);
+        self::assertStringContainsString('Products missing from the file: would delete 5 (A-2, A-3, A-4, A-5, OLD).', $dry->message);
+        self::assertSame(5, $dry->counts['deleted']);
+        self::assertTrue($this->core->history[1]['request']->dryRun);
+
+        $confirmed = $this->execute($profile, $this->newRun(RunInterface::MODE_LIVE, ['confirmed' => true]), $file);
+        self::assertSame(RunInterface::STATUS_SUCCESS, $confirmed->status, $confirmed->message);
+        self::assertSame('delete', $this->core->lastRequest()->behavior);
+        self::assertSame(['sku'], $this->core->columns);
+        self::assertSame(5, $confirmed->counts['deleted']);
+    }
+
+    public function testConfigurableParentsAreNotMissing(): void
+    {
+        $this->steps = new RowStepPool([
+            'configurable' => new ConfigurableStep(
+                new FakeConfigurableAttributes(),
+                new ParentBuilder(),
+                new RecordReaderPool(['catalog_product' => $this->shop]),
+                new FakeImageColumns(),
+                new FakeUrlKey()
+            ),
+            'missing' => new MissingProductsStep(
+                new FakeMissingScope(['TS-R' => [true, true], 'TS' => [true, true], 'MUG' => [true, true]]),
+                new ImporterPool($this->core)
+            ),
+        ]);
+        $outcome = $this->execute($this->profile([
+            'safety_threshold' => 100,
+            'import_options' => ['configurable' => '1', 'configurable_attributes' => 'color', 'missing_action' => 'disable'],
+            'mapping' => [
+                ['target' => 'sku', 'source' => 'sku'],
+                ['target' => 'name', 'source' => 'name'],
+                ['target' => 'color', 'source' => 'color'],
+                ['target' => 'configurable:parent_sku', 'source' => 'parent'],
+            ],
+        ]), $this->newRun(), $this->file("sku,name,color,parent\nTS-R,Shirt Red,Red,TS\n"));
+
+        self::assertStringContainsString('Products missing from the file: disabled 1 (MUG).', $outcome->message);
+    }
+
+    public function testRowErrorsLeaveMissingProductsAlone(): void
+    {
+        $this->steps = $this->missingSteps('out_of_stock');
+        $outcome = $this->execute(
+            $this->missingProfile('out_of_stock', ['on_error' => 'skip', 'allowed_errors' => 5, 'mapping' => [
+                ['target' => 'sku', 'source' => 'sku'],
+                ['target' => 'name', 'source' => 'name', 'required' => true],
+            ]]),
+            $this->newRun(),
+            $this->file("sku,name,name_de,price\nA-1,One,,1\nA-2,,,2\n")
+        );
+
+        self::assertSame(RunInterface::STATUS_PARTIAL, $outcome->status);
+        self::assertCount(1, $this->core->history, 'only the file was imported');
+        self::assertStringContainsString('Products missing from the file: nothing changed because 1 row(s) had errors.', $outcome->message);
+    }
+
+    public function testMissingProductsAreHandledWhenTheFileItselfChangesNothing(): void
+    {
+        $this->steps = $this->missingSteps('out_of_stock');
+        $profile = $this->missingProfile('out_of_stock', ['delta' => true]);
+        $file = $this->file("sku,name,name_de,price\nA-1,One,,1\nA-2,Two,,2\nA-3,Three,,3\n");
+        $this->execute($profile, $this->newRun(), $file);
+        $this->core->history = [];
+
+        $outcome = $this->execute($profile, $this->newRun(), $file);
+        self::assertSame(RunInterface::STATUS_SUCCESS, $outcome->status, $outcome->message);
+        self::assertStringStartsWith('Nothing to import', $outcome->message);
+        self::assertCount(1, $this->core->history, 'only the missing products');
+        self::assertSame(
+            [['sku' => 'A-4', 'qty' => '0', 'is_in_stock' => '0']],
+            $this->core->history[0]['rows'],
+            'A-5 and OLD are out of stock already'
+        );
     }
 
     public function testDeltaSkipsWhatTheLastRunSent(): void

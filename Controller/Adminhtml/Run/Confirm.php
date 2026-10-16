@@ -8,12 +8,10 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Controller\Adminhtml\Run;
 
-use Iranimij\OpenImport\Api\Data\ProfileInterface;
-use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
 use Iranimij\OpenImport\Model\Admin\RunStarter;
-use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
+use Iranimij\OpenImport\Model\Execution\ConfirmationWord;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -32,12 +30,14 @@ class Confirm extends Action implements HttpPostActionInterface
      * @param RunRepositoryInterface $runs
      * @param ProfileRepositoryInterface $profiles
      * @param RunStarter $runStarter
+     * @param ConfirmationWord $confirmationWord
      */
     public function __construct(
         Context $context,
         private readonly RunRepositoryInterface $runs,
         private readonly ProfileRepositoryInterface $profiles,
-        private readonly RunStarter $runStarter
+        private readonly RunStarter $runStarter,
+        private readonly ConfirmationWord $confirmationWord
     ) {
         parent::__construct($context);
     }
@@ -53,11 +53,11 @@ class Confirm extends Action implements HttpPostActionInterface
             $run = $this->runs->getById($runId);
             $profile = $this->profiles->getById((int) $run->getProfileId());
             $confirmed = false;
-            if ($this->needsWord($run, $profile)) {
+            $word = $this->confirmationWord->forRun($run, $profile);
+            if ($word !== '') {
                 if (!$this->_authorization->isAllowed('Iranimij_OpenImport::run_destructive')) {
                     throw new LocalizedException(__('Your role may not confirm runs above the safety limit.'));
                 }
-                $word = $profile->getBehavior() === ProfileInterface::BEHAVIOR_DELETE ? 'DELETE' : 'REPLACE';
                 if (strcasecmp(trim((string) $this->getRequest()->getParam('confirmation')), $word) !== 0) {
                     throw new LocalizedException(__('Type %1 to confirm.', $word));
                 }
@@ -70,12 +70,5 @@ class Confirm extends Action implements HttpPostActionInterface
         }
 
         return $redirect->setPath('*/*/view', ['id' => $live->getRunId()]);
-    }
-
-    private function needsWord(RunInterface $run, ProfileInterface $profile): bool
-    {
-        return $run->getStatus() === RunInterface::STATUS_NEEDS_CONFIRMATION
-            || (in_array($profile->getBehavior(), [ProfileInterface::BEHAVIOR_DELETE, ProfileInterface::BEHAVIOR_REPLACE], true)
-                && str_contains($run->getMessage(), ImportRunner::CONFIRMATION_NOTE));
     }
 }

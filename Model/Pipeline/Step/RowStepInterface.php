@@ -54,6 +54,15 @@ interface RowStepInterface
     public function observe(array $records): void;
 
     /**
+     * Identifiers of rows that are in the file but go nowhere (filtered out, mapping errors) and of records other
+     * steps added at the end: they are in the file too.
+     *
+     * @param string[] $identifiers
+     * @return void
+     */
+    public function observeIdentifiers(array $identifiers): void;
+
+    /**
      * Changes or fails the records of one batch that go to core.
      *
      * @param StepRecord[] $records

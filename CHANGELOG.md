@@ -16,8 +16,14 @@ All notable changes to this project are documented here. The format follows
   variant), hides the variants, gives new variants unique URL keys and lists every variant in the file even with
   *Skip unchanged rows*. A parent's own row (product type `configurable`, as WooCommerce exports) is used. See
   [Configurable products](https://iranimij.github.io/openimport/configurable/).
+- Products missing from the file: a product profile can treat its file as the complete list and disable, set out of
+  stock or delete the products of a scope (all, a website, an attribute value such as a supplier) that the file does
+  not name, after the import, in the dry run, under the safety limit with a typed confirmation (*DISABLE*, *OUT OF
+  STOCK*, *DELETE*); a run with row errors changes nothing. See
+  [Products missing from the file](https://iranimij.github.io/openimport/missing-products/).
 - Row steps (`RowStepInterface`, `AbstractRowStep`): a seam between mapping and Magento's import with `observe`,
-  `columns`, `apply` and `finish` hooks; pictures and configurable products are built on it.
+  `columns`, `observeIdentifiers`, `apply` and `finish` hooks, and `PostImportStepInterface` for changes after the
+  import; pictures, configurable products and missing products are built on it.
 
 ### Changed
 - Product pictures given as file names are read from `var/import/images` (as in Magento's own import), not from

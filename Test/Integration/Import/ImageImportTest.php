@@ -83,7 +83,9 @@ class ImageImportTest extends TestCase
     protected function tearDown(): void
     {
         if (is_resource($this->server)) {
+            // phpcs:ignore Magento2.Security.InsecureFunction -- stops the test web server
             proc_terminate($this->server);
+            // phpcs:ignore Magento2.Security.InsecureFunction -- stops the test web server
             proc_close($this->server);
         }
         foreach (array_merge($this->files ?? [], [$this->log]) as $file) {

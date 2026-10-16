@@ -437,7 +437,16 @@ class ImportRunner
             }
         }
         if ($dryRun && $accepted !== []) {
-            $this->preview($accepted, $behavior, $reader, $mapping);
+            // The preview shows what Magento receives: the values the steps wrote (a quantity after the change).
+            $shown = [];
+            foreach ($accepted as $item => [$line, $mapped, $exists]) {
+                $shown[$item] = [
+                    $line,
+                    isset($stepRows[$item]) ? new MappedRow($stepRows[$item], [], $mapped->identifier) : $mapped,
+                    $exists,
+                ];
+            }
+            $this->preview($shown, $behavior, $reader, $mapping);
         }
     }
 

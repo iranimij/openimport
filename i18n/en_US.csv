@@ -599,3 +599,8 @@
 "Set them out of stock","Set them out of stock"
 "The option label for dropdowns, e.g. the supplier's name.","The option label for dropdowns, e.g. the supplier's name."
 "Website","Website"
+"Changes add to the current quantity: +5 for a delivery, -3 for sales elsewhere, a plain 4 adds 4. Cannot be combined with ""Skip unchanged rows"".","Changes add to the current quantity: +5 for a delivery, -3 for sales elsewhere, a plain 4 adds 4. Cannot be combined with ""Skip unchanged rows""."
+"Quantities changed by the file: %1.","Quantities changed by the file: %1."
+"Quantities in the file","Quantities in the file"
+"are changes (+5, -3)","are changes (+5, -3)"
+"are the new stock","are the new stock"

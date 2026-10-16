@@ -83,7 +83,7 @@ parallelism only across runs and for exports).
 
 | Release | Slices | Status |
 |---|---|---|
-| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (`feat/1.3-missing`) |
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 on `feat/1.3-add-stock` |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
@@ -95,9 +95,9 @@ code.
 
 ## Exact next step
 
-1.3 slice 3 (products missing from the file) is on `feat/1.3-missing`: watch CI, merge; E2E for it in the
-dev-env. Then slice 4 (add to stock: "quantities are changes" for Stock & prices and MSI sources) on
-`feat/1.3-add-stock`.
+1.3 slice 3 is PR #46 (`feat/1.3-missing`), slice 4 (quantities as changes) is on `feat/1.3-add-stock`, stacked on
+it: merge #46 when green, rebase slice 4 onto main, open its PR. E2E for slices 3 and 4 in the dev-env. Then slice 5
+(URL keys from a pattern + 301 redirects for changed URL keys) on `feat/1.3-url-keys`.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -155,6 +155,17 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
   changed in the file, parents not missing); integration `MissingProductsImportTest` (supplier scope per test,
   dry run = live, out of stock with the limit, delete, row errors stop it).
 - Docs `docs/missing-products.md`.
+
+### 1.3 slice 4 · quantities as changes (what was built)
+
+- `Model/Stock`: `StockChangeStep` (+5/-3/4 for products, Stock & prices, MSI sources; running totals per SKU or
+  SKU|source; refuses "skip unchanged rows"), `QuantityReader` (default stock, inventory_source_item), `QuantityChange`
+  (parse, format). Form field *Quantities in the file* (step 5), validator check.
+- Runner: the dry-run preview now compares the step rows (what Magento receives). RunProcessor locks
+  `entity:<Magento entity>` (Stock & prices shares the products lock).
+- Tests: unit (parse/format, step incl. sources and repeated SKUs, validator); integration `StockChangeImportTest`
+  (preview 10 → 15/17, live 17 and 7, row error, second file adds again, MSI source +4).
+- Docs `docs/stock-changes.md`.
 
 ## Open questions
 

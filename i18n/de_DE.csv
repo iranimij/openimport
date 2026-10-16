@@ -599,3 +599,8 @@
 "Set them out of stock","Auf nicht vorrätig setzen"
 "The option label for dropdowns, e.g. the supplier's name.","Bei Auswahllisten die Bezeichnung der Option, z. B. der Name des Lieferanten."
 "Website","Website"
+"Changes add to the current quantity: +5 for a delivery, -3 for sales elsewhere, a plain 4 adds 4. Cannot be combined with ""Skip unchanged rows"".","Änderungen werden zur aktuellen Menge addiert: +5 für eine Lieferung, -3 für Verkäufe an anderer Stelle, eine einfache 4 addiert 4. Nicht zusammen mit ""Unveränderte Zeilen überspringen"" möglich."
+"Quantities changed by the file: %1.","Mengen durch die Datei geändert: %1."
+"Quantities in the file","Mengen in der Datei"
+"are changes (+5, -3)","sind Änderungen (+5, -3)"
+"are the new stock","sind der neue Bestand"

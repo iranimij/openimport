@@ -241,7 +241,7 @@ class ImportRunnerTest extends TestCase
         self::assertSame(['A-1', 'A-2', 'A-3', 'A-2', 'A-3'], $step->seen);
     }
 
-    public function testRowStepsSeeNothingSkippedAndDryRunsPreviewMappedValues(): void
+    public function testRowStepsSeeNothingSkippedAndDryRunsPreviewWhatMagentoReceives(): void
     {
         $step = new FakeRowStep();
         $this->steps = new RowStepPool(['fake' => $step]);
@@ -259,7 +259,7 @@ class ImportRunnerTest extends TestCase
             $preview[$record->identifier] = $record;
         }
         self::assertArrayNotHasKey('A-2', $preview, 'a failed record is not previewed');
-        self::assertSame(['One', 'One'], $preview['A-1']->diff['name'] ?? ['One', 'One'], 'the preview shows mapped values');
+        self::assertSame(['One', 'ONE'], $preview['A-1']->diff['name'] ?? null, 'the preview shows the step\'s value');
         self::assertSame(1, $outcome->counts['errors']);
     }
 

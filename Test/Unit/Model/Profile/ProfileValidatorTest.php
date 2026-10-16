@@ -108,6 +108,16 @@ class ProfileValidatorTest extends TestCase
         self::assertSame([], $this->validator()->validate(new ProfileStub($profile)), 'switched off: not checked');
     }
 
+    public function testQuantityChangesCannotSkipUnchangedRows(): void
+    {
+        $profile = ['name' => 'Deliveries', 'entity' => 'openimport_stock_price', 'import_options' => ['qty_mode' => 'add']];
+        self::assertSame([], $this->validator()->validate(new ProfileStub($profile)));
+        self::assertSame(
+            ['"Skip unchanged rows" cannot be used with quantities as changes: switch one of them off.'],
+            $this->validator()->validate(new ProfileStub($profile + ['delta' => true]))
+        );
+    }
+
     public function testDefaultsAreValid(): void
     {
         self::assertSame(

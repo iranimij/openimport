@@ -88,7 +88,7 @@ parallelism only across runs and for exports).
 | Release | Slices | Status |
 |---|---|---|
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
-| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
+| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | 1 in review (#53, E2E dev-env #13) |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
 
@@ -99,14 +99,15 @@ code.
 
 ## Exact next step
 
-1.3 is done: slices #44–#51 merged, release 1.3.0 (CHANGELOG, comparison table, release workflow, docs). Dev-env E2E
-for every slice: #9 pictures, #10 configurables, #11 missing products + quantities, #12 URL keys, conditional
-transforms, several files, presets (all against `main`). Still open: the local browser check on the Mac (double-click
-`claude-upgrade.command` first).
+1.3 released (v1.3.0, #44–#52; E2E dev-env #9–#12). Still open from 1.3: the local browser check on the Mac
+(double-click `claude-upgrade.command` first).
 
-Next: **1.4 slice 1 · connections** (branch `feat/1.4-connections`): shared connections that sources and destinations
-use (recommendation accepted 2026-10-16), then S3, Google, Dropbox, OneDrive and REST in slices 2–5. Design: Notion
-page 15, section 1.4.
+Now: **1.4 slice 1 · saved connections**, PR #53 (`feat/1.4-connections`), E2E dev-env #13 (`e2e/1.4-connections`, ref
+`feat/1.4-connections`). Merge both when green, set the dev-env ref back to `main`. Then slice 2 (S3-compatible storage):
+a third connection type `s3` (endpoint, region, bucket, access key, secret key, path style), own Signature V4 client
+implementing `RemoteClientInterface` (list with ListObjectsV2, get, put, copy+delete for move), unit tests with AWS's
+published SigV4 examples, integration against MinIO in CI (service container), E2E against a MinIO container in the
+dev-env.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -219,6 +220,25 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: unit `PresetFilesTest` (each preset compiles against documented columns and maps sample rows), fill_down,
   runner; integration `PresetImportTest` (unique names, Shopify/WooCommerce/Magento 1 files imported).
 - Docs `docs/presets.md`, `fill_down` in `docs/transforms.md`.
+
+### 1.4 slice 1 · saved connections (what was built)
+
+- Table `openimport_connection` (name unique, type, settings JSON with `secrets` encrypted by `Secrets`), repository
+  (`ConnectionRepositoryInterface`: save with validation and unique name, getById, getByName, getAll, delete refused
+  while `ConnectionUsage` finds profiles), kinds from di.xml (`ConnectionTypes`: sftp, ftp).
+- A profile links a connection with `source_config.connection_id` or `export_options.connection_id` (no new profile
+  column: form, duplicate and JSON keep working). `ConnectionConfig::resolve()` swaps the login keys (host, port,
+  username, auth_sftp, ssl, passive, timeout, secrets) for the connection's at run time; `RemoteSettingsBuilder` builds
+  `RemoteSettings` for sources, destinations and the tester.
+- Admin: grid and form (System › Data Transfer › OpenImport Connections), Test connection (`ConnectionTester`, lists
+  the login folder), ACL `Iranimij_OpenImport::connections`; profile form *Saved connection* selects (options only of
+  the chosen type; login fields hide), step summary names the connection, save problems land at the select.
+- Profile JSON: `"connection": "<name>"`, never id or login; unknown name stops the import.
+- Fixes on the way: `secrets:reencrypt` also covers export destinations (+ connections), keeps going past a profile
+  it cannot save; uninstall drops `openimport_image`.
+- Tests: unit (ConnectionConfig, validator, form mapper, tester, settings builder, profile validator, profile JSON),
+  integration `Test/Integration/Connection/ConnectionsTest.php` (fake remote client) and
+  `Test/Integration/Controller/ConnectionAdminTest.php`; E2E `connections.spec.ts`. Docs: `docs/connections.md`.
 
 ## Open questions
 

@@ -80,12 +80,23 @@ class ConnectionUsage
             $options = $profile->getExportOptions();
 
             return $this->types->has((string) ($options['destination'] ?? ''))
-                ? ConnectionConfig::idIn($options)
+                ? $this->selected($options)
                 : 0;
         }
 
         return $this->types->has($profile->getSourceType())
-            ? ConnectionConfig::idIn($profile->getSourceConfig())
+            ? $this->selected($profile->getSourceConfig())
             : 0;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     * @return int
+     */
+    private function selected(array $config): int
+    {
+        $id = $config[ConnectionConfig::ID] ?? '';
+
+        return is_scalar($id) && ctype_digit((string) $id) ? (int) $id : 0;
     }
 }

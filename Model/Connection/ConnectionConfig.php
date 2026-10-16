@@ -44,15 +44,6 @@ class ConnectionConfig
      */
     public function selected(array $config): int
     {
-        return self::idIn($config);
-    }
-
-    /**
-     * @param array<string, mixed> $config
-     * @return int the connection the settings name, 0 for none
-     */
-    public static function idIn(array $config): int
-    {
         $id = $config[self::ID] ?? '';
 
         return is_scalar($id) && ctype_digit((string) $id) ? (int) $id : 0;

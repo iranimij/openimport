@@ -38,7 +38,7 @@ class ConnectionConfigTest extends TestCase
 
         self::assertSame($own, $this->config()->resolve($own, 'sftp'));
         self::assertSame(0, $this->config()->selected($own));
-        self::assertSame(0, ConnectionConfig::idIn(['connection_id' => 'abc']));
+        self::assertSame(0, $this->config()->selected(['connection_id' => 'abc']));
     }
 
     public function testTheConnectionGivesServerAndLoginTheProfileKeepsItsFolder(): void

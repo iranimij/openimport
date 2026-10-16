@@ -186,7 +186,7 @@ class ProfileJson
      */
     private function connectionByName(array $config): array
     {
-        $id = ConnectionConfig::idIn($config);
+        $id = $this->connections->selected($config);
         unset($config[ConnectionConfig::ID]);
         $name = $id > 0 ? $this->connections->nameById($id) : null;
         if ($name !== null) {

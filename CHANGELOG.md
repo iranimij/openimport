@@ -13,7 +13,11 @@ All notable changes to this project are documented here. The format follows
 - Amazon S3 and S3-compatible storage (Cloudflare R2, Wasabi, MinIO, Garage, ...) as import source and export
   destination, through a saved S3 connection: own Signature Version 4 client (no SDK), folders as key prefixes, all
   matching files, move after success; every request through the URL guard. Tested against AWS's published signature
-  examples and a MinIO server in CI.
+  examples and an S3-compatible server in CI.
+- Google Drive and Google Sheets with a login, as import source and export destination: a service account (JSON key,
+  signed JWT) or a Google account (*Sign in with Google*: your own OAuth client, state and PKCE, refresh token stored
+  encrypted). Folders by link, id or path, Sheets read as Excel files, exports replace a file of the same name or
+  become a Google Sheet, moves into `processed`, deletes go to the bin.
 
 ### Fixed
 - `openimport:secrets:reencrypt` now also encrypts the secrets of export destinations again, and goes on when one

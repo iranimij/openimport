@@ -391,6 +391,7 @@
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
                         <item name="2" xsi:type="string">s3</item>
+                        <item name="3" xsi:type="string">google_drive</item>
                     </item>
                 </item>
             </argument>
@@ -671,6 +672,7 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
                     </item>
                     <item name="requiredWhen" xsi:type="array">
                         <item name="source_type" xsi:type="array">
@@ -682,12 +684,14 @@
                         <item name="sftp" xsi:type="string">remote</item>
                         <item name="ftp" xsi:type="string">remote</item>
                         <item name="s3" xsi:type="string">remote</item>
+                        <item name="google_drive" xsi:type="string">remote</item>
                     </item>
                     <item name="noticeByType" xsi:type="array">
                         <item name="folder" xsi:type="string" translate="true">A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.</item>
                         <item name="sftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
                         <item name="ftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
                         <item name="s3" xsi:type="string" translate="true">The folder in the bucket (key prefix), e.g. incoming; empty = the top of the bucket.</item>
+                        <item name="google_drive" xsi:type="string" translate="true">The link of the Drive folder, its id, or a path from My Drive such as Supplier/incoming. Google Sheets in it are read as Excel files (name.xlsx).</item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
@@ -707,6 +711,7 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
@@ -726,6 +731,7 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
                     </item>
                 </item>
             </argument>
@@ -770,6 +776,7 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
                     </item>
                     <item name="showWhen" xsi:type="array">
                         <item name="source_config.pick" xsi:type="array">
@@ -808,6 +815,7 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
                     </item>
                     <item name="showWhen" xsi:type="array">
                         <item name="after_success" xsi:type="array">
@@ -920,6 +928,7 @@
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
                         <item name="2" xsi:type="string">s3</item>
+                        <item name="3" xsi:type="string">google_drive</item>
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
@@ -1221,6 +1230,7 @@
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
                         <item name="2" xsi:type="string">s3</item>
+                        <item name="3" xsi:type="string">google_drive</item>
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
@@ -1233,6 +1243,33 @@
                 <notice translate="true">Empty = where the login lands.</notice>
                 <placeholder>/incoming</placeholder>
             </settings>
+        </field>
+        <field name="dest_as_sheet" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="31">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Save as a Google Sheet</label>
+                <dataScope>export_options.as_sheet</dataScope>
+                <notice translate="true">The file becomes a Google Sheet; the next export replaces its content and keeps its link.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
         </field>
         <field name="dest_emails" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
             <argument name="data" xsi:type="array">
@@ -2478,6 +2515,7 @@
                             <item name="1" xsi:type="string">sftp</item>
                             <item name="2" xsi:type="string">ftp</item>
                             <item name="3" xsi:type="string">s3</item>
+                            <item name="4" xsi:type="string">google_drive</item>
                         </item>
                     </item>
                 </item>

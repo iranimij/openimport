@@ -8,8 +8,9 @@ profile that uses it logs in with the new one. Open **System › Data Transfer �
 | **SFTP** | server, port (empty = 22), user name, password or private key (+ passphrase), time limit |
 | **FTP** | server, port (empty = 21), user name, password, explicit TLS (FTPS), passive mode, time limit |
 | **Amazon S3 / S3-compatible** | bucket, region, endpoint, path-style addresses, access key, secret key, time limit |
+| **Google Drive / Sheets** | a service account key, or a Google account (OAuth client ID and secret, then *Sign in with Google*) |
 
-Google Drive, Dropbox, OneDrive and REST APIs follow in later 1.4 releases as more kinds of connection.
+Dropbox, OneDrive and REST APIs follow in later 1.4 releases as more kinds of connection.
 
 **Test connection** logs in with what the form holds (saved or not; an empty password field uses the stored one) and
 reads the login folder: *Connected to files.example.com:22. The login folder has 3 file(s).*
@@ -36,12 +37,35 @@ Like every address OpenImport reaches, the endpoint must be public. A server in 
 host, for example) needs its host name under Stores › Configuration › iranimij › OpenImport › Safety › *Private hosts
 allowed as URL sources*.
 
+## Google Drive and Google Sheets
+
+Two ways to log in:
+
+- **Service account** (best for servers): in the Google Cloud console create a project, switch on the *Google Drive
+  API*, create a service account and a JSON key for it, and paste the key into the connection. The form then shows
+  the account's e-mail address: share the Drive folders (or a Shared Drive) with it, as you would with a person.
+- **Google account**: create an OAuth client of the type *Web application*, add the *Authorized redirect URI* the
+  connection form shows, enter client ID and client secret, save, then click **Sign in with Google**. OpenImport
+  keeps only the refresh token, encrypted. The connection sees what that person sees.
+
+OpenImport runs no service of its own in between: each shop uses its own Google Cloud project.
+
+In a profile, the folder is the folder's link (`https://drive.google.com/drive/folders/…`), its id, or a path from
+*My Drive* such as `Supplier/incoming`. Google Sheets in the folder appear as `<name>.xlsx` and are read as Excel
+files (every sheet; pick one under the file settings). *Move it to the processed folder* moves the file into a
+`processed` folder next to it (made when missing); *Delete it* moves it to the Drive bin.
+
+Exports upload into the folder; a file with the same name gets the new content and keeps its link. **Save as a Google
+Sheet** turns the export into a Google Sheet (named without `.csv`), and later exports replace its content.
+
+Published "anyone with the link" Sheets still work without a connection as a *Web address* source.
+
 ## Using a connection in a profile
 
-In step 2 of a profile, choose SFTP, FTP or Amazon S3 as the source (or as the export destination), then pick the
+In step 2 of a profile, choose SFTP, FTP, Amazon S3 or Google Drive as the source (or as the export destination), then pick the
 connection under **Saved connection**. The login fields disappear; the profile keeps only what is its own: the folder, the file
 pattern, which file to read and what to do with it after a successful run. For SFTP and FTP, *Enter the login here* keeps the
-login in the profile, as before 1.4; S3 always uses a saved connection.
+login in the profile, as before 1.4; S3 and Google Drive always use a saved connection.
 
 Only connections of the chosen kind are offered. A profile whose connection was deleted or changed to another kind
 cannot be saved and its runs fail with a plain message (*The saved connection "Supplier" is for SFTP, not for FTP.*).

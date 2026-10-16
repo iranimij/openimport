@@ -88,7 +88,7 @@ parallelism only across runs and for exports).
 | Release | Slices | Status |
 |---|---|---|
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
-| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | 1 done (#53, E2E dev-env #13); 2 in review (#54, E2E dev-env #14) |
+| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | 1 done (#53, E2E dev-env #13); 2 done (#54, E2E dev-env #14); 3 in review |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
 
@@ -102,11 +102,12 @@ code.
 1.3 released (v1.3.0, #44–#52; E2E dev-env #9–#12). Still open from 1.3: the local browser check on the Mac
 (double-click `claude-upgrade.command` first).
 
-Now: **1.4 slice 2 · S3**, PR #54 (`feat/1.4-s3`), E2E dev-env #14 (`e2e/1.4-s3`, ref `feat/1.4-s3`). Merge both
-when green, set the dev-env ref back to `main`. Then slice 3 (Google Drive and Sheets with login): connection kinds
-for a Google service account (JSON key, JWT bearer grant) and OAuth (user account, PKCE, refresh tokens stored as
-secrets), a Drive client on `RemoteClientInterface` (list a folder by id or path, download, upload, move), private
-Sheets read as CSV through the Drive export endpoint; tests against a mock Google API (recorded answers) in CI.
+Resumed 2026-10-21. Slice 1 (#53) and slice 2 (#54) merged; dev-env #14 (S3 E2E) set back to `main`, merge when
+green.
+
+Now: **1.4 slice 3 · Google Drive / Sheets**, PR on `feat/1.4-google`. Next after it: E2E for Google (the mock server
+from `Test/Integration/_files/google-server.php` as a container in the dev-env CI), then slice 4 (Dropbox, OneDrive:
+OAuth connections like Google, same `OAuthFlow` pattern).
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -251,6 +252,23 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - CI: `.github/ci/s3-server.sh` starts RustFS (MinIO images can no longer be pulled) and exports OPENIMPORT_TEST_S3;
   `Test/Integration/Connection/S3Test.php` runs against it. Lesson: Magento's integration framework sets the
   properties of a finished test to null, so typed test properties must be nullable.
+
+### 1.4 slice 3 · Google Drive and Sheets (what was built)
+
+- `Model/Http/ApiClient` (+`ApiResponse`): API requests through the URL guard, body from a file, answer to a file,
+  own header lines (no `Expect: 100-continue`).
+- `Model/Google/GoogleAuth`: service account (RS256 JWT, jwt-bearer grant), refresh token grant, code exchange with
+  PKCE, consent URL; tokens cached in memory. `GoogleEndpoints` (di; tests point it to a mock).
+- `Model/Google/DriveClient` (`RemoteClientInterface`): folders by link, id or path from My Drive (created for
+  "processed"), Sheets listed as `<name>.xlsx` and exported as XLSX, other Google types left out, resumable uploads
+  (an existing file keeps its id; *Save as a Google Sheet* converts), moves by parents, deletes to the bin.
+- `Model/Google/OAuthFlow` + `Connection/OauthStart`, `Connection/OauthCallback` (public action without secret key,
+  still ACL): state `<id>.<random>` hashed in the connection, verifier encrypted, 15 minutes; the refresh token is a
+  secret; the account e-mail comes from `about`.
+- Connection form: *Log in as* service account (key; account shown to share folders with) or Google account (client
+  ID/secret, redirect URI, Sign in button). Profile: source/destination `google_drive`.
+- Tests: unit (PKCE RFC 7636 vector, consent URL, key check, settings, validator, form mapper); integration with
+  the mock Google server (`GoogleDriveTest`, `GoogleOAuthAdminTest`).
 
 ## Open questions
 

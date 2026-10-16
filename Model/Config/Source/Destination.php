@@ -36,6 +36,7 @@ class Destination implements OptionSourceInterface
             'sftp' => __('SFTP'),
             'ftp' => __('FTP'),
             's3' => __('Amazon S3 / S3-compatible'),
+            'google_drive' => __('Google Drive / Sheets'),
             'email' => __('E-mail attachment'),
         ];
         $options = [];

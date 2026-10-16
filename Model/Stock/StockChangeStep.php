@@ -20,7 +20,9 @@ use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
  * stock per source (MSI, column quantity per SKU and source).
  *
  * Current quantities are read per batch; live runs hold the lock of Magento's entity, so two runs never add to the
- * same quantity at once. "Skip unchanged rows" is refused: the same +5 in the next file is a new delivery.
+ * same quantity at once. Rows with a change are taken over and sent once per SKU (or SKU and source) after the last
+ * row, with the sum of their changes, because Magento's import keeps only one quantity per SKU. "Skip unchanged rows"
+ * is refused: the same +5 in the next file is a new delivery.
  */
 class StockChangeStep extends AbstractRowStep
 {
@@ -36,9 +38,10 @@ class StockChangeStep extends AbstractRowStep
     private int $changed = 0;
 
     /**
-     * @var array<string, float> quantities this run already computed (a SKU twice in the file adds up)
+     * @var array<string, array{line: int, identifier: string, rows: array<int, array<string, string>>, qty: float}>
+     *     key => the record sent at the end (its latest row values, the summed quantity)
      */
-    private array $running = [];
+    private array $pending = [];
 
     /**
      * @param QuantityReader $reader
@@ -69,7 +72,7 @@ class StockChangeStep extends AbstractRowStep
         $this->sources = $profile->getEntity() === EntityRegistry::STOCK_SOURCES;
         $this->column = $this->sources ? 'quantity' : 'qty';
         $this->changed = 0;
-        $this->running = [];
+        $this->pending = [];
 
         return true;
     }
@@ -114,11 +117,28 @@ class StockChangeStep extends AbstractRowStep
         foreach ($changes as $index => $delta) {
             $record = $records[$index];
             $key = $this->key($record);
-            $quantity = ($this->running[$key] ?? $current[$key] ?? 0.0) + $delta;
-            $this->running[$key] = $quantity;
-            $record->rows[0][$this->column] = $this->change->format($quantity);
+            $quantity = ($this->pending[$key]['qty'] ?? $current[$key] ?? 0.0) + $delta;
+            $this->pending[$key] = ['line' => $record->line, 'identifier' => $record->identifier,
+                'rows' => $record->rows, 'qty' => $quantity];
+            $record->absorb();
             $this->changed++;
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function finish(\Closure $tick): array
+    {
+        $records = [];
+        foreach ($this->pending as $pending) {
+            $rows = $pending['rows'];
+            $rows[0][$this->column] = $this->change->format($pending['qty']);
+            $records[] = new StepRecord($pending['line'], $pending['identifier'], $rows);
+        }
+        $this->pending = [];
+
+        return $records;
     }
 
     /**

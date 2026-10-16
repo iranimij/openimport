@@ -164,8 +164,8 @@ class StockChangeImportTest extends TestCase
         foreach (Bootstrap::getObjectManager()->get(PreviewStore::class)->fetch((int) $dry->getRunId()) as $record) {
             $diffs[$record->identifier][] = $record->diff['qty'] ?? null;
         }
-        // The preview shows the quantity Magento receives, line by line.
-        self::assertSame([['10', '15'], ['10', '17']], $diffs[$prefix . '-1'] ?? null, $this->describe($dry));
+        // The preview shows the quantity Magento receives: one row per SKU with the sum of its changes.
+        self::assertSame([['10', '17']], $diffs[$prefix . '-1'] ?? null, $this->describe($dry));
         self::assertSame(10.0, $this->qty($prefix . '-1'), 'a dry run changes nothing');
 
         $live = $this->runImport($profile, $file);

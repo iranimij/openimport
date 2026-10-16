@@ -63,13 +63,28 @@ class StockChangeStepTest extends TestCase
         $step->columns(['sku', 'source_code', 'qty']);
     }
 
+    /**
+     * @param StockChangeStep $step
+     * @param string $column
+     * @return array<string, string> identifier => quantity sent at the end
+     */
+    private function sent(StockChangeStep $step, string $column = 'qty'): array
+    {
+        $sent = [];
+        foreach ($step->finish($this->noTick()) as $record) {
+            $sent[$record->identifier] = $record->rows[0][$column];
+        }
+
+        return $sent;
+    }
+
     public function testChangesAddToTheCurrentQuantity(): void
     {
         $reader = new FakeQuantityReader(['a-1' => 10.0, 'a-2' => 2.0]);
         $step = new StockChangeStep($reader, new QuantityChange());
         $step->begin($this->profile(), 'add_update', false);
         $records = [
-            new StepRecord(2, 'A-1', [['sku' => 'A-1', 'qty' => '+5']]),
+            new StepRecord(2, 'A-1', [['sku' => 'A-1', 'qty' => '+5', 'price' => '9']]),
             new StepRecord(3, 'A-2', [['sku' => 'A-2', 'qty' => '-3']]),
             new StepRecord(4, 'NEW', [['sku' => 'NEW', 'qty' => '4']]),
             new StepRecord(5, 'A-3', [['sku' => 'A-3', 'qty' => '']]),
@@ -77,16 +92,22 @@ class StockChangeStepTest extends TestCase
         ];
         $step->apply($records, $this->noTick());
 
-        self::assertSame(['15', '-1', '4', ''], array_map(
-            static fn (StepRecord $record): string => $record->rows[0]['qty'],
-            array_slice($records, 0, 4)
-        ));
+        self::assertSame([true, true, true, false, false], array_map(
+            static fn (StepRecord $record): bool => $record->isAbsorbed(),
+            $records
+        ), 'changes are sent at the end; an empty quantity goes as it is');
         self::assertSame(['"lots" is not a change of quantity (+5, -3 or 4).', 'qty'], [$records[4]->error(), $records[4]->errorColumn()]);
 
-        // The same SKU later in the file adds to what this run computed.
-        $later = new StepRecord(7, 'a-1', [['sku' => 'a-1', 'qty' => '+2,5']]);
+        // The same SKU later in the file adds to what this run computed; Magento gets one row per SKU.
+        $later = new StepRecord(7, 'a-1', [['sku' => 'a-1', 'qty' => '+2,5', 'price' => '11']]);
         $step->apply([$later], $this->noTick());
-        self::assertSame('17.5', $later->rows[0]['qty']);
+        $finished = $step->finish($this->noTick());
+        self::assertSame(['a-1' => '17.5', 'A-2' => '-1', 'NEW' => '4'], array_combine(
+            array_map(static fn (StepRecord $record): string => $record->identifier, $finished),
+            array_map(static fn (StepRecord $record): string => $record->rows[0]['qty'], $finished)
+        ));
+        self::assertSame('11', $finished[0]->rows[0]['price'], 'the latest row\'s other values');
+        self::assertSame(7, $finished[0]->line);
         self::assertSame('Quantities changed by the file: 4.', $step->summary());
     }
 
@@ -97,13 +118,12 @@ class StockChangeStepTest extends TestCase
             new QuantityChange()
         );
         $step->begin($this->profile('stock_sources'), 'add_update', false);
-        $records = [
+        $step->apply([
             new StepRecord(2, 'A-1|default', [['sku' => 'A-1', 'source_code' => 'default', 'quantity' => '+1']]),
             new StepRecord(3, 'A-1|berlin', [['sku' => 'A-1', 'source_code' => 'berlin', 'quantity' => '-2']]),
             new StepRecord(4, 'A-1|hamburg', [['sku' => 'A-1', 'source_code' => 'hamburg', 'quantity' => '6']]),
-        ];
-        $step->apply($records, $this->noTick());
-        self::assertSame(['4', '5', '6'], array_map(static fn (StepRecord $r): string => $r->rows[0]['quantity'], $records));
+        ], $this->noTick());
+        self::assertSame(['A-1|default' => '4', 'A-1|berlin' => '5', 'A-1|hamburg' => '6'], $this->sent($step, 'quantity'));
     }
 
     public function testNoSummaryWithoutChanges(): void

@@ -1,0 +1,238 @@
+{
+  "openimport": 1,
+  "preset": {
+    "code": "shopify_classic",
+    "label": "Shopify products (classic columns)",
+    "description": "A Shopify product file with the classic column names (Handle, Body (HTML), Variant SKU, Variant Price \u2026).",
+    "notes": "Variants without a SKU and rows that only add an image are skipped. Map Option1 value / Option2 value to your Magento attributes and switch on \"Build configurable products\" (step 5) to turn variants into configurable products. Additional images and categories are not mapped."
+  },
+  "profiles": [
+    {
+      "name": "Shopify products (classic columns)",
+      "direction": "import",
+      "entity": "catalog_product",
+      "is_active": false,
+      "source_type": "upload",
+      "format": "csv",
+      "behavior": "add_update",
+      "on_error": "skip",
+      "allowed_errors": 100,
+      "row_filters": {
+        "mode": "exclude",
+        "match": "any",
+        "conditions": [
+          {
+            "column": "Variant SKU",
+            "operator": "empty",
+            "value": ""
+          }
+        ]
+      },
+      "import_options": {
+        "images_on_error": "skip"
+      },
+      "mapping": [
+        {
+          "target": "sku",
+          "source": "Variant SKU",
+          "transforms": [
+            "trim"
+          ]
+        },
+        {
+          "target": "name",
+          "source": "Title",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "Handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "description",
+          "source": "Body (HTML)",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "Handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "price",
+          "source": "Variant Price",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF({Variant Compare At Price} != '', {Variant Compare At Price}, value)"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "special_price",
+          "source": "Variant Price",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF({Variant Compare At Price} != '', value, '')"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "cost",
+          "source": "Cost per item",
+          "transforms": []
+        },
+        {
+          "target": "qty",
+          "source": "Variant Inventory Qty",
+          "transforms": []
+        },
+        {
+          "target": "is_in_stock",
+          "source": "Variant Inventory Qty",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF(NUMBER(COALESCE(value, '0')) > 0, 1, IF({Variant Inventory Policy} = 'continue', 1, 0))"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "weight",
+          "source": "Variant Grams",
+          "transforms": [
+            {
+              "name": "math",
+              "args": [
+                "/",
+                "1000"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "product_online",
+          "source": "Status",
+          "transforms": [
+            "map"
+          ]
+        },
+        {
+          "target": "meta_title",
+          "source": "SEO Title",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "Handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "meta_description",
+          "source": "SEO Description",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "Handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "base_image",
+          "source": "Image Src",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "Handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "small_image",
+          "source": "Image Src",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "Handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "thumbnail_image",
+          "source": "Image Src",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "Handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "configurable:parent_sku",
+          "source": "Handle",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF({Option1 Value} = '' or {Option1 Value} = 'Default Title', '', value)"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "product_type",
+          "source": null,
+          "transforms": [],
+          "static": "simple"
+        },
+        {
+          "target": "visibility",
+          "source": null,
+          "transforms": [],
+          "static": "Catalog, Search"
+        },
+        {
+          "target": "attribute_set_code",
+          "source": null,
+          "transforms": [],
+          "static": "Default"
+        },
+        {
+          "target": "product_websites",
+          "source": null,
+          "transforms": [],
+          "static": "base"
+        }
+      ],
+      "value_maps": {
+        "product_online": {
+          "active": "1",
+          "draft": "2",
+          "archived": "2"
+        }
+      }
+    }
+  ]
+}

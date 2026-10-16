@@ -83,7 +83,7 @@ parallelism only across runs and for exports).
 
 | Release | Slices | Status |
 |---|---|---|
-| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 `feat/1.3-add-stock`, 5 `feat/1.3-url-keys`, 6 `feat/1.3-conditional`, 7 `feat/1.3-multi-file` (stacked) |
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 `feat/1.3-add-stock`, 5 `feat/1.3-url-keys`, 6 `feat/1.3-conditional`, 7 `feat/1.3-multi-file`, 8 `feat/1.3-presets` (stacked) |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
@@ -96,10 +96,12 @@ code.
 ## Exact next step
 
 Stack: slice 3 PR #46 (`feat/1.3-missing`) ← slice 4 (`feat/1.3-add-stock`) ← slice 5 (`feat/1.3-url-keys`) ← slice 6
-(`feat/1.3-conditional`) ← slice 7 (`feat/1.3-multi-file`). Merge #46 when green, rebase 4 onto main and open its PR,
-merge, then the same for 5, 6 and 7. E2E: dev-env PR #10
-(configurables) and #11 (missing + stock, ref `feat/1.3-add-stock`; set back to main after merge). Then slice 8
-(presets: Shopify, WooCommerce, Magento 1 product files) on `feat/1.3-presets`.
+(`feat/1.3-conditional`) ← slice 7 (`feat/1.3-multi-file`) ← slice 8 (`feat/1.3-presets`). #46 merged; slice 4 is PR #47 (rebased on
+main). Merge #47 when green, then rebase 5 onto main, PR, merge; the same for 6, 7, 8 (`git rebase --onto
+origin/main <old parent tip> <branch>`). E2E: dev-env PR #10
+(configurables) and #11 (missing + stock, ref `feat/1.3-add-stock`; set back to main after merge). Then release 1.3:
+E2E for slices 5–8, local browser check (double-click `claude-upgrade.command` first), CHANGELOG version, release
+workflow, Notion build log and page 03.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -200,6 +202,18 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: unit (selector order); integration in `SourcesTest` (3 files → 3 runs, failed file stays, others moved;
   stop cancels the rest and the next run starts at the first file again).
 - Docs: `docs/sources.md`.
+
+### 1.3 slice 8 · presets (what was built)
+
+- `presets/*.json` (profile JSON + `preset` block): Shopify (current and classic columns), WooCommerce, Magento 1,
+  written from public column lists. `Model/Preset/PresetRepository` (list, create with a unique name, inactive),
+  controller `profile/fromPreset`, section on the "Import profiles from JSON" page (`ViewModel/Presets`).
+- New transform `fill_down` (`RowTransforms`; group column, keeps only the latest group); in the mapping editor.
+- Configurable step: a parent's own row without a price takes its first variant's (WooCommerce variable products).
+- Runner: columns with ":" (step fields) never go to Magento.
+- Tests: unit `PresetFilesTest` (each preset compiles against documented columns and maps sample rows), fill_down,
+  runner; integration `PresetImportTest` (unique names, Shopify/WooCommerce/Magento 1 files imported).
+- Docs `docs/presets.md`, `fill_down` in `docs/transforms.md`.
 
 ## Open questions
 

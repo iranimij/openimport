@@ -31,11 +31,15 @@ All notable changes to this project are documented here. The format follows
   `value > 20`); other rows keep their value.
 - Several files per run: *Which file → All matching files, one run each (by name)* for folder, SFTP and FTP
   sources, each file with its own run, report and move; *When a file fails*: go on or stop.
+- Presets: *Or start from a preset* creates a product profile for Shopify (current and classic columns),
+  WooCommerce and Magento 1 product files. New transform `fill_down` (*Fill from the row above*). See
+  [Presets](https://iranimij.github.io/openimport/presets/).
 - Row steps (`RowStepInterface`, `AbstractRowStep`): a seam between mapping and Magento's import with `observe`,
   `columns`, `observeIdentifiers`, `apply` and `finish` hooks, and `PostImportStepInterface` for changes after the
   import; pictures, configurable products and missing products are built on it.
 
 ### Changed
+- Step fields such as `configurable:parent_sku` are never sent to Magento, also when their step is off.
 - The dry-run preview compares what Magento receives (after pictures, variants and quantity changes), not the raw
   mapped values.
 - Live imports lock Magento's entity, so products and Stock & prices runs no longer run at the same time.

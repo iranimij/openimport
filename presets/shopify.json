@@ -1,0 +1,238 @@
+{
+  "openimport": 1,
+  "preset": {
+    "code": "shopify",
+    "label": "Shopify products",
+    "description": "A product export from Shopify with the current column names (Title, URL handle, SKU, Price, Compare-at price \u2026).",
+    "notes": "Variants without a SKU and rows that only add an image are skipped. Map Option1 value / Option2 value to your Magento attributes and switch on \"Build configurable products\" (step 5) to turn variants into configurable products. Additional images and categories are not mapped."
+  },
+  "profiles": [
+    {
+      "name": "Shopify products",
+      "direction": "import",
+      "entity": "catalog_product",
+      "is_active": false,
+      "source_type": "upload",
+      "format": "csv",
+      "behavior": "add_update",
+      "on_error": "skip",
+      "allowed_errors": 100,
+      "row_filters": {
+        "mode": "exclude",
+        "match": "any",
+        "conditions": [
+          {
+            "column": "SKU",
+            "operator": "empty",
+            "value": ""
+          }
+        ]
+      },
+      "import_options": {
+        "images_on_error": "skip"
+      },
+      "mapping": [
+        {
+          "target": "sku",
+          "source": "SKU",
+          "transforms": [
+            "trim"
+          ]
+        },
+        {
+          "target": "name",
+          "source": "Title",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "URL handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "description",
+          "source": "Description",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "URL handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "price",
+          "source": "Price",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF({Compare-at price} != '', {Compare-at price}, value)"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "special_price",
+          "source": "Price",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF({Compare-at price} != '', value, '')"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "cost",
+          "source": "Cost per item",
+          "transforms": []
+        },
+        {
+          "target": "qty",
+          "source": "Inventory quantity",
+          "transforms": []
+        },
+        {
+          "target": "is_in_stock",
+          "source": "Inventory quantity",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF(NUMBER(COALESCE(value, '0')) > 0, 1, IF({Continue selling when out of stock} = 'continue', 1, 0))"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "weight",
+          "source": "Weight value (grams)",
+          "transforms": [
+            {
+              "name": "math",
+              "args": [
+                "/",
+                "1000"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "product_online",
+          "source": "Status",
+          "transforms": [
+            "map"
+          ]
+        },
+        {
+          "target": "meta_title",
+          "source": "SEO title",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "URL handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "meta_description",
+          "source": "SEO description",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "URL handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "base_image",
+          "source": "Product image URL",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "URL handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "small_image",
+          "source": "Product image URL",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "URL handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "thumbnail_image",
+          "source": "Product image URL",
+          "transforms": [
+            {
+              "name": "fill_down",
+              "args": [
+                "URL handle"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "configurable:parent_sku",
+          "source": "URL handle",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF({Option1 value} = '' or {Option1 value} = 'Default Title', '', value)"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "product_type",
+          "source": null,
+          "transforms": [],
+          "static": "simple"
+        },
+        {
+          "target": "visibility",
+          "source": null,
+          "transforms": [],
+          "static": "Catalog, Search"
+        },
+        {
+          "target": "attribute_set_code",
+          "source": null,
+          "transforms": [],
+          "static": "Default"
+        },
+        {
+          "target": "product_websites",
+          "source": null,
+          "transforms": [],
+          "static": "base"
+        }
+      ],
+      "value_maps": {
+        "product_online": {
+          "active": "1",
+          "draft": "2",
+          "archived": "2"
+        }
+      }
+    }
+  ]
+}

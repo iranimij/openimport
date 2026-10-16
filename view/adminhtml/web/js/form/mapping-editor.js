@@ -35,6 +35,7 @@ define([
         {name: 'split', label: $t('Part of the value'), args: [$t('Separator'), $t('Position (1 = first, -1 = last)')]},
         {name: 'join', label: $t('Join columns'), args: [$t('Separator'), $t('Column'), $t('Column'), $t('Column')]},
         {name: 'map', label: $t('Value map'), args: []},
+        {name: 'fill_down', label: $t('Fill from the row above'), args: [$t('Group column (optional)')]},
         {name: 'expr', label: $t('Expression'), args: [$t('Expression, e.g. {Price} * 1.19')]}
     ];
 

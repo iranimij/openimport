@@ -268,6 +268,7 @@ class ConfigurableStepTest extends TestCase
         $step->columns(self::COLUMNS);
         $variant = $this->row(3, ['sku' => 'P-1', 'name' => 'Polo Red', 'color' => 'Red', 'size' => 'M',
             'configurable:parent_sku' => 'P']);
+        $variant->rows[0]['price'] = '24.90';
         $own = $this->row(2, ['sku' => 'P', 'name' => 'Polo shirt', 'product_type' => 'Configurable',
             'visibility' => 'Search', 'base_image' => 'openimport/cc/dddddddd/polo.jpg']);
         $this->batch($step, [$own]);
@@ -280,6 +281,7 @@ class ConfigurableStepTest extends TestCase
         self::assertCount(1, $parents);
         self::assertSame(['P', 2], [$parents[0]->identifier, $parents[0]->line]);
         self::assertSame('Polo shirt', $parents[0]->rows[0]['name']);
+        self::assertSame('24.90', $parents[0]->rows[0]['price'], 'a parent row without a price takes its first variant\'s');
         self::assertSame('Search', $parents[0]->rows[0]['visibility']);
         self::assertSame('openimport/cc/dddddddd/polo.jpg', $parents[0]->rows[0]['base_image']);
         self::assertSame('configurable', $parents[0]->rows[0]['product_type']);

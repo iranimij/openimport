@@ -251,6 +251,8 @@ class ImportRunner
         foreach ($this->steps as $step) {
             $columns = array_values(array_unique($step->columns($columns)));
         }
+        // Step fields ("configurable:parent_sku") never go to Magento, also when their step is off.
+        $columns = array_values(array_filter($columns, static fn (string $column): bool => !str_contains($column, ':')));
         $spool = new Spool(rtrim($workDir, '/') . '/mapped.jsonl', $columns);
         $batch = [];
         try {

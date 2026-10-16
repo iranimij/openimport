@@ -307,6 +307,11 @@ class ConfigurableStep extends AbstractRowStep
             }
             if ($own !== null) {
                 $variants = $group['variants'] ?? [];
+                // A new configurable product needs a price; a parent row without one (WooCommerce's variable
+                // products) takes its first variant's.
+                if (trim((string) ($own['rows'][0]['price'] ?? '')) === '' && isset($group['template'][0]['price'])) {
+                    $own['rows'][0]['price'] = $group['template'][0]['price'];
+                }
                 $records[] = new StepRecord($own['line'], $own['sku'], $this->builder->build(
                     $own['sku'],
                     array_map(fn (array $row): array => $this->normalize($row), $own['rows']),

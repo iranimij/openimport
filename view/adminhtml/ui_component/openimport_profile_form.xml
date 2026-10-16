@@ -1581,6 +1581,49 @@
                 </select>
             </formElements>
         </field>
+        <field name="url_key_pattern" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="26">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">URL keys from a pattern</label>
+                <dataScope>import_options.url_key_pattern</dataScope>
+                <notice translate="true">For example {name}-{sku}: Magento fields in braces. Used for rows whose URL key is empty; empty = Magento makes the key from the name.</notice>
+            </settings>
+        </field>
+        <field name="url_redirects" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="27">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Redirect old URLs (301)</label>
+                <dataScope>import_options.url_redirects</dataScope>
+                <notice translate="true">When a URL key changes, the old address answers with a permanent redirect to the new one, so links and search results keep working.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
         <field name="allowed_errors" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

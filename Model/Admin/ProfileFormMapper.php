@@ -238,6 +238,7 @@ class ProfileFormMapper
             'missing_action' => '',
             'missing_scope' => 'all',
             'qty_mode' => 'set',
+            'url_redirects' => '0',
         ];
         $options['configurable_attributes'] = array_values(array_filter(
             array_map('trim', explode(',', (string) ($options['configurable_attributes'] ?? ''))),

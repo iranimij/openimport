@@ -604,3 +604,8 @@
 "Quantities in the file","Quantities in the file"
 "are changes (+5, -3)","are changes (+5, -3)"
 "are the new stock","are the new stock"
+"For example {name}-{sku}: Magento fields in braces. Used for rows whose URL key is empty; empty = Magento makes the key from the name.","For example {name}-{sku}: Magento fields in braces. Used for rows whose URL key is empty; empty = Magento makes the key from the name."
+"Redirect old URLs (301)","Redirect old URLs (301)"
+"URL keys from a pattern","URL keys from a pattern"
+"URL keys made from the pattern: %1.","URL keys made from the pattern: %1."
+"When a URL key changes, the old address answers with a permanent redirect to the new one, so links and search results keep working.","When a URL key changes, the old address answers with a permanent redirect to the new one, so links and search results keep working."

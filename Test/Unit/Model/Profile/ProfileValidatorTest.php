@@ -118,6 +118,23 @@ class ProfileValidatorTest extends TestCase
         );
     }
 
+    public function testUrlKeyPatterns(): void
+    {
+        $profile = $this->valid();
+        $profile['import_options'] = ['url_key_pattern' => 'name-sku'];
+        self::assertSame(
+            ['Write the fields of the URL key pattern in braces, for example {name}-{sku}.'],
+            $this->validator()->validate(new ProfileStub($profile))
+        );
+        $profile['import_options'] = ['url_key_pattern' => '{name}-{sku}'];
+        self::assertSame(
+            ['The URL key pattern uses name; map it in step 4.'],
+            $this->validator()->validate(new ProfileStub($profile))
+        );
+        $profile['mapping'][] = ['target' => 'name', 'source' => 'Bezeichnung'];
+        self::assertSame([], $this->validator()->validate(new ProfileStub($profile)));
+    }
+
     public function testDefaultsAreValid(): void
     {
         self::assertSame(

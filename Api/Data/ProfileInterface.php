@@ -35,6 +35,7 @@ interface ProfileInterface
     public const NOTIFY_EMAILS = 'notify_emails';
     public const ROW_FILTERS = 'row_filters';
     public const EXPORT_OPTIONS = 'export_options';
+    public const IMPORT_OPTIONS = 'import_options';
     public const CREATED_BY = 'created_by';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
@@ -272,6 +273,19 @@ interface ProfileInterface
      * @return $this
      */
     public function setExportOptions(array $options): self;
+
+    /**
+     * Import run options that are not columns of their own (images_on_error: error | skip).
+     *
+     * @return array<string, mixed>
+     */
+    public function getImportOptions(): array;
+
+    /**
+     * @param array<string, mixed> $options
+     * @return $this
+     */
+    public function setImportOptions(array $options): self;
 
     /**
      * Mapping rows in order: target, source, static, transforms, required, value_map_case_sensitive,

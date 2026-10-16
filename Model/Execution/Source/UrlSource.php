@@ -11,12 +11,12 @@ namespace Iranimij\OpenImport\Model\Execution\Source;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Execution\FetchedFile;
 use Iranimij\OpenImport\Model\Execution\SourceInterface;
+use Iranimij\OpenImport\Model\Http\SafeDownloader;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Security\Secrets;
-use Iranimij\OpenImport\Model\Security\UrlGuard;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
-use Magento\Framework\HTTP\Client\CurlFactory;
+use Magento\Framework\HTTP\Client\Curl;
 
 /**
  * A file behind a web address: http(s), optional basic auth or bearer token, Google Sheets links (a shared sheet's
@@ -27,7 +27,6 @@ use Magento\Framework\HTTP\Client\CurlFactory;
  */
 class UrlSource implements SourceInterface
 {
-    private const MAX_HOPS = 5;
     private const DEFAULT_MAX_MB = 256;
     private const EXTENSIONS = [
         'text/csv' => 'csv',
@@ -39,14 +38,12 @@ class UrlSource implements SourceInterface
     ];
 
     /**
-     * @param CurlFactory $curlFactory
-     * @param UrlGuard $guard
+     * @param SafeDownloader $downloader
      * @param Secrets $secrets
      * @param Filesystem $filesystem
      */
     public function __construct(
-        private readonly CurlFactory $curlFactory,
-        private readonly UrlGuard $guard,
+        private readonly SafeDownloader $downloader,
         private readonly Secrets $secrets,
         private readonly Filesystem $filesystem
     ) {
@@ -84,7 +81,7 @@ class UrlSource implements SourceInterface
             }
         }
 
-        return sprintf('Downloaded %s (%s%s).', $name, $this->size($bytes), $type === '' ? '' : ', ' . $type);
+        return sprintf('Downloaded %s (%s%s).', $name, $this->downloader->size($bytes), $type === '' ? '' : ', ' . $type);
     }
 
     /**
@@ -127,7 +124,7 @@ class UrlSource implements SourceInterface
     }
 
     /**
-     * Downloads to a local file, following at most MAX_HOPS redirects.
+     * Downloads to a local file through the safe downloader (SSRF guard on every hop, size cap).
      *
      * @param array<string, mixed> $config
      * @param string $target
@@ -137,63 +134,31 @@ class UrlSource implements SourceInterface
     private function download(array $config, string $target): array
     {
         $url = $this->url($config);
-        $maxBytes = max(1, (int) ($config['max_mb'] ?? self::DEFAULT_MAX_MB)) * 1048576;
-        $timeout = max(5, min(600, (int) ($config['timeout'] ?? 60)));
-        $driver = $this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)->getDriver();
-        for ($hop = 0; $hop < self::MAX_HOPS; $hop++) {
-            [$parts, $address] = $this->guard->check($url);
-            $port = (int) ($parts['port'] ?? ($parts['scheme'] === 'https' ? 443 : 80));
-            $handle = $driver->fileOpen($target, 'w');
-            $curl = $this->curlFactory->create();
-            $curl->setTimeout($timeout);
-            $curl->addHeader('User-Agent', 'OpenImport/1.0 (+https://github.com/iranimij/openimport)');
-            $curl->addHeader('Accept', 'text/csv, application/json, application/xml, text/xml, */*');
-            $this->authenticate($curl, $config, $hop === 0);
-            $curl->setOptions([
-                CURLOPT_FILE => $handle,
-                CURLOPT_FOLLOWLOCATION => false,
-                CURLOPT_MAXFILESIZE => $maxBytes,
-                CURLOPT_CONNECTTIMEOUT => min(30, $timeout),
-                CURLOPT_RESOLVE => [$parts['host'] . ':' . $port . ':' . $address],
-                CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
-            ]);
-            try {
-                $curl->get($url);
-            } catch (\Exception $exception) {
-                $driver->fileClose($handle);
-                throw new PipelineException(sprintf('%s could not be downloaded: %s', $url, $exception->getMessage()));
+        $result = $this->downloader->download(
+            $url,
+            $target,
+            max(1, (int) ($config['max_mb'] ?? self::DEFAULT_MAX_MB)) * 1048576,
+            (int) ($config['timeout'] ?? 60) ?: 60,
+            ['Accept' => 'text/csv, application/json, application/xml, text/xml, */*'],
+            function (Curl $curl, bool $first) use ($config): void {
+                $this->authenticate($curl, $config, $first);
             }
-            $driver->fileClose($handle);
-            $status = (int) $curl->getStatus();
-            $headers = array_change_key_case($curl->getHeaders(), CASE_LOWER);
-            if (in_array($status, [301, 302, 303, 307, 308], true) && isset($headers['location'])) {
-                $url = $this->absolute((string) $headers['location'], $parts);
-                continue;
-            }
-            if ($status < 200 || $status >= 300) {
-                throw new PipelineException(sprintf('%s answered with HTTP %d.', $url, $status));
-            }
-            $stat = $driver->stat($target);
-            $bytes = (int) ($stat['size'] ?? 0);
-            if ($bytes > $maxBytes) {
-                throw new PipelineException(sprintf('The file is larger than %d MB.', (int) ($maxBytes / 1048576)));
-            }
-            $type = strtolower(trim(explode(';', (string) ($headers['content-type'] ?? ''))[0]));
+        );
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- the framework has no URL parser without a request
+        $parts = (array) parse_url($result->url);
 
-            return [$this->fileName($headers, $parts, $type), $bytes, $type];
-        }
-        throw new PipelineException(sprintf('%s redirects too often (more than %d times).', $url, self::MAX_HOPS));
+        return [$this->fileName($result->headers, $parts, $result->contentType), $result->bytes, $result->contentType];
     }
 
     /**
-     * Basic auth or a bearer token, only on the first request (not sent along to another host after a redirect).
+     * Credentials go only to the first host: a redirect to another host must not receive them.
      *
-     * @param \Magento\Framework\HTTP\Client\Curl $curl
+     * @param Curl $curl
      * @param array<string, mixed> $config
      * @param bool $first
      * @return void
      */
-    private function authenticate(\Magento\Framework\HTTP\Client\Curl $curl, array $config, bool $first): void
+    private function authenticate(Curl $curl, array $config, bool $first): void
     {
         if (!$first) {
             return;
@@ -204,29 +169,6 @@ class UrlSource implements SourceInterface
         } elseif ($auth === 'token') {
             $curl->addHeader('Authorization', 'Bearer ' . $this->secrets->get($config, 'token'));
         }
-    }
-
-    /**
-     * @param string $location
-     * @param array<string, mixed> $parts of the current URL
-     * @return string
-     */
-    private function absolute(string $location, array $parts): string
-    {
-        $location = trim($location);
-        if (preg_match('#^[a-z][a-z0-9+.-]*://#i', $location) === 1) {
-            return $location;
-        }
-        $base = $parts['scheme'] . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
-        if (str_starts_with($location, '//')) {
-            return $parts['scheme'] . ':' . $location;
-        }
-        if (str_starts_with($location, '/')) {
-            return $base . $location;
-        }
-        $path = (string) ($parts['path'] ?? '/');
-
-        return $base . substr($path, 0, (int) strrpos($path, '/') + 1) . $location;
     }
 
     /**
@@ -266,16 +208,5 @@ class UrlSource implements SourceInterface
         $pos = strrpos($path, '/');
 
         return $pos === false ? $path : substr($path, $pos + 1);
-    }
-
-    /**
-     * @param int $bytes
-     * @return string
-     */
-    private function size(int $bytes): string
-    {
-        return $bytes >= 1048576
-            ? sprintf('%.1f MB', $bytes / 1048576)
-            : ($bytes >= 1024 ? sprintf('%.0f KB', $bytes / 1024) : $bytes . ' bytes');
     }
 }

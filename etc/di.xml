@@ -80,6 +80,13 @@
             </argument>
         </arguments>
     </type>
+    <type name="Iranimij\OpenImport\Model\Pipeline\Step\RowStepPool">
+        <arguments>
+            <argument name="steps" xsi:type="array">
+                <item name="images" xsi:type="object">Iranimij\OpenImport\Model\Image\ImageStep</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Iranimij\OpenImport\Model\Entity\RecordReaderPool">
         <arguments>
             <argument name="readers" xsi:type="array">

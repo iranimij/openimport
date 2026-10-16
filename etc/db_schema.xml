@@ -38,6 +38,7 @@
         <column xsi:type="text" name="notify_emails" nullable="true" comment="Notification addresses"/>
         <column xsi:type="text" name="row_filters" nullable="true" comment="Row filters (JSON)"/>
         <column xsi:type="text" name="export_options" nullable="true" comment="Export columns and filters (JSON)"/>
+        <column xsi:type="text" name="import_options" nullable="true" comment="Import run options (JSON)"/>
         <column xsi:type="varchar" name="created_by" length="255" nullable="true" comment="Admin user name"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
                 comment="Created at"/>
@@ -242,5 +243,26 @@
         <constraint xsi:type="foreign" referenceId="OPENIMPORT_EXPORT_MARK_PROFILE_ID_OPENIMPORT_PROFILE_PROFILE_ID"
                     table="openimport_export_mark" column="profile_id" referenceTable="openimport_profile"
                     referenceColumn="profile_id" onDelete="CASCADE"/>
+    </table>
+
+    <table name="openimport_image" resource="default" engine="innodb" comment="OpenImport downloaded pictures">
+        <column xsi:type="varchar" name="url_hash" length="40" nullable="false" comment="SHA-1 of the web address"/>
+        <column xsi:type="text" name="url" nullable="false" comment="Web address"/>
+        <column xsi:type="varchar" name="file" length="255" nullable="false"
+                comment="File under the import images folder"/>
+        <column xsi:type="varchar" name="etag" length="255" nullable="true" comment="ETag the server sent"/>
+        <column xsi:type="varchar" name="last_modified" length="64" nullable="true"
+                comment="Last-Modified the server sent"/>
+        <column xsi:type="int" name="bytes" unsigned="true" nullable="false" default="0" comment="Size"/>
+        <column xsi:type="timestamp" name="checked_at" on_update="false" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Last asked the server"/>
+        <column xsi:type="timestamp" name="used_at" on_update="false" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Last used by a run"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="url_hash"/>
+        </constraint>
+        <index referenceId="OPENIMPORT_IMAGE_USED_AT" indexType="btree">
+            <column name="used_at"/>
+        </index>
     </table>
 </schema>

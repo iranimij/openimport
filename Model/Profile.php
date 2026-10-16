@@ -359,6 +359,22 @@ class Profile extends AbstractModel implements ProfileInterface
     /**
      * @inheritDoc
      */
+    public function getImportOptions(): array
+    {
+        return $this->json()->decode($this->getData(self::IMPORT_OPTIONS));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setImportOptions(array $options): ProfileInterface
+    {
+        return $this->setData(self::IMPORT_OPTIONS, $this->json()->encode($options));
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getMapping(): array
     {
         $mapping = $this->getData(self::MAPPING);

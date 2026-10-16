@@ -56,6 +56,30 @@
                     <validate>required-entry validate-digits validate-digits-range digits-range-1-100</validate>
                 </field>
             </group>
+            <group id="images" translate="label comment" type="text" sortOrder="30" showInDefault="1">
+                <label>Pictures from web addresses</label>
+                <comment>Product imports download pictures given as web addresses (base_image, small_image, thumbnail_image, swatch_image, additional_images and other image attributes) safely and keep them in var/import/images/openimport, so the next run only asks whether a picture changed.</comment>
+                <field id="refresh_hours" translate="label comment" type="text" sortOrder="10" showInDefault="1" canRestore="1">
+                    <label>Check for changed pictures after (hours)</label>
+                    <comment>Until then a downloaded picture is used as it is. After that the next run asks the server whether it changed and downloads it only when it did. 0 = ask on every run.</comment>
+                    <validate>required-entry validate-digits</validate>
+                </field>
+                <field id="max_mb" translate="label comment" type="text" sortOrder="20" showInDefault="1" canRestore="1">
+                    <label>Largest picture (MB)</label>
+                    <comment>Larger pictures are refused. 1 to 100.</comment>
+                    <validate>required-entry validate-digits validate-digits-range digits-range-1-100</validate>
+                </field>
+                <field id="timeout" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
+                    <label>Time per picture (seconds)</label>
+                    <comment>A picture that takes longer counts as unreachable. 5 to 300.</comment>
+                    <validate>required-entry validate-digits validate-digits-range digits-range-5-300</validate>
+                </field>
+                <field id="keep_days" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestore="1">
+                    <label>Keep unused downloaded pictures for (days)</label>
+                    <comment>Downloaded pictures no run used for this many days are removed from the picture cache. Pictures already in the catalog stay.</comment>
+                    <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
         </section>
     </system>
 </config>

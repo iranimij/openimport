@@ -105,6 +105,7 @@ class ProfileFormMapper
                     array_map(static fn (string $name): string => $name . '_stored', array_keys($this->secrets->stored($profile->getExportOptions()))),
                     array_map(static fn (bool $stored): string => $stored ? '1' : '0', $this->secrets->stored($profile->getExportOptions()))
                 ),
+            'import_options' => $profile->getImportOptions() + ['images_on_error' => 'error'],
             'behavior' => $profile->getBehavior(),
             'on_error' => $profile->getOnError(),
             'allowed_errors' => (string) $profile->getAllowedErrors(),
@@ -173,6 +174,12 @@ class ProfileFormMapper
             }
         }
         $profile->setExportOptions($this->secrets->merge($export, $profile->getExportOptions()));
+
+        $importOptions = is_array($data['import_options'] ?? null) ? $data['import_options'] : [];
+        $profile->setImportOptions(array_filter(
+            array_map(static fn ($value) => is_scalar($value) ? trim((string) $value) : '', $importOptions),
+            static fn (string $value): bool => $value !== ''
+        ));
 
         $options = is_array($data['format_options'] ?? null) ? $data['format_options'] : [];
         $profile->setFormatOptions(array_filter(

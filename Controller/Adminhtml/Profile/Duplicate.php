@@ -70,6 +70,7 @@ class Duplicate extends Action implements HttpPostActionInterface
                 ->setNotifyEmails($original->getNotifyEmails())
                 ->setRowFilters($original->getRowFilters())
                 ->setExportOptions($original->getExportOptions())
+                ->setImportOptions($original->getImportOptions())
                 ->setMapping($original->getMapping())
                 ->setValueMaps($original->getValueMaps());
             $copy = $this->profiles->save($copy);

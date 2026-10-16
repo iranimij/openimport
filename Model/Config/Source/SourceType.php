@@ -28,6 +28,7 @@ class SourceType implements OptionSourceInterface
             'sftp' => 'SFTP',
             'ftp' => 'FTP',
             's3' => 'Amazon S3 / S3-compatible',
+            'google_drive' => 'Google Drive / Sheets (login)',
         ] as $value => $label) {
             $options[] = ['value' => (string) $value, 'label' => __($label)];
         }

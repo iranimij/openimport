@@ -177,7 +177,7 @@ class ProfileValidatorTest extends TestCase
         self::assertSame([
             'Give the profile a name.',
             'Magento has no import entity "catalog_category".',
-            'The source type "dropbox" is not one of upload, folder, url, sftp, ftp, s3.',
+            'The source type "dropbox" is not one of upload, folder, url, sftp, ftp, s3, google_drive.',
             'The format "pdf" is not one of auto, csv, xlsx, json, xml.',
             'The after-success action "archive" is not one of keep, move, delete.',
             'The notification setting "sometimes" is not one of never, failure, always.',
@@ -287,7 +287,7 @@ class ProfileValidatorTest extends TestCase
             ['source_type' => 's3', 'source_config' => ['connection_id' => '6', 'path' => 'feeds']] + $base
         )));
         self::assertSame(
-            ['Choose a saved S3 connection.'],
+            ['Choose a saved connection for this source.'],
             $validator->validate(new ProfileStub(['source_type' => 's3', 'source_config' => ['path' => 'feeds']] + $base))
         );
         self::assertSame(

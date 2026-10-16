@@ -102,11 +102,20 @@ code.
 1.3 released (v1.3.0, #44–#52; E2E dev-env #9–#12). Still open from 1.3: the local browser check on the Mac
 (double-click `claude-upgrade.command` first).
 
-Now: **1.4 slice 2 · S3**, PR #54 (`feat/1.4-s3`), E2E dev-env #14 (`e2e/1.4-s3`, ref `feat/1.4-s3`). Merge both
-when green, set the dev-env ref back to `main`. Then slice 3 (Google Drive and Sheets with login): connection kinds
-for a Google service account (JSON key, JWT bearer grant) and OAuth (user account, PKCE, refresh tokens stored as
-secrets), a Drive client on `RemoteClientInterface` (list a folder by id or path, download, upload, move), private
-Sheets read as CSV through the Drive export endpoint; tests against a mock Google API (recorded answers) in CI.
+**Paused 2026-10-16 (Iman: wait until Wednesday).** Slice 2 (S3) merged as #54 after CI and E2E (dev-env #14,
+ref `feat/1.4-s3`) were green. Open: dev-env #14 — set `.github/ci/openimport-ref` back to `main`, wait for green,
+merge.
+
+Slice 3 (Google Drive / Sheets) is **work in progress** on `feat/1.4-google` (pushed, no PR yet; based on the
+pre-squash S3 branch, so rebase with `git rebase --onto origin/main <old feat/1.4-s3 tip> feat/1.4-google`).
+Built so far: `Model/Http/ApiClient` (+ApiResponse), `Model/Google/{GoogleEndpoints,GoogleAuth,DriveClient,OAuthFlow}`,
+controllers `Connection/OauthStart` + `OauthCallback` (public action, state = "<id>.<random>" hashed in the
+connection, PKCE verifier encrypted), connection form fields (service account key or Google account sign-in),
+profile source/destination `google_drive` with "Save as a Google Sheet", translations. Unit tests pass locally;
+integration tests written but not run yet: `Test/Integration/Connection/GoogleDriveTest.php`,
+`Test/Integration/Controller/GoogleOAuthAdminTest.php` with the mock server `Test/Integration/_files/google-server.php`
+(`GoogleServer` helper). Next: open the PR, fix CI, docs (`docs/connections.md` Google section, sources/exports,
+CHANGELOG), E2E (mock server in the dev-env), then slices 4–7.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.

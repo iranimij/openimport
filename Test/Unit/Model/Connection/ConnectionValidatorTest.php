@@ -16,7 +16,7 @@ class ConnectionValidatorTest extends TestCase
 {
     private function validator(): ConnectionValidator
     {
-        return new ConnectionValidator(new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3']));
+        return new ConnectionValidator(new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3', 'google_drive' => 'Google']));
     }
 
     public function testAValidConnection(): void
@@ -39,7 +39,7 @@ class ConnectionValidatorTest extends TestCase
             $this->validator()->validate(new ConnectionStub(null, ' ', 'ftp', ['port' => '0', 'auth_sftp' => 'token']))
         );
         self::assertSame(
-            ['The name is longer than 255 characters.', 'Choose what the connection is for (SFTP, FTP, S3).'],
+            ['The name is longer than 255 characters.', 'Choose what the connection is for (SFTP, FTP, S3, Google).'],
             $this->validator()->validate(new ConnectionStub(null, str_repeat('x', 256), 'dropbox'))
         );
     }
@@ -72,6 +72,28 @@ class ConnectionValidatorTest extends TestCase
                 'endpoint' => 'minio:9000/path', 'bucket' => 'Shop_Feeds', 'access_key' => 'k',
                 'secrets' => ['secret_key' => 'enc(x)'],
             ]))
+        );
+    }
+
+    public function testGoogleNeedsAKeyOrAnOAuthClient(): void
+    {
+        self::assertSame([], $this->validator()->validate(new ConnectionStub(null, 'Drive', 'google_drive', [
+            'account' => 'importer@project.iam.gserviceaccount.com',
+            'secrets' => ['service_account_json' => 'enc({})'],
+        ])));
+        self::assertSame(
+            ['Paste the JSON key of a Google service account (Google Cloud console › IAM › Service accounts › Keys).'],
+            $this->validator()->validate(new ConnectionStub(null, 'Drive', 'google_drive', ['auth_google' => 'service_account']))
+        );
+        self::assertSame([], $this->validator()->validate(new ConnectionStub(null, 'Drive', 'google_drive', [
+            'auth_google' => 'oauth', 'client_id' => 'c-1', 'secrets' => ['client_secret' => 'enc(s)'],
+        ])));
+        self::assertSame(
+            [
+                'Enter the client ID of your OAuth client (Google Cloud console › APIs & Services › Credentials).',
+                'Enter the client secret of your OAuth client.',
+            ],
+            $this->validator()->validate(new ConnectionStub(null, 'Drive', 'google_drive', ['auth_google' => 'oauth']))
         );
     }
 }

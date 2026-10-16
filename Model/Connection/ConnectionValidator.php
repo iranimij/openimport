@@ -50,6 +50,9 @@ class ConnectionValidator
         if ($connection->getType() === 's3') {
             return array_merge($problems, $this->s3($text, isset($settings['secrets']['secret_key'])));
         }
+        if ($connection->getType() === 'google_drive') {
+            return array_merge($problems, $this->google($text, array_keys((array) ($settings['secrets'] ?? []))));
+        }
         if ($text('host') === '') {
             $problems[] = 'Enter the server (host name).';
         }
@@ -97,5 +100,34 @@ class ConnectionValidator
         }
 
         return $problems;
+    }
+
+    /**
+     * @param callable $text setting => trimmed text
+     * @param string[] $stored names of the stored secrets
+     * @return string[]
+     */
+    private function google(callable $text, array $stored): array
+    {
+        if (($text('auth_google') ?: 'service_account') === 'oauth') {
+            $problems = [];
+            if ($text('client_id') === '') {
+                $problems[] = 'Enter the client ID of your OAuth client (Google Cloud console › APIs & Services › '
+                    . 'Credentials).';
+            }
+            if (!in_array('client_secret', $stored, true)) {
+                $problems[] = 'Enter the client secret of your OAuth client.';
+            }
+
+            return $problems;
+        }
+        if (!in_array('service_account_json', $stored, true) || $text('account') === '') {
+            return [
+                'Paste the JSON key of a Google service account (Google Cloud console › IAM › Service accounts '
+                . '› Keys).',
+            ];
+        }
+
+        return [];
     }
 }

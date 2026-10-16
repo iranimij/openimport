@@ -80,4 +80,31 @@ class RemoteSettingsBuilderTest extends TestCase
         $this->expectExceptionMessage('Enter the bucket.');
         $builder->build(['region' => 'eu-west-1'], 's3');
     }
+
+    public function testGoogleDrive(): void
+    {
+        $builder = new RemoteSettingsBuilder(new Secrets(new FakeEncryptor()));
+
+        $service = $builder->build([
+            'auth_google' => 'service_account',
+            'account' => 'importer@project.iam.gserviceaccount.com',
+            'as_sheet' => '1',
+            'secrets' => ['service_account_json' => 'enc({"type":"service_account"})'],
+        ], 'google_drive');
+        self::assertSame('service_account', $service->options['auth']);
+        self::assertSame('{"type":"service_account"}', $service->options['service_account_json']);
+        self::assertSame('1', $service->options['as_sheet']);
+        self::assertSame('Google Drive (importer@project.iam.gserviceaccount.com)', $service->label());
+        self::assertSame(60, $service->timeout);
+
+        $user = $builder->build([
+            'auth_google' => 'oauth',
+            'client_id' => ' c-1 ',
+            'secrets' => ['client_secret' => 'enc(cs)', 'refresh_token' => 'enc(rt)'],
+        ], 'google_drive');
+        self::assertSame(['oauth', 'c-1', 'cs', 'rt', '0', 'Google Drive'], [
+            $user->options['auth'], $user->options['client_id'], $user->options['client_secret'],
+            $user->options['refresh_token'], $user->options['as_sheet'], $user->label(),
+        ]);
+    }
 }

@@ -9,6 +9,9 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Test\Integration\Controller;
 
 use Iranimij\OpenImport\Api\ConnectionRepositoryInterface;
+use Iranimij\OpenImport\Api\Data\ConnectionInterface;
+use Iranimij\OpenImport\Api\Data\ConnectionInterfaceFactory;
+use Iranimij\OpenImport\Model\Admin\ConnectionFormMapper;
 use Iranimij\OpenImport\Model\Connection\ConnectionTester;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteClientFactory;
 use Iranimij\OpenImport\Test\Integration\Connection\FakeRemoteClient;
@@ -104,10 +107,43 @@ class ConnectionAdminTest extends AbstractBackendController
         return $body;
     }
 
-    public function testGridAndForm(): void
+    /**
+     * @return ConnectionInterface
+     */
+    private function saved(): ConnectionInterface
+    {
+        $connection = $this->_objectManager->get(ConnectionFormMapper::class)->fromForm([
+            'name' => 'Page connection ' . bin2hex(random_bytes(4)),
+            'type' => 'sftp',
+            'settings' => ['host' => 'sftp.example.com', 'username' => 'shop', 'password' => 'hunter2'],
+        ], $this->_objectManager->get(ConnectionInterfaceFactory::class)->create());
+
+        return $this->_objectManager->get(ConnectionRepositoryInterface::class)->save($connection);
+    }
+
+    // One layout page per test: the layout of the first page stays for the test.
+
+    public function testGrid(): void
     {
         self::assertStringContainsString('openimport_connection_listing', $this->page('backend/openimport/connection/index'));
+    }
+
+    public function testNewForm(): void
+    {
         self::assertStringContainsString('openimport_connection_form', $this->page('backend/openimport/connection/new'));
+    }
+
+    public function testEditFormNeverShowsTheSecrets(): void
+    {
+        $form = $this->page('backend/openimport/connection/edit/id/' . $this->saved()->getConnectionId());
+        self::assertStringContainsString('sftp.example.com', $form);
+        self::assertStringNotContainsString('hunter2', $form);
+    }
+
+    public function testTheProfileFormOffersConnections(): void
+    {
+        $connection = $this->saved();
+        self::assertStringContainsString($connection->getName(), $this->page('backend/openimport/profile/new'));
     }
 
     public function testSaveTestAndDelete(): void
@@ -118,13 +154,8 @@ class ConnectionAdminTest extends AbstractBackendController
             'type' => 'sftp',
             'settings' => ['host' => 'sftp.example.com', 'username' => 'shop', 'auth_sftp' => 'password', 'password' => 'hunter2'],
         ]);
-        $this->assertRedirect($this->stringContains('openimport/connection/index'));
+        $this->assertRedirect($this->stringEndsWith('openimport/connection/'));
         $connection = $this->_objectManager->get(ConnectionRepositoryInterface::class)->getByName($name);
-
-        $form = $this->page('backend/openimport/connection/edit/id/' . $connection->getConnectionId());
-        self::assertStringContainsString('sftp.example.com', $form);
-        self::assertStringNotContainsString('hunter2', $form);
-        self::assertStringContainsString($name, $this->page('backend/openimport/profile/new'), 'offered in the profile form');
 
         // Test with the stored password: the form leaves the field empty.
         $this->post('backend/openimport/connection/test', [
@@ -148,7 +179,7 @@ class ConnectionAdminTest extends AbstractBackendController
         $this->assertRedirect($this->stringContains('openimport/connection/new'));
 
         $this->post('backend/openimport/connection/delete/id/' . $connection->getConnectionId(), []);
-        $this->assertRedirect($this->stringContains('openimport/connection/index'));
+        $this->assertRedirect($this->stringEndsWith('openimport/connection/'));
         $this->expectException(NoSuchEntityException::class);
         $this->_objectManager->get(ConnectionRepositoryInterface::class)->getById((int) $connection->getConnectionId());
     }

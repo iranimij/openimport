@@ -131,8 +131,11 @@ define([
             parts = {
                 what: [this.chosen('direction'), this.chosen('entity')],
                 where: exporting
-                    ? [this.chosen('export_destination')]
-                    : [this.chosen('source_type'), this.value('source_type') === 'upload'
+                    ? [this.chosen('export_destination'),
+                        this.value('export_options.connection_id') ? this.chosen('dest_connection') : '']
+                    : [this.chosen('source_type'),
+                        this.value('source_config.connection_id') ? this.chosen('source_connection') : '',
+                        this.value('source_type') === 'upload'
                         ? this.value('source_config.file_name') : this.value('source_config.path')
                             || this.value('source_config.host') || this.value('source_config.url')],
                 file: [this.chosen('format')],

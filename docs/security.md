@@ -6,7 +6,7 @@ page lists what the module does about that, what the settings control, and what 
 ## Admin actions
 
 - Every controller is behind an ACL resource: *View profiles*, *Create and edit profiles*, *Run profiles*, *Confirm
-  runs above the safety limit*, *View runs and error reports*, plus the configuration section. Roles that may view but
+  runs above the safety limit*, *View runs and error reports*, *Manage connections*, plus the configuration section. Roles that may view but
   not edit get a read-only form.
 - Everything that changes state is a POST with Magento's form key; everything that reads is a GET. File answers go
   through Magento's `FileFactory`, never a raw path.

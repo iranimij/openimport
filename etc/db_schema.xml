@@ -265,4 +265,23 @@
             <column name="used_at"/>
         </index>
     </table>
+
+    <table name="openimport_connection" resource="default" engine="innodb" comment="OpenImport saved connections">
+        <column xsi:type="int" name="connection_id" unsigned="true" nullable="false" identity="true"
+                comment="Connection ID"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="false" comment="Name"/>
+        <column xsi:type="varchar" name="type" length="16" nullable="false" comment="sftp, ftp"/>
+        <column xsi:type="text" name="settings" nullable="true"
+                comment="Server, login and encrypted secrets (JSON)"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created at"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="connection_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="OPENIMPORT_CONNECTION_NAME">
+            <column name="name"/>
+        </constraint>
+    </table>
 </schema>

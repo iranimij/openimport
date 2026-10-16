@@ -384,9 +384,36 @@
                 <notice translate="true">Google Sheets only: the gid from the sheet link; empty = the first sheet.</notice>
             </settings>
         </field>
+        <field name="source_connection" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="29">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Saved connection</label>
+                <dataScope>source_config.connection_id</dataScope>
+                <notice translate="true">Logins saved under System › Data Transfer › OpenImport Connections, shared by profiles.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\ConnectionOptions"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="source_host" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
@@ -406,6 +433,11 @@
         <field name="source_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="31">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
@@ -425,6 +457,11 @@
         <field name="source_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
@@ -443,6 +480,11 @@
         <field name="source_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="33">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                     </item>
@@ -479,11 +521,17 @@
                     <item name="secret" xsi:type="boolean">true</item>
                     <item name="showWhen" xsi:type="array">
                         <item name="0" xsi:type="array">
+                            <item name="source_config.connection_id" xsi:type="array">
+                                <item name="filled" xsi:type="string">0</item>
+                            </item>
                             <item name="source_type" xsi:type="array">
                                 <item name="0" xsi:type="string">ftp</item>
                             </item>
                         </item>
                         <item name="1" xsi:type="array">
+                            <item name="source_config.connection_id" xsi:type="array">
+                                <item name="filled" xsi:type="string">0</item>
+                            </item>
                             <item name="source_config.auth_sftp" xsi:type="array">
                                 <item name="not" xsi:type="array">
                                     <item name="0" xsi:type="string">key</item>
@@ -503,6 +551,11 @@
         <field name="source_private_key" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="35">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                     </item>
@@ -524,6 +577,11 @@
         <field name="source_passphrase" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="36">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                     </item>
@@ -543,6 +601,11 @@
         <field name="source_ssl" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="37">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">ftp</item>
                     </item>
@@ -572,6 +635,11 @@
         <field name="source_passive" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="38">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="default" xsi:type="string">1</item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">ftp</item>
@@ -837,9 +905,38 @@
                 </select>
             </formElements>
         </field>
+        <field name="dest_connection" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="21">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">sftp</item>
+                        <item name="1" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Saved connection</label>
+                <dataScope>export_options.connection_id</dataScope>
+                <notice translate="true">Logins saved under System › Data Transfer › OpenImport Connections, shared by profiles.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\DestinationConnectionOptions"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="dest_host" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="22">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
@@ -861,6 +958,11 @@
         <field name="dest_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="23">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
@@ -882,6 +984,11 @@
         <field name="dest_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="24">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
@@ -902,6 +1009,11 @@
         <field name="dest_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="25">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                     </item>
@@ -942,11 +1054,17 @@
                     <item name="secret" xsi:type="boolean">true</item>
                     <item name="showWhen" xsi:type="array">
                         <item name="0" xsi:type="array">
+                            <item name="export_options.connection_id" xsi:type="array">
+                                <item name="filled" xsi:type="string">0</item>
+                            </item>
                             <item name="export_options.destination" xsi:type="array">
                                 <item name="0" xsi:type="string">ftp</item>
                             </item>
                         </item>
                         <item name="1" xsi:type="array">
+                            <item name="export_options.connection_id" xsi:type="array">
+                                <item name="filled" xsi:type="string">0</item>
+                            </item>
                             <item name="export_options.auth_sftp" xsi:type="array">
                                 <item name="not" xsi:type="array">
                                     <item name="0" xsi:type="string">key</item>
@@ -966,6 +1084,11 @@
         <field name="dest_private_key" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="27">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                     </item>
@@ -990,6 +1113,11 @@
         <field name="dest_passphrase" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="28">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                     </item>
@@ -1012,6 +1140,11 @@
         <field name="dest_ssl" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="29">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">ftp</item>
                     </item>
@@ -1043,6 +1176,11 @@
         <field name="dest_passive" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.connection_id" xsi:type="array">
+                            <item name="filled" xsi:type="string">0</item>
+                        </item>
+                    </item>
                     <item name="default" xsi:type="string">1</item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">ftp</item>

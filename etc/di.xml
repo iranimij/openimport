@@ -14,6 +14,9 @@
     <preference for="Iranimij\OpenImport\Api\ProfileRepositoryInterface"
                 type="Iranimij\OpenImport\Model\ProfileRepository"/>
     <preference for="Iranimij\OpenImport\Api\RunRepositoryInterface" type="Iranimij\OpenImport\Model\RunRepository"/>
+    <preference for="Iranimij\OpenImport\Api\Data\ConnectionInterface" type="Iranimij\OpenImport\Model\Connection"/>
+    <preference for="Iranimij\OpenImport\Api\ConnectionRepositoryInterface"
+                type="Iranimij\OpenImport\Model\ConnectionRepository"/>
     <preference for="Iranimij\OpenImport\Api\Data\ProfileSearchResultsInterface"
                 type="Iranimij\OpenImport\Model\ProfileSearchResults"/>
     <preference for="Iranimij\OpenImport\Api\Data\RunSearchResultsInterface"
@@ -160,6 +163,7 @@
     <type name="Iranimij\OpenImport\Console\Command\SecretsReencryptCommand">
         <arguments>
             <argument name="profiles" xsi:type="object">Iranimij\OpenImport\Api\ProfileRepositoryInterface\Proxy</argument>
+            <argument name="connections" xsi:type="object">Iranimij\OpenImport\Api\ConnectionRepositoryInterface\Proxy</argument>
         </arguments>
     </type>
     <type name="Iranimij\OpenImport\Console\Command\ProfileListCommand">
@@ -174,7 +178,14 @@
             <argument name="collections" xsi:type="array">
                 <item name="openimport_profile_listing_data_source" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Profile\Grid\Collection</item>
                 <item name="openimport_run_listing_data_source" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Run\Grid\Collection</item>
+                <item name="openimport_connection_listing_data_source" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Connection\Grid\Collection</item>
             </argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Model\ResourceModel\Connection\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">openimport_connection</argument>
+            <argument name="resourceModel" xsi:type="string">Iranimij\OpenImport\Model\ResourceModel\Connection</argument>
         </arguments>
     </type>
     <type name="Iranimij\OpenImport\Model\ResourceModel\Profile\Grid\Collection">
@@ -217,6 +228,21 @@
             </argument>
         </arguments>
     </type>
+    <!-- Kinds of saved connection; S3, Google, Dropbox, Microsoft and REST follow in 1.4. -->
+    <type name="Iranimij\OpenImport\Model\Connection\ConnectionTypes">
+        <arguments>
+            <argument name="types" xsi:type="array">
+                <item name="sftp" xsi:type="string">SFTP</item>
+                <item name="ftp" xsi:type="string">FTP</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Iranimij\OpenImport\Model\Config\Source\DestinationConnectionOptions"
+                 type="Iranimij\OpenImport\Model\Config\Source\ConnectionOptions">
+        <arguments>
+            <argument name="typePath" xsi:type="string">export_options.destination</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="Iranimij\OpenImport\Model\Execution\Source\SftpSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
         <arguments>
             <argument name="protocol" xsi:type="string">sftp</argument>

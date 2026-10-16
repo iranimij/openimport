@@ -16,6 +16,7 @@ nav:
   - Product pictures: images.md
   - Configurable products: configurable.md
   - Products missing from the file: missing-products.md
+  - Quantities as changes: stock-changes.md
   - Exports: exports.md
   - Categories: categories.md
   - Attributes: attributes.md

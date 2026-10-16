@@ -20,6 +20,7 @@ use Iranimij\OpenImport\Model\Missing\MissingProductsStep;
 use Iranimij\OpenImport\Model\Missing\MissingScope;
 use Iranimij\OpenImport\Model\Mapping\MappingException;
 use Iranimij\OpenImport\Model\Schedule\CronExpression;
+use Iranimij\OpenImport\Model\Stock\StockChangeStep;
 use Iranimij\OpenImport\Model\Transform\ValueMap;
 use Iranimij\OpenImport\Model\Writer\WriterFactory;
 
@@ -118,7 +119,8 @@ class ProfileValidator
                 $problems,
                 $this->mapping($profile),
                 $this->configurable($profile),
-                $this->missing($profile)
+                $this->missing($profile),
+                $this->quantities($profile)
             );
         }
         if ($import && $profile->getRowFilters() !== []) {
@@ -314,6 +316,24 @@ class ProfileValidator
         }
 
         return $problems;
+    }
+
+    /**
+     * Quantities as changes cannot skip unchanged rows (the same +5 is a new delivery).
+     *
+     * @param ProfileInterface $profile
+     * @return string[]
+     */
+    private function quantities(ProfileInterface $profile): array
+    {
+        $mode = (string) ($profile->getImportOptions()[StockChangeStep::OPTION_MODE] ?? '');
+        if ($mode !== StockChangeStep::MODE_ADD) {
+            return [];
+        }
+
+        return $profile->isDelta()
+            ? ['"Skip unchanged rows" cannot be used with quantities as changes: switch one of them off.']
+            : [];
     }
 
     /**

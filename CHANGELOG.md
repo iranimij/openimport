@@ -21,11 +21,17 @@ All notable changes to this project are documented here. The format follows
   not name, after the import, in the dry run, under the safety limit with a typed confirmation (*DISABLE*, *OUT OF
   STOCK*, *DELETE*); a run with row errors changes nothing. See
   [Products missing from the file](https://iranimij.github.io/openimport/missing-products/).
+- Quantities as changes: *Quantities in the file → are changes (+5, -3)* for products, Stock & prices and stock per
+  source (MSI); current quantities are read per batch, repeated SKUs add up, the dry run shows the result. See
+  [Quantities as changes](https://iranimij.github.io/openimport/stock-changes/).
 - Row steps (`RowStepInterface`, `AbstractRowStep`): a seam between mapping and Magento's import with `observe`,
   `columns`, `observeIdentifiers`, `apply` and `finish` hooks, and `PostImportStepInterface` for changes after the
   import; pictures, configurable products and missing products are built on it.
 
 ### Changed
+- The dry-run preview compares what Magento receives (after pictures, variants and quantity changes), not the raw
+  mapped values.
+- Live imports lock Magento's entity, so products and Stock & prices runs no longer run at the same time.
 - Product pictures given as file names are read from `var/import/images` (as in Magento's own import), not from
   `pub/media/import`.
 

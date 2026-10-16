@@ -1547,6 +1547,40 @@
                 </select>
             </formElements>
         </field>
+        <field name="qty_mode" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="25">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                        <item name="1" xsi:type="string">openimport_stock_price</item>
+                        <item name="2" xsi:type="string">stock_sources</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Quantities in the file</label>
+                <dataScope>import_options.qty_mode</dataScope>
+                <notice translate="true">Changes add to the current quantity: +5 for a delivery, -3 for sales elsewhere, a plain 4 adds 4. Cannot be combined with "Skip unchanged rows".</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="set" xsi:type="array">
+                                <item name="value" xsi:type="string">set</item>
+                                <item name="label" xsi:type="string" translate="true">are the new stock</item>
+                            </option>
+                            <option name="add" xsi:type="array">
+                                <item name="value" xsi:type="string">add</item>
+                                <item name="label" xsi:type="string" translate="true">are changes (+5, -3)</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="allowed_errors" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

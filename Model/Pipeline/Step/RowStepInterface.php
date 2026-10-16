@@ -21,7 +21,8 @@ use Iranimij\OpenImport\Model\Pipeline\PipelineException;
  * - apply() sees the records that go to core and may change or fail them;
  * - finish() may add records (a configurable parent built from its variants); they pass the behaviour and the
  *   delta check like file records, but not the steps.
- * The dry-run preview shows the mapped values, not the values steps wrote.
+ * The dry-run preview compares the values steps wrote (what Magento receives); "skip unchanged rows" compares the
+ * mapped values (what the file says).
  */
 interface RowStepInterface
 {

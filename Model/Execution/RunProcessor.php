@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
+use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Export\ExportRunner;
 use Iranimij\OpenImport\Model\Notification\RunMailer;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
@@ -39,6 +40,7 @@ class RunProcessor
      * @param LoggerInterface $logger
      * @param RunMailer $mailer
      * @param ExportRunner $exportRunner
+     * @param EntityRegistry $entities
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -50,7 +52,8 @@ class RunProcessor
         private readonly SourceResolver $sources,
         private readonly LoggerInterface $logger,
         private readonly RunMailer $mailer,
-        private readonly ExportRunner $exportRunner
+        private readonly ExportRunner $exportRunner,
+        private readonly EntityRegistry $entities
     ) {
     }
 
@@ -142,7 +145,8 @@ class RunProcessor
     }
 
     /**
-     * One run per profile at a time; one live import per core entity at a time.
+     * One run per profile at a time; one live import per Magento entity at a time (Stock & prices and products both
+     * write products, so they share a lock).
      *
      * @param ProfileInterface $profile
      * @param RunInterface $run
@@ -152,7 +156,8 @@ class RunProcessor
     {
         $names = ['profile:' . $profile->getProfileId()];
         if (!$run->isDryRun() && $profile->getDirection() === ProfileInterface::DIRECTION_IMPORT) {
-            $names[] = 'entity:' . $profile->getEntity();
+            $entity = $this->entities->get($profile->getEntity());
+            $names[] = 'entity:' . ($entity === null ? $profile->getEntity() : $entity->importEntity());
         }
 
         return $names;

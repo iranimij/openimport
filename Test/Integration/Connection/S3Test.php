@@ -37,10 +37,11 @@ use PHPUnit\Framework\TestCase;
 #[DbIsolation(true)]
 class S3Test extends TestCase
 {
-    private string $endpoint = '';
-    private string $accessKey = '';
-    private string $secretKey = '';
-    private string $bucket = '';
+    // Nullable: Magento's test framework sets the properties of a finished test to null.
+    private ?string $endpoint = null;
+    private ?string $accessKey = null;
+    private ?string $secretKey = null;
+    private ?string $bucket = null;
 
     protected function setUp(): void
     {
@@ -63,7 +64,7 @@ class S3Test extends TestCase
     private function createBucket(): void
     {
         // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $parts = parse_url($this->endpoint);
+        $parts = parse_url((string) $this->endpoint);
         $host = $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
         $headers = (new S3Signer())->sign(
             'PUT',
@@ -72,8 +73,8 @@ class S3Test extends TestCase
             [],
             [],
             S3Signer::EMPTY_PAYLOAD,
-            $this->accessKey,
-            $this->secretKey,
+            (string) $this->accessKey,
+            (string) $this->secretKey,
             'us-east-1',
             new \DateTimeImmutable()
         );
@@ -82,7 +83,7 @@ class S3Test extends TestCase
             $curl->addHeader($name, $value);
         }
         $curl->setOption(CURLOPT_CUSTOMREQUEST, 'PUT');
-        $curl->get(rtrim($this->endpoint, '/') . '/' . $this->bucket);
+        $curl->get(rtrim((string) $this->endpoint, '/') . '/' . $this->bucket);
         self::assertSame(200, $curl->getStatus(), 'create the bucket: ' . $curl->getBody());
     }
 

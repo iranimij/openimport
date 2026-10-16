@@ -66,6 +66,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#your-own-transforms">Your own transforms</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#only-when">Only when</a>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -79,6 +81,30 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../configurable/">Configurable products</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../missing-products/">Products missing from the file</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stock-changes/">Quantities as changes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-keys/">URL keys and redirects</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../presets/">Presets (Shopify, WooCommerce, Magento 1)</a>
                 </li>
               </ul>
               <ul>
@@ -200,6 +226,11 @@ value; the rest of the file still imports.</p>
 <td><code>default</code></td>
 <td>value</td>
 <td>used when the value is empty</td>
+</tr>
+<tr>
+<td><code>fill_down</code></td>
+<td>group column (optional)</td>
+<td>an empty value takes the last value above it, within rows with the same group value (since 1.3; Shopify writes a title only on a product's first row)</td>
 </tr>
 <tr>
 <td><code>split</code></td>
@@ -330,6 +361,38 @@ COALESCE({EAN}, {GTIN}, {Supplier SKU})
 <p>Implement <code>Iranimij\OpenImport\Model\Transform\TransformProviderInterface</code> and add the class to the <code>providers</code>
 argument of <code>Iranimij\OpenImport\Model\Transform\TransformPool</code> in your module's <code>di.xml</code>. A provider may also
 replace a built-in transform by using its name.</p>
+<h2 id="only-when">Only when<a class="headerlink" href="#only-when" title="Permanent link">&para;</a></h2>
+<p>Since 1.3. Every transform can have a condition: type it into <strong>Only when</strong> before you add the transform. The
+transform then runs only for rows where the condition is true; other rows keep the value as it is. Conditions are
+expressions (see above) and can use the row's columns and <code>value</code>, the value at that step.</p>
+<table>
+<thead>
+<tr>
+<th>Transform</th>
+<th>Only when</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Change price by % (15)</td>
+<td><code>{Brand} = 'Acme'</code></td>
+<td>Acme prices +15 %, other brands unchanged</td>
+</tr>
+<tr>
+<td>Change price by % (-10)</td>
+<td><code>CONTAINS({Category}, 'sale')</code></td>
+<td>10 % off in the sale category</td>
+</tr>
+<tr>
+<td>Round (0, ending, .99)</td>
+<td><code>value &gt; 20</code></td>
+<td>only prices above 20 end in .99</td>
+</tr>
+</tbody>
+</table>
+<p>In the profile JSON a conditional transform is written as
+<code>{"name": "price_adjust", "args": ["15"], "when": "{Brand} = 'Acme'"}</code>.</p>
               
             </div>
           </div><footer>

@@ -78,6 +78,30 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../configurable/">Configurable products</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../missing-products/">Products missing from the file</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stock-changes/">Quantities as changes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-keys/">URL keys and redirects</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../presets/">Presets (Shopify, WooCommerce, Magento 1)</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
                 </li>
               </ul>
@@ -193,6 +217,12 @@ several patterns separated by commas: <code>stock-*.csv, Stock-*.xlsx</code>), a
 (by modification time, the usual choice for a drop folder), the oldest (process a backlog in order, one file per run),
 or the first or last by name (<code>2026-10-14.csv</code> style names). A run with no matching file fails with a plain message
 and nothing else happens.</p>
+<p><strong>All matching files, one run each</strong> (since 1.3) reads every matching file: the run takes the first file by name
+(<code>stock-2.csv</code> before <code>stock-10.csv</code>) and queues one run per other file, so every file has its own report, error list
+and move after success. The run message says <em>File 1 of 3: stock-1.csv. The other files are queued as runs 12, 13.</em>
+Files that another queued run of the profile already has are left to it, so a schedule never imports a file twice.
+<em>When a file fails</em>: <strong>Go on with the next file</strong> (default; the failed file stays for the next run) or <strong>Stop</strong>: the
+queued runs of the batch are cancelled and their files wait for the next run.</p>
 <h2 id="after-a-successful-run">After a successful run<a class="headerlink" href="#after-a-successful-run" title="Permanent link">&para;</a></h2>
 <p><em>Source file after a successful run</em> (step 6) applies to folders and servers:</p>
 <ul>
@@ -225,7 +255,7 @@ keep it, type a new one to replace it), never exported with a profile and never 
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../runs/" class="btn btn-neutral float-left" title="Runs, dry runs and safety"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../exports/" class="btn btn-neutral float-right" title="Exports">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../images/" class="btn btn-neutral float-right" title="Product pictures">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -255,7 +285,7 @@ keep it, type a new one to replace it), never exported with a profile and never 
       <span><a href="../runs/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../exports/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../images/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

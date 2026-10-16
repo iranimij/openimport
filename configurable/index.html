@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/configurable/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Configurable products - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Configurable products";
+        var mkdocs_page_input_path = "configurable.md";
+        var mkdocs_page_url = "/openimport/configurable/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../comparison/">How it compares</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Configurable products</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#set-it-up">Set it up</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-a-run-does">What a run does</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#the-parents-own-row">The parent's own row</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rows-that-cannot-be-variants">Rows that cannot be variants</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#skip-unchanged-rows">Skip unchanged rows</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#settings-checked-before-a-run">Settings checked before a run</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../missing-products/">Products missing from the file</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stock-changes/">Quantities as changes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-keys/">URL keys and redirects</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../presets/">Presets (Shopify, WooCommerce, Magento 1)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../categories/">Categories</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../attributes/">Attributes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cms/">CMS pages and blocks</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">REST API and triggers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Configurable products</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/configurable.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="configurable-products-from-simple-rows">Configurable products from simple rows<a class="headerlink" href="#configurable-products-from-simple-rows" title="Permanent link">&para;</a></h1>
+<p>Since 1.3. Supplier files usually have one row per variant: a T-shirt in red M, red L and blue M, with a column that
+names the model they belong to. OpenImport turns such rows into a configurable product with its variants, in the
+same run.</p>
+<h2 id="set-it-up">Set it up<a class="headerlink" href="#set-it-up" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Step 4 · Mapping</strong>: map the column with the model number to <strong>Parent SKU (configurable products)</strong>. Map the
+   attributes the variants differ in (color, size …) like any attribute. Optionally map a column to <strong>Parent name
+   (configurable products)</strong>.</li>
+<li><strong>Step 5 · Rules</strong>: switch on <strong>Build configurable products</strong> and choose the <strong>Variation attributes</strong>. Only
+   dropdowns with global scope that the shop defined are offered: Magento accepts only those for variants.</li>
+<li>Choose what happens to the variants: <strong>Not visible on their own</strong> (default) or <strong>Visibility as mapped</strong>.</li>
+</ol>
+<h2 id="what-a-run-does">What a run does<a class="headerlink" href="#what-a-run-does" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Rows with the same parent SKU are the variants of one configurable product. Rows without a parent SKU are imported
+  as they are.</li>
+<li>After the last row, OpenImport adds the configurable product with all its variants (Magento's
+  <code>configurable_variations</code>). It takes the values of the first variant in the file (attribute set, websites,
+  categories, description, price, pictures), with:<ul>
+<li><strong>name</strong>: <em>Parent name</em> when mapped; otherwise the words all variant names start with ("T-Shirt Basic Red M"
+  and "T-Shirt Basic Blue L" give "T-Shirt Basic"), per store view;</li>
+<li><strong>visibility</strong> <em>Catalog, Search</em>; <strong>URL key</strong> from the name;</li>
+<li>no values for the variation attributes, no quantity, in stock.</li>
+</ul>
+</li>
+<li>New variants get the URL key <code>&lt;name&gt;-&lt;sku&gt;</code> when the mapping has no URL key, so variants with equal names do not
+  collide. Existing products keep theirs.</li>
+<li>The run message says <em>Configurable products: 3 built from 12 variants.</em></li>
+</ul>
+<h2 id="the-parents-own-row">The parent's own row<a class="headerlink" href="#the-parents-own-row" title="Permanent link">&para;</a></h2>
+<p>Some files, WooCommerce exports among them, have a row for the parent itself. A row whose <strong>product type</strong> is
+<code>configurable</code> and which has no parent SKU is that row: OpenImport sends it once, at the end, with the variations.
+Its own name, URL key, visibility and stock stay as mapped. Map the file's type column to <code>product_type</code> with a
+value map (<code>variable</code> → <code>configurable</code>, <code>variation</code> → <code>simple</code>).</p>
+<p>A <strong>simple</strong> row with a parent's SKU conflicts with that parent: the parent is not built and the run message names
+it.</p>
+<h2 id="rows-that-cannot-be-variants">Rows that cannot be variants<a class="headerlink" href="#rows-that-cannot-be-variants" title="Permanent link">&para;</a></h2>
+<p>These rows are row errors (the column is named, the rest of the run goes on):</p>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A variation attribute is empty</td>
+<td><em>The variation attribute "size" is empty.</em></td>
+</tr>
+<tr>
+<td>A value is not an option of the attribute</td>
+<td><em>"Purple" is not an option of color; add it first …</em></td>
+</tr>
+<tr>
+<td>Two variants of one parent have the same values</td>
+<td><em>Another variant of TS, TS-RED-M, has the same color, size.</em></td>
+</tr>
+<tr>
+<td>A row is its own parent</td>
+<td><em>The parent SKU is the row's own SKU; a variant needs another parent.</em></td>
+</tr>
+<tr>
+<td>A parent SKU is also a variant</td>
+<td><em>This SKU is the parent of other rows; it cannot be a variant too.</em></td>
+</tr>
+</tbody>
+</table>
+<p>The values must be existing options of the attributes (matched by their admin label, ignoring case, as Magento's
+import does). Create options with the <a href="../attributes/">attribute import</a> first.</p>
+<h2 id="skip-unchanged-rows">Skip unchanged rows<a class="headerlink" href="#skip-unchanged-rows" title="Permanent link">&para;</a></h2>
+<p>With <em>Skip unchanged rows</em> on, unchanged variants are not sent again, but the parent still lists <strong>every</strong> variant
+in the file: Magento removes links a parent's list does not name. The parent itself is sent only when its list or
+values changed.</p>
+<h2 id="settings-checked-before-a-run">Settings checked before a run<a class="headerlink" href="#settings-checked-before-a-run" title="Permanent link">&para;</a></h2>
+<p>Saving the profile needs the parent SKU column, the variation attributes and their columns. A run stops before
+reading the file when an attribute is not a global dropdown.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../images/" class="btn btn-neutral float-left" title="Product pictures"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../missing-products/" class="btn btn-neutral float-right" title="Products missing from the file">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../images/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../missing-products/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

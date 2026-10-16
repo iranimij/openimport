@@ -228,7 +228,11 @@ class ImportRunner
             ));
         }
 
-        $spool = new Spool(rtrim($workDir, '/') . '/mapped.jsonl', $mapping->columns());
+        $columns = $mapping->columns();
+        foreach ($this->steps as $step) {
+            $columns = array_values(array_unique($step->columns($columns)));
+        }
+        $spool = new Spool(rtrim($workDir, '/') . '/mapped.jsonl', $columns);
         $batch = [];
         try {
             foreach ($reader->rows() as $line => $row) {
@@ -247,6 +251,7 @@ class ImportRunner
                 }
             }
             $this->flush($batch, $spool, $profile, $recordReader, $mapping, $useDelta, $dryRun);
+            $this->finishSteps($spool, $profile, $recordReader, $mapping, $useDelta, $dryRun);
         } catch (ReaderException $exception) {
             $spool->close();
             $this->storeErrors(true);
@@ -335,6 +340,7 @@ class ImportRunner
      * @param CompiledMapping $mapping
      * @param bool $useDelta
      * @param bool $dryRun
+     * @param bool $generated records row steps added (they skip the steps)
      * @return void
      */
     private function flush(
@@ -344,10 +350,14 @@ class ImportRunner
         ?RecordReaderInterface $reader,
         CompiledMapping $mapping,
         bool $useDelta,
-        bool $dryRun
+        bool $dryRun,
+        bool $generated = false
     ): void {
         if ($batch === []) {
             return;
+        }
+        if (!$generated) {
+            $this->observeSteps($batch);
         }
         $behavior = $this->behavior;
         $identifiers = array_map(static fn (array $item): string => $item[1]->identifier, $batch);
@@ -390,7 +400,7 @@ class ImportRunner
             }
             $accepted[$index] = [$line, $mapped, $exists];
         }
-        $stepRows = $this->applySteps($batch, $accepted, $deltaKeys);
+        $stepRows = $generated ? [] : $this->applySteps($batch, $accepted, $deltaKeys);
         $fill = $this->existingOnly && $reader !== null ? $this->currentRequired($accepted, $reader, $mapping) : [];
         foreach ($accepted as $item => [$line, $mapped]) {
             foreach ($stepRows[$item] ?? $mapped->rows as $index => $row) {
@@ -406,8 +416,65 @@ class ImportRunner
     }
 
     /**
+     * Shows the row steps every valid record of a batch, before behaviour and delta.
+     *
+     * @param array<int, array{0: int, 1: MappedRow, 2: array<string, string>}> $batch
+     * @return void
+     */
+    private function observeSteps(array $batch): void
+    {
+        if ($this->steps === []) {
+            return;
+        }
+        $records = [];
+        foreach ($batch as [$line, $mapped]) {
+            $records[] = new StepRecord($line, $mapped->identifier, $mapped->rows);
+        }
+        foreach ($this->steps as $step) {
+            $step->observe($records);
+        }
+    }
+
+    /**
+     * Records the row steps add after the last batch (configurable parents). They pass behaviour, delta and preview
+     * like file records.
+     *
+     * @param Spool $spool
+     * @param ProfileInterface $profile
+     * @param RecordReaderInterface|null $reader
+     * @param CompiledMapping $mapping
+     * @param bool $useDelta
+     * @param bool $dryRun
+     * @return void
+     */
+    private function finishSteps(
+        Spool $spool,
+        ProfileInterface $profile,
+        ?RecordReaderInterface $reader,
+        CompiledMapping $mapping,
+        bool $useDelta,
+        bool $dryRun
+    ): void {
+        $tick = function (): void {
+            $this->progress(true);
+        };
+        foreach ($this->steps as $step) {
+            $batch = [];
+            foreach ($step->finish($tick) as $record) {
+                $batch[] = [$record->line, new MappedRow($record->rows, [], $record->identifier), []];
+                if (count($batch) >= self::BATCH) {
+                    $this->flush($batch, $spool, $profile, $reader, $mapping, $useDelta, $dryRun, true);
+                    $batch = [];
+                }
+            }
+            $this->flush($batch, $spool, $profile, $reader, $mapping, $useDelta, $dryRun, true);
+        }
+    }
+
+    /**
      * Row steps (pictures, …) for the accepted records of a batch. Records a step fails become row errors and leave
-     * $accepted; records a step left incomplete keep no delta hash.
+     * $accepted, records a step absorbs leave it without an error; both and records a step left incomplete keep no
+     * delta hash.
      *
      * @param array<int, array{0: int, 1: MappedRow, 2: array<string, string>}> $batch
      * @param array<int, array{0: int, 1: MappedRow, 2: bool}> $accepted by batch index; failed records are removed
@@ -428,15 +495,22 @@ class ImportRunner
             $this->progress(true);
         };
         foreach ($this->steps as $step) {
-            $open = array_filter($records, static fn (StepRecord $record): bool => !$record->isFailed());
+            $open = array_filter(
+                $records,
+                static fn (StepRecord $record): bool => !$record->isFailed() && !$record->isAbsorbed()
+            );
             if ($open !== []) {
                 $step->apply($open, $tick);
             }
         }
         $rows = [];
         foreach ($records as $index => $record) {
-            if ($record->isFailed() || $record->isIncomplete()) {
+            if ($record->isFailed() || $record->isIncomplete() || $record->isAbsorbed()) {
                 unset($this->pendingHashes[$deltaKeys[$index] ?? '']);
+            }
+            if ($record->isAbsorbed()) {
+                unset($accepted[$index]);
+                continue;
             }
             if ($record->isFailed()) {
                 $this->error(new ErrorRecord(

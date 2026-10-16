@@ -9,12 +9,12 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
-use Iranimij\OpenImport\Model\Pipeline\Step\RowStepInterface;
+use Iranimij\OpenImport\Model\Pipeline\Step\AbstractRowStep;
 
 /**
  * Upper-cases names, fails records whose name is "bad" and leaves records named "half" incomplete.
  */
-class FakeRowStep implements RowStepInterface
+class FakeRowStep extends AbstractRowStep
 {
     /**
      * @var string[] identifiers seen, in order

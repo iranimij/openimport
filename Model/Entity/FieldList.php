@@ -82,7 +82,27 @@ class FieldList
         usort($fields, static fn (array $a, array $b): int => [!$a['identifier'], !$a['required'], $a['code']]
             <=> [!$b['identifier'], !$b['required'], $b['code']]);
 
-        return $fields;
+        return array_merge($fields, $this->stepFields($entity));
+    }
+
+    /**
+     * Fields OpenImport's row steps read; they are not sent to Magento.
+     *
+     * @param string $entity
+     * @return array<int, array{code: string, label: string, required: bool, identifier: bool}>
+     */
+    private function stepFields(string $entity): array
+    {
+        if ($entity !== 'catalog_product') {
+            return [];
+        }
+
+        return [
+            ['code' => 'configurable:parent_sku', 'label' => (string) __('Parent SKU (configurable products)'),
+                'required' => false, 'identifier' => false],
+            ['code' => 'configurable:parent_name', 'label' => (string) __('Parent name (configurable products)'),
+                'required' => false, 'identifier' => false],
+        ];
     }
 
     /**

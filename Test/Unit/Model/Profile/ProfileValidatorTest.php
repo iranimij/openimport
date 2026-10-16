@@ -83,6 +83,31 @@ class ProfileValidatorTest extends TestCase
         self::assertSame([], $this->validator()->validate(new ProfileStub($this->valid())));
     }
 
+    public function testConfigurableProductsNeedTheirColumnsAndAttributes(): void
+    {
+        $profile = $this->valid();
+        $profile['import_options'] = ['configurable' => '1', 'configurable_attributes' => 'color,size'];
+        self::assertSame([
+            'Map a column to "Parent SKU (configurable products)" in step 4 to build configurable products.',
+            'Map the variation attribute "color" in step 4.',
+            'Map the variation attribute "size" in step 4.',
+        ], $this->validator()->validate(new ProfileStub($profile)));
+
+        $profile['import_options'] = ['configurable' => '1'];
+        $profile['mapping'][] = ['target' => 'configurable:parent_sku', 'source' => 'Modell'];
+        self::assertSame(
+            ['Choose the variation attributes to build configurable products.'],
+            $this->validator()->validate(new ProfileStub($profile))
+        );
+
+        $profile['import_options'] = ['configurable' => '1', 'configurable_attributes' => 'color'];
+        $profile['mapping'][] = ['target' => 'color', 'source' => 'Farbe'];
+        self::assertSame([], $this->validator()->validate(new ProfileStub($profile)));
+
+        $profile['import_options'] = ['configurable_attributes' => 'size'];
+        self::assertSame([], $this->validator()->validate(new ProfileStub($profile)), 'switched off: not checked');
+    }
+
     public function testDefaultsAreValid(): void
     {
         self::assertSame(

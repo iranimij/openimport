@@ -105,7 +105,7 @@ class ProfileFormMapper
                     array_map(static fn (string $name): string => $name . '_stored', array_keys($this->secrets->stored($profile->getExportOptions()))),
                     array_map(static fn (bool $stored): string => $stored ? '1' : '0', $this->secrets->stored($profile->getExportOptions()))
                 ),
-            'import_options' => $profile->getImportOptions() + ['images_on_error' => 'error'],
+            'import_options' => $this->importOptionsForForm($profile->getImportOptions()),
             'behavior' => $profile->getBehavior(),
             'on_error' => $profile->getOnError(),
             'allowed_errors' => (string) $profile->getAllowedErrors(),
@@ -177,8 +177,14 @@ class ProfileFormMapper
 
         $importOptions = is_array($data['import_options'] ?? null) ? $data['import_options'] : [];
         $profile->setImportOptions(array_filter(
-            array_map(static fn ($value) => is_scalar($value) ? trim((string) $value) : '', $importOptions),
-            static fn (string $value): bool => $value !== ''
+            array_map(
+                // Multiselects (variation attributes) are kept as a comma list.
+                static fn ($value) => is_array($value)
+                    ? implode(',', array_filter(array_map('trim', array_map('strval', $value))))
+                    : (is_scalar($value) ? trim((string) $value) : ''),
+                $importOptions
+            ),
+            static fn (string $value): bool => $value !== '' && $value !== '0'
         ));
 
         $options = is_array($data['format_options'] ?? null) ? $data['format_options'] : [];
@@ -215,6 +221,27 @@ class ProfileFormMapper
         ]);
 
         return $profile;
+    }
+
+    /**
+     * Import options with the form's defaults; the variation attributes as a list for the multiselect.
+     *
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
+    private function importOptionsForForm(array $options): array
+    {
+        $options += [
+            'images_on_error' => 'error',
+            'configurable' => '0',
+            'configurable_child_visibility' => 'hide',
+        ];
+        $options['configurable_attributes'] = array_values(array_filter(
+            array_map('trim', explode(',', (string) ($options['configurable_attributes'] ?? ''))),
+            static fn (string $code): bool => $code !== ''
+        ));
+
+        return $options;
     }
 
     /**

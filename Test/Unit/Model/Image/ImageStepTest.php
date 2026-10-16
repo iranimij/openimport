@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Test\Unit\Model\Image;
 
-use Iranimij\OpenImport\Model\Image\ImageColumns;
 use Iranimij\OpenImport\Model\Image\ImageStep;
 use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
+use Iranimij\OpenImport\Test\Unit\Model\Image\Fake\FakeImageColumns;
 use Iranimij\OpenImport\Test\Unit\Model\Image\Fake\FakeImageFetcher;
 use Iranimij\OpenImport\Test\Unit\Model\ProfileStub;
 use PHPUnit\Framework\TestCase;
@@ -20,24 +20,6 @@ use PHPUnit\Framework\TestCase;
  */
 class ImageStepTest extends TestCase
 {
-    private function columns(): ImageColumns
-    {
-        return new class extends ImageColumns {
-            // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock
-            public function __construct()
-            {
-            }
-
-            /**
-             * @return string[]
-             */
-            public function single(): array
-            {
-                return ['base_image', 'small_image', 'thumbnail_image', 'swatch_image', 'hover_image'];
-            }
-        };
-    }
-
     /**
      * @param array<string, mixed> $data
      * @return ProfileStub
@@ -49,7 +31,7 @@ class ImageStepTest extends TestCase
 
     public function testOnlyProductRunsThatKeepRecords(): void
     {
-        $step = new ImageStep(new FakeImageFetcher(), $this->columns());
+        $step = new ImageStep(new FakeImageFetcher(), new FakeImageColumns());
         self::assertTrue($step->begin($this->profile(), 'add_update', false));
         self::assertTrue($step->begin($this->profile(), 'replace', true));
         self::assertFalse($step->begin($this->profile(), 'delete', false));
@@ -59,7 +41,7 @@ class ImageStepTest extends TestCase
     public function testAddressesBecomeFilesAndOtherCellsStay(): void
     {
         $fetcher = new FakeImageFetcher();
-        $step = new ImageStep($fetcher, $this->columns());
+        $step = new ImageStep($fetcher, new FakeImageColumns());
         $step->begin($this->profile(), 'add_update', false);
         $record = new StepRecord(2, 'A-1', [
             [
@@ -101,7 +83,7 @@ class ImageStepTest extends TestCase
 
     public function testAPictureThatCannotBeReadFailsTheRecord(): void
     {
-        $step = new ImageStep(new FakeImageFetcher(['https://cdn.example.com/gone.jpg']), $this->columns());
+        $step = new ImageStep(new FakeImageFetcher(['https://cdn.example.com/gone.jpg']), new FakeImageColumns());
         $step->begin($this->profile(), 'add_update', false);
         $broken = new StepRecord(3, 'A-2', [[
             'sku' => 'A-2',
@@ -124,7 +106,7 @@ class ImageStepTest extends TestCase
 
     public function testSkipImportsTheRecordWithoutThePicture(): void
     {
-        $step = new ImageStep(new FakeImageFetcher(['https://cdn.example.com/gone.jpg']), $this->columns());
+        $step = new ImageStep(new FakeImageFetcher(['https://cdn.example.com/gone.jpg']), new FakeImageColumns());
         $step->begin($this->profile(['import_options' => ['images_on_error' => 'skip']]), 'add_update', false);
         $records = [];
         for ($i = 1; $i <= 7; $i++) {
@@ -151,7 +133,7 @@ class ImageStepTest extends TestCase
 
     public function testNoSummaryWithoutAddresses(): void
     {
-        $step = new ImageStep(new FakeImageFetcher(), $this->columns());
+        $step = new ImageStep(new FakeImageFetcher(), new FakeImageColumns());
         $step->begin($this->profile(), 'add_update', false);
         $step->apply([new StepRecord(2, 'A', [['sku' => 'A', 'base_image' => 'a.jpg']])], static function (): void {
         });

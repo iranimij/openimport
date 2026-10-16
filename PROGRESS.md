@@ -73,10 +73,27 @@ delete branches), repository settings (squash only, delete branch on merge,
   object between dispatches, file answers (FileResponse) never reach the test response.
 - E-mails render in the frontend area for the default store view (header/footer templates live there).
 
+## Plan 1.3–1.6 (every feature of the paid modules)
+
+Written 2026-10-16 on Iman's request; Notion "15 · Plan 1.3–1.6 · every feature of the paid modules"
+(https://app.notion.com/p/3fb563c039fc811082f5e481e52fe233). Status: **waiting for Iman's go**, no code yet.
+
+| Release | Slices | Status |
+|---|---|---|
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | not started |
+| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
+| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
+| 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
+
+Rule for every slice: one PR, pushed at once; this file updated after each slice (done, exact next step, open
+questions, failing/skipped tests, CI link); unit ≥ 85 % on new namespaces, integration on all seven pairs, oracle or
+round-trip tests for entities, security tests, E2E with axe/CSP; full matrix before merging schema, runner or sales
+code.
+
 ## Exact next step
 
-Nothing in flight. Next features from Notion "12 · Roadmap 1.x" when Iman picks them. Known flake: the first E2E
-test's Auto-match sometimes needs Playwright's retry (more time given in dev-env #8).
+Wait for Iman's answers to the eight decisions in the plan (§6). After "go": 1.3 slice 1 (images from URLs) on branch
+`feat/1.3-images`.
 
 ## Open questions
 

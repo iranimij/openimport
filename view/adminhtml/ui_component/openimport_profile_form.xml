@@ -679,6 +679,47 @@
                                 <item name="value" xsi:type="string">last_name</item>
                                 <item name="label" xsi:type="string" translate="true">Last by name</item>
                             </option>
+                            <option name="4" xsi:type="array">
+                                <item name="value" xsi:type="string">all</item>
+                                <item name="label" xsi:type="string" translate="true">All matching files, one run each (by name)</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="source_all_on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="43">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">folder</item>
+                        <item name="1" xsi:type="string">sftp</item>
+                        <item name="2" xsi:type="string">ftp</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.pick" xsi:type="array">
+                            <item name="0" xsi:type="string">all</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">When a file fails</label>
+                <dataScope>source_config.all_on_error</dataScope>
+                <notice translate="true">Each file gets its own run, report and move after success. A failed file stays where it is.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="continue" xsi:type="array">
+                                <item name="value" xsi:type="string">continue</item>
+                                <item name="label" xsi:type="string" translate="true">Go on with the next file</item>
+                            </option>
+                            <option name="stop" xsi:type="array">
+                                <item name="value" xsi:type="string">stop</item>
+                                <item name="label" xsi:type="string" translate="true">Stop; the next files wait for the next run</item>
+                            </option>
                         </options>
                     </settings>
                 </select>

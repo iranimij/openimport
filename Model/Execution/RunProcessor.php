@@ -41,6 +41,7 @@ class RunProcessor
      * @param RunMailer $mailer
      * @param ExportRunner $exportRunner
      * @param EntityRegistry $entities
+     * @param FileBatch $fileBatch
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -53,7 +54,8 @@ class RunProcessor
         private readonly LoggerInterface $logger,
         private readonly RunMailer $mailer,
         private readonly ExportRunner $exportRunner,
-        private readonly EntityRegistry $entities
+        private readonly EntityRegistry $entities,
+        private readonly FileBatch $fileBatch
     ) {
     }
 
@@ -126,6 +128,7 @@ class RunProcessor
 
         $finished = $this->finish($runId, $outcome);
         if ($profile !== null) {
+            $this->fileBatch->stopAfterFailure($profile, $finished);
             $this->mailer->send($profile, $finished);
         }
 
@@ -190,6 +193,7 @@ class RunProcessor
 
             return $outcome;
         }
+        $batchNote = $this->fileBatch->start($profile, $run);
         $fetched = $this->sources->fetch($profile, $run, $folder);
         $staged = $this->runFiles->stageSource($runId, $fetched->path, $fetched->name);
         $run->setSourceFile($this->runFiles->relative($staged));
@@ -198,10 +202,26 @@ class RunProcessor
             $run->setOptions($run->getOptions() + ['original_name' => $fetched->name]);
         }
         $this->runRepository->save($run);
-        $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $fetched->name, $heartbeat);
+        try {
+            $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $fetched->name, $heartbeat);
+        } catch (PipelineException $exception) {
+            // The run fails, but the note says which file it was and which runs got the others.
+            if ($batchNote === null) {
+                throw $exception;
+            }
+            throw new PipelineException(rtrim($exception->getMessage()) . "\n" . $batchNote, 0, $exception);
+        }
         if ($fetched->reference !== '' && !$run->isDryRun() && empty($run->getOptions()['file'])
             && in_array($outcome->status, [RunInterface::STATUS_SUCCESS, RunInterface::STATUS_PARTIAL], true)) {
             $outcome = $this->afterSuccess($profile, $fetched, $outcome);
+        }
+        if ($batchNote !== null) {
+            $outcome = new RunOutcome(
+                $outcome->status,
+                $outcome->counts,
+                rtrim($outcome->message) . "\n" . $batchNote,
+                $outcome->historyId
+            );
         }
 
         return $outcome;

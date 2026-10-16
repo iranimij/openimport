@@ -612,3 +612,8 @@
 "Only when (optional)","Only when (optional)"
 "Only when, e.g. {Brand} = 'Acme'","Only when, e.g. {Brand} = 'Acme'"
 "only when %1","only when %1"
+"All matching files, one run each (by name)","All matching files, one run each (by name)"
+"Each file gets its own run, report and move after success. A failed file stays where it is.","Each file gets its own run, report and move after success. A failed file stays where it is."
+"Go on with the next file","Go on with the next file"
+"Stop; the next files wait for the next run","Stop; the next files wait for the next run"
+"When a file fails","When a file fails"

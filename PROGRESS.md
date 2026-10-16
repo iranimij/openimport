@@ -83,7 +83,7 @@ parallelism only across runs and for exports).
 
 | Release | Slices | Status |
 |---|---|---|
-| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 `feat/1.3-add-stock`, 5 `feat/1.3-url-keys`, 6 `feat/1.3-conditional` (stacked) |
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 `feat/1.3-add-stock`, 5 `feat/1.3-url-keys`, 6 `feat/1.3-conditional`, 7 `feat/1.3-multi-file` (stacked) |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
@@ -96,9 +96,10 @@ code.
 ## Exact next step
 
 Stack: slice 3 PR #46 (`feat/1.3-missing`) ← slice 4 (`feat/1.3-add-stock`) ← slice 5 (`feat/1.3-url-keys`) ← slice 6
-(`feat/1.3-conditional`). Merge #46 when green, rebase 4 onto main and open its PR, merge, then the same for 5 and 6. E2E: dev-env PR #10
-(configurables) and #11 (missing + stock, ref `feat/1.3-add-stock`; set back to main after merge). Then slice 7
-(several files per run: one child run per matching file) on `feat/1.3-multi-file`.
+(`feat/1.3-conditional`) ← slice 7 (`feat/1.3-multi-file`). Merge #46 when green, rebase 4 onto main and open its PR,
+merge, then the same for 5, 6 and 7. E2E: dev-env PR #10
+(configurables) and #11 (missing + stock, ref `feat/1.3-add-stock`; set back to main after merge). Then slice 8
+(presets: Shopify, WooCommerce, Magento 1 product files) on `feat/1.3-presets`.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -186,6 +187,19 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
   settings that are added at once take it too); the chip shows "· only when …".
 - Tests: unit (pool: conditions on columns and `value`, blank condition, errors). E2E in the dev-env pending.
 - Docs: "Only when" section in `docs/transforms.md`.
+
+### 1.3 slice 7 · several files per run (what was built)
+
+- `MultiFileSourceInterface` (names, fetchNamed) on FolderSource and RemoteSource (SFTP/FTP); `FileSelector::PICK_ALL`
+  and `ordered()` (natural name order).
+- `FileBatch`: a run of an "all" profile takes the first free file (`remote_file` option), queues one run per other
+  file (`batch_of` = first run id; files of open runs are skipped); with `all_on_error = stop` a failed run cancels
+  the batch's queued runs. Wired into RunProcessor (note in the run message); SourceResolver fetches `remote_file`.
+  `RunResource::openRunOptions()`.
+- Form: pick option "All matching files", field *When a file fails*.
+- Tests: unit (selector order); integration in `SourcesTest` (3 files → 3 runs, failed file stays, others moved;
+  stop cancels the rest and the next run starts at the first file again).
+- Docs: `docs/sources.md`.
 
 ## Open questions
 

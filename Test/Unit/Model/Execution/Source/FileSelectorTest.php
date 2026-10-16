@@ -48,6 +48,16 @@ class FileSelectorTest extends TestCase
         self::assertSame('stock-10.csv', $selector->pick(self::FILES, 'stock-*', FileSelector::PICK_FIRST_NAME), 'natural order: 10 before 2026');
     }
 
+    public function testAllFilesInNameOrder(): void
+    {
+        $selector = new FileSelector();
+        $files = ['stock-10.csv' => 1, 'Stock-2.csv' => 3, 'stock-1.csv' => 2, 'notes.txt' => 9];
+        self::assertSame(['stock-1.csv', 'Stock-2.csv', 'stock-10.csv'], $selector->ordered($files, 'stock-*.csv'));
+        self::assertSame('stock-1.csv', $selector->pick($files, 'stock-*.csv', FileSelector::PICK_ALL));
+        self::assertSame([], $selector->ordered($files, '*.xml'));
+        self::assertContains('all', FileSelector::PICKS);
+    }
+
     public function testNoMatchIsAPlainMessage(): void
     {
         $this->expectException(PipelineException::class);

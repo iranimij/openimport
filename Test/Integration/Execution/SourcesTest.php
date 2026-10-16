@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
+use Iranimij\OpenImport\Api\RunRepositoryInterface;
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
 use Iranimij\OpenImport\Model\Execution\RunProcessor;
 use Iranimij\OpenImport\Model\Execution\RunQueue;
@@ -110,6 +111,61 @@ class SourcesTest extends TestCase
         $empty = $this->process($delete);
         self::assertSame(RunInterface::STATUS_FAILED, $empty->getStatus());
         self::assertStringContainsString('No file matches "stock-*.csv" (1 file(s) in the folder)', $empty->getMessage());
+    }
+
+    public function testAllMatchingFilesRunOneRunEach(): void
+    {
+        $tag = bin2hex(random_bytes(3));
+        $folder = 'openimport/it-all-' . $tag;
+        $var = $this->var();
+        $var->writeFile($folder . '/stock-2.csv', "sku,name,price\nOI-ALL-{$tag}-2,Two {$tag},2\n");
+        $var->writeFile($folder . '/stock-10.csv', "sku,name,price\nOI-ALL-{$tag}-10,Ten {$tag},10\n");
+        $var->writeFile($folder . '/stock-1.csv', "sku,name\nOI-ALL-{$tag}-1,One {$tag}\n");
+        $profile = $this->profile('folder', ['path' => 'it-all-' . $tag, 'pattern' => 'stock-*.csv', 'pick' => 'all'], 'move');
+        $processor = Bootstrap::getObjectManager()->get(RunProcessor::class);
+        $runs = Bootstrap::getObjectManager()->get(RunRepositoryInterface::class);
+
+        $first = $this->process($profile);
+        // stock-1.csv has no price column: the mapping needs it, so that file fails and stays.
+        self::assertSame(RunInterface::STATUS_FAILED, $first->getStatus(), $first->getMessage());
+        self::assertSame('stock-1.csv', $first->getOptions()['remote_file'] ?? null);
+        self::assertMatchesRegularExpression('/File 1 of 3: stock-1\.csv\. The other files are queued as runs (\d+), (\d+)\./', $first->getMessage());
+        preg_match('/queued as runs (\d+), (\d+)\./', $first->getMessage(), $ids);
+        $second = $processor->process((int) $ids[1]);
+        $third = $processor->process((int) $ids[2]);
+        self::assertSame(['stock-2.csv', 'stock-10.csv'], [$second->getOptions()['remote_file'] ?? null,
+            $third->getOptions()['remote_file'] ?? null], 'name order, numbers as numbers');
+        self::assertSame(RunInterface::STATUS_SUCCESS, $second->getStatus(), $second->getMessage());
+        self::assertSame(RunInterface::STATUS_SUCCESS, $third->getStatus(), $third->getMessage());
+        self::assertTrue($var->isExist($folder . '/stock-1.csv'), 'the failed file stays');
+        self::assertTrue($var->isExist($folder . '/processed/stock-2.csv'));
+        self::assertTrue($var->isExist($folder . '/processed/stock-10.csv'));
+        self::assertSame((int) $first->getRunId(), (int) ($runs->getById((int) $ids[2])->getOptions()['batch_of'] ?? 0));
+    }
+
+    public function testAllMatchingFilesCanStopAtAFailedFile(): void
+    {
+        $tag = bin2hex(random_bytes(3));
+        $folder = 'openimport/it-stop-' . $tag;
+        $var = $this->var();
+        $var->writeFile($folder . '/a.csv', "sku,name\nOI-STOP-{$tag}-A,A\n");
+        $var->writeFile($folder . '/b.csv', "sku,name,price\nOI-STOP-{$tag}-B,B {$tag},1\n");
+        $profile = $this->profile(
+            'folder',
+            ['path' => 'it-stop-' . $tag, 'pattern' => '*.csv', 'pick' => 'all', 'all_on_error' => 'stop'],
+            'move'
+        );
+
+        $first = $this->process($profile);
+        self::assertSame(RunInterface::STATUS_FAILED, $first->getStatus());
+        preg_match('/queued as runs (\d+)\./', $first->getMessage(), $ids);
+        $next = Bootstrap::getObjectManager()->get(RunRepositoryInterface::class)->getById((int) $ids[1]);
+        self::assertSame(RunInterface::STATUS_CANCELLED, $next->getStatus(), 'b.csv waits for the next run');
+        self::assertTrue($var->isExist($folder . '/b.csv'));
+
+        // The next run starts again at the first file: nothing is lost.
+        $again = $this->process($profile);
+        self::assertSame('a.csv', $again->getOptions()['remote_file'] ?? null);
     }
 
     public function testFolderSourceStaysInsideTheAllowedFolders(): void

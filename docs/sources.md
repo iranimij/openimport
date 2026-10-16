@@ -22,6 +22,13 @@ several patterns separated by commas: `stock-*.csv, Stock-*.xlsx`), and *Which f
 or the first or last by name (`2026-10-14.csv` style names). A run with no matching file fails with a plain message
 and nothing else happens.
 
+**All matching files, one run each** (since 1.3) reads every matching file: the run takes the first file by name
+(`stock-2.csv` before `stock-10.csv`) and queues one run per other file, so every file has its own report, error list
+and move after success. The run message says *File 1 of 3: stock-1.csv. The other files are queued as runs 12, 13.*
+Files that another queued run of the profile already has are left to it, so a schedule never imports a file twice.
+*When a file fails*: **Go on with the next file** (default; the failed file stays for the next run) or **Stop**: the
+queued runs of the batch are cancelled and their files wait for the next run.
+
 ## After a successful run
 
 *Source file after a successful run* (step 6) applies to folders and servers:

@@ -10,7 +10,7 @@ namespace Iranimij\OpenImport\Model\Execution\Source;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Execution\FetchedFile;
-use Iranimij\OpenImport\Model\Execution\SourceInterface;
+use Iranimij\OpenImport\Model\Execution\MultiFileSourceInterface;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Security\FolderSandbox;
 use Magento\Framework\Exception\FileSystemException;
@@ -23,7 +23,7 @@ use Magento\Framework\Exception\FileSystemException;
  * source_config: path, pattern (default *), pick (newest | oldest | first_name | last_name), move_to (default
  * "processed", for after success = move).
  */
-class FolderSource implements SourceInterface
+class FolderSource implements MultiFileSourceInterface
 {
     /**
      * @param FolderSandbox $sandbox
@@ -47,6 +47,30 @@ class FolderSource implements SourceInterface
             (string) ($config['pattern'] ?? '*'),
             (string) ($config['pick'] ?? FileSelector::PICK_NEWEST)
         );
+
+        return new FetchedFile($directory . '/' . $name, $name, $directory . '/' . $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function names(ProfileInterface $profile): array
+    {
+        return $this->selector->ordered(
+            $this->files($this->directory($profile)),
+            (string) ($profile->getSourceConfig()['pattern'] ?? '*')
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function fetchNamed(ProfileInterface $profile, string $folder, string $name): FetchedFile
+    {
+        $directory = $this->directory($profile);
+        if (!in_array($name, array_map('strval', array_keys($this->files($directory))), true)) {
+            throw new PipelineException(sprintf('The file %s is no longer in %s.', $name, $directory));
+        }
 
         return new FetchedFile($directory . '/' . $name, $name, $directory . '/' . $name);
     }

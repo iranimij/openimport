@@ -58,6 +58,7 @@ class ImageImportTest extends TestCase
         fclose($probe);
         $this->log = sys_get_temp_dir() . '/openimport-image-server-' . $port . '.log';
         file_put_contents($this->log, '');
+        // phpcs:ignore Magento2.Security.InsecureFunction -- starts the test web server, fixed command, no user input
         $this->server = proc_open(
             [PHP_BINARY, '-S', '127.0.0.1:' . $port, __DIR__ . '/../_files/image-server.php'],
             [0 => ['pipe', 'r'], 1 => ['file', '/dev/null', 'w'], 2 => ['file', '/dev/null', 'w']],
@@ -67,6 +68,7 @@ class ImageImportTest extends TestCase
         );
         $this->base = 'http://127.0.0.1:' . $port;
         for ($i = 0; $i < 50; $i++) {
+            // phpcs:ignore Generic.PHP.NoSilencedErrors -- "not listening yet" is expected while the server starts
             $socket = @fsockopen('127.0.0.1', $port);
             if ($socket !== false) {
                 fclose($socket);

@@ -1,0 +1,27 @@
+name: Delete branch
+
+# Cloud sessions cannot delete branches; this workflow does it on request (Actions › Delete branch › Run workflow).
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to delete (never main)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete the branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if [ -z "$BRANCH" ] || [ "$BRANCH" = "main" ] || [ "$BRANCH" = "${{ github.event.repository.default_branch }}" ]; then
+            echo "Refusing to delete '$BRANCH'."; exit 1
+          fi
+          gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/$BRANCH"
+          echo "Deleted $BRANCH."

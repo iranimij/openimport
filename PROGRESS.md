@@ -83,7 +83,7 @@ parallelism only across runs and for exports).
 
 | Release | Slices | Status |
 |---|---|---|
-| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 `feat/1.3-add-stock`, 5 `feat/1.3-url-keys` (stacked) |
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44), 2 done (#45); 3 in review (#46); 4 `feat/1.3-add-stock`, 5 `feat/1.3-url-keys`, 6 `feat/1.3-conditional` (stacked) |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
@@ -95,10 +95,10 @@ code.
 
 ## Exact next step
 
-Stack: slice 3 PR #46 (`feat/1.3-missing`) ← slice 4 (`feat/1.3-add-stock`) ← slice 5 (`feat/1.3-url-keys`).
-Merge #46 when green, rebase 4 onto main and open its PR, merge, then the same for 5. E2E: dev-env PR #10
-(configurables) and #11 (missing + stock, ref `feat/1.3-add-stock`; set back to main after merge). Then slice 6
-(conditional transforms: "only when" per transform chip) on `feat/1.3-conditional`.
+Stack: slice 3 PR #46 (`feat/1.3-missing`) ← slice 4 (`feat/1.3-add-stock`) ← slice 5 (`feat/1.3-url-keys`) ← slice 6
+(`feat/1.3-conditional`). Merge #46 when green, rebase 4 onto main and open its PR, merge, then the same for 5 and 6. E2E: dev-env PR #10
+(configurables) and #11 (missing + stock, ref `feat/1.3-add-stock`; set back to main after merge). Then slice 7
+(several files per run: one child run per matching file) on `feat/1.3-multi-file`.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -177,6 +177,15 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: unit (pattern, step), validator; integration `UrlKeyImportTest` (key from pattern, renamed product → old URL
   301 to the new one, duplicate key error).
 - Docs `docs/url-keys.md`.
+
+### 1.3 slice 6 · conditional transforms (what was built)
+
+- `TransformPool`: a definition may have `when` (expression, parsed once); the step runs only where it is true, other
+  rows keep the value; parse errors name the step, evaluation errors are row errors.
+- Mapping editor: *Only when* input in front of the transform picker (typed before choosing, so transforms without
+  settings that are added at once take it too); the chip shows "· only when …".
+- Tests: unit (pool: conditions on columns and `value`, blank condition, errors). E2E in the dev-env pending.
+- Docs: "Only when" section in `docs/transforms.md`.
 
 ## Open questions
 

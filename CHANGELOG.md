@@ -27,6 +27,8 @@ All notable changes to this project are documented here. The format follows
 - URL keys from a pattern (`{name}-{sku}`) for rows without a URL key, with duplicate keys reported with the other
   SKU, and *Redirect old URLs (301)* for changed URL keys. See
   [URL keys and redirects](https://iranimij.github.io/openimport/url-keys/).
+- Conditional transforms: every transform can have *Only when* (an expression such as `{Brand} = 'Acme'` or
+  `value > 20`); other rows keep their value.
 - Row steps (`RowStepInterface`, `AbstractRowStep`): a seam between mapping and Magento's import with `observe`,
   `columns`, `observeIdentifiers`, `apply` and `finish` hooks, and `PostImportStepInterface` for changes after the
   import; pictures, configurable products and missing products are built on it.

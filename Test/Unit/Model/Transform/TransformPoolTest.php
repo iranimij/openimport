@@ -226,6 +226,33 @@ class TransformPoolTest extends TestCase
         self::assertSame('[cba]', $pool->compile(['reverse', 'trim'], new TransformScope('x'))('abc', []));
     }
 
+    public function testOnlyWhen(): void
+    {
+        $chain = (new TransformPool())->compile([
+            ['name' => 'price_adjust', 'args' => ['10'], 'when' => "{Brand} = 'Acme'"],
+            ['name' => 'prefix', 'args' => ['*'], 'when' => 'value > 105'],
+            ['name' => 'suffix', 'args' => [' EUR'], 'when' => '  '],
+        ], new TransformScope('price'));
+
+        self::assertSame('*110.00 EUR', $chain('100', ['Brand' => 'acme']), 'text compares without case; value is the step\'s input');
+        self::assertSame('100 EUR', $chain('100', ['Brand' => 'Other']));
+        self::assertSame('*200 EUR', $chain('200', ['Brand' => 'Other']), 'an empty condition always runs');
+    }
+
+    public function testOnlyWhenErrors(): void
+    {
+        try {
+            (new TransformPool())->compile([['name' => 'trim', 'when' => '{Brand} ==']], new TransformScope('name'));
+            self::fail('A broken condition must be refused.');
+        } catch (TransformException $exception) {
+            self::assertStringStartsWith('Step 1 (trim): "only when" ', $exception->getMessage());
+        }
+        $chain = (new TransformPool())->compile([['name' => 'trim', 'when' => '{Qty} * 2 > 1']], new TransformScope('name'));
+        $this->expectException(TransformException::class);
+        $this->expectExceptionMessage('trim, only when:');
+        $chain(' x ', ['Qty' => 'many']);
+    }
+
     public function testArgumentsGivenAsAScalar(): void
     {
         self::assertSame('x-1', $this->transform([['name' => 'prefix', 'args' => 'x-']], '1'));

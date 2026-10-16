@@ -6,6 +6,8 @@
 
 /** @var \Magento\Backend\Block\Template $block */
 /** @var \Magento\Framework\Escaper $escaper */
+/** @var \Iranimij\OpenImport\ViewModel\Presets $presets */
+$presets = $block->getData('presets');
 ?>
 <section class="admin__page-section">
     <p><?= $escaper->escapeHtml(__('A file from "Download as JSON" on a profile, or from bin/magento openimport:profile:export. Profiles with the same name are updated; passwords, keys and tokens are not in the file and stay as they are. When one profile has a problem, nothing is saved.')) ?></p>
@@ -28,3 +30,23 @@
         </div>
     </form>
 </section>
+<?php if ($presets !== null && $presets->all() !== []): ?>
+<section class="admin__page-section openimport-presets">
+    <div class="admin__page-section-title">
+        <h2 class="title"><?= $escaper->escapeHtml(__('Or start from a preset')) ?></h2>
+    </div>
+    <p><?= $escaper->escapeHtml(__('A new, inactive profile with the mapping for a file from another shop system. Check it and run a dry run first.')) ?></p>
+    <ul class="openimport-preset-list">
+        <?php foreach ($presets->all() as $code => $preset): ?>
+            <li>
+                <form method="post" action="<?= $escaper->escapeUrl($block->getUrl('openimport/profile/fromPreset')) ?>">
+                    <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
+                    <input name="preset" type="hidden" value="<?= $escaper->escapeHtmlAttr($code) ?>"/>
+                    <button type="submit" class="action-secondary"><span><?= $escaper->escapeHtml(__($preset['label'])) ?></span></button>
+                    <span class="openimport-preset-description"><?= $escaper->escapeHtml(__($preset['description'])) ?></span>
+                </form>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</section>
+<?php endif; ?>

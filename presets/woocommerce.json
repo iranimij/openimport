@@ -1,0 +1,238 @@
+{
+  "openimport": 1,
+  "preset": {
+    "code": "woocommerce",
+    "label": "WooCommerce products",
+    "description": "A product export from WooCommerce (Products › Export: ID, Type, SKU, Name, Regular price …).",
+    "notes": "Products without a SKU and grouped or external products are skipped. Variable products become configurable products: map \"Attribute 1 value(s)\" to your Magento attribute and switch on \"Build configurable products\" (step 5). A parent written as id:123 needs its SKU instead. Weights are taken from \"Weight (kg)\"; categories are not mapped."
+  },
+  "profiles": [
+    {
+      "name": "WooCommerce products",
+      "direction": "import",
+      "entity": "catalog_product",
+      "is_active": false,
+      "source_type": "upload",
+      "format": "csv",
+      "behavior": "add_update",
+      "on_error": "skip",
+      "allowed_errors": 100,
+      "row_filters": {
+        "mode": "exclude",
+        "match": "any",
+        "conditions": [
+          {
+            "column": "SKU",
+            "operator": "empty",
+            "value": ""
+          },
+          {
+            "column": "Type",
+            "operator": "in",
+            "value": "grouped,external"
+          }
+        ]
+      },
+      "import_options": {
+        "images_on_error": "skip",
+        "url_key_pattern": "{name}-{sku}"
+      },
+      "mapping": [
+        {
+          "target": "sku",
+          "source": "SKU",
+          "transforms": [
+            "trim"
+          ]
+        },
+        {
+          "target": "name",
+          "source": "Name",
+          "transforms": []
+        },
+        {
+          "target": "description",
+          "source": "Description",
+          "transforms": []
+        },
+        {
+          "target": "short_description",
+          "source": "Short description",
+          "transforms": []
+        },
+        {
+          "target": "price",
+          "source": "Regular price",
+          "transforms": []
+        },
+        {
+          "target": "special_price",
+          "source": "Sale price",
+          "transforms": []
+        },
+        {
+          "target": "special_price_from_date",
+          "source": "Date sale price starts",
+          "transforms": [
+            {
+              "name": "date",
+              "args": [
+                "",
+                "Y-m-d"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "special_price_to_date",
+          "source": "Date sale price ends",
+          "transforms": [
+            {
+              "name": "date",
+              "args": [
+                "",
+                "Y-m-d"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "qty",
+          "source": "Stock",
+          "transforms": []
+        },
+        {
+          "target": "is_in_stock",
+          "source": "In stock?",
+          "transforms": [
+            "map"
+          ]
+        },
+        {
+          "target": "weight",
+          "source": "Weight (kg)",
+          "transforms": []
+        },
+        {
+          "target": "product_online",
+          "source": "Published",
+          "transforms": [
+            "map"
+          ]
+        },
+        {
+          "target": "visibility",
+          "source": "Visibility in catalog",
+          "transforms": [
+            "map"
+          ]
+        },
+        {
+          "target": "product_type",
+          "source": "Type",
+          "transforms": [
+            "map"
+          ]
+        },
+        {
+          "target": "configurable:parent_sku",
+          "source": "Parent",
+          "transforms": []
+        },
+        {
+          "target": "base_image",
+          "source": "Images",
+          "transforms": [
+            {
+              "name": "split",
+              "args": [
+                ",",
+                "1"
+              ]
+            },
+            "trim"
+          ]
+        },
+        {
+          "target": "small_image",
+          "source": "Images",
+          "transforms": [
+            {
+              "name": "split",
+              "args": [
+                ",",
+                "1"
+              ]
+            },
+            "trim"
+          ]
+        },
+        {
+          "target": "thumbnail_image",
+          "source": "Images",
+          "transforms": [
+            {
+              "name": "split",
+              "args": [
+                ",",
+                "1"
+              ]
+            },
+            "trim"
+          ]
+        },
+        {
+          "target": "additional_images",
+          "source": "Images",
+          "transforms": [
+            {
+              "name": "replace",
+              "args": [
+                ", ",
+                ","
+              ]
+            }
+          ]
+        },
+        {
+          "target": "attribute_set_code",
+          "source": null,
+          "transforms": [],
+          "static": "Default"
+        },
+        {
+          "target": "product_websites",
+          "source": null,
+          "transforms": [],
+          "static": "base"
+        }
+      ],
+      "value_maps": {
+        "is_in_stock": {
+          "1": "1",
+          "0": "0",
+          "backorder": "1"
+        },
+        "product_online": {
+          "1": "1",
+          "0": "2",
+          "-1": "2"
+        },
+        "visibility": {
+          "visible": "Catalog, Search",
+          "catalog": "Catalog",
+          "search": "Search",
+          "hidden": "Not Visible Individually"
+        },
+        "product_type": {
+          "simple": "simple",
+          "variable": "configurable",
+          "variation": "simple",
+          "simple, virtual": "virtual",
+          "virtual": "virtual",
+          "simple, downloadable": "downloadable"
+        }
+      }
+    }
+  ]
+}

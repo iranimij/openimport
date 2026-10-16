@@ -18,6 +18,7 @@ value; the rest of the file still imports.
 | `strip_html` | – | `<p>Soft &amp; warm</p>` → `Soft & warm` |
 | `prefix`, `suffix` | text | `prefix("DE-")`: `42` → `DE-42` (empty values stay empty) |
 | `default` | value | used when the value is empty |
+| `fill_down` | group column (optional) | an empty value takes the last value above it, within rows with the same group value (since 1.3; Shopify writes a title only on a product's first row) |
 | `split` | separator, position (1 = first, -1 = last) | `split(";", 2)`: `a;b;c` → `b` |
 | `join` | separator, column, … | `join(" ", "Brand")`: `Shirt` → `Shirt ACME`; empty parts are left out |
 

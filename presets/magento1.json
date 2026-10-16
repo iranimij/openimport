@@ -1,0 +1,223 @@
+{
+  "openimport": 1,
+  "preset": {
+    "code": "magento1",
+    "label": "Magento 1 products",
+    "description": "A product export from Magento 1 (System \u203a Import/Export \u203a Export, entity Products: sku, _store, _attribute_set, _type \u2026).",
+    "notes": "Magento 1 writes extra categories, pictures and store-view values on rows without a SKU; those rows are skipped, so each product gets its first category. Copy Magento 1's media/catalog/product folder to var/import/images so the picture paths are found. The tax class is not mapped (its id differs between shops)."
+  },
+  "profiles": [
+    {
+      "name": "Magento 1 products",
+      "direction": "import",
+      "entity": "catalog_product",
+      "is_active": false,
+      "source_type": "upload",
+      "format": "csv",
+      "behavior": "add_update",
+      "on_error": "skip",
+      "allowed_errors": 100,
+      "row_filters": {
+        "mode": "exclude",
+        "match": "any",
+        "conditions": [
+          {
+            "column": "sku",
+            "operator": "empty",
+            "value": ""
+          }
+        ]
+      },
+      "import_options": {
+        "images_on_error": "skip"
+      },
+      "mapping": [
+        {
+          "target": "sku",
+          "source": "sku",
+          "transforms": [
+            "trim"
+          ]
+        },
+        {
+          "target": "name",
+          "source": "name",
+          "transforms": []
+        },
+        {
+          "target": "description",
+          "source": "description",
+          "transforms": []
+        },
+        {
+          "target": "short_description",
+          "source": "short_description",
+          "transforms": []
+        },
+        {
+          "target": "price",
+          "source": "price",
+          "transforms": []
+        },
+        {
+          "target": "special_price",
+          "source": "special_price",
+          "transforms": []
+        },
+        {
+          "target": "special_price_from_date",
+          "source": "special_from_date",
+          "transforms": [
+            {
+              "name": "date",
+              "args": [
+                "",
+                "Y-m-d"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "special_price_to_date",
+          "source": "special_to_date",
+          "transforms": [
+            {
+              "name": "date",
+              "args": [
+                "",
+                "Y-m-d"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "weight",
+          "source": "weight",
+          "transforms": []
+        },
+        {
+          "target": "qty",
+          "source": "qty",
+          "transforms": []
+        },
+        {
+          "target": "is_in_stock",
+          "source": "is_in_stock",
+          "transforms": []
+        },
+        {
+          "target": "product_online",
+          "source": "status",
+          "transforms": [
+            "map"
+          ]
+        },
+        {
+          "target": "visibility",
+          "source": "visibility",
+          "transforms": [
+            "map"
+          ]
+        },
+        {
+          "target": "url_key",
+          "source": "url_key",
+          "transforms": []
+        },
+        {
+          "target": "meta_title",
+          "source": "meta_title",
+          "transforms": []
+        },
+        {
+          "target": "meta_description",
+          "source": "meta_description",
+          "transforms": []
+        },
+        {
+          "target": "meta_keywords",
+          "source": "meta_keyword",
+          "transforms": []
+        },
+        {
+          "target": "attribute_set_code",
+          "source": "_attribute_set",
+          "transforms": []
+        },
+        {
+          "target": "product_type",
+          "source": "_type",
+          "transforms": []
+        },
+        {
+          "target": "product_websites",
+          "source": "_product_websites",
+          "transforms": []
+        },
+        {
+          "target": "categories",
+          "source": "_category",
+          "transforms": [
+            {
+              "name": "expr",
+              "args": [
+                "IF(value = '', '', CONCAT(COALESCE({_root_category}, 'Default Category'), '/', value))"
+              ]
+            }
+          ]
+        },
+        {
+          "target": "base_image",
+          "source": "image",
+          "transforms": [
+            {
+              "name": "replace",
+              "args": [
+                "no_selection",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "target": "small_image",
+          "source": "small_image",
+          "transforms": [
+            {
+              "name": "replace",
+              "args": [
+                "no_selection",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "target": "thumbnail_image",
+          "source": "thumbnail",
+          "transforms": [
+            {
+              "name": "replace",
+              "args": [
+                "no_selection",
+                ""
+              ]
+            }
+          ]
+        }
+      ],
+      "value_maps": {
+        "product_online": {
+          "1": "1",
+          "2": "2"
+        },
+        "visibility": {
+          "1": "Not Visible Individually",
+          "2": "Catalog",
+          "3": "Search",
+          "4": "Catalog, Search"
+        }
+      }
+    }
+  ]
+}

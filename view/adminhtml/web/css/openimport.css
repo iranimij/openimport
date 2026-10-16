@@ -484,3 +484,16 @@ a.openimport-strip-problem {
     margin-bottom: .5rem;
 }
 
+.openimport-preset-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.openimport-preset-list li {
+    margin-bottom: 1rem;
+}
+
+.openimport-preset-description {
+    margin-left: 1rem;
+}

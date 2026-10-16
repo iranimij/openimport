@@ -453,6 +453,18 @@ class ImportRunnerTest extends TestCase
         );
     }
 
+    public function testStepFieldsNeverReachMagento(): void
+    {
+        $outcome = $this->execute($this->profile(['mapping' => [
+            ['target' => 'sku', 'source' => 'sku'],
+            ['target' => 'name', 'source' => 'name'],
+            ['target' => 'configurable:parent_sku', 'source' => 'parent'],
+        ]]), $this->newRun(), $this->file("sku,name,parent\nA-1,One,P\n"));
+
+        self::assertSame(RunInterface::STATUS_SUCCESS, $outcome->status, $outcome->message);
+        self::assertSame(['sku', 'name'], $this->core->columns, 'building configurables is off: the field is dropped');
+    }
+
     public function testDeltaSkipsWhatTheLastRunSent(): void
     {
         $profile = $this->profile(['delta' => true]);

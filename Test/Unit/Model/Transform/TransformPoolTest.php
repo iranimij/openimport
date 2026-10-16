@@ -253,6 +253,23 @@ class TransformPoolTest extends TestCase
         $chain(' x ', ['Qty' => 'many']);
     }
 
+    public function testFillDown(): void
+    {
+        $chain = (new TransformPool())->compile([['name' => 'fill_down', 'args' => ['Handle']]], new TransformScope('name'));
+        self::assertSame('Shirt', $chain('Shirt', ['Handle' => 'shirt']));
+        self::assertSame('Shirt', $chain('', ['Handle' => 'shirt']), 'the row below takes it');
+        self::assertSame('Shirt', $chain(' ', ['Handle' => 'shirt']));
+        self::assertSame('', $chain('', ['Handle' => 'mug']), 'another group starts empty');
+        self::assertSame('Mug', $chain('Mug', ['Handle' => 'mug']));
+        self::assertSame('', $chain('', ['Handle' => 'shirt']), 'only the latest group is remembered');
+
+        $plain = (new TransformPool())->compile(['fill_down'], new TransformScope('name'));
+        self::assertSame('A', $plain('A', []));
+        self::assertSame('A', $plain('', []));
+        $fresh = (new TransformPool())->compile(['fill_down'], new TransformScope('name'));
+        self::assertSame('', $fresh('', []), 'every compile (run) starts empty');
+    }
+
     public function testArgumentsGivenAsAScalar(): void
     {
         self::assertSame('x-1', $this->transform([['name' => 'prefix', 'args' => 'x-']], '1'));

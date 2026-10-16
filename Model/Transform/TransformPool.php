@@ -34,7 +34,8 @@ class TransformPool
     public function __construct(array $providers = [])
     {
         $this->parser = new Parser();
-        $builtIn = [new TextTransforms(), new NumberTransforms(), new DateTransform(), new LookupTransforms()];
+        $builtIn = [new TextTransforms(), new NumberTransforms(), new DateTransform(), new LookupTransforms(),
+            new RowTransforms()];
         foreach (array_merge($builtIn, array_values($providers)) as $provider) {
             foreach ($provider->names() as $name) {
                 $this->byName[strtolower($name)] = $provider;

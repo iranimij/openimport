@@ -24,7 +24,7 @@ class ProfileStub implements ProfileInterface
     public function __construct(private array $data = [])
     {
         $this->json = new JsonField();
-        foreach (['source_config', 'format_options', 'row_filters', 'export_options'] as $key) {
+        foreach (['source_config', 'format_options', 'row_filters', 'export_options', 'import_options'] as $key) {
             if (isset($this->data[$key]) && is_array($this->data[$key])) {
                 $this->data[$key] = $this->json->encode($this->data[$key]);
             }

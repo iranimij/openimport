@@ -41,6 +41,8 @@ class MissingProductsStep extends AbstractRowStep implements PostImportStepInter
 
     private const NAMED = 10;
 
+    private const BEHAVIORS = [ProfileInterface::BEHAVIOR_ADD_UPDATE, ProfileInterface::BEHAVIOR_ONLY_UPDATE];
+
     private string $action = '';
 
     /**
@@ -72,7 +74,7 @@ class MissingProductsStep extends AbstractRowStep implements PostImportStepInter
         $action = (string) ($options[self::OPTION_ACTION] ?? '');
         if ($profile->getEntity() !== 'catalog_product'
             || !in_array($action, [self::ACTION_DISABLE, self::ACTION_OUT_OF_STOCK, self::ACTION_DELETE], true)
-            || !in_array($behavior, [ProfileInterface::BEHAVIOR_ADD_UPDATE, ProfileInterface::BEHAVIOR_ONLY_UPDATE], true)
+            || !in_array($behavior, self::BEHAVIORS, true)
         ) {
             return false;
         }
@@ -192,7 +194,8 @@ class MissingProductsStep extends AbstractRowStep implements PostImportStepInter
         }
         $count = count($skus);
         $message = (string) match (true) {
-            $dryRun && $this->action === self::ACTION_DISABLE => __('%1: would disable %2 (%3).', $this->label(), $count, $names),
+            $dryRun && $this->action === self::ACTION_DISABLE
+                => __('%1: would disable %2 (%3).', $this->label(), $count, $names),
             $dryRun && $this->action === self::ACTION_OUT_OF_STOCK
                 => __('%1: would set %2 out of stock (%3).', $this->label(), $count, $names),
             $dryRun => __('%1: would delete %2 (%3).', $this->label(), $count, $names),

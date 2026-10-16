@@ -98,7 +98,9 @@ class MissingScope
                 $website = null;
             }
             if ($code === '' || $website === null || !$website->getId()) {
-                throw new PipelineException(sprintf('Products missing from the file: there is no website "%s".', $code));
+                throw new PipelineException(
+                    sprintf('Products missing from the file: there is no website "%s".', $code)
+                );
             }
             $collection->addWebsiteFilter([(int) $website->getId()]);
         } elseif ($type === self::ATTRIBUTE) {

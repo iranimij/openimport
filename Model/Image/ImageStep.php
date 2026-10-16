@@ -10,7 +10,7 @@ namespace Iranimij\OpenImport\Model\Image;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
-use Iranimij\OpenImport\Model\Pipeline\Step\RowStepInterface;
+use Iranimij\OpenImport\Model\Pipeline\Step\AbstractRowStep;
 use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
 
 /**
@@ -21,7 +21,7 @@ use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
  * A picture that cannot be read fails its row, or, with the profile option images_on_error = skip, the row is
  * imported without that picture (the run message names them).
  */
-class ImageStep implements RowStepInterface
+class ImageStep extends AbstractRowStep
 {
     public const OPTION_ON_ERROR = 'images_on_error';
     public const ON_ERROR_ERROR = 'error';

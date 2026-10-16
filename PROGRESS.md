@@ -83,7 +83,7 @@ parallelism only across runs and for exports).
 
 | Release | Slices | Status |
 |---|---|---|
-| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | slice 1 in review (PR on `feat/1.3-images`) |
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | 1 done (#44); 2 in review (`feat/1.3-configurables`) |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
@@ -95,10 +95,12 @@ code.
 
 ## Exact next step
 
-1.3 slice 1 (pictures from web addresses) is on `feat/1.3-images`: watch CI and E2E, merge. Then slice 2
-(configurables from simple rows) on `feat/1.3-configurables`: a row step that groups simple rows by a parent key
-column, builds the parent row with `configurable_variations` and `configurable_variation_labels`, and checks that
-the super attributes are global dropdowns in the attribute set.
+1.3 slice 2 (configurables) is on `feat/1.3-configurables`: watch CI, merge, then E2E for it in the dev-env. Then
+slice 3 (products missing from the file: disable, set out of stock or delete products of the profile's scope that a
+full file no longer lists, with the safety limit) on `feat/1.3-missing`.
+
+Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
+`setup:upgrade`); the cloud thread cannot run Warden commands.
 
 ### 1.3 slice 1 · pictures from web addresses (what was built)
 
@@ -118,6 +120,23 @@ the super attributes are global dropdowns in the attribute set.
   PHP's built-in server (`Test/Integration/_files/image-server.php`): download, 304, no request inside the refresh
   time, 404/HTML/WebP errors, skip option, SSRF refusal, file names from var/import/images, housekeeping.
 - Docs `docs/images.md`; changelog Unreleased (Added + Changed: file names now read from `var/import/images`).
+- Merged as #44 (CI green on all seven pairs), E2E dev-env #9 (`pictures.spec.ts`) green.
+- Lesson: Magento's object manager leaves optional constructor arguments at their default (null) unless di.xml sets
+  them; new collaborators must be required arguments.
+
+### 1.3 slice 2 · configurable products from simple rows (what was built)
+
+- Row step hooks grew: `columns()` (add/drop core columns), `observe()` (every valid record, before behaviour and
+  delta), `finish()` (records added after the last batch, which pass behaviour, delta and preview), `AbstractRowStep`
+  with no-op defaults, `StepRecord::absorb()` (a step takes a record over).
+- `Model/Configurable`: `ConfigurableStep` (groups, problems, own parent rows, conflicts, hidden variants, URL keys for
+  new variants), `ParentBuilder` (parent rows, `configurable_variations`, common-prefix name), `ConfigurableAttributes`
+  (global user-defined dropdowns), `UrlKey`; source `ConfigurableAttribute`; mapping targets
+  `configurable:parent_sku` / `configurable:parent_name` (FieldList); form fields in step 5; validator checks.
+- Tests: unit (builder, step, runner with the real step and delta), validator; integration `ConfigurableImportTest`
+  (attributes created by OpenImport's attribute import, parent + links, delta, added variant keeps old links, own
+  parent row, duplicate/empty variants).
+- Docs `docs/configurable.md`.
 
 ## Open questions
 

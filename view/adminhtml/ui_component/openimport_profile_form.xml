@@ -1598,6 +1598,103 @@
                 </select>
             </formElements>
         </field>
+        <field name="configurable" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="36">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Build configurable products</label>
+                <dataScope>import_options.configurable</dataScope>
+                <notice translate="true">Rows with the same "Parent SKU (configurable products)" in step 4 become the variants of one configurable product, which OpenImport creates or updates. A row with product type "configurable" and no parent SKU is that parent's own row.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="configurable_attributes" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="37">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="import_options.configurable" xsi:type="array">
+                            <item name="0" xsi:type="string">1</item>
+                        </item>
+                    </item>
+                    <item name="requiredWhen" xsi:type="array">
+                        <item name="import_options.configurable" xsi:type="array">
+                            <item name="0" xsi:type="string">1</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Variation attributes</label>
+                <dataScope>import_options.configurable_attributes</dataScope>
+                <notice translate="true">The attributes the variants differ in (dropdowns with global scope). Map each of them in step 4. Hold Ctrl or ⌘ to choose several.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\ConfigurableAttribute"/>
+                        <size>6</size>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="configurable_child_visibility" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="38">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="import_options.configurable" xsi:type="array">
+                            <item name="0" xsi:type="string">1</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Variants</label>
+                <dataScope>import_options.configurable_child_visibility</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="hide" xsi:type="array">
+                                <item name="value" xsi:type="string">hide</item>
+                                <item name="label" xsi:type="string" translate="true">Not visible on their own</item>
+                            </option>
+                            <option name="keep" xsi:type="array">
+                                <item name="value" xsi:type="string">keep</item>
+                                <item name="label" xsi:type="string" translate="true">Visibility as mapped</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="delta" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

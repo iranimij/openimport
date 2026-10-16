@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\Profile;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
+use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Execution\Source\FileSelector;
 use Iranimij\OpenImport\Model\Export\DestinationPool;
@@ -111,7 +112,7 @@ class ProfileValidator
             ) {
                 $problems[] = sprintf('%s cannot be imported with "Replace": use Add/Update.', $entity);
             }
-            $problems = array_merge($problems, $this->mapping($profile));
+            $problems = array_merge($problems, $this->mapping($profile), $this->configurable($profile));
         }
         if ($import && $profile->getRowFilters() !== []) {
             try {
@@ -230,6 +231,40 @@ class ProfileValidator
         foreach ($checks as [$label, $value, $allowed]) {
             if (!in_array($value, $allowed, true)) {
                 $problems[] = sprintf('The %s "%s" is not one of %s.', $label, $value, implode(', ', $allowed));
+            }
+        }
+
+        return $problems;
+    }
+
+    /**
+     * "Build configurable products" needs the variation attributes and their columns, and the parent SKU column.
+     *
+     * @param ProfileInterface $profile
+     * @return string[]
+     */
+    private function configurable(ProfileInterface $profile): array
+    {
+        $options = $profile->getImportOptions();
+        if ($profile->getEntity() !== 'catalog_product' || empty($options[ConfigurableStep::OPTION_ENABLED])) {
+            return [];
+        }
+        $targets = array_map(static fn (array $row): string => (string) ($row['target'] ?? ''), $profile->getMapping());
+        $problems = [];
+        if (!in_array(ConfigurableStep::COLUMN_PARENT_SKU, $targets, true)) {
+            $problems[] = 'Map a column to "Parent SKU (configurable products)" in step 4 to build configurable'
+                . ' products.';
+        }
+        $attributes = array_filter(array_map(
+            'trim',
+            explode(',', (string) ($options[ConfigurableStep::OPTION_ATTRIBUTES] ?? ''))
+        ));
+        if ($attributes === []) {
+            $problems[] = 'Choose the variation attributes to build configurable products.';
+        }
+        foreach ($attributes as $attribute) {
+            if (!in_array($attribute, $targets, true)) {
+                $problems[] = sprintf('Map the variation attribute "%s" in step 4.', $attribute);
             }
         }
 

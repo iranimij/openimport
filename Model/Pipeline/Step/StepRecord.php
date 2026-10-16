@@ -20,6 +20,8 @@ class StepRecord
 
     private bool $incomplete = false;
 
+    private bool $absorbed = false;
+
     /**
      * @param int $line source row number
      * @param string $identifier
@@ -61,6 +63,22 @@ class StepRecord
     public function isIncomplete(): bool
     {
         return $this->incomplete;
+    }
+
+    /**
+     * The step takes the record over (a configurable parent row it rebuilds at the end): the record does not go to
+     * core now and is no error.
+     *
+     * @return void
+     */
+    public function absorb(): void
+    {
+        $this->absorbed = true;
+    }
+
+    public function isAbsorbed(): bool
+    {
+        return $this->absorbed;
     }
 
     public function isFailed(): bool

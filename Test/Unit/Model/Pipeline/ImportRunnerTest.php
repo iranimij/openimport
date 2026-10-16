@@ -11,6 +11,8 @@ namespace Iranimij\OpenImport\Test\Unit\Model\Pipeline;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Model\Bridge\ImporterPool;
 use Iranimij\OpenImport\Model\Bridge\RowError;
+use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
+use Iranimij\OpenImport\Model\Configurable\ParentBuilder;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Entity\RecordReaderPool;
 use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
@@ -29,6 +31,9 @@ use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeCoreImporter;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeErrorLog;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeImageFolder;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakePreviewStore;
+use Iranimij\OpenImport\Test\Unit\Model\Configurable\Fake\FakeConfigurableAttributes;
+use Iranimij\OpenImport\Test\Unit\Model\Configurable\Fake\FakeUrlKey;
+use Iranimij\OpenImport\Test\Unit\Model\Image\Fake\FakeImageColumns;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeCascadingRecordReader;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRecordReader;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRowHashStore;
@@ -254,6 +259,51 @@ class ImportRunnerTest extends TestCase
         self::assertArrayNotHasKey('A-2', $preview, 'a failed record is not previewed');
         self::assertSame(['One', 'One'], $preview['A-1']->diff['name'] ?? ['One', 'One'], 'the preview shows mapped values');
         self::assertSame(1, $outcome->counts['errors']);
+    }
+
+    public function testConfigurableParentsComeAfterTheRowsAndFollowTheDelta(): void
+    {
+        $this->steps = new RowStepPool(['configurable' => new ConfigurableStep(
+            new FakeConfigurableAttributes(),
+            new ParentBuilder(),
+            new RecordReaderPool(['catalog_product' => $this->shop]),
+            new FakeImageColumns(),
+            new FakeUrlKey()
+        )]);
+        $profile = $this->profile([
+            'delta' => true,
+            'import_options' => ['configurable' => '1', 'configurable_attributes' => 'color'],
+            'mapping' => [
+                ['target' => 'sku', 'source' => 'sku'],
+                ['target' => 'name', 'source' => 'name'],
+                ['target' => 'color', 'source' => 'color'],
+                ['target' => 'configurable:parent_sku', 'source' => 'parent'],
+            ],
+        ]);
+        $csv = "sku,name,color,parent\nTS-R,Shirt Red,Red,TS\nMUG,Mug,,\nTS-B,Shirt Blue,Blue,TS\n";
+
+        $first = $this->execute($profile, $this->newRun(), $this->file($csv));
+        self::assertSame(RunInterface::STATUS_SUCCESS, $first->status, $first->message);
+        self::assertSame(['sku', 'name', 'color', 'product_type', 'configurable_variations', 'visibility', 'url_key'],
+            $this->core->columns, 'the parent column is not sent; the step adds its columns');
+        self::assertSame(['TS-R', 'MUG', 'TS-B', 'TS'], array_column($this->core->rows, 'sku'), 'the parent comes last');
+        $parent = $this->core->rows[3];
+        self::assertSame(['Shirt', 'configurable', 'sku=TS-R,color=Red|sku=TS-B,color=Blue', 'Catalog, Search'],
+            [$parent['name'], $parent['product_type'], $parent['configurable_variations'], $parent['visibility']]);
+        self::assertSame('Not Visible Individually', $this->core->rows[0]['visibility']);
+        self::assertSame('shirt-red-ts-r', $this->core->rows[0]['url_key']);
+        self::assertSame('', $this->core->rows[1]['url_key'], 'not a variant');
+        self::assertStringEndsWith("\nConfigurable products: 1 built from 2 variants.", $first->message);
+        self::assertCount(4, $this->hashes->hashes[5], 'the parent is remembered too');
+
+        $again = $this->execute($profile, $this->newRun(), $this->file($csv));
+        self::assertSame(4, $again->counts['unchanged'], $again->message);
+        self::assertStringStartsWith('Nothing to import', $again->message);
+
+        // A new variant: it and its parent are sent, the unchanged variants are not (the parent still lists them).
+        $this->execute($profile, $this->newRun(), $this->file($csv . "TS-G,Shirt Green,Green,TS\n"));
+        self::assertSame(['TS-G', 'TS'], array_column($this->core->rows, 'sku'));
+        self::assertSame('sku=TS-R,color=Red|sku=TS-B,color=Blue|sku=TS-G,color=Green', $this->core->rows[1]['configurable_variations']);
     }
 
     public function testDeltaSkipsWhatTheLastRunSent(): void

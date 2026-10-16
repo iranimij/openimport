@@ -84,6 +84,7 @@
         <arguments>
             <argument name="steps" xsi:type="array">
                 <item name="images" xsi:type="object">Iranimij\OpenImport\Model\Image\ImageStep</item>
+                <item name="configurable" xsi:type="object">Iranimij\OpenImport\Model\Configurable\ConfigurableStep</item>
             </argument>
         </arguments>
     </type>

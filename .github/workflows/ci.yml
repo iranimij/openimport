@@ -108,16 +108,8 @@ jobs:
             -e OPENSEARCH_JAVA_OPTS='-Xms512m -Xmx512m' opensearchproject/opensearch:2.12.0
           for i in $(seq 1 60); do curl -fsS 'localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' && break; sleep 3; done
           curl -fsS localhost:9200
-      - name: S3-compatible server (MinIO, for the S3 connection tests)
-        run: |
-          image=RELEASE.2025-04-22T22-12-26Z
-          docker run -d --name s3 -p 9000:9000 -e MINIO_ROOT_USER=openimport -e MINIO_ROOT_PASSWORD=openimport-s3-secret \
-            "minio/minio:$image" server /data \
-            || docker run -d --name s3 -p 9000:9000 -e MINIO_ROOT_USER=openimport -e MINIO_ROOT_PASSWORD=openimport-s3-secret \
-            "quay.io/minio/minio:$image" server /data
-          for i in $(seq 1 30); do curl -fsS localhost:9000/minio/health/live && break; sleep 2; done
-          curl -fsS localhost:9000/minio/health/live
-          echo "OPENIMPORT_TEST_S3=http://127.0.0.1:9000|openimport|openimport-s3-secret" >> "$GITHUB_ENV"
+      - name: S3-compatible server (for the S3 connection tests)
+        run: .github/ci/s3-server.sh
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}

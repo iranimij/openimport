@@ -1566,6 +1566,38 @@
                 </validation>
             </settings>
         </field>
+        <field name="images_on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="35">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">catalog_product</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Pictures that cannot be read</label>
+                <dataScope>import_options.images_on_error</dataScope>
+                <notice translate="true">Pictures given as web addresses are downloaded and kept, so later runs only ask whether they changed. Pictures given as file names are read from var/import/images.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="error" xsi:type="array">
+                                <item name="value" xsi:type="string">error</item>
+                                <item name="label" xsi:type="string" translate="true">Report the row as an error</item>
+                            </option>
+                            <option name="skip" xsi:type="array">
+                                <item name="value" xsi:type="string">skip</item>
+                                <item name="label" xsi:type="string" translate="true">Import the row without the picture</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="delta" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

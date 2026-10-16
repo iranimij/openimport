@@ -20,6 +20,7 @@ use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Pipeline\PreviewBuilder;
 use Iranimij\OpenImport\Model\Pipeline\ProfileCompiler;
 use Iranimij\OpenImport\Model\Pipeline\RunOutcome;
+use Iranimij\OpenImport\Model\Pipeline\Step\RowStepPool;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\PreviewRecord;
 use Iranimij\OpenImport\Model\Transform\TransformPool;
@@ -30,6 +31,7 @@ use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakePreviewStore;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeCascadingRecordReader;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRecordReader;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRowHashStore;
+use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRowStep;
 use Iranimij\OpenImport\Test\Unit\Model\Pipeline\Fake\FakeRunResource;
 use Iranimij\OpenImport\Test\Unit\Model\ProfileStub;
 use Iranimij\OpenImport\Test\Unit\Model\RunStub;
@@ -55,6 +57,8 @@ class ImportRunnerTest extends TestCase
     private ?FakeRecordReader $shop = null;
 
     private ?FakeConfig $config = null;
+
+    private ?RowStepPool $steps = null;
 
     protected function setUp(): void
     {
@@ -97,7 +101,8 @@ class ImportRunnerTest extends TestCase
             $this->hashes,
             $this->runResource,
             $this->config,
-            new PreviewBuilder()
+            new PreviewBuilder(),
+            $this->steps
         );
     }
 
@@ -179,6 +184,72 @@ class ImportRunnerTest extends TestCase
         self::assertSame([], $this->hashes->hashes, 'no delta, no hashes');
         self::assertGreaterThan(0, $heartbeats);
         self::assertNotEmpty($this->runResource->progress);
+    }
+
+    public function testRowStepsChangeWhatReachesCoreAndFailRecords(): void
+    {
+        $step = new FakeRowStep();
+        $this->steps = new RowStepPool(['fake' => $step, 'off' => new FakeRowStep(false)]);
+        $profile = $this->profile(['delta' => true, 'on_error' => 'skip', 'allowed_errors' => 5]);
+        $heartbeats = 0;
+        $outcome = $this->runner()->run(
+            $profile,
+            $this->newRun(),
+            $this->file("sku,name,name_de,price\nA-1,One,Eins,10\nA-2,bad,,20\nA-3,half,,30\n"),
+            $this->folder,
+            'steps.csv',
+            static function () use (&$heartbeats): void {
+                $heartbeats++;
+            }
+        );
+
+        self::assertSame('add_update', $step->began);
+        self::assertSame(['A-1', 'A-2', 'A-3'], $step->seen);
+        self::assertSame(
+            [
+                ['sku' => 'A-1', 'name' => 'ONE', 'price' => '10', 'store_view_code' => ''],
+                ['sku' => 'A-1', 'name' => 'EINS', 'price' => '', 'store_view_code' => 'de'],
+                ['sku' => 'A-3', 'name' => 'HALF', 'price' => '30', 'store_view_code' => ''],
+            ],
+            $this->core->rows,
+            'step changes reach core; the failed record does not'
+        );
+        self::assertSame(RunInterface::STATUS_PARTIAL, $outcome->status, $outcome->message);
+        self::assertSame(1, $outcome->counts['errors']);
+        $error = $this->errors->stored[0];
+        self::assertSame([3, 'Bad name', 'A-2', 'name'], [$error->sourceRow, $error->message, $error->identifier, $error->field]);
+        self::assertSame('bad', $error->sourceData['name'] ?? null, 'the error report keeps the source row');
+        self::assertStringEndsWith("\nFake step: 3 seen.", $outcome->message);
+        self::assertGreaterThan(0, $heartbeats);
+        self::assertSame('', $this->core->lastRequest()->imagesDirectory, 'no images folder without one');
+        // Only the complete record is remembered: the failed and the incomplete one are tried again next time.
+        self::assertCount(1, $this->hashes->hashes[5]);
+
+        $again = $this->execute($profile, $this->newRun(), $this->file("sku,name,name_de,price\nA-1,One,Eins,10\nA-2,bad,,20\nA-3,half,,30\n"));
+        self::assertSame(1, $again->counts['unchanged']);
+        self::assertSame(['A-1', 'A-2', 'A-3', 'A-2', 'A-3'], $step->seen);
+    }
+
+    public function testRowStepsSeeNothingSkippedAndDryRunsPreviewMappedValues(): void
+    {
+        $step = new FakeRowStep();
+        $this->steps = new RowStepPool(['fake' => $step]);
+        $outcome = $this->execute(
+            $this->profile(['behavior' => 'only_update', 'on_error' => 'skip', 'allowed_errors' => 5]),
+            $this->newRun(RunInterface::MODE_DRY_RUN),
+            $this->file("sku,name,name_de,price\nA-1,One,,10\nA-9,New,,5\nA-2,bad,,20\n")
+        );
+
+        self::assertSame('only_update dry', $step->began);
+        self::assertSame(['A-1', 'A-2'], $step->seen, 'A-9 was skipped by the behaviour before the steps');
+        self::assertSame([['sku' => 'A-1', 'name' => 'ONE', 'price' => '10', 'store_view_code' => '']], $this->core->rows);
+        $preview = [];
+        foreach ($this->preview->stored as $record) {
+            $preview[$record->identifier] = $record;
+        }
+        self::assertArrayNotHasKey('A-2', $preview, 'a failed record is not previewed');
+        self::assertSame(['One', 'One'], $preview['A-1']->diff['name'] ?? ['One', 'One'], 'the preview shows mapped values');
+        self::assertSame(1, $outcome->counts['errors']);
     }
 
     public function testDeltaSkipsWhatTheLastRunSent(): void

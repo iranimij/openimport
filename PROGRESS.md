@@ -76,11 +76,14 @@ delete branches), repository settings (squash only, delete branch on merge,
 ## Plan 1.3–1.6 (every feature of the paid modules)
 
 Written 2026-10-16 on Iman's request; Notion "15 · Plan 1.3–1.6 · every feature of the paid modules"
-(https://app.notion.com/p/3fb563c039fc811082f5e481e52fe233). Status: **waiting for Iman's go**, no code yet.
+(https://app.notion.com/p/3fb563c039fc811082f5e481e52fe233). Status: **approved 2026-10-16** ("go"), all eight
+recommendations in §6 accepted (order import as historic as-is, shared connections, no new Composer packages,
+merchants register their own OAuth apps, mocks in CI + optional nightly live tests, undo only for update runs,
+parallelism only across runs and for exports).
 
 | Release | Slices | Status |
 |---|---|---|
-| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | not started |
+| 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | slice 1 in review (PR on `feat/1.3-images`) |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | not started |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
@@ -92,8 +95,29 @@ code.
 
 ## Exact next step
 
-Wait for Iman's answers to the eight decisions in the plan (§6). After "go": 1.3 slice 1 (images from URLs) on branch
-`feat/1.3-images`.
+1.3 slice 1 (pictures from web addresses) is on `feat/1.3-images`: watch CI and E2E, merge. Then slice 2
+(configurables from simple rows) on `feat/1.3-configurables`: a row step that groups simple rows by a parent key
+column, builds the parent row with `configurable_variations` and `configurable_variation_labels`, and checks that
+the super attributes are global dropdowns in the attribute set.
+
+### 1.3 slice 1 · pictures from web addresses (what was built)
+
+- `Model/Http/SafeDownloader` (+ `DownloadResult`): the URL source's safe download, now shared: SSRF guard on every
+  hop, pinned address, size cap, timeout, conditional requests (304).
+- Row steps: `Model/Pipeline/Step/RowStepInterface`, `RowStepPool` (di.xml), `StepRecord`. `ImportRunner::flush()`
+  runs them after behaviour and delta; failed records become row errors (with the source row), incomplete records keep
+  no delta hash, step summaries end the run message.
+- `Model/Image`: `ImageStep` (columns from `ImageColumns`, custom media_image attributes included), `ImageFetcher`
+  (per-run memo, cache freshness, conditional requests, earlier file when the server is away), `ImageSniffer`
+  (JPG/PNG/GIF by magic bytes; WebP/AVIF/SVG/HTML refused with reasons), `ImageName`
+  (`openimport/<2>/<8>/<name>.<ext>` from the content SHA-1), `ImageCache` (table `openimport_image`),
+  `ImageFolder` (core's import images folder; product runs pass it to core as `import_images_file_dir`).
+- Profile column `import_options` (JSON) with `images_on_error` (error | skip); form field in step 5 for products.
+- Config group `openimport/images` (refresh_hours 24, max_mb 10, timeout 30, keep_days 30); housekeeping prunes.
+- Tests: unit (sniffer, names, freshness, step, runner with a fake step, pool); integration `ImageImportTest` with
+  PHP's built-in server (`Test/Integration/_files/image-server.php`): download, 304, no request inside the refresh
+  time, 404/HTML/WebP errors, skip option, SSRF refusal, file names from var/import/images, housekeeping.
+- Docs `docs/images.md`; changelog Unreleased (Added + Changed: file names now read from `var/import/images`).
 
 ## Open questions
 

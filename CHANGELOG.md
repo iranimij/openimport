@@ -5,6 +5,19 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Product pictures from web addresses: OpenImport downloads them itself (SSRF check on every redirect, JPG/PNG/GIF
+  checked by their first bytes, size and time limits), keeps them in `var/import/images/openimport` and asks the
+  server with ETag/Last-Modified before downloading again. Profile option *Pictures that cannot be read*: report the
+  row or import it without the picture. Settings under *Pictures from web addresses*; housekeeping removes pictures
+  no run used for 30 days. See [Product pictures](https://iranimij.github.io/openimport/images/).
+- Row steps (`RowStepInterface`): a seam between mapping and Magento's import for steps that work on batches of
+  mapped records; pictures are the first one.
+
+### Changed
+- Product pictures given as file names are read from `var/import/images` (as in Magento's own import), not from
+  `pub/media/import`.
+
 ## [1.2.0] - 2026-10-15
 
 The admin, reworked from the second hands-on review (design items D1–D15, product items P1–P10).

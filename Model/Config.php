@@ -24,6 +24,10 @@ class Config
     public const XML_FORMULA_GUARD = 'openimport/security/formula_guard';
     public const XML_SAFETY_THRESHOLD = 'openimport/security/safety_threshold_percent';
     public const XML_EMAIL_IDENTITY = 'openimport/general/email_identity';
+    public const XML_IMAGE_REFRESH_HOURS = 'openimport/images/refresh_hours';
+    public const XML_IMAGE_MAX_MB = 'openimport/images/max_mb';
+    public const XML_IMAGE_TIMEOUT = 'openimport/images/timeout';
+    public const XML_IMAGE_KEEP_DAYS = 'openimport/images/keep_days';
 
     /**
      * @param TypedReader $reader
@@ -115,6 +119,46 @@ class Config
     public function getSafetyThresholdPercent(): int
     {
         return min(100, max(1, $this->int(self::XML_SAFETY_THRESHOLD, 10)));
+    }
+
+    /**
+     * Hours a downloaded picture is trusted before its address is asked again whether it changed (0 = every run).
+     *
+     * @return int
+     */
+    public function getImageRefreshHours(): int
+    {
+        return max(0, $this->int(self::XML_IMAGE_REFRESH_HOURS, 24));
+    }
+
+    /**
+     * Largest picture a run downloads, in bytes (1–100 MB).
+     *
+     * @return int
+     */
+    public function getImageMaxBytes(): int
+    {
+        return min(100, max(1, $this->int(self::XML_IMAGE_MAX_MB, 10))) * 1048576;
+    }
+
+    /**
+     * Seconds one picture download may take (5–300).
+     *
+     * @return int
+     */
+    public function getImageTimeout(): int
+    {
+        return min(300, max(5, $this->int(self::XML_IMAGE_TIMEOUT, 30)));
+    }
+
+    /**
+     * Days a downloaded picture no run used stays in the picture cache (at least 1).
+     *
+     * @return int
+     */
+    public function getImageKeepDays(): int
+    {
+        return max(1, $this->int(self::XML_IMAGE_KEEP_DAYS, 30));
     }
 
     /**

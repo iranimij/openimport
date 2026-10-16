@@ -21,6 +21,7 @@
             "notify_emails": true,
             "row_filters": true,
             "export_options": true,
+            "import_options": true,
             "created_by": true,
             "created_at": true,
             "updated_at": true
@@ -182,6 +183,24 @@
         "constraint": {
             "PRIMARY": true,
             "OPENIMPORT_EXPORT_MARK_PROFILE_ID_OPENIMPORT_PROFILE_PROFILE_ID": true
+        }
+    },
+    "openimport_image": {
+        "column": {
+            "url_hash": true,
+            "url": true,
+            "file": true,
+            "etag": true,
+            "last_modified": true,
+            "bytes": true,
+            "checked_at": true,
+            "used_at": true
+        },
+        "index": {
+            "OPENIMPORT_IMAGE_USED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true
         }
     }
 }

@@ -25,7 +25,8 @@ class ProfileJson
 
     private const FIELDS = ['name', 'direction', 'entity', 'is_active', 'source_type', 'source_config', 'format',
         'format_options', 'behavior', 'on_error', 'allowed_errors', 'delta', 'safety_threshold', 'schedule',
-        'after_success', 'notify', 'notify_emails', 'row_filters', 'export_options', 'mapping', 'value_maps'];
+        'after_success', 'notify', 'notify_emails', 'row_filters', 'export_options', 'import_options', 'mapping',
+        'value_maps'];
 
     /**
      * @param ProfileRepositoryInterface $profiles
@@ -84,6 +85,7 @@ class ProfileJson
             'notify_emails' => $profile->getNotifyEmails(),
             'row_filters' => $profile->getRowFilters(),
             'export_options' => $this->secrets->strip($profile->getExportOptions()),
+            'import_options' => $profile->getImportOptions(),
             'mapping' => $profile->getMapping(),
             'value_maps' => $profile->getValueMaps(),
         ];
@@ -200,6 +202,7 @@ class ProfileJson
             ->setNotifyEmails($text('notify_emails', ''))
             ->setRowFilters($list('row_filters'))
             ->setExportOptions($export)
+            ->setImportOptions($list('import_options'))
             ->setMapping($list('mapping'))
             ->setValueMaps($list('value_maps'));
     }

@@ -369,6 +369,22 @@ class ProfileStub implements ProfileInterface
     /**
      * @inheritDoc
      */
+    public function getImportOptions(): array
+    {
+        return $this->json->decode($this->get(self::IMPORT_OPTIONS));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setImportOptions(array $options): ProfileInterface
+    {
+        return $this->set(self::IMPORT_OPTIONS, $this->json->encode($options));
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getMapping(): array
     {
         $mapping = $this->get(self::MAPPING);

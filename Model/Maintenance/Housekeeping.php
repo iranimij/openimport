@@ -12,6 +12,8 @@ use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Model\Admin\UploadStore;
 use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\Execution\RunFiles;
+use Iranimij\OpenImport\Model\Image\ImageCache;
+use Iranimij\OpenImport\Model\Image\ImageFolder;
 use Iranimij\OpenImport\Model\JsonField;
 use Iranimij\OpenImport\Model\Storage\LockManager;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -23,7 +25,8 @@ use Magento\Framework\Filesystem;
  * - run folders of runs finished more than "keep run files for" days ago are removed (the run rows stay);
  * - uploaded files no profile uses any more are removed after two days;
  * - one-time schedule records older than two days are removed;
- * - runs still marked "running" whose process no longer holds their lock are marked failed.
+ * - runs still marked "running" whose process no longer holds their lock are marked failed;
+ * - downloaded pictures no run used for "keep unused pictures" days leave the picture cache (catalog copies stay).
  */
 class Housekeeping
 {
@@ -36,13 +39,17 @@ class Housekeeping
      * @param Config $config
      * @param LockManager $locks
      * @param JsonField $json
+     * @param ImageCache $images
+     * @param ImageFolder $imageFolder
      */
     public function __construct(
         private readonly ResourceConnection $resource,
         private readonly Filesystem $filesystem,
         private readonly Config $config,
         private readonly LockManager $locks,
-        private readonly JsonField $json
+        private readonly JsonField $json,
+        private readonly ImageCache $images,
+        private readonly ImageFolder $imageFolder
     ) {
     }
 
@@ -59,6 +66,7 @@ class Housekeeping
             'uploads' => $this->uploads($now->modify(sprintf('-%d days', self::UPLOAD_DAYS))),
             'schedule_records' => $this->locks->purge('schedule:', $now->modify(sprintf('-%d days', self::UPLOAD_DAYS))),
             'stale_runs' => $this->staleRuns($now->modify(sprintf('-%d minutes', self::STALE_RUN_MINUTES))),
+            'pictures' => $this->pictures($now->modify(sprintf('-%d days', $this->config->getImageKeepDays()))),
         ];
     }
 
@@ -112,6 +120,19 @@ class Housekeeping
             $stat = $directory->stat($path);
             if (!isset($used[$name]) && (int) ($stat['mtime'] ?? 0) < $before->getTimestamp()) {
                 $directory->delete($path);
+                $removed++;
+            }
+        }
+
+        return $removed;
+    }
+
+    private function pictures(\DateTimeImmutable $before): int
+    {
+        $removed = 0;
+        foreach ($this->images->prune($before) as $file) {
+            if (!$this->images->isUsed($file) && $this->imageFolder->exists($file)) {
+                $this->imageFolder->delete($file);
                 $removed++;
             }
         }

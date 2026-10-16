@@ -19,8 +19,12 @@ use Iranimij\OpenImport\Model\Entity\RecordReaderInterface;
 use Iranimij\OpenImport\Model\Entity\RecordReaderPool;
 use Iranimij\OpenImport\Model\Filter\FilterException;
 use Iranimij\OpenImport\Model\Filter\RowFilter;
+use Iranimij\OpenImport\Model\Image\ImageFolder;
 use Iranimij\OpenImport\Model\Mapping\CompiledMapping;
 use Iranimij\OpenImport\Model\Mapping\MappedRow;
+use Iranimij\OpenImport\Model\Pipeline\Step\RowStepInterface;
+use Iranimij\OpenImport\Model\Pipeline\Step\RowStepPool;
+use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\ResourceModel\Run as RunResource;
@@ -33,7 +37,8 @@ use Iranimij\OpenImport\Model\Storage\RowHashStore;
 use Magento\ImportExport\Model\Import;
 
 /**
- * Runs one import: read → filter → map → behaviour → delta → (preview) → core validate/import → errors, hashes.
+ * Runs one import: read → filter → map → behaviour → delta → row steps (pictures, …) → (preview) → core
+ * validate/import → errors, hashes.
  *
  * Memory stays flat: rows are handled in batches and the prepared core rows go to a spool file in the run folder.
  * The caller (RunProcessor) stages the file, holds the locks and saves the run row.
@@ -135,6 +140,10 @@ class ImportRunner
 
     private bool $existingOnly = false;
 
+    /**
+     * @var RowStepInterface[] the row steps taking part in this run
+     */
+    private array $steps = [];
 
     /**
      * @param ReaderFactory $readerFactory
@@ -147,6 +156,8 @@ class ImportRunner
      * @param RunResource $runResource
      * @param Config $config
      * @param PreviewBuilder $previewBuilder
+     * @param RowStepPool|null $rowSteps
+     * @param ImageFolder|null $imageFolder product runs read pictures from it
      */
     public function __construct(
         private readonly ReaderFactory $readerFactory,
@@ -158,7 +169,9 @@ class ImportRunner
         private readonly RowHashStore $rowHashes,
         private readonly RunResource $runResource,
         private readonly Config $config,
-        private readonly PreviewBuilder $previewBuilder
+        private readonly PreviewBuilder $previewBuilder,
+        private readonly ?RowStepPool $rowSteps = null,
+        private readonly ?ImageFolder $imageFolder = null
     ) {
     }
 
@@ -202,6 +215,7 @@ class ImportRunner
         }
         [$mapping, $entity] = $this->profileCompiler->mapping($profile, $strictColumns);
         $behavior = $this->behavior($profile, $entity);
+        $this->steps = $this->rowSteps?->begin($profile, $behavior, $dryRun) ?? [];
         $useDelta = $profile->isDelta() && empty($options['full']) && in_array($behavior, self::DELTA_BEHAVIORS, true);
         $filter = $this->profileCompiler->filter($profile, $strictColumns);
         $recordReader = $this->recordReaders->get($profile->getEntity());
@@ -277,6 +291,7 @@ class ImportRunner
         $this->affectedIdentifiers = [];
         $this->skippedNames = [];
         $this->firstError = null;
+        $this->steps = [];
     }
 
     /**
@@ -373,11 +388,12 @@ class ImportRunner
                 $this->existingAffected++;
                 $this->affectedIdentifiers[] = $mapped->identifier;
             }
-            $accepted[] = [$line, $mapped, $exists];
+            $accepted[$index] = [$line, $mapped, $exists];
         }
+        $stepRows = $this->applySteps($batch, $accepted, $deltaKeys);
         $fill = $this->existingOnly && $reader !== null ? $this->currentRequired($accepted, $reader, $mapping) : [];
-        foreach ($accepted as [$line, $mapped]) {
-            foreach ($mapped->rows as $index => $row) {
+        foreach ($accepted as $item => [$line, $mapped]) {
+            foreach ($stepRows[$item] ?? $mapped->rows as $index => $row) {
                 if ($index === 0 && isset($fill[mb_strtolower($mapped->identifier)])) {
                     $row = array_merge($row, $fill[mb_strtolower($mapped->identifier)]);
                 }
@@ -387,6 +403,56 @@ class ImportRunner
         if ($dryRun && $accepted !== []) {
             $this->preview($accepted, $behavior, $reader, $mapping);
         }
+    }
+
+    /**
+     * Row steps (pictures, …) for the accepted records of a batch. Records a step fails become row errors and leave
+     * $accepted; records a step left incomplete keep no delta hash.
+     *
+     * @param array<int, array{0: int, 1: MappedRow, 2: array<string, string>}> $batch
+     * @param array<int, array{0: int, 1: MappedRow, 2: bool}> $accepted by batch index; failed records are removed
+     * @param array<int, string> $deltaKeys by batch index
+     * @return array<int, array<int, array<string, string>>> the core rows by batch index
+     */
+    private function applySteps(array $batch, array &$accepted, array $deltaKeys): array
+    {
+        if ($this->steps === [] || $accepted === []) {
+            return [];
+        }
+        $records = [];
+        foreach ($accepted as $index => [$line, $mapped]) {
+            $records[$index] = new StepRecord($line, $mapped->identifier, $mapped->rows);
+        }
+        $tick = function (): void {
+            // Nothing is written to the shop while steps run: a cancelled run may stop here.
+            $this->progress(true);
+        };
+        foreach ($this->steps as $step) {
+            $open = array_filter($records, static fn (StepRecord $record): bool => !$record->isFailed());
+            if ($open !== []) {
+                $step->apply($open, $tick);
+            }
+        }
+        $rows = [];
+        foreach ($records as $index => $record) {
+            if ($record->isFailed() || $record->isIncomplete()) {
+                unset($this->pendingHashes[$deltaKeys[$index] ?? '']);
+            }
+            if ($record->isFailed()) {
+                $this->error(new ErrorRecord(
+                    $record->line,
+                    $record->error(),
+                    $record->identifier,
+                    $record->errorColumn(),
+                    $batch[$index][2]
+                ));
+                unset($accepted[$index]);
+                continue;
+            }
+            $rows[$index] = $record->rows;
+        }
+
+        return $rows;
     }
 
     /**
@@ -576,6 +642,8 @@ class ImportRunner
             $dryRun,
             $skipErrors,
             max(0, $allowed - $ownErrors),
+            imagesDirectory: $entity->importEntity() === 'catalog_product' && $this->imageFolder !== null
+                ? $this->imageFolder->absoluteBase() : '',
             historyLabel: sprintf('openimport-run-%d.csv', $this->runId)
         );
         $result = $this->importers->get($entity->importEntity())->run(
@@ -771,6 +839,13 @@ class ImportRunner
                 . ($this->counts['skipped'] > count($this->skippedNames)
                     ? ' ' . __('and %1 more', $this->counts['skipped'] - count($this->skippedNames)) : '')
             );
+        }
+
+        foreach ($this->steps as $step) {
+            $summary = $step->summary();
+            if ($summary !== '') {
+                $message .= "\n" . $summary;
+            }
         }
 
         return new RunOutcome($status, $this->counts, $message, $historyId);

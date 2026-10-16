@@ -24,7 +24,8 @@ class ImportRequest
      * @param int $allowedErrors errors tolerated before the whole import is refused
      * @param string $multipleValueSeparator separator of multi-value cells (categories, websites, …)
      * @param string $emptyValueConstant cell value that clears an attribute
-     * @param string $imagesDirectory images folder relative to var/import/images ('' = core default)
+     * @param string $imagesDirectory folder core reads pictures from: absolute, or relative to the Magento root
+     *                                ('' = core's default, pub/media/import)
      * @param string $historyLabel name shown in core's System › Data Transfer › Import History
      */
     public function __construct(

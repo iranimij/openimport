@@ -21,6 +21,12 @@
                 <formula_guard>1</formula_guard>
                 <safety_threshold_percent>10</safety_threshold_percent>
             </security>
+            <images>
+                <refresh_hours>24</refresh_hours>
+                <max_mb>10</max_mb>
+                <timeout>30</timeout>
+                <keep_days>30</keep_days>
+            </images>
         </openimport>
     </default>
 </config>

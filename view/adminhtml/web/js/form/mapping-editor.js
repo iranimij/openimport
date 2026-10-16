@@ -71,6 +71,11 @@ define([
     }
 
     return Abstract.extend({
+        /**
+         * Braces in a template attribute confuse Magento's binding syntax, so the example lives here.
+         */
+        whenPlaceholder: $t('Only when, e.g. {Brand} = \'Acme\''),
+
         defaults: {
             template: 'Iranimij_OpenImport/form/mapping-editor',
             fieldsUrl: '',

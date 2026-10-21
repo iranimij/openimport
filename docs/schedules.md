@@ -52,6 +52,23 @@ Each due minute fires once, even when:
 Two runs of one profile never run at the same time, and two live imports of the same entity never run at the same
 time (products and Stock & prices share the product entity).
 
+## Job chains
+
+Since 1.6. Step 6 of a profile, **Then run**: the profile that runs after this one, as a live run of its own with
+this run as its parent (the run grid shows *Job chain* as the start). A nightly chain is one schedule: the first
+profile has the schedule, every next one has none.
+
+- **When**: *Only after a successful run* (success or partial — the next step gets the data it expects) or
+  *Always, even after a failed run* (cleanup or a report that must run regardless). A cancelled run starts
+  nothing; a dry run never does.
+- The next profile runs with its own settings. A live run under the safety limit stops at *needs confirmation*
+  as always, which also holds the rest of the chain until an admin confirms it.
+- Saving refuses a chain that comes back to a profile (*The chain would loop: A → B → A*), a profile that runs
+  itself, a next profile that reads uploaded files (nothing would be there to read), and more than 20 links.
+- The run page says what happened next: *Then: "Stock update" queued as run 512*, or why nothing started.
+- Profiles exported as JSON carry the chain by profile name; an import links the profiles of the file to each
+  other once they are saved.
+
 ## Housekeeping
 
 - Run files (the uploaded or fetched source, prepared rows, output) are removed after "Keep run files for" days

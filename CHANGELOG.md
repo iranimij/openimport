@@ -5,6 +5,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Job chains: *Then run* in step 6 of a profile runs another profile after this one (after success, or always),
+  as a live run with the parent run recorded and *Job chain* as the start; loops, self-links and next profiles
+  that read uploaded files are refused at save; profile JSON carries the chain by name. See
+  [Schedules › Job chains](https://iranimij.github.io/openimport/schedules/#job-chains).
+
 ## [1.5.0] - 2026-10-21
 
 Sales and marketing entities: orders, shipments, URL rewrites, price rules and coupons, reviews, newsletter,

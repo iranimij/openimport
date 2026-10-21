@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Model\Execution;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
+use Iranimij\OpenImport\Model\Chain\ChainStarter;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
 use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
@@ -47,6 +48,7 @@ class RunProcessor
      * @param FileBatch $fileBatch
      * @param Unpacker $unpacker
      * @param XsltStep $xslt
+     * @param ChainStarter $chains
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -62,7 +64,8 @@ class RunProcessor
         private readonly EntityRegistry $entities,
         private readonly FileBatch $fileBatch,
         private readonly Unpacker $unpacker,
-        private readonly XsltStep $xslt
+        private readonly XsltStep $xslt,
+        private readonly ChainStarter $chains
     ) {
     }
 
@@ -136,6 +139,11 @@ class RunProcessor
         $finished = $this->finish($runId, $outcome);
         if ($profile !== null) {
             $this->fileBatch->stopAfterFailure($profile, $finished);
+            $then = $this->chains->after($profile, $finished);
+            if ($then !== '') {
+                $finished->setMessage(rtrim((string) $finished->getMessage()) . "\n" . $then);
+                $finished = $this->runRepository->save($finished);
+            }
             $this->mailer->send($profile, $finished);
         }
 

@@ -14,6 +14,7 @@ use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
 use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
 use Iranimij\OpenImport\Model\Profile\EntityCodes;
+use Iranimij\OpenImport\Model\Chain\ChainLinks;
 use Iranimij\OpenImport\Model\Profile\ProfileValidator;
 use Iranimij\OpenImport\Model\Transform\TransformPool;
 use Iranimij\OpenImport\Test\Unit\Model\ProfileStub;
@@ -62,7 +63,18 @@ class ProfileValidatorTest extends TestCase
                 ]),
                 new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3'])
             ),
-            new XsltStep(new File())
+            new XsltStep(new File()),
+            new class extends ChainLinks {
+                // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock
+                public function __construct()
+                {
+                }
+
+                public function profile(int $profileId): ?array
+                {
+                    return null;
+                }
+            }
         );
     }
 

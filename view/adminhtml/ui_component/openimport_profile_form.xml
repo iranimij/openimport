@@ -3088,6 +3088,45 @@
                 <notice translate="true">Comma-separated. Empty = the admin who created the profile.</notice>
             </settings>
         </field>
+        <field name="then_profile_id" formElement="select" sortOrder="70">
+            <settings>
+                <label translate="true">Then run</label>
+                <dataScope>then_profile_id</dataScope>
+                <notice translate="true">Job chain: the profile that runs after this one (as a live run, with this run as its parent). Not after dry runs. A profile cannot run again in the same chain.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\ThenProfile"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="then_when" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="75">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="then_profile_id" xsi:type="array">
+                            <item name="not" xsi:type="array">
+                                <item name="0" xsi:type="string"></item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">When</label>
+                <dataScope>then_when</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\ThenWhen"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="after_success" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="60">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

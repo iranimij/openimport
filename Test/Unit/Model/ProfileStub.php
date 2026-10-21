@@ -49,6 +49,16 @@ class ProfileStub implements ProfileInterface
     }
 
     /**
+     * Test helper: what a repository save would give a new profile.
+     */
+    public function assignId(int $id): self
+    {
+        $this->set(self::PROFILE_ID, $id);
+
+        return $this;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getProfileId(): ?int

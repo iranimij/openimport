@@ -86,7 +86,7 @@ class ChainTest extends TestCase
         return Bootstrap::getObjectManager()->get(RunProcessor::class)->process((int) $run->getRunId());
     }
 
-    private function run(int $runId): RunInterface
+    private function runOf(int $runId): RunInterface
     {
         return Bootstrap::getObjectManager()->get(RunRepositoryInterface::class)->getById($runId);
     }
@@ -111,7 +111,7 @@ class ChainTest extends TestCase
         self::assertSame(RunInterface::STATUS_SUCCESS, $first->getStatus(), $first->getMessage());
         self::assertStringContainsString("Then: \"Chain B $tag\" queued as run", (string) $first->getMessage());
         $secondId = $this->queuedRunOf((string) $first->getMessage());
-        $second = $this->run($secondId);
+        $second = $this->runOf($secondId);
         self::assertSame([RunInterface::STATUS_QUEUED, RunInterface::TRIGGER_CHAIN, RunInterface::MODE_LIVE], [
             $second->getStatus(), $second->getTrigger(), $second->getMode(),
         ]);
@@ -122,7 +122,7 @@ class ChainTest extends TestCase
         $second = Bootstrap::getObjectManager()->get(RunProcessor::class)->process($secondId);
         self::assertSame(RunInterface::STATUS_SUCCESS, $second->getStatus(), $second->getMessage());
         $thirdId = $this->queuedRunOf((string) $second->getMessage());
-        $third = $this->run($thirdId);
+        $third = $this->runOf($thirdId);
         self::assertSame([(int) $a->getProfileId(), (int) $b->getProfileId()], $third->getOptions()[ChainStarter::OPTION_CHAIN]);
         $third = Bootstrap::getObjectManager()->get(RunProcessor::class)->process($thirdId);
         self::assertSame(RunInterface::STATUS_SUCCESS, $third->getStatus(), $third->getMessage());
@@ -156,7 +156,7 @@ class ChainTest extends TestCase
         $failing = $this->repository()->save($failing->setThenWhen(ProfileInterface::THEN_ALWAYS));
         $run = $this->process($failing);
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
-        $queued = $this->run($this->queuedRunOf((string) $run->getMessage()));
+        $queued = $this->runOf($this->queuedRunOf((string) $run->getMessage()));
         self::assertSame((int) $next->getProfileId(), $queued->getProfileId());
     }
 

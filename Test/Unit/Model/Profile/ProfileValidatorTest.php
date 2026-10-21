@@ -14,7 +14,6 @@ use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
 use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
 use Iranimij\OpenImport\Model\Profile\EntityCodes;
-use Iranimij\OpenImport\Model\Chain\ChainLinks;
 use Iranimij\OpenImport\Model\Profile\ProfileValidator;
 use Iranimij\OpenImport\Model\Transform\TransformPool;
 use Iranimij\OpenImport\Test\Unit\Model\ProfileStub;
@@ -32,6 +31,13 @@ use PHPUnit\Framework\TestCase;
 
 class ProfileValidatorTest extends TestCase
 {
+    private FakeChainLinks $chains;
+
+    protected function setUp(): void
+    {
+        $this->chains = new FakeChainLinks();
+    }
+
     private function validator(): ProfileValidator
     {
         $codes = new class extends EntityCodes {
@@ -64,17 +70,7 @@ class ProfileValidatorTest extends TestCase
                 new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3'])
             ),
             new XsltStep(new File()),
-            new class extends ChainLinks {
-                // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock
-                public function __construct()
-                {
-                }
-
-                public function profile(int $profileId): ?array
-                {
-                    return null;
-                }
-            }
+            $this->chains
         );
     }
 
@@ -405,5 +401,40 @@ class ProfileValidatorTest extends TestCase
         }
         $replace = $this->validator()->validate(new ProfileStub(['behavior' => 'replace'] + $base));
         self::assertContains('openimport_shipment cannot be imported with "Replace": use Add/Update.', $replace);
+    }
+
+    public function testJobChainsAreCheckedAtSave(): void
+    {
+        $this->chains = new FakeChainLinks([
+            1 => ['name' => 'Nightly stock', 'then' => 2],
+            2 => ['name' => 'Stock report', 'then' => 3],
+            3 => ['name' => 'Cleanup', 'then' => null],
+            4 => ['name' => 'Upload import', 'direction' => 'import', 'source_type' => 'upload'],
+        ]);
+        $own = $this->valid() + ['profile_id' => 1];
+
+        self::assertSame([], $this->validator()->validate(new ProfileStub($own + ['then_profile_id' => 2])));
+        self::assertSame(
+            ['A profile cannot run itself afterwards.'],
+            $this->validator()->validate(new ProfileStub($own + ['then_profile_id' => 1]))
+        );
+        self::assertSame(
+            ['There is no profile with id 9 to run afterwards.'],
+            $this->validator()->validate(new ProfileStub($own + ['then_profile_id' => 9]))
+        );
+        self::assertSame(
+            ['"Upload import" reads an uploaded file, so it cannot run afterwards: give it a server folder, web address, '
+                . 'SFTP, FTP or cloud source.'],
+            $this->validator()->validate(new ProfileStub($own + ['then_profile_id' => 4]))
+        );
+        // Cleanup (3) would run Nightly stock (1) again: 3 → 1 → 2 → 3.
+        $cleanup = $this->valid() + ['profile_id' => 3, 'name' => 'Cleanup', 'then_profile_id' => 1];
+        self::assertSame(
+            ['The chain would loop: Cleanup → Nightly stock → Stock report → Cleanup. '
+                . 'A profile cannot run again in the same chain.'],
+            $this->validator()->validate(new ProfileStub($cleanup))
+        );
+        // A new profile (no id yet) may point at any chain: nothing can loop back to it.
+        self::assertSame([], $this->validator()->validate(new ProfileStub($this->valid() + ['then_profile_id' => 3])));
     }
 }

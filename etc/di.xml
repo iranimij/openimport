@@ -98,6 +98,49 @@
             <argument name="kind" xsi:type="string">catalog</argument>
         </arguments>
     </virtualType>
+    <virtualType name="OpenImportReviewReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\ReviewSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="product_sku" xsi:type="string">product_sku</item>
+                <item name="nickname" xsi:type="string">nickname</item>
+                <item name="title" xsi:type="string">title</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportNewsletterReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\NewsletterSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="email" xsi:type="string">email</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportSearchTermReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SearchTermSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="query_text" xsi:type="string">query_text</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportSynonymReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SynonymSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="synonyms" xsi:type="string">synonyms</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCategoryPositionReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\CategoryPositionSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="category_path" xsi:type="string">category_path</item>
+                <item name="product_sku" xsi:type="string">product_sku</item>
+            </argument>
+        </arguments>
+    </virtualType>
     <virtualType name="OpenImportCatalogRuleReader" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleRecordReader">
         <arguments>
             <argument name="source" xsi:type="object">OpenImportCatalogRuleSource</argument>
@@ -116,6 +159,11 @@
                 <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteImporter</item>
                 <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleImporter</item>
                 <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleImporter</item>
+                <item name="openimport_review" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\ReviewImporter</item>
+                <item name="openimport_newsletter" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\NewsletterImporter</item>
+                <item name="openimport_search_term" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SearchTermImporter</item>
+                <item name="openimport_search_synonym" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SynonymImporter</item>
+                <item name="openimport_category_position" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\CategoryPositionImporter</item>
                 <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Import\Order\OrderImporter</item>
             </argument>
         </arguments>
@@ -146,6 +194,11 @@
                 <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteRecordReader</item>
                 <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleReader</item>
                 <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleReader</item>
+                <item name="openimport_review" xsi:type="object">OpenImportReviewReader</item>
+                <item name="openimport_newsletter" xsi:type="object">OpenImportNewsletterReader</item>
+                <item name="openimport_search_term" xsi:type="object">OpenImportSearchTermReader</item>
+                <item name="openimport_search_synonym" xsi:type="object">OpenImportSynonymReader</item>
+                <item name="openimport_category_position" xsi:type="object">OpenImportCategoryPositionReader</item>
                 <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Import\Order\OrderRecordReader</item>
             </argument>
         </arguments>
@@ -360,6 +413,11 @@
                 <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteEntitySource</item>
                 <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleSource</item>
                 <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleSource</item>
+                <item name="openimport_review" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\ReviewSource</item>
+                <item name="openimport_newsletter" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\NewsletterSource</item>
+                <item name="openimport_search_term" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SearchTermSource</item>
+                <item name="openimport_search_synonym" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SynonymSource</item>
+                <item name="openimport_category_position" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\CategoryPositionSource</item>
             </argument>
         </arguments>
     </type>

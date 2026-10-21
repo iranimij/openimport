@@ -52,6 +52,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | URL rewrites (custom, product, category, CMS page; 301/302; conflicts with generated URLs reported) | ✓ import and export | ✗ | ✗ | ✓ | ✓ | ✗ |
 | Cart price rules with coupons and labels, catalog price rules; conditions as simple columns or Magento's tree as JSON | ✓ import and export | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Product reviews with ratings, newsletter subscribers, search terms and synonyms, product positions in categories | ✓ import and export, round trips | ✗ | ✗ | ✓ | ○ reviews, newsletter | ✗ |
 | Export destinations | ✓ download, folder, SFTP, FTP, S3, Google Drive/Sheet, Dropbox, OneDrive, REST, e-mail | ✗ | ○ | ✓ | ✓ | ✓ |
 | Run history, error report with your file's line numbers | ✓ original rows in the report | ○ history | ○ last outcome | ✓ | ✓ | ✓ |
 | E-mail on failure or always | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |

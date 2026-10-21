@@ -29,6 +29,7 @@ nav:
   - Order import: orders-import.md
   - URL rewrites: url-rewrites.md
   - Price rules and coupons: price-rules.md
+  - Reviews, newsletter, search, positions: small-entities.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
   - REST API and triggers: api.md

@@ -36,6 +36,11 @@ class Entity implements OptionSourceInterface
         EntityRegistry::URL_REWRITE => 'URL rewrites',
         EntityRegistry::CART_RULE => 'Cart price rules and coupons',
         EntityRegistry::CATALOG_RULE => 'Catalog price rules',
+        EntityRegistry::REVIEW => 'Product reviews',
+        EntityRegistry::NEWSLETTER => 'Newsletter subscribers',
+        EntityRegistry::SEARCH_TERM => 'Search terms',
+        EntityRegistry::SEARCH_SYNONYM => 'Search synonyms',
+        EntityRegistry::CATEGORY_POSITION => 'Product positions in categories',
         EntityRegistry::CMS_PAGE => 'CMS pages',
         EntityRegistry::CMS_BLOCK => 'CMS blocks',
     ];
@@ -61,6 +66,11 @@ class Entity implements OptionSourceInterface
         EntityRegistry::URL_REWRITE => 'URL rewrites by request path and store view: custom targets with 301, 302 or a plain rewrite, or the URL of a product (SKU), category (path) or CMS page. Magento\'s own generated URLs are never changed.',
         EntityRegistry::CART_RULE => 'Cart price rules by name: discount, websites, customer groups, dates, coupon code or a list of codes, labels; conditions from simple columns (subtotal, SKUs, categories) or Magento\'s condition tree as JSON.',
         EntityRegistry::CATALOG_RULE => 'Catalog price rules by name: discount, websites, customer groups, dates; conditions from simple columns (SKUs, categories) or Magento\'s condition tree as JSON. Apply the rules afterwards (Marketing › Catalog Price Rules).',
+        EntityRegistry::REVIEW => 'Reviews with ratings by product SKU, nickname and title: text, status, store views, date, the customer by e-mail, ratings as "Quality:4, Value:5".',
+        EntityRegistry::NEWSLETTER => 'Newsletter subscribers by e-mail and store view: subscribed, unsubscribed, not activated or unconfirmed; no e-mail is sent.',
+        EntityRegistry::SEARCH_TERM => 'Search terms by text and store view: redirect URL, shown among the popular terms, popularity.',
+        EntityRegistry::SEARCH_SYNONYM => 'Search synonym groups: words separated by commas, for all store views, a website (website:base) or a store view (store:de).',
+        EntityRegistry::CATEGORY_POSITION => 'Products in categories with their position, by category path and SKU; Delete removes the product from the category.',
     ];
 
     /**
@@ -90,6 +100,11 @@ class Entity implements OptionSourceInterface
         $import[EntityRegistry::URL_REWRITE] = ['label' => self::NAMES[EntityRegistry::URL_REWRITE]];
         $import[EntityRegistry::CART_RULE] = ['label' => self::NAMES[EntityRegistry::CART_RULE]];
         $import[EntityRegistry::CATALOG_RULE] = ['label' => self::NAMES[EntityRegistry::CATALOG_RULE]];
+        $import[EntityRegistry::REVIEW] = ['label' => self::NAMES[EntityRegistry::REVIEW]];
+        $import[EntityRegistry::NEWSLETTER] = ['label' => self::NAMES[EntityRegistry::NEWSLETTER]];
+        $import[EntityRegistry::SEARCH_TERM] = ['label' => self::NAMES[EntityRegistry::SEARCH_TERM]];
+        $import[EntityRegistry::SEARCH_SYNONYM] = ['label' => self::NAMES[EntityRegistry::SEARCH_SYNONYM]];
+        $import[EntityRegistry::CATEGORY_POSITION] = ['label' => self::NAMES[EntityRegistry::CATEGORY_POSITION]];
         $import[EntityRegistry::ORDER] = ['label' => self::NAMES[EntityRegistry::ORDER]];
         $import[EntityRegistry::SHIPMENT] = ['label' => self::NAMES[EntityRegistry::SHIPMENT]];
         $export = $this->exportConfig->getEntities();
@@ -101,6 +116,11 @@ class Entity implements OptionSourceInterface
         $export[EntityRegistry::URL_REWRITE] = ['label' => self::NAMES[EntityRegistry::URL_REWRITE]];
         $export[EntityRegistry::CART_RULE] = ['label' => self::NAMES[EntityRegistry::CART_RULE]];
         $export[EntityRegistry::CATALOG_RULE] = ['label' => self::NAMES[EntityRegistry::CATALOG_RULE]];
+        $export[EntityRegistry::REVIEW] = ['label' => self::NAMES[EntityRegistry::REVIEW]];
+        $export[EntityRegistry::NEWSLETTER] = ['label' => self::NAMES[EntityRegistry::NEWSLETTER]];
+        $export[EntityRegistry::SEARCH_TERM] = ['label' => self::NAMES[EntityRegistry::SEARCH_TERM]];
+        $export[EntityRegistry::SEARCH_SYNONYM] = ['label' => self::NAMES[EntityRegistry::SEARCH_SYNONYM]];
+        $export[EntityRegistry::CATEGORY_POSITION] = ['label' => self::NAMES[EntityRegistry::CATEGORY_POSITION]];
         $order = array_flip(array_keys(self::NAMES));
         foreach (['import' => $import, 'export' => $export] as $direction => $entities) {
             uksort($entities, static fn ($a, $b): int => [$order[$a] ?? PHP_INT_MAX, (string) $a]

@@ -13,6 +13,11 @@ use Iranimij\OpenImport\Model\Import\Category\CategoryImporter;
 use Iranimij\OpenImport\Model\Import\Cms\CmsImporter;
 use Iranimij\OpenImport\Model\Import\Order\OrderFile;
 use Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleImporter;
+use Iranimij\OpenImport\Model\Import\Small\ReviewImporter;
+use Iranimij\OpenImport\Model\Import\Small\NewsletterImporter;
+use Iranimij\OpenImport\Model\Import\Small\SearchTermImporter;
+use Iranimij\OpenImport\Model\Import\Small\SynonymImporter;
+use Iranimij\OpenImport\Model\Import\Small\CategoryPositionImporter;
 use Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteImporter;
 use Iranimij\OpenImport\Model\Import\Shipment\ShipmentImporter;
 
@@ -38,12 +43,18 @@ class EntityRegistry
     public const URL_REWRITE = 'openimport_url_rewrite';
     public const CART_RULE = 'openimport_cart_rule';
     public const CATALOG_RULE = 'openimport_catalog_rule';
+    public const REVIEW = 'openimport_review';
+    public const NEWSLETTER = 'openimport_newsletter';
+    public const SEARCH_TERM = 'openimport_search_term';
+    public const SEARCH_SYNONYM = 'openimport_search_synonym';
+    public const CATEGORY_POSITION = 'openimport_category_position';
 
     /**
      * Entities that cannot be imported with "Replace" (their importers refuse it).
      */
     public const NO_REPLACE = [self::CATEGORY, self::ATTRIBUTE, self::CMS_PAGE, self::CMS_BLOCK, self::SHIPMENT,
-        self::ORDER, self::URL_REWRITE, self::CART_RULE, self::CATALOG_RULE];
+        self::ORDER, self::URL_REWRITE, self::CART_RULE, self::CATALOG_RULE, self::REVIEW, self::NEWSLETTER,
+        self::SEARCH_TERM, self::SEARCH_SYNONYM, self::CATEGORY_POSITION];
 
     /**
      * Entities that can only be added (nothing to update or delete).
@@ -110,6 +121,18 @@ class EntityRegistry
             'kategorien' => 'condition_categories', 'categories' => 'condition_categories',
             'mindestbestellwert' => 'condition_subtotal', 'subtotal' => 'condition_subtotal',
             'minimum' => 'condition_subtotal', 'bedingungen' => 'conditions', 'aktionen' => 'actions',
+        ];
+        $smallSynonyms = [
+            'sku' => 'product_sku', 'artikelnummer' => 'product_sku', 'product' => 'product_sku', 'produkt' => 'product_sku',
+            'name' => 'nickname', 'author' => 'nickname', 'autor' => 'nickname', 'titel' => 'title', 'summary' => 'title',
+            'text' => 'detail', 'review' => 'detail', 'bewertung' => 'detail', 'comment' => 'detail',
+            'e mail' => 'email', 'e-mail' => 'email', 'mail' => 'email', 'store' => 'store_code',
+            'store view' => 'store_code', 'storeview' => 'store_code', 'store views' => 'store_codes',
+            'datum' => 'created_at', 'date' => 'created_at', 'kunde' => 'customer_email', 'customer' => 'customer_email',
+            'sterne' => 'ratings', 'stars' => 'ratings', 'rating' => 'ratings', 'suchbegriff' => 'query_text',
+            'term' => 'query_text', 'query' => 'query_text', 'search term' => 'query_text', 'weiterleitung' => 'redirect',
+            'synonyme' => 'synonyms', 'words' => 'synonyms', 'kategorie' => 'category_path', 'category' => 'category_path',
+            'position' => 'position', 'sort' => 'position', 'reihenfolge' => 'position',
         ];
         $builtIn = [
             new EntityInfo(
@@ -184,6 +207,51 @@ class EntityRegistry
                 $ruleSynonyms,
                 null,
                 PriceRuleImporter::CATALOG_COLUMNS
+            ),
+            new EntityInfo(
+                self::REVIEW,
+                ['product_sku', 'nickname', 'title'],
+                false,
+                [],
+                $smallSynonyms,
+                null,
+                ReviewImporter::COLUMNS
+            ),
+            new EntityInfo(
+                self::NEWSLETTER,
+                ['email'],
+                false,
+                [],
+                $smallSynonyms,
+                null,
+                NewsletterImporter::COLUMNS
+            ),
+            new EntityInfo(
+                self::SEARCH_TERM,
+                ['query_text'],
+                false,
+                [],
+                $smallSynonyms,
+                null,
+                SearchTermImporter::COLUMNS
+            ),
+            new EntityInfo(
+                self::SEARCH_SYNONYM,
+                ['synonyms'],
+                false,
+                [],
+                $smallSynonyms,
+                null,
+                SynonymImporter::COLUMNS
+            ),
+            new EntityInfo(
+                self::CATEGORY_POSITION,
+                ['category_path', 'product_sku'],
+                false,
+                [],
+                $smallSynonyms,
+                null,
+                CategoryPositionImporter::COLUMNS
             ),
             new EntityInfo(
                 self::SHIPMENT,

@@ -35,6 +35,11 @@ class FieldList
         'openimport_url_rewrite' => ['request_path'],
         'openimport_cart_rule' => ['name', 'action', 'discount_amount'],
         'openimport_catalog_rule' => ['name', 'action', 'discount_amount'],
+        'openimport_review' => ['product_sku', 'nickname', 'title', 'detail'],
+        'openimport_newsletter' => ['email'],
+        'openimport_search_term' => ['query_text'],
+        'openimport_search_synonym' => ['synonyms'],
+        'openimport_category_position' => ['category_path', 'product_sku'],
         'openimport_order' => ['increment_id', 'customer_email', 'status', 'billing_firstname', 'billing_lastname',
             'billing_street', 'billing_city', 'billing_country_id', 'item_sku', 'item_qty_ordered', 'item_price'],
     ];

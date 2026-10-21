@@ -653,6 +653,7 @@
         <field name="oauth_signin" component="Iranimij_OpenImport/js/form/oauth-signin" formElement="input" sortOrder="68">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">Iranimij_OpenImport/form/oauth-signin</item>
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">google_drive</item>
                         <item name="1" xsi:type="string">dropbox</item>

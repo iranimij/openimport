@@ -43,7 +43,7 @@ class ProfileValidatorTest extends TestCase
             {
                 return $direction === 'export'
                     ? ['catalog_product', 'openimport_order']
-                    : ['catalog_product', 'customer', 'openimport_stock_price', 'openimport_category'];
+                    : ['catalog_product', 'customer', 'openimport_stock_price', 'openimport_category', 'openimport_shipment'];
             }
         };
 
@@ -378,5 +378,20 @@ class ProfileValidatorTest extends TestCase
             ['direction' => 'export', 'export_options' => ['compress' => 'rar', 'xslt' => $xsl]] + $this->valid()
         ));
         self::assertSame(['"rar" is not a compression OpenImport writes (zip, gz, tar.gz).'], $export);
+    }
+
+    public function testShipmentsCanOnlyBeAdded(): void
+    {
+        $base = ['entity' => 'openimport_shipment', 'mapping' => [['target' => 'increment_id', 'source' => 'order']]] + $this->valid();
+        self::assertSame([], $this->validator()->validate(new ProfileStub(['behavior' => 'add_update'] + $base)));
+        self::assertSame([], $this->validator()->validate(new ProfileStub(['behavior' => 'only_add'] + $base)));
+        foreach (['only_update', 'delete'] as $behavior) {
+            self::assertContains(
+                'openimport_shipment can only be added: use Add/Update.',
+                $this->validator()->validate(new ProfileStub(['behavior' => $behavior] + $base))
+            );
+        }
+        $replace = $this->validator()->validate(new ProfileStub(['behavior' => 'replace'] + $base));
+        self::assertContains('openimport_shipment cannot be imported with "Replace": use Add/Update.', $replace);
     }
 }

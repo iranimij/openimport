@@ -48,6 +48,10 @@ class EntityCodes
         $codes[] = EntityRegistry::ATTRIBUTE;
         $codes[] = EntityRegistry::CMS_PAGE;
         $codes[] = EntityRegistry::CMS_BLOCK;
+        if ($direction !== 'export') {
+            // OpenImport's own shipment import (through Magento's ShipOrder service).
+            $codes[] = EntityRegistry::SHIPMENT;
+        }
 
         return $codes;
     }

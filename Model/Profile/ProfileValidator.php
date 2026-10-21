@@ -138,6 +138,13 @@ class ProfileValidator
             ) {
                 $problems[] = sprintf('%s cannot be imported with "Replace": use Add/Update.', $entity);
             }
+            if (in_array($entity, EntityRegistry::ADD_ONLY, true) && !in_array(
+                $profile->getBehavior(),
+                [ProfileInterface::BEHAVIOR_ADD_UPDATE, ProfileInterface::BEHAVIOR_ONLY_ADD],
+                true
+            )) {
+                $problems[] = sprintf('%s can only be added: use Add/Update.', $entity);
+            }
             $problems = array_merge(
                 $problems,
                 $this->mapping($profile),

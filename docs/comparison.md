@@ -45,7 +45,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | Products, advanced pricing, customers, addresses, MSI stock | ✓ through Magento's own importer | ✓ | ✓ | ✓ | ✓ | ○ stock and price |
 | Fast stock & price update of existing products | ✓ | ✗ | ✗ | ○ | ○ | ✓ |
 | Order export (per order or per line, only new or changed) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
-| Order import, tracking import | ✗ (1.5) | ✗ | ✗ | ✓ | ✓ with invoice/ship actions | ✓ |
+| Shipment and tracking import | ✓ via Magento's shipment service, duplicates skipped | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Order import | ✗ (1.5) | ✗ | ✗ | ✓ | ✓ with invoice/ship actions | ✓ |
 | Categories (paths, store views) | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
 | Product attributes and attribute sets (options, store labels) | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |

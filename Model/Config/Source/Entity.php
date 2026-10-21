@@ -32,6 +32,7 @@ class Entity implements OptionSourceInterface
         'customer_composite' => 'Customers with addresses',
         'customer_address' => 'Customer addresses',
         EntityRegistry::ORDER => 'Orders',
+        EntityRegistry::SHIPMENT => 'Shipments and tracking numbers',
         EntityRegistry::CMS_PAGE => 'CMS pages',
         EntityRegistry::CMS_BLOCK => 'CMS blocks',
     ];
@@ -50,6 +51,7 @@ class Entity implements OptionSourceInterface
         'customer_composite' => 'Customer accounts with their billing and shipping address in one row.',
         'customer_address' => 'Addresses of existing customers.',
         EntityRegistry::ORDER => 'Orders, one row per order or per item; optionally only orders not exported before.',
+        EntityRegistry::SHIPMENT => 'Ships orders by order number: all open items or one SKU with a quantity, carrier and tracking number, optional customer e-mail. Orders that already carry the tracking number are skipped.',
         EntityRegistry::CMS_PAGE => 'CMS pages by URL key (identifier) and store views.',
         EntityRegistry::CMS_BLOCK => 'CMS blocks by identifier and store views.',
     ];
@@ -78,6 +80,7 @@ class Entity implements OptionSourceInterface
         $import[EntityRegistry::ATTRIBUTE] = ['label' => self::NAMES[EntityRegistry::ATTRIBUTE]];
         $import[EntityRegistry::CMS_PAGE] = ['label' => self::NAMES[EntityRegistry::CMS_PAGE]];
         $import[EntityRegistry::CMS_BLOCK] = ['label' => self::NAMES[EntityRegistry::CMS_BLOCK]];
+        $import[EntityRegistry::SHIPMENT] = ['label' => self::NAMES[EntityRegistry::SHIPMENT]];
         $export = $this->exportConfig->getEntities();
         $export[EntityRegistry::ORDER] = ['label' => self::NAMES[EntityRegistry::ORDER]];
         $export[EntityRegistry::CATEGORY] = ['label' => self::NAMES[EntityRegistry::CATEGORY]];

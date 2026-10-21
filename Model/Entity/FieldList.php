@@ -31,6 +31,7 @@ class FieldList
         'openimport_attribute' => ['attribute_code', 'label', 'frontend_input'],
         'openimport_cms_page' => ['identifier', 'title'],
         'openimport_cms_block' => ['identifier', 'title'],
+        'openimport_shipment' => ['increment_id'],
     ];
 
     /**

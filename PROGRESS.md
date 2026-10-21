@@ -109,8 +109,8 @@ code.
 (double-click `claude-upgrade.command` first), now also for the 1.4 pages (connections grid and form, Google/Dropbox/
 Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).
 
-Next: **1.5 · Sales and marketing entities** (plan page 15 §3): slice 1 shipments and tracking (`ShipOrderInterface`),
-2 order import (historic orders as they are; round-trip oracle; full matrix), 3 URL rewrites, 4 price rules and
+**1.5 · Sales and marketing entities** (plan page 15 §3) in progress: slice 1 shipments and tracking
+(`feat/1.5-shipments`) built; next 2 order import (historic orders as they are; round-trip oracle; full matrix), 3 URL rewrites, 4 price rules and
 coupons, 5 small entities (reviews, newsletter, search terms/synonyms, category positions). Each slice: README,
 CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
 
@@ -330,6 +330,19 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: unit (ODS reader with Calc-style content, ODS writer round trip, XSLT with eight hostile stylesheets),
   integration `Execution/OdsXsltTest` (ODS export → edit → ODS import, XSLT in and out through live runs, hostile
   stylesheet refused at save). Docs: file-formats (ODS, XSLT), security, sources, exports; README; CHANGELOG.
+
+### 1.5 slice 1 · shipments and tracking (what was built)
+
+- Entity `openimport_shipment` (import only, Add/Update or Only add): `Import/Shipment/ShipmentImporter` collects
+  the rows per order (items by SKU with quantities or everything open, tracking numbers, notify, comment), checks
+  every row (order, can ship, open item, quantity left, carrier from `Magento\Shipping\Model\Config`), skips and
+  reports orders that already carry a tracking number or have nothing left, and ships through
+  `ShipOrderInterface`. `ShipmentRecords` caches orders per run; `ShipmentRecordReader` treats every row as new.
+  Registry: `EntityRegistry::SHIPMENT`, `ADD_ONLY` (validator), synonyms, entity source names and hints, field list,
+  di importer and reader, `magento/module-shipping` required (core module, for the carrier list).
+- Tests: integration `Import/ShipmentImportTest` against the Sales order fixture (partial shipment with tracking,
+  file imported twice, the rest without SKU with two tracking rows, bad rows refused before anything ships,
+  behaviours refused at save); unit validator rule. Docs `docs/shipments.md`, README, comparison, CHANGELOG.
 
 ## Open questions
 

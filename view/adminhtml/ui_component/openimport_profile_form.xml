@@ -1949,6 +1949,7 @@
                             <item name="1" xsi:type="string">xml</item>
                         </item>
                     </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/textarea</item>
                     <item name="rows" xsi:type="number">8</item>
                     <item name="placeholder" xsi:type="string">&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt; …</item>
                 </item>
@@ -1967,6 +1968,7 @@
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">format</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/textarea</item>
                     <item name="rows" xsi:type="number">8</item>
                     <item name="placeholder" xsi:type="string">&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt; …</item>
                 </item>

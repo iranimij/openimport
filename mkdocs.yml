@@ -21,6 +21,7 @@ nav:
   - URL keys and redirects: url-keys.md
   - Presets (Shopify, WooCommerce, Magento 1): presets.md
   - Exports: exports.md
+  - Archives (ZIP, gzip, tar): archives.md
   - Categories: categories.md
   - Attributes: attributes.md
   - CMS pages and blocks: cms.md

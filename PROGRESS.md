@@ -106,10 +106,13 @@ Resumed 2026-10-21. Slice 1 (#53) and slice 2 (#54) merged; dev-env #14 (S3 E2E)
 green.
 
 Open PRs (stacked): **slice 3 · Google Drive / Sheets** #58 (`feat/1.4-google`, E2E dev-env #15), **slice 4 ·
-Dropbox, OneDrive/SharePoint** #59 (`feat/1.4-dropbox-onedrive`), **slice 5 · REST API** (`feat/1.4-rest`).
-#58 waits on the Magento 2.4.7 integration jobs: the Sales order fixture crashes after the Google tests (first error
-not visible yet; `logged.sh` now also annotates the first stack trace). Next: fix that, merge #58, #59, slice 5 in
-order (rebase each on main), then slice 6 (archives zip/gz/tar.gz) and slice 7 (ODS, XSLT), then release 1.4.0.
+Dropbox, OneDrive/SharePoint** #59 (`feat/1.4-dropbox-onedrive`), **slice 5 · REST API** #60 (`feat/1.4-rest`),
+**slice 6 · archives** (`feat/1.4-archives`), README refresh #61 (main). Rule since 2026-10-21: every feature slice
+updates README.md too.
+2.4.7 CI was red on every branch and on main: the runner's libxml2 2.12+ refuses core's `esconfig.xsd` ("content
+model is not determinist"); `.github/ci/integration.sh` patches that schema in the test store. CI also writes a
+TeamCity log so a crash before PHPUnit's summary still names the failed tests. Next: merge #61, #58, #59, #60, slice
+6 in order (rebase each on main), then slice 7 (ODS, XSLT), then release 1.4.0.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -297,6 +300,21 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
   through the JSON reader. `RestDestination`: the export file in one request, or JSON batches of N records.
 - Tests: unit (paging helpers); integration against `Test/Integration/_files/rest-server.php` (every paging kind,
   every login, retries with recorded waits, the page limit, file and batch exports).
+
+### 1.4 slice 6 · archives (what was built)
+
+- `Model/Archive/Unpacker`: ZIP (ZipArchive), gzip (zlib stream), tar and tar.gz (own ustar reader with GNU long
+  names and pax paths); the entry by pattern or the first readable file; fixed target file name (no zip-slip),
+  size counted while writing (1 GB), 10,000 entries, links skipped, nested and password-protected archives refused.
+  `Packer` writes ZIP, gzip and tar.gz (own ustar header); `PackedWriter` gives destinations the archive's
+  extension and content type. `Storage/TempFolder` for short-lived folders under `var/openimport/tmp`.
+- Wired into `RunProcessor` (the run names the inner file, the message says "Read x from y."), `FileSample` (form
+  previews and Test connection unpack too, `inner` in the sample), `ExportRunner` (export option `compress`),
+  uploads accept `.zip .gz .tgz .tar`, validator checks, form fields in step 3 (`format_options.archive`,
+  `archive_entry`, `export_options.compress`).
+- Tests: unit with real archives (zip-slip, bomb, entries limit, password, damaged, gzip, tar long names, links,
+  truncated tar, round trips through the Packer); integration `Execution/ArchivesTest` (ZIP and gzip from a folder
+  through a live run, pattern, "read as it is", broken ZIP, packed export). Docs `docs/archives.md`.
 
 ## Open questions
 

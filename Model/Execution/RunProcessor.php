@@ -12,6 +12,8 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
+use Iranimij\OpenImport\Model\Archive\ArchiveException;
+use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Export\ExportRunner;
 use Iranimij\OpenImport\Model\Notification\RunMailer;
@@ -42,6 +44,7 @@ class RunProcessor
      * @param ExportRunner $exportRunner
      * @param EntityRegistry $entities
      * @param FileBatch $fileBatch
+     * @param Unpacker $unpacker
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -55,7 +58,8 @@ class RunProcessor
         private readonly RunMailer $mailer,
         private readonly ExportRunner $exportRunner,
         private readonly EntityRegistry $entities,
-        private readonly FileBatch $fileBatch
+        private readonly FileBatch $fileBatch,
+        private readonly Unpacker $unpacker
     ) {
     }
 
@@ -195,15 +199,19 @@ class RunProcessor
         }
         $batchNote = $this->fileBatch->start($profile, $run);
         $fetched = $this->sources->fetch($profile, $run, $folder);
-        $staged = $this->runFiles->stageSource($runId, $fetched->path, $fetched->name);
+        [$readPath, $readName, $archiveNote] = $this->unpack($profile, $fetched, $folder);
+        $staged = $this->runFiles->stageSource($runId, $readPath, $readName);
         $run->setSourceFile($this->runFiles->relative($staged));
-        if (empty($run->getOptions()['original_name']) && $fetched->name !== '') {
+        if ($archiveNote !== null) {
+            // The run page shows the file that was read, not the archive it came in.
+            $run->setOptions(['original_name' => $readName] + $run->getOptions());
+        } elseif (empty($run->getOptions()['original_name']) && $fetched->name !== '') {
             // The run page and the download show the file by its own name (uploads set it when queued).
             $run->setOptions($run->getOptions() + ['original_name' => $fetched->name]);
         }
         $this->runRepository->save($run);
         try {
-            $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $fetched->name, $heartbeat);
+            $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $readName, $heartbeat);
         } catch (PipelineException $exception) {
             // The run fails, but the note says which file it was and which runs got the others.
             if ($batchNote === null) {
@@ -215,16 +223,42 @@ class RunProcessor
             && in_array($outcome->status, [RunInterface::STATUS_SUCCESS, RunInterface::STATUS_PARTIAL], true)) {
             $outcome = $this->afterSuccess($profile, $fetched, $outcome);
         }
-        if ($batchNote !== null) {
-            $outcome = new RunOutcome(
-                $outcome->status,
-                $outcome->counts,
-                rtrim($outcome->message) . "\n" . $batchNote,
-                $outcome->historyId
-            );
+        foreach ([$archiveNote, $batchNote] as $note) {
+            if ($note !== null) {
+                $outcome = new RunOutcome(
+                    $outcome->status,
+                    $outcome->counts,
+                    rtrim($outcome->message) . "\n" . $note,
+                    $outcome->historyId
+                );
+            }
         }
 
         return $outcome;
+    }
+
+    /**
+     * The file to read: the fetched file, or the file taken out of it when it is an archive.
+     *
+     * @param ProfileInterface $profile
+     * @param FetchedFile $fetched
+     * @param string $folder the run folder
+     * @return array{0: string, 1: string, 2: string|null} path, name, note for the run message
+     * @throws PipelineException
+     */
+    private function unpack(ProfileInterface $profile, FetchedFile $fetched, string $folder): array
+    {
+        $options = $profile->getFormatOptions();
+        if ($this->unpacker->kindFor($fetched->path, $fetched->name, $options) === '') {
+            return [$fetched->path, $fetched->name, null];
+        }
+        try {
+            $unpacked = $this->unpacker->unpack($fetched->path, $fetched->name, $folder, $options);
+        } catch (ArchiveException $exception) {
+            throw new PipelineException($exception->getMessage(), 0, $exception);
+        }
+
+        return [$unpacked->path, $unpacked->name, $unpacked->note()];
     }
 
     /**

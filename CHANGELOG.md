@@ -25,6 +25,10 @@ All notable changes to this project are documented here. The format follows
   credentials), paging by page numbers, offsets, cursors, next addresses or the Link header, records path, a page
   limit that stops instead of importing a partial list, retries after 429/503 with Retry-After; exports send the
   file or JSON batches.
+- Archives: a `.zip`, `.gz`, `.tar` or `.tar.gz` file from any source is unpacked and the file inside is read
+  (*File inside the archive*: a name or pattern, else the first CSV, Excel, ODS, JSON or XML file); exports can be
+  packed as ZIP, gzip or tar.gz (*Compress*). Zip-slip-safe (fixed file name), size counted while unpacking (1 GB),
+  nested and password-protected archives refused. See [Archives](https://iranimij.github.io/openimport/archives/).
 
 ### Fixed
 - `openimport:secrets:reencrypt` now also encrypts the secrets of export destinations again, and goes on when one

@@ -47,7 +47,7 @@ orders to CSV, XLSX, JSON or XML, downloaded, dropped in a folder, pushed to SFT
 | | |
 |---|---|
 | **Profiles** | Saved import and export settings, duplicated, exported to JSON and imported again (version control, staging → production). |
-| **Files** | CSV/TSV (delimiter and encoding detected, UTF-16 and Windows-1252 too), Excel `.xlsx`, JSON, XML. Streamed: a 50k-row file needs about the same memory as a 1k-row file. |
+| **Files** | CSV/TSV (delimiter and encoding detected, UTF-16 and Windows-1252 too), Excel `.xlsx`, JSON, XML, also inside ZIP, gzip and tar archives; exports can be compressed. Streamed: a 50k-row file needs about the same memory as a 1k-row file. |
 | **Sources** | Upload, server folder (sandboxed, with "move to processed" or delete after success), HTTP(S) URL including published Google Sheets, SFTP (password or key), FTP(S), Amazon S3 and S3-compatible storage (R2, Wasabi, MinIO), Google Drive and private Sheets, Dropbox, OneDrive and SharePoint, REST APIs (paging, header/Basic/OAuth 2 logins, records path). All matching files, one run each. Private and internal addresses are refused unless you allow them. |
 | **Connections** | Saved logins shared by profiles (System › Data Transfer › OpenImport › Connections) with *Test connection*: SFTP, FTP, S3, Google (service account or *Sign in with Google*), Dropbox, Microsoft, REST; OAuth with your own app, state and PKCE; secrets and tokens encrypted and never shown again; profile JSON names the connection instead of carrying a login. |
 | **Catalog helpers** | Product pictures from web addresses (downloaded by OpenImport, cached by ETag), configurable products from simple rows (*Parent SKU* column), products missing from the file disabled, set out of stock or deleted (under the safety limit), quantities as changes (`+5`, `-3`), URL keys from a pattern with 301 redirects. |
@@ -83,6 +83,7 @@ From the vendors' public docs as of 2026-10-13; details and sources in [docs/com
 | Column mapping with auto-match, store-view columns | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Transforms and a safe expression language | ✓ | ✗ | ✗ | ✓ | ✓ | ○ |
 | CSV, XLSX, JSON, XML, streamed | ✓ | CSV | CSV | ✓ | ○ | ✓ |
+| ZIP, gzip, tar archives in and out | ✓ | ✗ | ✗ | ✓ | ○ | ✓ |
 | Upload, folder, URL, SFTP, FTP, Google Sheets | ✓ | ✗ | ○ | ✓ | ○ | ✓ |
 | Saved connections, S3-compatible storage | ✓ | ✗ | ✗ | ✓ | ○ | ✓ |
 | Google Drive and Sheets with login, Dropbox, OneDrive/SharePoint | ✓ | ✗ | ✗ | ✓ | ○ | ✗ |
@@ -114,7 +115,7 @@ instead of a project: mapping, transforms, dry runs, schedules, remote files, hi
 ## Security
 
 The module fetches files from remote servers and writes into your catalog, so it is careful: SSRF guard with DNS
-re-checks on every redirect, sandboxed server folders, no XML entities, zip-bomb limits for `.xlsx`, encrypted
+re-checks on every redirect, sandboxed server folders, no XML entities, zip-bomb and zip-slip limits for archives and `.xlsx`, encrypted
 credentials that never leave the database (not in JSON exports, not in forms), CSRF-protected admin actions behind
 six ACL resources, and a formula guard for spreadsheets. See [docs/security.md](docs/security.md) and
 [SECURITY.md](SECURITY.md) for how to report a problem.

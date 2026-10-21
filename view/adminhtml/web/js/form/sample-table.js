@@ -77,6 +77,9 @@ define([
             this.columns = sample.columns || [];
             this.rows = sample.rows || [];
             this.detected = sample.detected || {};
+            if (sample.inner) {
+                this.detected = _.extend({'file in the archive': sample.inner}, this.detected);
+            }
             this.sheets = sample.sheets || [];
         },
 

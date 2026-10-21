@@ -9,11 +9,15 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Test\Unit\Model\Admin;
 
 use Iranimij\OpenImport\Model\Admin\FileSample;
+use Iranimij\OpenImport\Model\Archive\Unpacker;
+use Iranimij\OpenImport\Model\Storage\TempFolder;
+use Magento\Framework\Filesystem\Driver\File;
 use Iranimij\OpenImport\Model\Admin\MappingPreview;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Filter\RowFilterCompiler;
 use Iranimij\OpenImport\Model\Mapping\MappingCompiler;
 use Iranimij\OpenImport\Model\Pipeline\ProfileCompiler;
+use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Transform\TransformPool;
 use Iranimij\OpenImport\Model\Value\FormulaGuard;
@@ -91,13 +95,52 @@ class MappingPreviewTest extends TestCase
 
     public function testFileSample(): void
     {
-        $sample = (new FileSample(new ReaderFactory()))->read($this->file, 'feed.csv', 'auto', ['delimiter' => ';'], 3);
+        $tempFolder = new class extends TempFolder {
+            public function __construct()
+            {
+            }
+
+            public function with(string $prefix, callable $work): mixed
+            {
+                $folder = sys_get_temp_dir() . '/openimport-sample-' . bin2hex(random_bytes(4));
+                mkdir($folder);
+                try {
+                    return $work($folder);
+                } finally {
+                    array_map('unlink', glob($folder . '/*') ?: []);
+                    rmdir($folder);
+                }
+            }
+        };
+        $files = new FileSample(new ReaderFactory(), new Unpacker(new File(), $tempFolder));
+        $sample = $files->read($this->file, 'feed.csv', 'auto', ['delimiter' => ';'], 3);
 
         self::assertSame('csv', $sample['format']);
+        self::assertSame('', $sample['inner']);
         self::assertSame(['sku', 'name', 'name_de', 'price', 'status'], $sample['columns']);
         self::assertCount(3, $sample['rows']);
         self::assertSame('2', $sample['rows'][0]['__row']);
         self::assertSame([], $sample['sheets']);
+
+        // The same file in a ZIP: read from the archive, the inner file's name reported.
+        $zip = sys_get_temp_dir() . '/openimport-sample-' . bin2hex(random_bytes(4)) . '.zip';
+        $archive = new \ZipArchive();
+        $archive->open($zip, \ZipArchive::CREATE);
+        $archive->addFile($this->file, 'in/feed.csv');
+        $archive->close();
+        try {
+            $zipped = $files->read($zip, 'feed.zip', 'auto', ['delimiter' => ';'], 3);
+            try {
+                $files->read($zip, 'feed.zip', 'auto', ['archive' => 'none', 'delimiter' => ';'], 3);
+                self::fail('read as it is');
+            } catch (ReaderException $exception) {
+                self::assertSame('The file is not an Excel workbook (.xlsx).', $exception->getMessage());
+            }
+        } finally {
+            unlink($zip);
+        }
+        self::assertSame('feed.csv', $zipped['inner']);
+        self::assertSame($sample['rows'], $zipped['rows']);
     }
 
     public function testFormulaGuard(): void

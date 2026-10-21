@@ -1937,6 +1937,92 @@
                 </checkbox>
             </formElements>
         </field>
+        <field name="archive" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="64">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="default" xsi:type="string">auto</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Archives (ZIP, gzip, tar)</label>
+                <dataScope>format_options.archive</dataScope>
+                <notice translate="true">A .zip, .gz, .tar or .tar.gz file is unpacked and the file inside is read. Archives inside archives are not unpacked.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">auto</item>
+                                <item name="label" xsi:type="string" translate="true">Unpack archives</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">none</item>
+                                <item name="label" xsi:type="string" translate="true">Read the file as it is</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="archive_entry" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="65">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="format_options.archive" xsi:type="array">
+                            <item name="not" xsi:type="array">
+                                <item name="0" xsi:type="string">none</item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">File inside the archive</label>
+                <dataScope>format_options.archive_entry</dataScope>
+                <notice translate="true">Name or pattern such as products-*.csv or data/*.xml. Empty = the first CSV, Excel, ODS, JSON or XML file by name.</notice>
+                <placeholder>*.csv</placeholder>
+            </settings>
+        </field>
+        <field name="out_compress" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="66">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="default" xsi:type="string">none</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Compress</label>
+                <dataScope>export_options.compress</dataScope>
+                <notice translate="true">The export file is packed before it is delivered; its name gets the archive's extension.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">none</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">zip</item>
+                                <item name="label" xsi:type="string" translate="true">ZIP (.zip)</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">gz</item>
+                                <item name="label" xsi:type="string" translate="true">gzip (.gz)</item>
+                            </option>
+                            <option name="3" xsi:type="array">
+                                <item name="value" xsi:type="string">tar.gz</item>
+                                <item name="label" xsi:type="string" translate="true">tar.gz</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <container name="sample" component="Iranimij_OpenImport/js/form/sample-table" sortOrder="70">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

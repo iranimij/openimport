@@ -12,7 +12,7 @@
         <div class="openimport-dropzone" css="{'_dragging': dragging, '_has-file': fileName}"
              event="dragover: dragOver, dragenter: dragOver, dragleave: dragLeave, drop: drop">
             <input type="file" class="openimport-dropzone-input"
-                   accept=".csv,.tsv,.txt,.xlsx,.json,.xml"
+                   accept=".csv,.tsv,.txt,.xlsx,.json,.xml,.zip,.gz,.tgz,.tar"
                    attr="id: uid, 'aria-describedby': uid + '-note'"
                    event="change: upload"
                    disable="uploading">
@@ -25,7 +25,7 @@
                 <span text="$t('Current file\:')"></span> <strong text="fileName"></strong>
                 <!-- /ko -->
                 <!-- ko ifnot: fileName -->
-                <span translate="'CSV, Excel (.xlsx), JSON or XML. The first rows appear in step 3.'"></span>
+                <span translate="'CSV, Excel (.xlsx), JSON or XML, also inside a ZIP, gzip or tar archive. The first rows appear in step 3.'"></span>
                 <!-- /ko -->
             </div>
         </div>

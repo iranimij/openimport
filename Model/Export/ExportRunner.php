@@ -10,6 +10,9 @@ namespace Iranimij\OpenImport\Model\Export;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
+use Iranimij\OpenImport\Model\Archive\ArchiveException;
+use Iranimij\OpenImport\Model\Archive\PackedWriter;
+use Iranimij\OpenImport\Model\Archive\Packer;
 use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\Filter\RowFilter;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
@@ -46,6 +49,7 @@ class ExportRunner
      * @param Config $config
      * @param FileNamer $namer
      * @param DestinationPool $destinations
+     * @param Packer $packer
      */
     public function __construct(
         private readonly EntitySourcePool $sources,
@@ -55,7 +59,8 @@ class ExportRunner
         private readonly RunResource $runResource,
         private readonly Config $config,
         private readonly FileNamer $namer,
-        private readonly DestinationPool $destinations
+        private readonly DestinationPool $destinations,
+        private readonly Packer $packer
     ) {
     }
 
@@ -127,6 +132,15 @@ class ExportRunner
                     ? 'Nothing to export: Magento has no records of this kind that match the filters.'
                     : sprintf('Nothing to export: %d record(s) read, all %d skipped by the row filters.', $this->counts['read'], $this->counts['filtered'])
             ), ''];
+        }
+        $compress = (string) ($profile->getExportOptions()['compress'] ?? Packer::NONE);
+        if (in_array($compress, Packer::KINDS, true)) {
+            try {
+                $path = $this->packer->pack($path, $compress);
+            } catch (ArchiveException $exception) {
+                throw new PipelineException($exception->getMessage(), 0, $exception);
+            }
+            $writer = new PackedWriter($writer, $compress, $this->packer->contentType($compress));
         }
         $summary = sprintf(
             '%d record(s) read, %d skipped by filters, %d exported to %s.',

@@ -78,6 +78,10 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../connections/">Saved connections</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
                 </li>
               </ul>
@@ -103,6 +107,10 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../archives/">Archives (ZIP, gzip, tar)</a>
                 </li>
               </ul>
               <ul>
@@ -207,8 +215,32 @@
 <td>server, port, user name, password, explicit TLS (FTPS), passive mode, remote folder, pattern, which file, move-to</td>
 <td></td>
 </tr>
+<tr>
+<td><strong>Google Drive / Sheets (login)</strong></td>
+<td>saved Google connection, folder link, id or path, pattern, which file, move-to</td>
+<td>Private files and Sheets (Sheets are read as Excel files); see <a href="../connections/#google-drive-and-google-sheets">Google Drive and Google Sheets</a>.</td>
+</tr>
+<tr>
+<td><strong>Dropbox</strong>, <strong>OneDrive / SharePoint</strong></td>
+<td>saved connection, folder path, pattern, which file, move-to</td>
+<td>See <a href="../connections/#dropbox">Dropbox</a> and <a href="../connections/#onedrive-and-sharepoint">OneDrive and SharePoint</a>.</td>
+</tr>
+<tr>
+<td><strong>REST API</strong></td>
+<td>saved REST connection, path, records path, pages</td>
+<td>JSON answers, paged; see <a href="../connections/#rest-apis">REST APIs</a>.</td>
+</tr>
+<tr>
+<td><strong>Amazon S3 / S3-compatible</strong></td>
+<td>saved S3 connection, folder in the bucket, pattern, which file, move-to</td>
+<td>Amazon S3, Cloudflare R2, Wasabi, MinIO, Garage and other S3-compatible services; the login is always a <a href="../connections/#amazon-s3-and-s3-compatible-storage">saved connection</a>.</td>
+</tr>
 </tbody>
 </table>
+<p>For SFTP and FTP, <strong>Saved connection</strong> picks a login saved under System › Data Transfer › OpenImport Connections
+instead of entering it in the profile (since 1.4); see <a href="../connections/">Saved connections</a>.</p>
+<p>Any source may deliver a ZIP, gzip or tar archive: the file inside is read, see <a href="../archives/">Archives</a>. XML files
+can go through an <a href="../file-formats/#xslt-since-14">XSLT stylesheet</a> before they are read.</p>
 <p><strong>Test connection</strong> checks the settings as they are in the form (saved or not) and says what the next run would read,
 without importing anything.</p>
 <h2 id="which-file">Which file<a class="headerlink" href="#which-file" title="Permanent link">&para;</a></h2>
@@ -237,7 +269,8 @@ successful and its message says what did not work.</p>
 <h2 id="secrets">Secrets<a class="headerlink" href="#secrets" title="Permanent link">&para;</a></h2>
 <p>Passwords, private keys, passphrases and tokens are encrypted with Magento's key (<code>app/etc/env.php</code>) and stored in
 the profile. They are never sent back to the form (it only says that a value is stored; leave the field empty to
-keep it, type a new one to replace it), never exported with a profile and never logged. After
+keep it, type a new one to replace it), never exported with a profile and never logged. Saved connections keep theirs
+the same way. After
 <code>bin/magento encryption:key:change</code>, run <code>bin/magento openimport:secrets:reencrypt</code>.</p>
 <h2 id="safety">Safety<a class="headerlink" href="#safety" title="Permanent link">&para;</a></h2>
 <ul>
@@ -255,7 +288,7 @@ keep it, type a new one to replace it), never exported with a profile and never 
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../runs/" class="btn btn-neutral float-left" title="Runs, dry runs and safety"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../images/" class="btn btn-neutral float-right" title="Product pictures">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../connections/" class="btn btn-neutral float-right" title="Saved connections">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -285,7 +318,7 @@ keep it, type a new one to replace it), never exported with a profile and never 
       <span><a href="../runs/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../images/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../connections/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

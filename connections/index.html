@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/connections/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Saved connections - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Saved connections";
+        var mkdocs_page_input_path = "connections.md";
+        var mkdocs_page_url = "/openimport/connections/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../comparison/">How it compares</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Saved connections</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#amazon-s3-and-s3-compatible-storage">Amazon S3 and S3-compatible storage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#google-drive-and-google-sheets">Google Drive and Google Sheets</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dropbox">Dropbox</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#onedrive-and-sharepoint">OneDrive and SharePoint</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rest-apis">REST APIs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#using-a-connection-in-a-profile">Using a connection in a profile</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#deleting">Deleting</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#secrets">Secrets</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#profiles-as-json">Profiles as JSON</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#permissions">Permissions</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../configurable/">Configurable products</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../missing-products/">Products missing from the file</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stock-changes/">Quantities as changes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-keys/">URL keys and redirects</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../presets/">Presets (Shopify, WooCommerce, Magento 1)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../archives/">Archives (ZIP, gzip, tar)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../categories/">Categories</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../attributes/">Attributes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cms/">CMS pages and blocks</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">REST API and triggers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Saved connections</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/connections.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="saved-connections">Saved connections<a class="headerlink" href="#saved-connections" title="Permanent link">&para;</a></h1>
+<p><em>Since 1.4.</em> A saved connection is a server login that many profiles share: change the password once, and every
+profile that uses it logs in with the new one. Open <strong>System › Data Transfer › OpenImport Connections</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Settings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SFTP</strong></td>
+<td>server, port (empty = 22), user name, password or private key (+ passphrase), time limit</td>
+</tr>
+<tr>
+<td><strong>FTP</strong></td>
+<td>server, port (empty = 21), user name, password, explicit TLS (FTPS), passive mode, time limit</td>
+</tr>
+<tr>
+<td><strong>Amazon S3 / S3-compatible</strong></td>
+<td>bucket, region, endpoint, path-style addresses, access key, secret key, time limit</td>
+</tr>
+<tr>
+<td><strong>Google Drive / Sheets</strong></td>
+<td>a service account key, or a Google account (OAuth client ID and secret, then <em>Sign in with Google</em>)</td>
+</tr>
+<tr>
+<td><strong>Dropbox</strong></td>
+<td>app key and app secret of your Dropbox app, then <em>Sign in with Dropbox</em></td>
+</tr>
+<tr>
+<td><strong>OneDrive / SharePoint</strong></td>
+<td>directory (tenant), client ID and secret of your app registration, SharePoint site (empty = OneDrive), then <em>Sign in with Microsoft</em></td>
+</tr>
+<tr>
+<td><strong>REST API</strong></td>
+<td>base address, login: none, a token in a header, user name and password (Basic) or OAuth 2 client credentials</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Test connection</strong> logs in with what the form holds (saved or not; an empty password field uses the stored one) and
+reads the login folder: <em>Connected to files.example.com:22. The login folder has 3 file(s).</em></p>
+<h2 id="amazon-s3-and-s3-compatible-storage">Amazon S3 and S3-compatible storage<a class="headerlink" href="#amazon-s3-and-s3-compatible-storage" title="Permanent link">&para;</a></h2>
+<p>OpenImport talks to S3 itself (Signature Version 4, no SDK), so the same connection works with Amazon S3 and with
+services that speak its API:</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Region</th>
+<th>Endpoint</th>
+<th>Path-style</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Amazon S3</td>
+<td>the bucket's region, e.g. <code>eu-central-1</code></td>
+<td>empty</td>
+<td>off</td>
+</tr>
+<tr>
+<td>Cloudflare R2</td>
+<td><code>auto</code></td>
+<td><code>https://&lt;account id&gt;.r2.cloudflarestorage.com</code></td>
+<td>on or off</td>
+</tr>
+<tr>
+<td>Wasabi</td>
+<td>the bucket's region, e.g. <code>eu-central-1</code></td>
+<td><code>https://s3.eu-central-1.wasabisys.com</code></td>
+<td>off</td>
+</tr>
+<tr>
+<td>MinIO, Garage, SeaweedFS and other self-hosted servers</td>
+<td>what the server is set up with, often <code>us-east-1</code></td>
+<td>the server's address, e.g. <code>http://minio:9000</code></td>
+<td>on</td>
+</tr>
+</tbody>
+</table>
+<p>Folders are key prefixes: the profile's folder <code>incoming</code> reads the files <code>incoming/*</code> (not those in deeper
+folders), <em>Move it to the processed folder</em> copies the file to <code>incoming/processed/</code> and deletes the original.</p>
+<p>The access key needs these permissions on the bucket: list (<code>s3:ListBucket</code>), read (<code>s3:GetObject</code>), and for exports
+and moving files write and delete (<code>s3:PutObject</code>, <code>s3:DeleteObject</code>).</p>
+<p>Like every address OpenImport reaches, the endpoint must be public. A server in your own network (MinIO on the same
+host, for example) needs its host name under Stores › Configuration › iranimij › OpenImport › Safety › <em>Private hosts
+allowed as URL sources</em>.</p>
+<h2 id="google-drive-and-google-sheets">Google Drive and Google Sheets<a class="headerlink" href="#google-drive-and-google-sheets" title="Permanent link">&para;</a></h2>
+<p>Two ways to log in:</p>
+<ul>
+<li><strong>Service account</strong> (best for servers): in the Google Cloud console create a project, switch on the <em>Google Drive
+  API</em>, create a service account and a JSON key for it, and paste the key into the connection. The form then shows
+  the account's e-mail address: share the Drive folders (or a Shared Drive) with it, as you would with a person.</li>
+<li><strong>Google account</strong>: create an OAuth client of the type <em>Web application</em>, add the <em>Authorized redirect URI</em> the
+  connection form shows, enter client ID and client secret, save, then click <strong>Sign in with Google</strong>. OpenImport
+  keeps only the refresh token, encrypted. The connection sees what that person sees.</li>
+</ul>
+<p>OpenImport runs no service of its own in between: each shop uses its own Google Cloud project.</p>
+<p>In a profile, the folder is the folder's link (<code>https://drive.google.com/drive/folders/…</code>), its id, or a path from
+<em>My Drive</em> such as <code>Supplier/incoming</code>. Google Sheets in the folder appear as <code>&lt;name&gt;.xlsx</code> and are read as Excel
+files (every sheet; pick one under the file settings). <em>Move it to the processed folder</em> moves the file into a
+<code>processed</code> folder next to it (made when missing); <em>Delete it</em> moves it to the Drive bin.</p>
+<p>Exports upload into the folder; a file with the same name gets the new content and keeps its link. <strong>Save as a Google
+Sheet</strong> turns the export into a Google Sheet (named without <code>.csv</code>), and later exports replace its content.</p>
+<p>Published "anyone with the link" Sheets still work without a connection as a <em>Web address</em> source.</p>
+<h2 id="dropbox">Dropbox<a class="headerlink" href="#dropbox" title="Permanent link">&para;</a></h2>
+<ol>
+<li>At <a href="https://www.dropbox.com/developers/apps">dropbox.com/developers/apps</a> create an app (<em>Scoped access</em>; <em>App
+   folder</em> for a folder of its own, or <em>Full Dropbox</em>), give it the permissions <code>files.content.read</code>,
+   <code>files.content.write</code> and <code>account_info.read</code>, and add the connection form's <em>Redirect URI</em> under <em>OAuth 2</em>.</li>
+<li>Enter app key and app secret in the connection, save, click <strong>Sign in with Dropbox</strong>.</li>
+</ol>
+<p>Folders are paths from the top of the Dropbox (or of the app folder): <code>Supplier/incoming</code>. Uploads replace a file of
+the same name (up to 150 MB per file); <em>Delete it</em> moves the file to Dropbox's deleted files.</p>
+<h2 id="onedrive-and-sharepoint">OneDrive and SharePoint<a class="headerlink" href="#onedrive-and-sharepoint" title="Permanent link">&para;</a></h2>
+<ol>
+<li>In <a href="https://entra.microsoft.com">Microsoft Entra ID</a> register an app, add the platform <em>Web</em> with the connection
+   form's <em>Redirect URI</em>, create a client secret, and allow the delegated permissions <code>Files.ReadWrite.All</code>,
+   <code>User.Read</code>, <code>offline_access</code> (and <code>Sites.ReadWrite.All</code> for SharePoint sites).</li>
+<li>Enter directory (tenant) ID or domain (empty = <code>common</code>), client ID and secret; for a SharePoint document library
+   the site address (<code>contoso.sharepoint.com/sites/Shop</code>); save, click <strong>Sign in with Microsoft</strong>.</li>
+</ol>
+<p>Folders are paths in the OneDrive or the library: <code>Supplier/incoming</code>. Large files are uploaded in 10 MB parts;
+<em>Delete it</em> moves the file to the recycle bin.</p>
+<h2 id="rest-apis">REST APIs<a class="headerlink" href="#rest-apis" title="Permanent link">&para;</a></h2>
+<p>A REST connection holds the API's base address (<code>https://api.example.com/v1</code>) and its login; profiles add their own
+path (<code>/products?status=active</code>). The login is a header with a token (<code>Authorization: Bearer …</code>, <code>X-Api-Key: …</code>),
+Basic user name and password, or OAuth 2 client credentials (token address, client ID and secret, optional scope;
+the token is fetched and renewed by OpenImport). When an API answers <em>429 Too Many Requests</em> or <em>503</em>, OpenImport
+waits as its <code>Retry-After</code> says (up to 30 seconds) and tries again, three times at most.</p>
+<p><strong>As a source</strong>, the profile names where the records are in the JSON answer (a dotted path such as <code>data.items</code>;
+empty = the answer itself, or its first list) and how the API pages:</p>
+<table>
+<thead>
+<tr>
+<th>Pages</th>
+<th>Settings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One answer</td>
+<td>–</td>
+</tr>
+<tr>
+<td>Page numbers</td>
+<td>page parameter (<code>page</code>), first page (1), optional page size parameter and size (<code>per_page</code>, 100)</td>
+</tr>
+<tr>
+<td>Offsets</td>
+<td>offset parameter (<code>offset</code>), first offset (0), optional size parameter and size (<code>limit</code>, 100)</td>
+</tr>
+<tr>
+<td>A cursor in the answer</td>
+<td>where the cursor is (<code>meta.next_cursor</code>) and its parameter (<code>cursor</code>)</td>
+</tr>
+<tr>
+<td>The next address in the answer</td>
+<td>where it is (<code>links.next</code>); it must be on the API's host</td>
+</tr>
+<tr>
+<td>The Link header</td>
+<td>– (<code>rel="next"</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Pages stop at an empty page, a shorter page (with a size parameter) or when there is no next cursor or address.
+<em>Pages at most</em> (100) protects against endless paging: a run that reaches it stops with an error and imports nothing,
+so a partial list never counts as the complete list. Nested fields become columns such as <code>stock.qty</code>; map them as
+usual.</p>
+<p><strong>As an export destination</strong>, the file is sent as it is (POST or PUT, with the content type of the format), or, for
+JSON exports, the records go in batches of a chosen size, each a JSON list.</p>
+<h2 id="using-a-connection-in-a-profile">Using a connection in a profile<a class="headerlink" href="#using-a-connection-in-a-profile" title="Permanent link">&para;</a></h2>
+<p>In step 2 of a profile, choose SFTP, FTP, Amazon S3, Google Drive, Dropbox, OneDrive / SharePoint or a REST API as the
+source (or as the export destination), then pick the
+connection under <strong>Saved connection</strong>. The login fields disappear; the profile keeps only what is its own: the folder, the file
+pattern, which file to read and what to do with it after a successful run. For SFTP and FTP, <em>Enter the login here</em> keeps the
+login in the profile, as before 1.4; S3 and the cloud drives always use a saved connection.</p>
+<p>Only connections of the chosen kind are offered. A profile whose connection was deleted or changed to another kind
+cannot be saved and its runs fail with a plain message (<em>The saved connection "Supplier" is for SFTP, not for FTP.</em>).</p>
+<h2 id="deleting">Deleting<a class="headerlink" href="#deleting" title="Permanent link">&para;</a></h2>
+<p>A connection that a profile uses cannot be deleted; the message names the profiles. The grid shows which profiles use
+each connection.</p>
+<h2 id="secrets">Secrets<a class="headerlink" href="#secrets" title="Permanent link">&para;</a></h2>
+<p>Passwords, private keys and passphrases are encrypted with Magento's key, never sent back to the form and never
+logged. After <code>bin/magento encryption:key:change</code>, <code>bin/magento openimport:secrets:reencrypt</code> encrypts the secrets of
+profiles and connections again.</p>
+<h2 id="profiles-as-json">Profiles as JSON<a class="headerlink" href="#profiles-as-json" title="Permanent link">&para;</a></h2>
+<p>A profile file names its connection (<code>"connection": "Supplier SFTP"</code> in <code>source_config</code> or <code>export_options</code>), never
+its id or login. Importing the file on another shop needs a connection with that name there; otherwise the import
+stops before anything is saved and says which connection is missing.</p>
+<h2 id="permissions">Permissions<a class="headerlink" href="#permissions" title="Permanent link">&para;</a></h2>
+<p>The admin role resource <strong>OpenImport › Manage connections</strong> opens the connections grid and form. Choosing a saved
+connection in a profile only needs the profile permissions.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../sources/" class="btn btn-neutral float-left" title="Sources"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../images/" class="btn btn-neutral float-right" title="Product pictures">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../sources/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../images/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

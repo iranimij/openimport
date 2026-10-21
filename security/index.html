@@ -68,6 +68,10 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../connections/">Saved connections</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
                 </li>
               </ul>
@@ -93,6 +97,10 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../archives/">Archives (ZIP, gzip, tar)</a>
                 </li>
               </ul>
               <ul>
@@ -180,7 +188,7 @@ page lists what the module does about that, what the settings control, and what 
 <h2 id="admin-actions">Admin actions<a class="headerlink" href="#admin-actions" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Every controller is behind an ACL resource: <em>View profiles</em>, <em>Create and edit profiles</em>, <em>Run profiles</em>, <em>Confirm
-  runs above the safety limit</em>, <em>View runs and error reports</em>, plus the configuration section. Roles that may view but
+  runs above the safety limit</em>, <em>View runs and error reports</em>, <em>Manage connections</em>, plus the configuration section. Roles that may view but
   not edit get a read-only form.</li>
 <li>Everything that changes state is a POST with Magento's form key; everything that reads is a GET. File answers go
   through Magento's <code>FileFactory</code>, never a raw path.</li>
@@ -213,6 +221,13 @@ form shows "stored" and lets you replace a secret, not read it) or the error rep
 <ul>
 <li><strong>XML:</strong> streamed with <code>XMLReader</code>; documents with a <code>DOCTYPE</code> are refused, so there is no entity expansion and no
   external entity. The parser never resolves URLs.</li>
+<li><strong>Archives (ZIP, gzip, tar):</strong> the file inside is written under a fixed name (entry names never become paths: no
+  zip-slip), its size is counted while unpacking (1 GB limit, zip bombs), links are skipped, nested archives and
+  password-protected entries are refused. See <a href="../archives/">Archives</a>.</li>
+<li><strong>XSLT:</strong> stylesheets run with every read and write permission of libxslt switched off (no <code>document()</code>, no
+  <code>xsl:include</code>/<code>xsl:import</code>, no files, no network), no PHP functions, no DOCTYPE in the stylesheet or the file, a
+  size limit for the file (a DOM holds it whole). See <a href="../file-formats/#xslt-since-14">XSLT</a>.</li>
+<li><strong>ODS:</strong> as XLSX (no DOCTYPE, no network, 512 MB unpacked limit), streamed with XMLReader.</li>
 <li><strong>XLSX:</strong> read from the zip with size checks; a workbook whose parts would unpack to more than 512 MB is refused
   (zip bombs). Only the parts the reader needs are opened.</li>
 <li><strong>CSV written by the module</strong> (error reports, exports): cells starting with <code>= + - @</code> or a tab are prefixed with an

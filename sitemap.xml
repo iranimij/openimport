@@ -2,102 +2,110 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://iranimij.github.io/openimport/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/admin/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/api/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
+    </url>
+    <url>
+         <loc>https://iranimij.github.io/openimport/archives/</loc>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/attributes/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/baseline/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/categories/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/cli/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/cms/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/comparison/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/configurable/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
+    </url>
+    <url>
+         <loc>https://iranimij.github.io/openimport/connections/</loc>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/core-bridge/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/core-facts/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/exports/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/file-formats/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/images/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/mapping/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/missing-products/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/presets/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/runs/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/schedules/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/security/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/sources/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/stock-changes/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/transforms/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
     <url>
          <loc>https://iranimij.github.io/openimport/url-keys/</loc>
-         <lastmod>2026-10-16</lastmod>
+         <lastmod>2026-10-21</lastmod>
     </url>
 </urlset>

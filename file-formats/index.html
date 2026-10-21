@@ -54,9 +54,15 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#excel-xlsx">Excel (.xlsx)</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#opendocument-ods">OpenDocument (.ods)</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#json">JSON</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#xml">XML</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#xslt-since-14">XSLT (since 1.4)</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#column-names-in-json-and-xml-files">Column names in JSON and XML files</a>
     </li>
@@ -77,6 +83,10 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../connections/">Saved connections</a>
                 </li>
               </ul>
               <ul>
@@ -105,6 +115,10 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../archives/">Archives (ZIP, gzip, tar)</a>
                 </li>
               </ul>
               <ul>
@@ -247,6 +261,19 @@ says "row 18" and row 18 is what the merchant sees in Excel or a text editor.</p
 <li>Workbooks that would unpack to more than 512 MB are refused.</li>
 <li>The sheet is streamed with PHP's XMLReader; only the shared strings table is held in memory.</li>
 </ul>
+<h2 id="opendocument-ods">OpenDocument (.ods)<a class="headerlink" href="#opendocument-ods" title="Permanent link">&para;</a></h2>
+<p>Since 1.4. LibreOffice Calc, Collabora and OnlyOffice spreadsheets, with the same options as Excel (sheet by name or
+position, header row).</p>
+<ul>
+<li>Typed cells are read by their value: numbers without display formatting (<code>12.5</code>, not <code>12,50 €</code>), dates and times
+  as <code>2024-01-31</code> or <code>2024-01-31 14:30:00</code>, booleans as <code>1</code> / <code>0</code>; everything else as the cell's text (several
+  paragraphs joined by a line break). Comments (annotations) are left out.</li>
+<li>Repeated cells and rows, as Calc writes them for the unused area, are expanded; empty rows and trailing empty
+  cells are dropped. Row numbers are the sheet's own.</li>
+<li>Exports write one sheet with a bold header row; numbers as numbers, text as text (formula guard as for CSV).</li>
+<li>Streamed with XMLReader; files with a DOCTYPE, files that are no spreadsheet (an <code>.odt</code> text) and files that
+  would unpack to more than 512 MB are refused.</li>
+</ul>
 <h2 id="json">JSON<a class="headerlink" href="#json" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -296,6 +323,30 @@ says "row 18" and row 18 is what the merchant sees in Excel or a text editor.</p
 <li>The file is streamed record by record: memory does not grow with the file size.</li>
 <li>Files with a DOCTYPE are refused, and the parser never loads anything from the network (no XML entity attacks).</li>
 </ul>
+<h3 id="xslt-since-14">XSLT (since 1.4)<a class="headerlink" href="#xslt-since-14" title="Permanent link">&para;</a></h3>
+<p>A supplier's XML rarely has one element per record. <em>XSLT before reading (XML)</em> in step 3 takes an XSLT 1.0
+stylesheet that turns the file into the XML OpenImport reads, before the reader and the sample see it; <em>XSLT after
+writing (XML)</em> in an export profile reshapes the written file (root and record names as set) into any layout a
+partner wants, before it is delivered. Example for an import:</p>
+<pre><code class="language-xml">&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+  &lt;xsl:template match=&quot;/&quot;&gt;
+    &lt;products&gt;
+      &lt;xsl:for-each select=&quot;lieferung/artikel&quot;&gt;
+        &lt;product&gt;
+          &lt;sku&gt;&lt;xsl:value-of select=&quot;@nr&quot;/&gt;&lt;/sku&gt;
+          &lt;name&gt;&lt;xsl:value-of select=&quot;bezeichnung&quot;/&gt;&lt;/name&gt;
+          &lt;price&gt;&lt;xsl:value-of select=&quot;translate(vk, ',', '.')&quot;/&gt;&lt;/price&gt;
+        &lt;/product&gt;
+      &lt;/xsl:for-each&gt;
+    &lt;/products&gt;
+  &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+</code></pre>
+<p>Safety: the stylesheet and the file are parsed without network access and without DOCTYPE; the processor may read
+nothing from disk or the network (<code>document()</code>, <code>xsl:include</code> and <code>xsl:import</code> are refused) and write nothing; PHP
+functions are not available. The whole file is held in memory for the transformation, so files above 64 MB are
+refused (<code>Iranimij\OpenImport\Model\Xslt\XsltStep</code> in <code>di.xml</code>); the stylesheet is checked when the profile is
+saved. Needs PHP's <code>ext-xsl</code>, which Magento requires anyway.</p>
 <h2 id="column-names-in-json-and-xml-files">Column names in JSON and XML files<a class="headerlink" href="#column-names-in-json-and-xml-files" title="Permanent link">&para;</a></h2>
 <p>JSON and XML records do not all need the same fields. The column list shown in the mapping editor comes from the
 first 1,000 records; fields that only appear later are still imported when they are mapped by name.</p>

@@ -68,6 +68,10 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../connections/">Saved connections</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
                 </li>
               </ul>
@@ -103,6 +107,10 @@
     <li class="toctree-l2"><a class="reference internal" href="#destinations">Destinations</a>
     </li>
     </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../archives/">Archives (ZIP, gzip, tar)</a>
                 </li>
               </ul>
               <ul>
@@ -179,7 +187,10 @@ on a schedule.</p>
 <h2 id="steps">Steps<a class="headerlink" href="#steps" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>What</strong>: direction Export and the entity.</li>
-<li><strong>Where</strong>: the destination (download from the run page, server folder, SFTP, FTP, e-mail) and the file name.
+<li><strong>Where</strong>: the destination (download from the run page, server folder, SFTP, FTP, Amazon S3 or
+   S3-compatible, Google Drive, Dropbox, OneDrive / SharePoint, a REST API,
+   e-mail)
+   and the file name.
    Placeholders in the file name: <code>{entity}</code>, <code>{profile}</code>, <code>{date}</code> (2026-10-14), <code>{time}</code> (143000),
    <code>{datetime}</code>, <code>{run}</code>, <code>{ext}</code>. Default <code>{entity}-{datetime}.{ext}</code>.</li>
 <li><strong>File</strong>: CSV (delimiter, encoding UTF-8, Windows-1252 or ISO-8859-1/-15, BOM, line ending, header row on or off), Excel (.xlsx, sheet name),
@@ -225,11 +236,23 @@ postcode, region, country_id, telephone, email, vat_id), and per line <code>item
 <code>item_row_total_incl_tax</code>, <code>item_discount_amount</code>, <code>item_tax_amount</code>, <code>item_tax_percent</code>, <code>item_weight</code>,
 <code>item_product_options</code>. Amounts are in the order's currency without trailing zeros.</p>
 <h2 id="destinations">Destinations<a class="headerlink" href="#destinations" title="Permanent link">&para;</a></h2>
+<p><strong>XSLT after writing (XML)</strong> reshapes an XML export into any layout before it is delivered, see
+<a href="../file-formats/#xslt-since-14">XSLT</a>; <strong>Compress</strong> (step 3) packs the file as <code>.zip</code>, <code>.gz</code> or <code>.tar.gz</code> before it
+goes to any destination; see <a href="../archives/">Archives</a>.</p>
 <ul>
 <li><strong>Download</strong>: the file stays in the run folder, with a button on the run page.</li>
 <li><strong>Server folder</strong>: under <code>var/openimport/&lt;path&gt;</code> or an allowed absolute folder (created when missing). A file of
   the same name is kept and the new one gets the date and time, or overwritten (profile setting).</li>
-<li><strong>SFTP / FTP</strong>: uploaded into the remote folder; same login settings and secrets as sources.</li>
+<li><strong>SFTP / FTP</strong>: uploaded into the remote folder; same login settings and secrets as sources, or a
+  <a href="../connections/">saved connection</a>.</li>
+<li><strong>Google Drive / Sheets</strong>: uploaded into the Drive folder of a
+  <a href="../connections/#google-drive-and-google-sheets">saved Google connection</a>; optionally as a Google Sheet.</li>
+<li><strong>Dropbox</strong>, <strong>OneDrive / SharePoint</strong>: uploaded into the folder of a <a href="../connections/">saved connection</a>; a file of
+  the same name is replaced.</li>
+<li><strong>REST API</strong>: the file (POST or PUT) or, for JSON exports, the records in batches; see
+  <a href="../connections/#rest-apis">REST APIs</a>.</li>
+<li><strong>Amazon S3 / S3-compatible</strong>: uploaded into the folder (key prefix) of the bucket of a
+  <a href="../connections/#amazon-s3-and-s3-compatible-storage">saved S3 connection</a>.</li>
 <li><strong>E-mail</strong>: attached (up to 10 MB) to an e-mail sent through the store's mail settings, template
   <em>OpenImport: an exported file</em>.</li>
 </ul>
@@ -238,7 +261,7 @@ postcode, region, country_id, telephone, email, vat_id), and per line <code>item
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../presets/" class="btn btn-neutral float-left" title="Presets (Shopify, WooCommerce, Magento 1)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../categories/" class="btn btn-neutral float-right" title="Categories">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../archives/" class="btn btn-neutral float-right" title="Archives (ZIP, gzip, tar)">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -268,7 +291,7 @@ postcode, region, country_id, telephone, email, vat_id), and per line <code>item
       <span><a href="../presets/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../categories/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../archives/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

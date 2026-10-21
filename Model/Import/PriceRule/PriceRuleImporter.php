@@ -349,11 +349,16 @@ class PriceRuleImporter implements ImporterInterface
             $data['coupon_type'] = CartRule::COUPON_TYPE_NO_COUPON;
         }
         if (($data['coupon_type'] ?? null) === CartRule::COUPON_TYPE_SPECIFIC) {
-            if ($get('coupon_code') !== '') {
+            // Magento: a rule has either one code (its primary coupon) or a list of generated codes, not both.
+            if ($codes !== []) {
+                if ($get('coupon_code') !== '' && !in_array($get('coupon_code'), $codes, true)) {
+                    array_unshift($codes, $get('coupon_code'));
+                }
+                $data['coupon_code'] = '';
+                $data['use_auto_generation'] = 1;
+            } elseif ($get('coupon_code') !== '') {
                 $data['coupon_code'] = $get('coupon_code');
                 $data['use_auto_generation'] = 0;
-            } elseif ($codes !== []) {
-                $data['use_auto_generation'] = 1;
             } elseif ($new) {
                 return ['coupon_code', 'A rule with a specific coupon needs a coupon_code (or coupon_codes).'];
             }

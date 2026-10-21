@@ -146,9 +146,9 @@ class PriceRuleImportTest extends TestCase
             . "uses_per_coupon;uses_per_customer;action;discount_amount;free_shipping;labels;condition_subtotal;condition_skus;action_skus;conditions\n";
         $columns = explode(';', trim($header));
         $file = $this->file($header
-            . "{$tag} ten;Ten percent;1;base;NOT LOGGED IN,General;2020-01-01;;5;specific;{$code};{$list[0]},{$list[1]};5;1;by_percent;10;no;"
+            . "{$tag} ten;Ten percent;1;base;NOT LOGGED IN,General;2020-01-01;;5;specific;{$code};;5;1;by_percent;10;no;"
             . "10 % off|default:Ten off;20;;;\n"
-            . "{$tag} fixed;;1;all;all;;;0;none;;;0;0;by_fixed;2;matching;;;simple;simple;\n"
+            . "{$tag} fixed;;1;all;all;;;0;specific;;{$list[0]},{$list[1]};3;0;by_fixed;2;matching;;;simple;simple;\n"
             . "{$tag} json;;0;base;General;;;1;;;;;;cart_fixed;5;;;;;;"
             . '"{""type"":""Combine"",""aggregator"":""any"",""value"":""1"",""conditions"":[{""type"":""Address"",""attribute"":""base_subtotal"",""operator"":"">="",""value"":""100""}]}"'
             . "\n");
@@ -176,13 +176,15 @@ class PriceRuleImportTest extends TestCase
         $websiteId = (int) Bootstrap::getObjectManager()->get(StoreManagerInterface::class)->getWebsite('base')->getId();
         self::assertSame([$websiteId], array_map('intval', $ten->getWebsiteIds()));
         $records = Bootstrap::getObjectManager()->get(PriceRuleRecords::class);
-        self::assertSame($list, $records->couponCodes((int) $ten->getId()));
+        self::assertSame([], $records->couponCodes((int) $ten->getId()));
         $conditions = $ten->getConditions()->asArray();
         self::assertSame('base_subtotal', $conditions['conditions'][0]['attribute']);
         self::assertSame('20', $conditions['conditions'][0]['value']);
         $fixed = $this->cartRule("{$tag} fixed");
         self::assertNotNull($fixed);
         self::assertSame(1, (int) $fixed->getSimpleFreeShipping());
+        self::assertSame([1, 1], [(int) $fixed->getUseAutoGeneration(), (int) $fixed->getUsesPerCoupon()]);
+        self::assertSame($list, $records->couponCodes((int) $fixed->getId()));
         self::assertSame('sku', $fixed->getConditions()->asArray()['conditions'][0]['conditions'][0]['attribute']);
         self::assertSame('simple', $fixed->getActions()->asArray()['conditions'][0]['value']);
         $json = $this->cartRule("{$tag} json");
@@ -236,7 +238,8 @@ class PriceRuleImportTest extends TestCase
         $rows = $this->export(EntityRegistry::CART_RULE, $tag);
         self::assertCount(3, $rows);
         self::assertSame($code, $rows["{$tag} ten"]['coupon_code']);
-        self::assertSame(implode(';', $list), $rows["{$tag} ten"]['coupon_codes']);
+        self::assertSame('', $rows["{$tag} ten"]['coupon_codes']);
+        self::assertSame(['', implode(';', $list)], [$rows["{$tag} fixed"]['coupon_code'], $rows["{$tag} fixed"]['coupon_codes']]);
         self::assertSame('10 % off|default:Ten off', $rows["{$tag} ten"]['labels']);
         self::assertSame('base', $rows["{$tag} ten"]['websites']);
         self::assertSame('NOT LOGGED IN,General', $rows["{$tag} ten"]['customer_groups']);
@@ -248,7 +251,7 @@ class PriceRuleImportTest extends TestCase
         self::assertSame([0, 0, 3], [$back->getCount('created'), $back->getCount('updated'), $back->getCount('unchanged')], $back->getMessage());
         $again = $this->process($this->profile(EntityRegistry::CART_RULE, PriceRuleImporter::CART_COLUMNS), $rows["{$tag} ten"]['_file']);
         self::assertSame(RunInterface::STATUS_SUCCESS, $again->getStatus(), $this->report($again));
-        self::assertSame($list, $records->couponCodes((int) $ten->getId()), 'coupons not doubled');
+        self::assertSame($list, $records->couponCodes((int) $fixed->getId()), 'coupons not doubled');
 
         // Bad rows are reported, nothing is written.
         $bad = $this->file($header
@@ -278,7 +281,7 @@ class PriceRuleImportTest extends TestCase
         self::assertSame(RunInterface::STATUS_SUCCESS, $gone->getStatus(), $this->report($gone));
         self::assertSame(3, $gone->getCount('deleted'));
         self::assertNull($this->cartRule("{$tag} ten"));
-        self::assertSame([], $records->couponOwners([$code, $list[0]]), 'coupons go with the rule');
+        self::assertSame([], $records->couponOwners([$code, $list[0]]), 'coupons go with the rules');
     }
 
     #[DataFixture('Magento/Catalog/_files/product_simple.php')]

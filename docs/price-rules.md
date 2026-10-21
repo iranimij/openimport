@@ -33,7 +33,7 @@ which one.
 |---|---|
 | `coupon_type` | `none` (the default), `specific` (a code) or `auto` (Magento generates codes). Empty with a `coupon_code`: specific. |
 | `coupon_code` | The coupon code of the rule. |
-| `coupon_codes` | Several codes of one rule, separated by `;` or `,` — a code list from a campaign. Codes the rule has already are kept; a code of another rule is an error. |
+| `coupon_codes` | Several codes of one rule, separated by `;` or `,` — a code list from a campaign. The rule then works like Magento's *Use Auto Generation* (a `coupon_code` given as well joins the list). Codes the rule has already are kept; a code of another rule is an error. |
 | `uses_per_coupon`, `uses_per_customer` | Limits; 0 = unlimited. |
 | `discount_qty`, `discount_step` | *Maximum Qty Discount is Applied To*, *Discount Qty Step (Buy X)*. |
 | `apply_to_shipping` | `1`/`0`. |

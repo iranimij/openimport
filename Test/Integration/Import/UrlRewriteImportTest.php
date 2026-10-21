@@ -190,7 +190,11 @@ class UrlRewriteImportTest extends TestCase
         self::assertSame('302', $rows["{$tag}-promo"]['redirect_type']);
         $back = $this->process($profile, $path, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $back->getStatus(), $back->getMessage());
-        self::assertSame([0, 3], [$back->getCount('created'), $back->getCount('updated')]);
+        self::assertSame(
+            [0, 3],
+            [$back->getCount('created'), $back->getCount('updated')],
+            $back->getMessage() . "\n" . implode("\n", $this->errorMessages($back))
+        );
 
         // Conflicts and bad rows are reported, nothing is written.
         $bad = $this->file($header

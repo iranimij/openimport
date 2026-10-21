@@ -171,6 +171,8 @@ class ProfileValidator
                 break;
             case 's3':
             case 'google_drive':
+            case 'dropbox':
+            case 'onedrive':
                 $problem = $this->connections->selected($config) > 0
                     ? $this->connections->problem($config, $profile->getSourceType())
                     : 'Choose a saved connection for this source.';
@@ -209,7 +211,7 @@ class ProfileValidator
             if ($destination === 'folder' && $out('path') === '') {
                 $problems[] = 'Enter the server folder to write to.';
             }
-            if (in_array($destination, ['s3', 'google_drive'], true)) {
+            if (in_array($destination, ['s3', 'google_drive', 'dropbox', 'onedrive'], true)) {
                 $problem = $this->connections->selected($export) > 0
                     ? $this->connections->problem($export, $destination)
                     : 'Choose a saved connection for the destination.';

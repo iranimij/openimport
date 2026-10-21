@@ -6,11 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Iranimij\OpenImport\Model\Google;
+namespace Iranimij\OpenImport\Model\OAuth;
 
 use Iranimij\OpenImport\Api\ConnectionRepositoryInterface;
 use Iranimij\OpenImport\Api\Data\ConnectionInterface;
-use Iranimij\OpenImport\Model\Http\ApiClient;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Security\Secrets;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -19,9 +18,10 @@ use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\Math\Random;
 
 /**
- * "Sign in with Google" for a connection: the consent page gets a random state ("<connection id>.<random>") and a
- * PKCE challenge; the connection keeps the state's hash and the encrypted verifier for 15 minutes. The answer
- * (code + state) is traded for a refresh token, which is stored encrypted with the connection.
+ * "Sign in" for a connection (Google, Dropbox, Microsoft; providers by connection type in di.xml): the consent page
+ * gets a random state ("<connection id>.<random>") and a PKCE challenge; the connection keeps the state's hash and the
+ * encrypted verifier for 15 minutes. The answer (code + state) is traded for a refresh token, which is stored
+ * encrypted with the connection.
  */
 class OAuthFlow
 {
@@ -31,28 +31,37 @@ class OAuthFlow
 
     /**
      * @param ConnectionRepositoryInterface $connections
-     * @param GoogleAuth $auth
      * @param Secrets $secrets
      * @param EncryptorInterface $encryptor
      * @param UrlInterface $url
      * @param Random $random
-     * @param ApiClient $api
-     * @param GoogleEndpoints $endpoints
+     * @param array<string, OAuthProviderInterface> $providers connection type => provider
      */
     public function __construct(
         private readonly ConnectionRepositoryInterface $connections,
-        private readonly GoogleAuth $auth,
         private readonly Secrets $secrets,
         private readonly EncryptorInterface $encryptor,
         private readonly UrlInterface $url,
         private readonly Random $random,
-        private readonly ApiClient $api,
-        private readonly GoogleEndpoints $endpoints
+        private readonly array $providers = []
     ) {
     }
 
     /**
-     * The address to register as "Authorized redirect URI" of the OAuth client in Google Cloud.
+     * @param ConnectionInterface $connection
+     * @return OAuthProviderInterface|null the provider when the connection signs in
+     */
+    public function provider(ConnectionInterface $connection): ?OAuthProviderInterface
+    {
+        $provider = $this->providers[$connection->getType()] ?? null;
+
+        return $provider instanceof OAuthProviderInterface && $provider->signsIn($connection->getSettings())
+            ? $provider
+            : null;
+    }
+
+    /**
+     * The address to register as redirect URI of the shop's OAuth client (Google, Dropbox, Microsoft).
      *
      * @return string
      */
@@ -70,9 +79,8 @@ class OAuthFlow
     {
         $settings = $connection->getSettings();
         $clientId = trim((string) ($settings['client_id'] ?? ''));
-        if ($connection->getType() !== 'google_drive' || ($settings['auth_google'] ?? '') !== GoogleAuth::OAUTH
-            || $clientId === '' || $this->secrets->get($settings, 'client_secret') === ''
-        ) {
+        $provider = $this->provider($connection);
+        if ($provider === null || $clientId === '' || $this->secrets->get($settings, 'client_secret') === '') {
             throw new PipelineException('Save the client ID and client secret of the connection first.');
         }
         $state = $connection->getConnectionId() . '.' . $this->random->getRandomString(32);
@@ -87,11 +95,11 @@ class OAuthFlow
         ];
         $this->connections->save($connection->setSettings($settings));
 
-        return $this->auth->consentUrl($clientId, $this->redirectUri(), $state, $verifier);
+        return $provider->consentUrl($settings, $clientId, $this->redirectUri(), $state, $verifier);
     }
 
     /**
-     * Stores the refresh token Google gave for this state and code.
+     * Stores the refresh token the service gave for this state and code.
      *
      * @param string $state
      * @param string $code
@@ -114,11 +122,14 @@ class OAuthFlow
             throw new PipelineException($unknown);
         }
         unset($settings[self::PENDING]);
-        $tokens = $this->auth->exchange(
-            [
-                'client_id' => (string) ($settings['client_id'] ?? ''),
-                'client_secret' => $this->secrets->get($settings, 'client_secret'),
-            ],
+        $provider = $this->provider($connection);
+        if ($provider === null) {
+            throw new PipelineException($unknown);
+        }
+        $tokens = $provider->exchange(
+            $settings,
+            (string) ($settings['client_id'] ?? ''),
+            $this->secrets->get($settings, 'client_secret'),
             $code,
             (string) $this->encryptor->decrypt((string) ($pending['verifier'] ?? '')),
             $this->redirectUri()
@@ -126,32 +137,13 @@ class OAuthFlow
         $refresh = (string) ($tokens['refresh_token'] ?? '');
         if ($refresh === '') {
             throw new PipelineException(
-                'Google gave no lasting access. Remove OpenImport under myaccount.google.com › Security › '
-                . 'Third-party access and sign in again.'
+                'The service gave no lasting access. Remove the app from the account\'s connected apps and sign '
+                . 'in again.'
             );
         }
         $settings = $this->secrets->merge(['refresh_token' => $refresh] + $this->secrets->strip($settings), $settings);
-        $settings['account'] = $this->email((string) ($tokens['access_token'] ?? ''));
+        $settings['account'] = $provider->account((string) ($tokens['access_token'] ?? ''));
 
         return $this->connections->save($connection->setSettings($settings));
-    }
-
-    /**
-     * @param string $token
-     * @return string the signed-in account's e-mail address ('' when Google does not tell)
-     */
-    private function email(string $token): string
-    {
-        try {
-            $answer = $this->api->send(
-                'GET',
-                $this->endpoints->drive . '/about?fields=user(emailAddress)',
-                ['Authorization' => 'Bearer ' . $token]
-            );
-        } catch (PipelineException $exception) {
-            return '';
-        }
-
-        return (string) ($answer->json()['user']['emailAddress'] ?? '');
     }
 }

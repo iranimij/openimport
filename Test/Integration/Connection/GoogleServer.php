@@ -12,7 +12,8 @@ use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\Google\DriveClient;
 use Iranimij\OpenImport\Model\Google\GoogleAuth;
 use Iranimij\OpenImport\Model\Google\GoogleEndpoints;
-use Iranimij\OpenImport\Model\Google\OAuthFlow;
+use Iranimij\OpenImport\Model\Google\GoogleOAuthProvider;
+use Iranimij\OpenImport\Model\OAuth\OAuthFlow;
 use Magento\Framework\App\Config\MutableScopeConfigInterface;
 use Magento\Framework\ObjectManagerInterface;
 
@@ -68,7 +69,7 @@ class GoogleServer
             usleep(100000);
         }
         $this->objectManager->get(MutableScopeConfigInterface::class)->setValue(Config::XML_ALLOWED_HOSTS, '127.0.0.1');
-        foreach ([GoogleAuth::class, DriveClient::class, OAuthFlow::class] as $shared) {
+        foreach ([GoogleAuth::class, DriveClient::class, OAuthFlow::class, GoogleOAuthProvider::class] as $shared) {
             $this->objectManager->removeSharedInstance($shared);
         }
         $this->objectManager->addSharedInstance(
@@ -88,7 +89,7 @@ class GoogleServer
             // phpcs:ignore Magento2.Security.InsecureFunction -- stops the test web server
             proc_close($this->process);
         }
-        foreach ([GoogleEndpoints::class, GoogleAuth::class, DriveClient::class, OAuthFlow::class] as $shared) {
+        foreach ([GoogleEndpoints::class, GoogleAuth::class, DriveClient::class, OAuthFlow::class, GoogleOAuthProvider::class] as $shared) {
             $this->objectManager->removeSharedInstance($shared);
         }
         if (is_file($this->stateFile)) {

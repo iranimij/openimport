@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Controller\Adminhtml\Connection;
 
 use Iranimij\OpenImport\Api\ConnectionRepositoryInterface;
-use Iranimij\OpenImport\Model\Google\OAuthFlow;
+use Iranimij\OpenImport\Model\OAuth\OAuthFlow;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;

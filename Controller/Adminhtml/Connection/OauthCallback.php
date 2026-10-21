@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Controller\Adminhtml\Connection;
 
-use Iranimij\OpenImport\Model\Google\OAuthFlow;
+use Iranimij\OpenImport\Model\OAuth\OAuthFlow;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -30,6 +30,8 @@ class OauthCallback extends Action implements HttpGetActionInterface
      */
     protected $_publicActions = ['oauthcallback'];
 
+    private const SERVICES = ['google_drive' => 'Google', 'dropbox' => 'Dropbox', 'onedrive' => 'Microsoft'];
+
     /**
      * @param Context $context
      * @param OAuthFlow $flow
@@ -49,7 +51,7 @@ class OauthCallback extends Action implements HttpGetActionInterface
         $request = $this->getRequest();
         $error = (string) $request->getParam('error');
         if ($error !== '') {
-            $this->messageManager->addErrorMessage((string) __('Google did not sign in: %1', $error));
+            $this->messageManager->addErrorMessage((string) __('The sign-in was refused: %1', $error));
 
             return $this->resultRedirectFactory->create()->setPath('*/*/');
         }
@@ -64,9 +66,10 @@ class OauthCallback extends Action implements HttpGetActionInterface
             return $this->resultRedirectFactory->create()->setPath('*/*/');
         }
         $account = (string) ($connection->getSettings()['account'] ?? '');
+        $service = self::SERVICES[$connection->getType()] ?? $connection->getType();
         $this->messageManager->addSuccessMessage($account !== ''
-            ? (string) __('"%1" is signed in to Google as %2.', $connection->getName(), $account)
-            : (string) __('"%1" is signed in to Google.', $connection->getName()));
+            ? (string) __('"%1" is signed in to %2 as %3.', $connection->getName(), $service, $account)
+            : (string) __('"%1" is signed in to %2.', $connection->getName(), $service));
 
         return $this->resultRedirectFactory->create()->setPath('*/*/edit', ['id' => $connection->getConnectionId()]);
     }

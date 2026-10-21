@@ -53,7 +53,8 @@ interface ProfileInterface
     public const BEHAVIORS = [self::BEHAVIOR_ADD_UPDATE, self::BEHAVIOR_ONLY_ADD, self::BEHAVIOR_ONLY_UPDATE,
         self::BEHAVIOR_REPLACE, self::BEHAVIOR_DELETE];
 
-    public const SOURCE_TYPES = ['upload', 'folder', 'url', 'sftp', 'ftp', 's3', 'google_drive'];
+    public const SOURCE_TYPES = ['upload', 'folder', 'url', 'sftp', 'ftp', 's3', 'google_drive', 'dropbox',
+        'onedrive'];
     public const FORMATS = ['auto', 'csv', 'xlsx', 'json', 'xml'];
     public const ON_ERROR_STOP = 'stop';
     public const ON_ERROR_SKIP = 'skip';

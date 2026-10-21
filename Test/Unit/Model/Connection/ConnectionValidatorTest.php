@@ -16,7 +16,8 @@ class ConnectionValidatorTest extends TestCase
 {
     private function validator(): ConnectionValidator
     {
-        return new ConnectionValidator(new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3', 'google_drive' => 'Google']));
+        return new ConnectionValidator(new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3', 'google_drive' => 'Google',
+            'dropbox' => 'Dropbox', 'onedrive' => 'OneDrive']));
     }
 
     public function testAValidConnection(): void
@@ -39,8 +40,8 @@ class ConnectionValidatorTest extends TestCase
             $this->validator()->validate(new ConnectionStub(null, ' ', 'ftp', ['port' => '0', 'auth_sftp' => 'token']))
         );
         self::assertSame(
-            ['The name is longer than 255 characters.', 'Choose what the connection is for (SFTP, FTP, S3, Google).'],
-            $this->validator()->validate(new ConnectionStub(null, str_repeat('x', 256), 'dropbox'))
+            ['The name is longer than 255 characters.', 'Choose what the connection is for (SFTP, FTP, S3, Google, Dropbox, OneDrive).'],
+            $this->validator()->validate(new ConnectionStub(null, str_repeat('x', 256), 'box'))
         );
     }
 
@@ -94,6 +95,24 @@ class ConnectionValidatorTest extends TestCase
                 'Enter the client secret of your OAuth client.',
             ],
             $this->validator()->validate(new ConnectionStub(null, 'Drive', 'google_drive', ['auth_google' => 'oauth']))
+        );
+    }
+
+    public function testDropboxAndOneDriveNeedTheirApp(): void
+    {
+        self::assertSame([], $this->validator()->validate(new ConnectionStub(null, 'D', 'dropbox', [
+            'client_id' => 'key', 'secrets' => ['client_secret' => 'enc(s)'],
+        ])));
+        self::assertSame(
+            ['Enter the app key of your Dropbox app (dropbox.com/developers/apps).', 'Enter the app secret of your Dropbox app.'],
+            $this->validator()->validate(new ConnectionStub(null, 'D', 'dropbox'))
+        );
+        self::assertSame(
+            [
+                'Enter the application (client) ID of your app registration (entra.microsoft.com).',
+                'Enter a client secret of your app registration.',
+            ],
+            $this->validator()->validate(new ConnectionStub(null, 'O', 'onedrive'))
         );
     }
 }

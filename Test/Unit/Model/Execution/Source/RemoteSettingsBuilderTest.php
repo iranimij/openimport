@@ -107,4 +107,23 @@ class RemoteSettingsBuilderTest extends TestCase
             $user->options['refresh_token'], $user->options['as_sheet'], $user->label(),
         ]);
     }
+
+    public function testDropboxAndOneDrive(): void
+    {
+        $builder = new RemoteSettingsBuilder(new Secrets(new FakeEncryptor()));
+
+        $dropbox = $builder->build([
+            'client_id' => 'key', 'account' => 'shop@example.com',
+            'secrets' => ['client_secret' => 'enc(s)', 'refresh_token' => 'enc(r)'],
+        ], 'dropbox');
+        self::assertSame(['key', 's', 'r'], [
+            $dropbox->options['client_id'], $dropbox->options['client_secret'], $dropbox->options['refresh_token'],
+        ]);
+        self::assertSame('Dropbox (shop@example.com)', $dropbox->label());
+
+        self::assertSame('OneDrive', $builder->build([], 'onedrive')->label());
+        $site = $builder->build(['tenant' => 'contoso.onmicrosoft.com', 'site' => 'contoso.sharepoint.com/sites/Shop'], 'onedrive');
+        self::assertSame('SharePoint contoso.sharepoint.com/sites/Shop', $site->label());
+        self::assertSame('contoso.onmicrosoft.com', $site->options['tenant']);
+    }
 }

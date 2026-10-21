@@ -8,15 +8,17 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Model\Import\Small;
 
-use Magento\Catalog\Api\CategoryLinkRepositoryInterface;
-use Magento\Catalog\Api\Data\CategoryProductLinkInterfaceFactory;
+use Magento\Catalog\Model\Category;
+use Magento\Catalog\Model\CategoryFactory;
+use Magento\Catalog\Model\ResourceModel\Category as CategoryResource;
 use Magento\ImportExport\Model\Import;
 use Psr\Log\LoggerInterface;
 
 /**
  * Product positions in categories: a product (SKU) in a category (path) at a position. Add/Update assigns the
- * product and sets the position, Delete removes it from the category. Written through Magento's category link
- * repository, as the admin's "Products in Category" grid does.
+ * product and sets the position, Delete removes it from the category. Written as the admin's "Products in
+ * Category" grid does: the category's posted products through the category resource (a fresh model per row, so
+ * the positions are read from the database, not from a cached instance).
  */
 class CategoryPositionImporter extends SmallImporter
 {
@@ -26,15 +28,15 @@ class CategoryPositionImporter extends SmallImporter
      * @param LoggerInterface $logger
      * @param SmallRecords $records
      * @param CategoryPositionSource $source
-     * @param CategoryProductLinkInterfaceFactory $linkFactory
-     * @param CategoryLinkRepositoryInterface $links
+     * @param CategoryFactory $categoryFactory
+     * @param CategoryResource $categoryResource
      */
     public function __construct(
         LoggerInterface $logger,
         private readonly SmallRecords $records,
         private readonly CategoryPositionSource $source,
-        private readonly CategoryProductLinkInterfaceFactory $linkFactory,
-        private readonly CategoryLinkRepositoryInterface $links
+        private readonly CategoryFactory $categoryFactory,
+        private readonly CategoryResource $categoryResource
     ) {
         parent::__construct($logger);
     }
@@ -71,8 +73,7 @@ class CategoryPositionImporter extends SmallImporter
                 return ['error' => ['product_sku', 'is not in this category']];
             }
 
-            return ['key' => $key, 'exists' => true, 'category_id' => $categoryId,
-                'sku' => (string) $this->records->sku($productId)];
+            return ['key' => $key, 'exists' => true, 'category_id' => $categoryId, 'product_id' => $productId];
         }
         $position = $row['position'] ?? '';
         if ($position !== '' && preg_match('/^-?\d+$/', $position) !== 1) {
@@ -83,7 +84,7 @@ class CategoryPositionImporter extends SmallImporter
             'key' => $key,
             'exists' => $existing !== null,
             'category_id' => $categoryId,
-            'sku' => (string) $this->records->sku($productId),
+            'product_id' => $productId,
             'position' => $position !== '' ? (int) $position : ($existing ?? 0),
         ];
     }
@@ -93,9 +94,11 @@ class CategoryPositionImporter extends SmallImporter
      */
     protected function write(array $prepared): void
     {
-        $link = $this->linkFactory->create();
-        $link->setCategoryId($prepared['category_id'])->setSku($prepared['sku'])->setPosition($prepared['position']);
-        $this->links->save($link);
+        $category = $this->category((int) $prepared['category_id']);
+        $positions = $category->getProductsPosition();
+        $positions[(int) $prepared['product_id']] = (int) $prepared['position'];
+        $category->setData('posted_products', $positions);
+        $this->categoryResource->save($category);
     }
 
     /**
@@ -103,6 +106,25 @@ class CategoryPositionImporter extends SmallImporter
      */
     protected function remove(array $prepared): void
     {
-        $this->links->deleteByIds($prepared['category_id'], $prepared['sku']);
+        $category = $this->category((int) $prepared['category_id']);
+        $positions = $category->getProductsPosition();
+        unset($positions[(int) $prepared['product_id']]);
+        $category->setData('posted_products', $positions);
+        $this->categoryResource->save($category);
+    }
+
+    /**
+     * @param int $id
+     * @return Category a fresh model, loaded from the database
+     */
+    private function category(int $id): Category
+    {
+        $category = $this->categoryFactory->create();
+        $this->categoryResource->load($category, $id);
+        if (!$category->getId()) {
+            throw new \RuntimeException(sprintf('Category %d disappeared during the import.', $id));
+        }
+
+        return $category;
     }
 }

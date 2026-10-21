@@ -182,9 +182,10 @@ class SmallEntitiesImportTest extends TestCase
         );
         self::assertCount(2, $rows);
         $anna = $rows["Anna {$tag}"];
-        self::assertSame(['approved', 'default', '2025-02-03 10:00:00', 'customer@example.com', 'Quality:4,Value:5'], [
-            $anna['status'], $anna['store_codes'], $anna['created_at'], $anna['customer_email'], $anna['ratings'],
-        ]);
+        foreach (['status' => 'approved', 'store_codes' => 'default', 'created_at' => '2025-02-03 10:00:00',
+            'customer_email' => 'customer@example.com', 'ratings' => 'Quality:4,Value:5'] as $column => $expected) {
+            self::assertSame($expected, $anna[$column], $column . ' of the exported review: ' . json_encode($anna));
+        }
         self::assertSame(['pending', 'all', ''], [$rows["Ben {$tag}"]['status'], $rows["Ben {$tag}"]['store_codes'], $rows["Ben {$tag}"]['ratings']]);
         $review = Bootstrap::getObjectManager()->get(ReviewSource::class)->byKey(1, "Anna {$tag}", 'Great shirt');
         self::assertNotNull($review);

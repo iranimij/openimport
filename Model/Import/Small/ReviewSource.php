@@ -149,7 +149,7 @@ class ReviewSource implements SmallSourceInterface
                         'o.rating_id = rt.rating_id',
                         ['option_id', 'value']
                     )
-                    ->order(['rt.position ASC', 'o.value ASC'])
+                    ->order(['rt.position ASC', 'rt.rating_id ASC', 'o.value ASC'])
             );
             foreach ($rows as $row) {
                 $code = mb_strtolower((string) $row['rating_code']);
@@ -211,7 +211,7 @@ class ReviewSource implements SmallSourceInterface
                     ['rating_code']
                 )
                 ->where('v.review_id = ?', $id)
-                ->order('rt.position ASC')
+                ->order(['rt.position ASC', 'rt.rating_id ASC'])
         );
         $ratings = [];
         foreach ($votes as $vote) {

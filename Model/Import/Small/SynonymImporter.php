@@ -90,10 +90,16 @@ class SynonymImporter extends SmallImporter
     protected function write(array $prepared): void
     {
         $group = $this->groupFactory->create();
+        $words = $prepared['words'];
         if ($prepared['id'] !== null) {
+            // Merge: the words the group has already stay, as the admin form does.
             $group = $this->repository->get($prepared['id']);
+            $words = array_values(array_unique(array_merge(
+                array_filter(array_map('trim', explode(',', (string) $group->getSynonymGroup()))),
+                $words
+            )));
         }
-        $group->setSynonymGroup(implode(',', $prepared['words']));
+        $group->setSynonymGroup(implode(',', $words));
         $group->setStoreId($prepared['store_id']);
         $group->setWebsiteId($prepared['website_id']);
         $this->repository->save($group);

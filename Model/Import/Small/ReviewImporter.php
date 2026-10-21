@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Model\Import\Small;
 use Magento\ImportExport\Model\Import;
 use Magento\Review\Model\Rating;
 use Magento\Review\Model\RatingFactory;
+use Magento\Review\Model\ResourceModel\Review as ReviewResource;
 use Magento\Review\Model\Review;
 use Magento\Review\Model\ReviewFactory;
 use Psr\Log\LoggerInterface;
@@ -35,13 +36,15 @@ class ReviewImporter extends SmallImporter
      * @param ReviewSource $source
      * @param ReviewFactory $reviewFactory
      * @param RatingFactory $ratingFactory
+     * @param ReviewResource $reviewResource
      */
     public function __construct(
         LoggerInterface $logger,
         private readonly SmallRecords $records,
         private readonly ReviewSource $source,
         private readonly ReviewFactory $reviewFactory,
-        private readonly RatingFactory $ratingFactory
+        private readonly RatingFactory $ratingFactory,
+        private readonly ReviewResource $reviewResource
     ) {
         parent::__construct($logger);
     }
@@ -182,7 +185,7 @@ class ReviewImporter extends SmallImporter
         /** @var Review $review */
         $review = $this->reviewFactory->create();
         if ($prepared['id'] !== null) {
-            $review->load((int) $prepared['id']);
+            $this->reviewResource->load($review, (int) $prepared['id']);
         } else {
             $review->setEntityId((int) $review->getEntityIdByCode(Review::ENTITY_PRODUCT_CODE))
                 ->setEntityPkValue($prepared['product_id'])
@@ -210,7 +213,7 @@ class ReviewImporter extends SmallImporter
             $review->setData('customer_id', $prepared['customer_id']);
         }
         $review->setData('store_id', $review->getData('store_id') ?: ($this->records->storeId('') ?? 0));
-        $review->save();
+        $this->reviewResource->save($review);
         if ($prepared['ratings'] !== null) {
             $this->source->deleteVotes((int) $review->getId());
             foreach ($prepared['ratings'] as $ratingId => $optionId) {
@@ -231,9 +234,9 @@ class ReviewImporter extends SmallImporter
     {
         /** @var Review $review */
         $review = $this->reviewFactory->create();
-        $review->load((int) $prepared['id']);
+        $this->reviewResource->load($review, (int) $prepared['id']);
         if ($review->getId()) {
-            $review->delete();
+            $this->reviewResource->delete($review);
             $review->aggregate();
         }
     }

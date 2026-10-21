@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\Import\Small;
 
 use Magento\ImportExport\Model\Import;
+use Magento\Newsletter\Model\ResourceModel\Subscriber as SubscriberResource;
 use Magento\Newsletter\Model\Subscriber;
 use Magento\Newsletter\Model\SubscriberFactory;
 use Psr\Log\LoggerInterface;
@@ -31,12 +32,14 @@ class NewsletterImporter extends SmallImporter
      * @param SmallRecords $records
      * @param NewsletterSource $source
      * @param SubscriberFactory $subscriberFactory
+     * @param SubscriberResource $subscriberResource
      */
     public function __construct(
         LoggerInterface $logger,
         private readonly SmallRecords $records,
         private readonly NewsletterSource $source,
-        private readonly SubscriberFactory $subscriberFactory
+        private readonly SubscriberFactory $subscriberFactory,
+        private readonly SubscriberResource $subscriberResource
     ) {
         parent::__construct($logger);
     }
@@ -105,7 +108,7 @@ class NewsletterImporter extends SmallImporter
         /** @var Subscriber $subscriber */
         $subscriber = $this->subscriberFactory->create();
         if ($prepared['id'] !== null) {
-            $subscriber->load((int) $prepared['id']);
+            $this->subscriberResource->load($subscriber, (int) $prepared['id']);
         } else {
             $subscriber->setSubscriberEmail($prepared['email'])
                 ->setSubscriberConfirmCode(bin2hex(random_bytes(16)));
@@ -116,7 +119,7 @@ class NewsletterImporter extends SmallImporter
         if ($prepared['status'] === Subscriber::STATUS_SUBSCRIBED && !$subscriber->getChangeStatusAt()) {
             $subscriber->setChangeStatusAt(gmdate('Y-m-d H:i:s'));
         }
-        $subscriber->save();
+        $this->subscriberResource->save($subscriber);
     }
 
     /**
@@ -126,9 +129,9 @@ class NewsletterImporter extends SmallImporter
     {
         /** @var Subscriber $subscriber */
         $subscriber = $this->subscriberFactory->create();
-        $subscriber->load((int) $prepared['id']);
+        $this->subscriberResource->load($subscriber, (int) $prepared['id']);
         if ($subscriber->getId()) {
-            $subscriber->delete();
+            $this->subscriberResource->delete($subscriber);
         }
     }
 }

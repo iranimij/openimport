@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Model\Import\Small;
 use Magento\ImportExport\Model\Import;
 use Magento\Search\Model\Query;
 use Magento\Search\Model\QueryFactory;
+use Magento\Search\Model\ResourceModel\Query as QueryResource;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -26,12 +27,14 @@ class SearchTermImporter extends SmallImporter
      * @param SmallRecords $records
      * @param SearchTermSource $source
      * @param QueryFactory $queryFactory
+     * @param QueryResource $queryResource
      */
     public function __construct(
         LoggerInterface $logger,
         private readonly SmallRecords $records,
         private readonly SearchTermSource $source,
-        private readonly QueryFactory $queryFactory
+        private readonly QueryFactory $queryFactory,
+        private readonly QueryResource $queryResource
     ) {
         parent::__construct($logger);
     }
@@ -98,7 +101,7 @@ class SearchTermImporter extends SmallImporter
         /** @var Query $query */
         $query = $this->queryFactory->create();
         if ($prepared['id'] !== null) {
-            $query->load((int) $prepared['id']);
+            $this->queryResource->load($query, (int) $prepared['id']);
         } else {
             $query->setQueryText($prepared['query_text']);
             $query->setStoreId($prepared['store_id']);
@@ -115,7 +118,7 @@ class SearchTermImporter extends SmallImporter
         if ($prepared['popularity'] !== null) {
             $query->setPopularity($prepared['popularity']);
         }
-        $query->save();
+        $this->queryResource->save($query);
     }
 
     /**
@@ -125,9 +128,9 @@ class SearchTermImporter extends SmallImporter
     {
         /** @var Query $query */
         $query = $this->queryFactory->create();
-        $query->load((int) $prepared['id']);
+        $this->queryResource->load($query, (int) $prepared['id']);
         if ($query->getId()) {
-            $query->delete();
+            $this->queryResource->delete($query);
         }
     }
 }

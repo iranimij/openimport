@@ -27,6 +27,7 @@ nav:
   - CMS pages and blocks: cms.md
   - Shipments and tracking: shipments.md
   - Order import: orders-import.md
+  - URL rewrites: url-rewrites.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
   - REST API and triggers: api.md

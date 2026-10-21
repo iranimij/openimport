@@ -197,6 +197,8 @@ class PriceRuleImportTest extends TestCase
         $quote = Bootstrap::getObjectManager()->create(Quote::class);
         $quote->setStoreId(1)->setIsActive(true)->setCustomerIsGuest(true)->setCustomerGroupId(0)
             ->addProduct($product, 3);
+        $quote->getBillingAddress();
+        $quote->getShippingAddress()->setCollectShippingRates(true);
         $quote->setCouponCode($code)->collectTotals();
         self::assertSame($code, $quote->getCouponCode(), 'the coupon is accepted');
         $address = $quote->getShippingAddress();

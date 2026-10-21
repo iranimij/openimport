@@ -207,13 +207,16 @@ class OrderImporter implements ImporterInterface
             ? (string) $this->sequences->getSequence('order', (int) $store['id'])->getNextValue()
             : $key;
 
+        // With documents the order starts as new (a complete or closed order cannot be invoiced or shipped); the
+        // file's state and status are set once the documents exist.
+        $documents = ($options[self::OPTION_DOCUMENTS] ?? '0') === '1';
         /** @var Order $model */
         $model = $this->orderFactory->create();
         $model->setIncrementId($incrementId)
             ->setStoreId((int) $store['id'])
             ->setStoreName($store['name'])
-            ->setState($state)
-            ->setStatus($status)
+            ->setState($documents ? Order::STATE_NEW : $state)
+            ->setStatus($documents ? ($this->records->defaultStatus(Order::STATE_NEW) ?: 'pending') : $status)
             ->setCustomerIsGuest($isGuest ? 1 : 0)
             ->setCustomerId($isGuest ? null : $customer['id'])
             ->setCustomerEmail($data['customer_email'])
@@ -273,7 +276,6 @@ class OrderImporter implements ImporterInterface
         }
         $model->setPayment($payment);
 
-        $documents = ($options[self::OPTION_DOCUMENTS] ?? '0') === '1';
         $items = $this->items($order, (int) $store['id']);
         if (!$documents) {
             // No documents: the items still carry the file's quantities, so the order reads as it was.

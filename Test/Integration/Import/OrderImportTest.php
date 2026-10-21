@@ -147,6 +147,11 @@ class OrderImportTest extends TestCase
         return implode("\n", $lines) . "\n";
     }
 
+    private function report(RunInterface $run): string
+    {
+        return $run->getMessage() . "\n" . implode("\n", $this->errorMessages($run));
+    }
+
     /**
      * @return string[]
      */
@@ -171,7 +176,11 @@ class OrderImportTest extends TestCase
             ['increment_id IN (?)' => ['100000001', '100000002', '100000003', '100000004']]
         );
         $before = $this->rows($this->process($this->exportProfile()));
-        $fixture = array_values(array_filter($before, static fn (array $row): bool => (int) $row['increment_id'] <= 100000004));
+        $numbers = ['100000001', '100000002', '100000003', '100000004'];
+        $fixture = array_values(array_filter(
+            $before,
+            static fn (array $row): bool => in_array((string) $row['increment_id'], $numbers, true)
+        ));
         self::assertNotEmpty($fixture);
         $file = $this->file($this->csv($fixture));
 
@@ -180,11 +189,14 @@ class OrderImportTest extends TestCase
         self::assertSame(count(array_unique(array_column($fixture, 'increment_id'))), $dry->getCount('created'));
 
         $live = $this->process($this->importProfile([OrderImporter::OPTION_NUMBER => 'generate']), $file);
-        self::assertSame(RunInterface::STATUS_SUCCESS, $live->getStatus(), $live->getMessage());
+        self::assertSame(RunInterface::STATUS_SUCCESS, $live->getStatus(), $this->report($live));
         self::assertSame($dry->getCount('created'), $live->getCount('created'));
 
         $after = $this->rows($this->process($this->exportProfile()));
-        $imported = array_values(array_filter($after, static fn (array $row): bool => (int) $row['increment_id'] > 100000004));
+        $imported = array_values(array_filter(
+            $after,
+            static fn (array $row): bool => !in_array((string) $row['increment_id'], $numbers, true)
+        ));
         self::assertCount(count($fixture), $imported, 'one exported row per imported item');
         $strip = static fn (array $row): array => array_intersect_key($row, array_flip(self::ROUND_TRIP));
         self::assertSame(array_map($strip, $fixture), array_map($strip, $imported));
@@ -215,7 +227,7 @@ class OrderImportTest extends TestCase
         ], ProfileInterface::BEHAVIOR_ADD_UPDATE, $columns);
 
         $run = $this->process($profile, $file);
-        self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
+        self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $this->report($run));
         self::assertSame(1, $run->getCount('created'));
         $order = Bootstrap::getObjectManager()->create(Order::class)->loadByIncrementId('OI-9001');
         self::assertNotEmpty($order->getId());

@@ -16,6 +16,8 @@
         <a if="signInUrl" class="action-secondary" attr="href: signInUrl">
             <span text="$t('Sign in with %1').replace('%1', service())"></span>
         </a>
-        <p if="!signInUrl" class="note" translate="'Save the connection with its client ID and client secret, then sign in.'"></p>
+        <p if="!signInUrl" class="note">
+            <span translate="'Save the connection with its client ID and client secret, then sign in.'"></span>
+        </p>
     </div>
 </div>

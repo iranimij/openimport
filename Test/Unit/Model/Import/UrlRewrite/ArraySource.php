@@ -27,6 +27,9 @@ class ArraySource extends AbstractSource
         parent::__construct(array_values($columns));
     }
 
+    /**
+     * @return string[]|false
+     */
     protected function _getNextRow()
     {
         $row = $this->rows[$this->_key] ?? false;

@@ -4,6 +4,8 @@
  * See LICENSE for license details (MIT).
  */
 
+// phpcs:ignoreFile -- router for PHP's built-in web server, started by the Google integration tests and the E2E job
+
 declare(strict_types=1);
 
 /*

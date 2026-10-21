@@ -103,6 +103,23 @@ function token(string $grant, array $form, string $refresh, string $access): voi
 
 $auth = (string) preg_replace('/^Bearer /', '', (string) ($_SERVER['HTTP_AUTHORIZATION'] ?? ''));
 
+// ---- Consent page (browser tests): remembers the PKCE challenge and sends the browser back with the code ----
+if ($path === '/dropbox/oauth2/authorize' || preg_match('#^/ms/login/[^/]+/oauth2/v2\.0/authorize$#', $path)) {
+    $query = $_GET;
+    if (($query['response_type'] ?? '') !== 'code' || ($query['code_challenge_method'] ?? '') !== 'S256'
+        || empty($query['client_id']) || empty($query['state']) || empty($query['redirect_uri'])
+    ) {
+        raw(400, 'Bad authorization request: ' . json_encode($query));
+    }
+    $state['challenge'] = (string) $query['code_challenge'];
+    save();
+    $back = $query['redirect_uri'] . (str_contains((string) $query['redirect_uri'], '?') ? '&' : '?')
+        . http_build_query(['code' => 'good-code', 'state' => $query['state']]);
+    header('Location: ' . $back);
+    http_response_code(302);
+    exit;
+}
+
 // ---- Dropbox ----
 if ($path === '/dropbox/oauth2/token') {
     parse_str($body, $form);

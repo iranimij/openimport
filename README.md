@@ -1,8 +1,8 @@
 # OpenImport
 
 Import and export for Magento 2 and Mage-OS: saved profiles, column mapping, value transforms, a dry run that shows
-every change before anything is written, schedules, and remote sources and destinations (SFTP, FTP, URL, server
-folder, e-mail). Built on Magento's own import engine, so what lands in the catalog is exactly what core import would
+every change before anything is written, schedules, saved connections, and remote sources and destinations (SFTP,
+FTP, S3, URL, server folder, e-mail). Built on Magento's own import engine, so what lands in the catalog is exactly what core import would
 produce. Free forever, MIT, no licence keys, no telemetry.
 
 [![CI](https://github.com/iranimij/openimport/actions/workflows/ci.yml/badge.svg)](https://github.com/iranimij/openimport/actions/workflows/ci.yml)
@@ -30,8 +30,8 @@ Uninstall without a trace: `bin/magento module:uninstall Iranimij_OpenImport --r
 
 1. **System › Data Transfer › OpenImport › Profiles › New profile.** Two sample profiles are there already.
 2. Choose what to import (products, prices, stock, customers, addresses, MSI stock, or the fast *Stock & prices* update)
-   and where the file comes from (upload, server folder, web address, SFTP, FTP). *Test connection* fetches the first
-   rows right away.
+   and where the file comes from (upload, server folder, web address, SFTP, FTP, S3). *Test connection* fetches the
+   first rows right away. Or start from a preset for Shopify, WooCommerce or Magento 1 product files.
 3. Upload or fetch a file, press **Auto-match**: `Artikelnummer` becomes `sku`, `Preis` becomes `price`, `name_de`
    becomes the German store view's name. Add transforms (trim, decimal comma, maths, `.99` endings, dates, value maps,
    expressions) where needed, and row filters if only some rows should go in.
@@ -40,7 +40,7 @@ Uninstall without a trace: `bin/magento module:uninstall Iranimij_OpenImport --r
 5. **Run for real.** Or set a schedule (hourly, nightly, weekdays, or any cron expression) and let cron do it.
 
 Exports work the same way in the other direction: products, customers, addresses, advanced prices, MSI stock and
-orders to CSV, XLSX, JSON or XML, downloaded, dropped in a folder, pushed to SFTP/FTP, or e-mailed.
+orders to CSV, XLSX, JSON or XML, downloaded, dropped in a folder, pushed to SFTP/FTP/S3, or e-mailed.
 
 ## What it does
 
@@ -48,14 +48,16 @@ orders to CSV, XLSX, JSON or XML, downloaded, dropped in a folder, pushed to SFT
 |---|---|
 | **Profiles** | Saved import and export settings, duplicated, exported to JSON and imported again (version control, staging → production). |
 | **Files** | CSV/TSV (delimiter and encoding detected, UTF-16 and Windows-1252 too), Excel `.xlsx`, JSON, XML. Streamed: a 50k-row file needs about the same memory as a 1k-row file. |
-| **Sources** | Upload, server folder (sandboxed, with "move to processed" or delete after success), HTTP(S) URL including published Google Sheets, SFTP (password or key), FTP(S). Private and internal addresses are refused unless you allow them. |
+| **Sources** | Upload, server folder (sandboxed, with "move to processed" or delete after success), HTTP(S) URL including published Google Sheets, SFTP (password or key), FTP(S), Amazon S3 and S3-compatible storage (R2, Wasabi, MinIO). All matching files, one run each. Private and internal addresses are refused unless you allow them. |
+| **Connections** | Saved logins shared by profiles (System › Data Transfer › OpenImport › Connections) with *Test connection*; secrets encrypted and never shown again; profile JSON names the connection instead of carrying a login. |
+| **Catalog helpers** | Product pictures from web addresses (downloaded by OpenImport, cached by ETag), configurable products from simple rows (*Parent SKU* column), products missing from the file disabled, set out of stock or deleted (under the safety limit), quantities as changes (`+5`, `-3`), URL keys from a pattern with 301 redirects. |
 | **Mapping** | Columns to fields, fixed values, required fields, store-view columns (`name_de`, `price_ch`), auto-match with English and German synonyms. |
-| **Transforms** | 20 transforms and a safe expression language (`{price} * 1.19`, `if(...)`, `round(...)`), no `eval`, parsed once per run. Own transforms through `di.xml`. |
+| **Transforms** | 21 transforms and a safe expression language (`{price} * 1.19`, `if(...)`, `round(...)`), no `eval`, parsed once per run; every transform can be conditional (*Only when*). Own transforms through `di.xml`. |
 | **Dry run** | Every new profile starts with one. Field-level before/after preview, counts of new, changed, unchanged and deleted records, error report with your file's line numbers. |
 | **Safety** | Runs that would delete or replace more than a threshold wait for a typed confirmation. Formula-injection guard on every CSV the module writes. |
 | **Delta** | Only rows that changed since the last run are sent to Magento (per line, per store view). |
 | **Schedules** | Cron expressions and presets, each due minute runs exactly once, catch-up after a missed window, one run per profile at a time. |
-| **Exports** | Core entities and orders (one row per order or per line, only new or changed orders), renamed and transformed columns, to CSV, XLSX, JSON, XML and five destinations. |
+| **Exports** | Core entities and orders (one row per order or per line, only new or changed orders), renamed and transformed columns, to CSV, XLSX, JSON, XML and six destinations (download, folder, SFTP, FTP, S3, e-mail). |
 | **Operations** | Run history, e-mail on failure or always, a system message when cron stops, `openimport:doctor`, housekeeping of old run files. |
 | **REST API** | `POST /V1/openimport/profiles/{id}/runs` starts a profile, `GET /V1/openimport/runs/{id}` reports on it; order exports can run after every placed order. |
 | **CLI** | `openimport:run`, `openimport:run:status`, `openimport:profile:list`, `openimport:queue:run`, `openimport:profiles:export`, `openimport:profiles:import`, `openimport:secrets:reencrypt`, `openimport:doctor`. |
@@ -68,7 +70,7 @@ with a CSV, OpenImport does with a mapped file.
 
 ## How it compares
 
-✓ yes · ○ partly or higher tier · ✗ no · **1.1** / **1.2** planned ([roadmap](https://github.com/iranimij/openimport/milestones)).
+✓ yes · ○ partly or higher tier · ✗ no · **1.4** / **1.5** planned ([roadmap](https://github.com/iranimij/openimport/milestones)).
 From the vendors' public docs as of 2026-10-13; details and sources in [docs/comparison.md](docs/comparison.md).
 
 | | **OpenImport** | Magento Open Source | Adobe Commerce | Firebear Improved I/E | Amasty Import & Export | Xtento |
@@ -82,14 +84,17 @@ From the vendors' public docs as of 2026-10-13; details and sources in [docs/com
 | Transforms and a safe expression language | ✓ | ✗ | ✗ | ✓ | ✓ | ○ |
 | CSV, XLSX, JSON, XML, streamed | ✓ | CSV | CSV | ✓ | ○ | ✓ |
 | Upload, folder, URL, SFTP, FTP, Google Sheets | ✓ | ✗ | ○ | ✓ | ○ | ✓ |
-| Google Drive, Dropbox, OneDrive | **1.2** | ✗ | ✗ | ✓ | ○ | ✗ |
+| Saved connections, S3-compatible storage | ✓ | ✗ | ✗ | ✓ | ○ | ✓ |
+| Google Drive, Dropbox, OneDrive | **1.4** | ✗ | ✗ | ✓ | ○ | ✗ |
+| Pictures from URLs, configurables from simple rows, missing products, quantities as changes, URL keys with 301s | ✓ | ○ pictures | ○ | ✓ | ✓ | ○ |
+| Presets for Shopify, WooCommerce, Magento 1 files | ✓ | ✗ | ✗ | ✓ | ○ | ✗ |
 | Products, prices, customers, addresses, MSI stock | ✓ via Magento's own importer | ✓ | ✓ | ✓ | ✓ | ○ |
 | Fast stock & price update | ✓ | ✗ | ✗ | ○ | ○ | ✓ |
 | Order export (only new or changed) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Categories, attributes and attribute sets, CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
-| Cart and catalog price rules, URL rewrites | **1.2** | ✗ | ✗ | ✓ | ✓ | ✗ |
-| Order import, tracking import | **1.2** | ✗ | ✗ | ✓ | ✓ | ✓ |
-| Export to download, folder, SFTP, FTP, e-mail | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |
+| Cart and catalog price rules, URL rewrites | **1.5** | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Order import, tracking import | **1.5** | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Export to download, folder, SFTP, FTP, S3, e-mail | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |
 | Export right after an order is placed | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Start profiles over REST, read run status | ✓ | ○ raw CSV import | ○ | ○ | ○ | ✗ |
 | Error report with your file's own line numbers and rows | ✓ | ○ | ○ | ✓ | ✓ | ✓ |

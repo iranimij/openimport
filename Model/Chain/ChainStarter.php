@@ -64,9 +64,6 @@ class ChainStarter
         } catch (NoSuchEntityException $exception) {
             return 'Then: the next profile was deleted; nothing started.';
         }
-        if (!$next->isActive()) {
-            return sprintf('Then: "%s" is inactive; nothing started.', $next->getName());
-        }
         $queued = $this->queue->queue(
             $next,
             RunInterface::MODE_LIVE,

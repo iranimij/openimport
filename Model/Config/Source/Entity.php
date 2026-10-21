@@ -33,6 +33,7 @@ class Entity implements OptionSourceInterface
         'customer_address' => 'Customer addresses',
         EntityRegistry::ORDER => 'Orders',
         EntityRegistry::SHIPMENT => 'Shipments and tracking numbers',
+        EntityRegistry::URL_REWRITE => 'URL rewrites',
         EntityRegistry::CMS_PAGE => 'CMS pages',
         EntityRegistry::CMS_BLOCK => 'CMS blocks',
     ];
@@ -55,6 +56,7 @@ class Entity implements OptionSourceInterface
         EntityRegistry::SHIPMENT => 'Ships orders by order number: all open items or one SKU with a quantity, carrier and tracking number, optional customer e-mail. Orders that already carry the tracking number are skipped.',
         EntityRegistry::CMS_PAGE => 'CMS pages by URL key (identifier) and store views.',
         EntityRegistry::CMS_BLOCK => 'CMS blocks by identifier and store views.',
+        EntityRegistry::URL_REWRITE => 'URL rewrites by request path and store view: custom targets with 301, 302 or a plain rewrite, or the URL of a product (SKU), category (path) or CMS page. Magento\'s own generated URLs are never changed.',
     ];
 
     /**
@@ -81,6 +83,7 @@ class Entity implements OptionSourceInterface
         $import[EntityRegistry::ATTRIBUTE] = ['label' => self::NAMES[EntityRegistry::ATTRIBUTE]];
         $import[EntityRegistry::CMS_PAGE] = ['label' => self::NAMES[EntityRegistry::CMS_PAGE]];
         $import[EntityRegistry::CMS_BLOCK] = ['label' => self::NAMES[EntityRegistry::CMS_BLOCK]];
+        $import[EntityRegistry::URL_REWRITE] = ['label' => self::NAMES[EntityRegistry::URL_REWRITE]];
         $import[EntityRegistry::ORDER] = ['label' => self::NAMES[EntityRegistry::ORDER]];
         $import[EntityRegistry::SHIPMENT] = ['label' => self::NAMES[EntityRegistry::SHIPMENT]];
         $export = $this->exportConfig->getEntities();
@@ -89,6 +92,7 @@ class Entity implements OptionSourceInterface
         $export[EntityRegistry::ATTRIBUTE] = ['label' => self::NAMES[EntityRegistry::ATTRIBUTE]];
         $export[EntityRegistry::CMS_PAGE] = ['label' => self::NAMES[EntityRegistry::CMS_PAGE]];
         $export[EntityRegistry::CMS_BLOCK] = ['label' => self::NAMES[EntityRegistry::CMS_BLOCK]];
+        $export[EntityRegistry::URL_REWRITE] = ['label' => self::NAMES[EntityRegistry::URL_REWRITE]];
         $order = array_flip(array_keys(self::NAMES));
         foreach (['import' => $import, 'export' => $export] as $direction => $entities) {
             uksort($entities, static fn ($a, $b): int => [$order[$a] ?? PHP_INT_MAX, (string) $a]

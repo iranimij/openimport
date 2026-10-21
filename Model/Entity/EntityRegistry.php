@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter;
 use Iranimij\OpenImport\Model\Import\Category\CategoryImporter;
 use Iranimij\OpenImport\Model\Import\Cms\CmsImporter;
 use Iranimij\OpenImport\Model\Import\Order\OrderFile;
+use Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteImporter;
 use Iranimij\OpenImport\Model\Import\Shipment\ShipmentImporter;
 
 /**
@@ -33,12 +34,13 @@ class EntityRegistry
     public const CMS_PAGE = 'openimport_cms_page';
     public const CMS_BLOCK = 'openimport_cms_block';
     public const SHIPMENT = 'openimport_shipment';
+    public const URL_REWRITE = 'openimport_url_rewrite';
 
     /**
      * Entities that cannot be imported with "Replace" (their importers refuse it).
      */
     public const NO_REPLACE = [self::CATEGORY, self::ATTRIBUTE, self::CMS_PAGE, self::CMS_BLOCK, self::SHIPMENT,
-        self::ORDER];
+        self::ORDER, self::URL_REWRITE];
 
     /**
      * Entities that can only be added (nothing to update or delete).
@@ -136,6 +138,23 @@ class EntityRegistry
                     'sendungsnummer' => 'tracking_numbers', 'tracking' => 'tracking_numbers'],
                 null,
                 OrderFile::COLUMNS
+            ),
+            new EntityInfo(
+                self::URL_REWRITE,
+                ['request_path'],
+                false,
+                [],
+                ['request path' => 'request_path', 'alte url' => 'request_path', 'old url' => 'request_path',
+                    'from' => 'request_path', 'von' => 'request_path', 'url' => 'request_path', 'path' => 'request_path',
+                    'target path' => 'target_path', 'neue url' => 'target_path', 'new url' => 'target_path',
+                    'to' => 'target_path', 'nach' => 'target_path', 'ziel' => 'target_path', 'target' => 'target_path',
+                    'redirect' => 'redirect_type', 'weiterleitung' => 'redirect_type', 'type' => 'redirect_type',
+                    'store' => 'store_code', 'store view' => 'store_code', 'sku' => 'product_sku',
+                    'artikelnummer' => 'product_sku', 'product' => 'product_sku', 'produkt' => 'product_sku',
+                    'category' => 'category_path', 'kategorie' => 'category_path', 'page' => 'cms_page',
+                    'seite' => 'cms_page', 'beschreibung' => 'description', 'comment' => 'description'],
+                null,
+                UrlRewriteImporter::COLUMNS
             ),
             new EntityInfo(
                 self::SHIPMENT,

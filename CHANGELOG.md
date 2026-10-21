@@ -17,6 +17,11 @@ All notable changes to this project are documented here. The format follows
   Orders are only added; existing numbers are skipped and reported; one transaction per order; the dry run checks
   totals and every column. See [Order import](https://iranimij.github.io/openimport/orders-import/).
 - Import profiles carry import options (`ImportRequest::$options`) for the own importers.
+- URL rewrites (`openimport_url_rewrite`, import and export): custom rewrites and redirects (301, 302, plain) by
+  request path and store view, or the URL of a product (SKU), category (path) or CMS page (identifier); Add/Update,
+  Delete; Magento's generated URLs are never changed or deleted and a request path that is one is reported as a
+  conflict naming the owner. The export writes every rewrite with SKUs, category paths and page identifiers
+  instead of ids. See [URL rewrites](https://iranimij.github.io/openimport/url-rewrites/).
 
 ## [1.4.0] - 2026-10-21
 

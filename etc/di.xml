@@ -72,6 +72,38 @@
             <argument name="kind" xsi:type="string">block</argument>
         </arguments>
     </virtualType>
+    <virtualType name="OpenImportCartRuleImporter" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleImporter">
+        <arguments>
+            <argument name="kind" xsi:type="string">cart</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCartRuleSource" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleEntitySource">
+        <arguments>
+            <argument name="kind" xsi:type="string">cart</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCartRuleReader" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">OpenImportCartRuleSource</argument>
+            <argument name="kind" xsi:type="string">cart</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCatalogRuleImporter" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleImporter">
+        <arguments>
+            <argument name="kind" xsi:type="string">catalog</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCatalogRuleSource" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleEntitySource">
+        <arguments>
+            <argument name="kind" xsi:type="string">catalog</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCatalogRuleReader" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">OpenImportCatalogRuleSource</argument>
+            <argument name="kind" xsi:type="string">catalog</argument>
+        </arguments>
+    </virtualType>
     <!-- OpenImport's own importers; every other entity goes through core's import engine. -->
     <type name="Iranimij\OpenImport\Model\Bridge\ImporterPool">
         <arguments>
@@ -82,6 +114,8 @@
                 <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockImporter</item>
                 <item name="openimport_shipment" xsi:type="object">Iranimij\OpenImport\Model\Import\Shipment\ShipmentImporter</item>
                 <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteImporter</item>
+                <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleImporter</item>
+                <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleImporter</item>
                 <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Import\Order\OrderImporter</item>
             </argument>
         </arguments>
@@ -110,6 +144,8 @@
                 <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockReader</item>
                 <item name="openimport_shipment" xsi:type="object">Iranimij\OpenImport\Model\Import\Shipment\ShipmentRecordReader</item>
                 <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteRecordReader</item>
+                <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleReader</item>
+                <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleReader</item>
                 <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Import\Order\OrderRecordReader</item>
             </argument>
         </arguments>
@@ -322,6 +358,8 @@
                 <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageSource</item>
                 <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockSource</item>
                 <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteEntitySource</item>
+                <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleSource</item>
+                <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleSource</item>
             </argument>
         </arguments>
     </type>

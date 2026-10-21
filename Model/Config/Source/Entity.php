@@ -34,6 +34,8 @@ class Entity implements OptionSourceInterface
         EntityRegistry::ORDER => 'Orders',
         EntityRegistry::SHIPMENT => 'Shipments and tracking numbers',
         EntityRegistry::URL_REWRITE => 'URL rewrites',
+        EntityRegistry::CART_RULE => 'Cart price rules and coupons',
+        EntityRegistry::CATALOG_RULE => 'Catalog price rules',
         EntityRegistry::CMS_PAGE => 'CMS pages',
         EntityRegistry::CMS_BLOCK => 'CMS blocks',
     ];
@@ -57,6 +59,8 @@ class Entity implements OptionSourceInterface
         EntityRegistry::CMS_PAGE => 'CMS pages by URL key (identifier) and store views.',
         EntityRegistry::CMS_BLOCK => 'CMS blocks by identifier and store views.',
         EntityRegistry::URL_REWRITE => 'URL rewrites by request path and store view: custom targets with 301, 302 or a plain rewrite, or the URL of a product (SKU), category (path) or CMS page. Magento\'s own generated URLs are never changed.',
+        EntityRegistry::CART_RULE => 'Cart price rules by name: discount, websites, customer groups, dates, coupon code or a list of codes, labels; conditions from simple columns (subtotal, SKUs, categories) or Magento\'s condition tree as JSON.',
+        EntityRegistry::CATALOG_RULE => 'Catalog price rules by name: discount, websites, customer groups, dates; conditions from simple columns (SKUs, categories) or Magento\'s condition tree as JSON. Apply the rules afterwards (Marketing › Catalog Price Rules).',
     ];
 
     /**
@@ -84,6 +88,8 @@ class Entity implements OptionSourceInterface
         $import[EntityRegistry::CMS_PAGE] = ['label' => self::NAMES[EntityRegistry::CMS_PAGE]];
         $import[EntityRegistry::CMS_BLOCK] = ['label' => self::NAMES[EntityRegistry::CMS_BLOCK]];
         $import[EntityRegistry::URL_REWRITE] = ['label' => self::NAMES[EntityRegistry::URL_REWRITE]];
+        $import[EntityRegistry::CART_RULE] = ['label' => self::NAMES[EntityRegistry::CART_RULE]];
+        $import[EntityRegistry::CATALOG_RULE] = ['label' => self::NAMES[EntityRegistry::CATALOG_RULE]];
         $import[EntityRegistry::ORDER] = ['label' => self::NAMES[EntityRegistry::ORDER]];
         $import[EntityRegistry::SHIPMENT] = ['label' => self::NAMES[EntityRegistry::SHIPMENT]];
         $export = $this->exportConfig->getEntities();
@@ -93,6 +99,8 @@ class Entity implements OptionSourceInterface
         $export[EntityRegistry::CMS_PAGE] = ['label' => self::NAMES[EntityRegistry::CMS_PAGE]];
         $export[EntityRegistry::CMS_BLOCK] = ['label' => self::NAMES[EntityRegistry::CMS_BLOCK]];
         $export[EntityRegistry::URL_REWRITE] = ['label' => self::NAMES[EntityRegistry::URL_REWRITE]];
+        $export[EntityRegistry::CART_RULE] = ['label' => self::NAMES[EntityRegistry::CART_RULE]];
+        $export[EntityRegistry::CATALOG_RULE] = ['label' => self::NAMES[EntityRegistry::CATALOG_RULE]];
         $order = array_flip(array_keys(self::NAMES));
         foreach (['import' => $import, 'export' => $export] as $direction => $entities) {
             uksort($entities, static fn ($a, $b): int => [$order[$a] ?? PHP_INT_MAX, (string) $a]

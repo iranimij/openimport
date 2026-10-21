@@ -95,7 +95,7 @@ parallelism only across runs and for exports).
 |---|---|---|
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | **released 1.4.0** (#53, #54, #58–#60, #62, #63; release PR); E2E dev-env #13–#16 |
-| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | in progress: 1 merged (#65), 2 PR #67, 3 PR open |
+| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | in progress: 1 merged (#65), 2 PR #67, 3 PR #68, 4 PR open |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
 
 Rule for every slice: one PR, pushed at once; this file updated after each slice (done, exact next step, open
@@ -110,7 +110,7 @@ code.
 Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).
 
 **1.5 · Sales and marketing entities** (plan page 15 §3) in progress: slice 1 shipments and tracking
-merged (#65), slice 2 order import (#67), slice 3 URL rewrites (`feat/1.5-url-rewrites`, stacked on #67) built; next 4 price rules and
+merged (#65), slice 2 order import (#67), slice 3 URL rewrites (#68, stacked on #67), slice 4 price rules and coupons (`feat/1.5-price-rules`, stacked on #68) built; next 5 small entities (reviews, newsletter, search terms/synonyms, category positions). Was: 4 price rules and
 coupons, 5 small entities (reviews, newsletter, search terms/synonyms, category positions). Each slice: README,
 CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
 
@@ -378,6 +378,26 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
   conflicts and bad rows, delete, replace); integration `Import/UrlRewriteImportTest` (product_simple fixture:
   create, the storefront router answers 301/302/forward, update, export round trip, conflicts, delete, generated
   URL kept, replace refused). Docs `docs/url-rewrites.md`, README, comparison, CHANGELOG.
+
+### 1.5 slice 4 · price rules and coupons (what was built)
+
+- Entities `openimport_cart_rule` and `openimport_catalog_rule` (import Add/Update + Delete, export), one
+  `Import/PriceRule/PriceRuleImporter` with a `kind` (di virtual types): rows matched by `rule_id` or name
+  (several rules of one name reported), values from the columns (empty columns of an existing rule keep their
+  values; new rules get defaults: active, all websites and groups), websites/groups by code or `all`, dates,
+  action per kind, numbers, cart extras (coupon type/code/codes, limits, free shipping, labels per store view).
+  `ConditionTree` parses Magento's condition arrays from JSON (short types expanded, every type must be an
+  `AbstractCondition` subclass), builds trees from the simple columns (subtotal, SKUs, categories; Product\Found
+  for cart conditions, bare Product for cart actions and catalog rules) and compacts saved trees for the export.
+  `PriceRuleRecords`: lookups, rule models + resources, coupon codes/owners, `addCoupon` (generated type).
+  Writes: `addData` + fresh condition/action combine loaded from the tree, resource save; extra coupon codes added
+  unless the rule has them, codes of another rule refused. `PriceRuleEntitySource` (codes, labels, JSON),
+  `PriceRuleRecordReader`. Requires `magento/module-sales-rule`, `module-catalog-rule`, `module-rule`.
+- Tests: unit `ConditionTreeTest`; integration `Import/PriceRuleImportTest` (three cart rules from simple columns
+  and JSON, coupon list, labels; the coupon applies in a quote; update by name keeps the rest; export round trip
+  imports as updates without doubling coupons; bad rows; delete removes coupons; a catalog rule for one SKU,
+  reindex, rule price 9 for guests; round trip; delete; replace refused). Docs `docs/price-rules.md`, README,
+  comparison, CHANGELOG.
 
 ## Open questions
 

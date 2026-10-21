@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter;
 use Iranimij\OpenImport\Model\Import\Category\CategoryImporter;
 use Iranimij\OpenImport\Model\Import\Cms\CmsImporter;
 use Iranimij\OpenImport\Model\Import\Order\OrderFile;
+use Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleImporter;
 use Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteImporter;
 use Iranimij\OpenImport\Model\Import\Shipment\ShipmentImporter;
 
@@ -35,12 +36,14 @@ class EntityRegistry
     public const CMS_BLOCK = 'openimport_cms_block';
     public const SHIPMENT = 'openimport_shipment';
     public const URL_REWRITE = 'openimport_url_rewrite';
+    public const CART_RULE = 'openimport_cart_rule';
+    public const CATALOG_RULE = 'openimport_catalog_rule';
 
     /**
      * Entities that cannot be imported with "Replace" (their importers refuse it).
      */
     public const NO_REPLACE = [self::CATEGORY, self::ATTRIBUTE, self::CMS_PAGE, self::CMS_BLOCK, self::SHIPMENT,
-        self::ORDER, self::URL_REWRITE];
+        self::ORDER, self::URL_REWRITE, self::CART_RULE, self::CATALOG_RULE];
 
     /**
      * Entities that can only be added (nothing to update or delete).
@@ -91,6 +94,22 @@ class EntityRegistry
             'inhalt' => 'content', 'html' => 'content', 'body' => 'content', 'aktiv' => 'is_active', 'active' => 'is_active',
             'store views' => 'stores', 'store view' => 'stores', 'shops' => 'stores', 'überschrift' => 'content_heading',
             'heading' => 'content_heading', 'layout' => 'page_layout',
+        ];
+        $ruleSynonyms = [
+            'regel' => 'name', 'rule' => 'name', 'rule name' => 'name', 'titel' => 'name', 'title' => 'name',
+            'beschreibung' => 'description', 'aktiv' => 'is_active', 'active' => 'is_active', 'websites' => 'websites',
+            'website' => 'websites', 'kundengruppen' => 'customer_groups', 'groups' => 'customer_groups',
+            'customer group' => 'customer_groups', 'von' => 'from_date', 'from' => 'from_date', 'start' => 'from_date',
+            'bis' => 'to_date', 'to' => 'to_date', 'end' => 'to_date', 'priorität' => 'priority',
+            'sort order' => 'priority', 'gutschein' => 'coupon_code', 'coupon' => 'coupon_code', 'code' => 'coupon_code',
+            'gutscheine' => 'coupon_codes', 'coupons' => 'coupon_codes', 'codes' => 'coupon_codes', 'aktion' => 'action',
+            'type' => 'action', 'typ' => 'action', 'rabatt' => 'discount_amount', 'discount' => 'discount_amount',
+            'amount' => 'discount_amount', 'betrag' => 'discount_amount', 'prozent' => 'discount_amount',
+            'percent' => 'discount_amount', 'label' => 'labels', 'skus' => 'condition_skus', 'sku' => 'condition_skus',
+            'artikel' => 'condition_skus', 'products' => 'condition_skus', 'produkte' => 'condition_skus',
+            'kategorien' => 'condition_categories', 'categories' => 'condition_categories',
+            'mindestbestellwert' => 'condition_subtotal', 'subtotal' => 'condition_subtotal',
+            'minimum' => 'condition_subtotal', 'bedingungen' => 'conditions', 'aktionen' => 'actions',
         ];
         $builtIn = [
             new EntityInfo(
@@ -155,6 +174,16 @@ class EntityRegistry
                     'seite' => 'cms_page', 'beschreibung' => 'description', 'comment' => 'description'],
                 null,
                 UrlRewriteImporter::COLUMNS
+            ),
+            new EntityInfo(self::CART_RULE, ['name'], false, [], $ruleSynonyms, null, PriceRuleImporter::CART_COLUMNS),
+            new EntityInfo(
+                self::CATALOG_RULE,
+                ['name'],
+                false,
+                [],
+                $ruleSynonyms,
+                null,
+                PriceRuleImporter::CATALOG_COLUMNS
             ),
             new EntityInfo(
                 self::SHIPMENT,

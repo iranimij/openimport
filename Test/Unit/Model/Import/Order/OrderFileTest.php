@@ -26,7 +26,7 @@ class OrderFileTest extends TestCase
     private function row(string $sku, string $qty, string $price, array $extra = []): array
     {
         return array_merge([
-            'increment_id' => '100000001',
+            'increment_id' => 'ORD-1',
             'status' => 'complete',
             'customer_email' => 'jane@example.com',
             'billing_firstname' => 'Jane',
@@ -46,15 +46,15 @@ class OrderFileTest extends TestCase
         $orders = (new OrderFile())->group([
             $this->row('a', '1', '10', ['subtotal' => '30']),
             $this->row('b', '2', '10', ['subtotal' => 'ignored on later rows']),
-            $this->row('c', '1', '5', ['increment_id' => '100000002']),
+            $this->row('c', '1', '5', ['increment_id' => 'ORD-2']),
             ['increment_id' => '', 'item_sku' => 'x'],
         ], $errors);
 
-        self::assertSame(['100000001', '100000002'], array_map('strval', array_keys($orders)));
-        self::assertSame([0, 1], $orders['100000001']['rows']);
-        self::assertSame('30', $orders['100000001']['order']['subtotal']);
-        self::assertSame(['a', 'b'], array_column($orders['100000001']['items'], 'item_sku'));
-        self::assertSame(2, $orders['100000002']['row']);
+        self::assertSame(['ORD-1', 'ORD-2'], array_keys($orders));
+        self::assertSame([0, 1], $orders['ORD-1']['rows']);
+        self::assertSame('30', $orders['ORD-1']['order']['subtotal']);
+        self::assertSame(['a', 'b'], array_column($orders['ORD-1']['items'], 'item_sku'));
+        self::assertSame(2, $orders['ORD-2']['row']);
         self::assertCount(1, $errors);
         self::assertSame(3, $errors[0]->row);
         self::assertSame('The order number is empty.', $errors[0]->message);
@@ -69,7 +69,7 @@ class OrderFileTest extends TestCase
             $this->row('b', '1', '7.5', ['item_row_total' => '7.5']),
             $this->row('child', '1', '0', ['item_parent_sku' => 'A', 'item_row_total' => '99']),
         ], $errors);
-        $order = $orders['100000001'];
+        $order = $orders['ORD-1'];
 
         self::assertTrue($file->check($order, self::STATUSES, self::GROUPS, $errors), $this->messages($errors));
         self::assertSame('27.5', $order['order']['subtotal']);
@@ -86,7 +86,7 @@ class OrderFileTest extends TestCase
             $this->row('a', '2', '10', ['subtotal' => '20', 'grand_total' => '99', 'shipping_amount' => '5']),
             $this->row('b', '0', '', ['item_parent_sku' => 'nope', 'item_product_options' => '{bad']),
         ], $errors);
-        $order = $orders['100000001'];
+        $order = $orders['ORD-1'];
 
         self::assertFalse($file->check($order, self::STATUSES, self::GROUPS, $errors));
         $messages = $this->messages($errors);
@@ -102,7 +102,7 @@ class OrderFileTest extends TestCase
         $orders = $file->group([
             $this->row('a', '2', '10', ['subtotal' => '20', 'grand_total' => '99', 'shipping_amount' => '5']),
         ], $errors);
-        $order = $orders['100000001'];
+        $order = $orders['ORD-1'];
         self::assertFalse($file->check($order, self::STATUSES, self::GROUPS, $errors));
         self::assertSame(
             ['The grand total 99 is not subtotal + shipping + tax - discount (25).'],
@@ -118,12 +118,12 @@ class OrderFileTest extends TestCase
             $this->row('a', '1', '1', ['customer_email' => 'nobody', 'status' => 'shipped', 'customer_group' => 'VIP',
                 'created_at' => 'yesterday-ish', 'order_currency_code' => 'dollars', 'subtotal' => 'one',
                 'billing_city' => '']),
-            ['increment_id' => '100000002', 'customer_email' => 'x@example.com', 'status' => 'complete',
+            ['increment_id' => 'ORD-2', 'customer_email' => 'x@example.com', 'status' => 'complete',
                 'billing_firstname' => 'A', 'billing_lastname' => 'B', 'billing_street' => 'S', 'billing_city' => 'C',
                 'billing_country_id' => 'US'],
         ], $errors);
 
-        $first = $orders['100000001'];
+        $first = $orders['ORD-1'];
         self::assertFalse($file->check($first, self::STATUSES, self::GROUPS, $errors));
         $messages = $this->messages($errors);
         foreach ([
@@ -137,7 +137,7 @@ class OrderFileTest extends TestCase
         ] as $expected) {
             self::assertStringContainsString($expected, $messages);
         }
-        $second = $orders['100000002'];
+        $second = $orders['ORD-2'];
         $errors = [];
         self::assertFalse($file->check($second, self::STATUSES, self::GROUPS, $errors));
         self::assertSame('The order has no items (no row with an item SKU).', $errors[0]->message);

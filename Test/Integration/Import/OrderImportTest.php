@@ -101,7 +101,7 @@ class OrderImportTest extends TestCase
     /**
      * @param array<string, mixed> $options
      */
-    private function run(ProfileInterface $profile, string $file = '', string $mode = RunInterface::MODE_LIVE): RunInterface
+    private function process(ProfileInterface $profile, string $file = '', string $mode = RunInterface::MODE_LIVE): RunInterface
     {
         $options = $file === '' ? [] : ['file' => $file, 'original_name' => 'orders.csv'];
         $run = Bootstrap::getObjectManager()->get(RunQueue::class)->queue($profile, $mode, RunInterface::TRIGGER_CLI, $options);
@@ -157,20 +157,20 @@ class OrderImportTest extends TestCase
     #[DataFixture('Magento/Sales/_files/order_list.php')]
     public function testRoundTripExportImportExport(): void
     {
-        $before = $this->rows($this->run($this->exportProfile()));
+        $before = $this->rows($this->process($this->exportProfile()));
         $fixture = array_values(array_filter($before, static fn (array $row): bool => (int) $row['increment_id'] <= 100000004));
         self::assertNotEmpty($fixture);
         $file = $this->file($this->csv($fixture));
 
-        $dry = $this->run($this->importProfile([OrderImporter::OPTION_NUMBER => 'generate']), $file, RunInterface::MODE_DRY_RUN);
+        $dry = $this->process($this->importProfile([OrderImporter::OPTION_NUMBER => 'generate']), $file, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $dry->getStatus(), $dry->getMessage());
         self::assertSame(count(array_unique(array_column($fixture, 'increment_id'))), $dry->getCount('created'));
 
-        $live = $this->run($this->importProfile([OrderImporter::OPTION_NUMBER => 'generate']), $file);
+        $live = $this->process($this->importProfile([OrderImporter::OPTION_NUMBER => 'generate']), $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $live->getStatus(), $live->getMessage());
         self::assertSame($dry->getCount('created'), $live->getCount('created'));
 
-        $after = $this->rows($this->run($this->exportProfile()));
+        $after = $this->rows($this->process($this->exportProfile()));
         $imported = array_values(array_filter($after, static fn (array $row): bool => (int) $row['increment_id'] > 100000004));
         self::assertCount(count($fixture), $imported, 'one exported row per imported item');
         $strip = static fn (array $row): array => array_intersect_key($row, array_flip(self::ROUND_TRIP));
@@ -200,7 +200,7 @@ class OrderImportTest extends TestCase
             OrderImporter::OPTION_STOCK => '1',
         ]);
 
-        $run = $this->run($profile, $file);
+        $run = $this->process($profile, $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
         self::assertSame(1, $run->getCount('created'));
         $order = Bootstrap::getObjectManager()->create(Order::class)->loadByIncrementId('OI-9001');
@@ -223,7 +223,7 @@ class OrderImportTest extends TestCase
         self::assertSame('Hauptstraße 1', implode(', ', (array) $order->getShippingAddress()->getStreet()));
 
         // The same file again: skipped and reported, nothing created twice.
-        $again = $this->run($profile, $file);
+        $again = $this->process($profile, $file);
         self::assertSame(RunInterface::STATUS_PARTIAL, $again->getStatus(), $again->getMessage());
         self::assertSame(0, $again->getCount('created'));
         self::assertSame(['Order OI-9001 exists already; it is not imported again.'], $this->errorMessages($again));
@@ -234,7 +234,7 @@ class OrderImportTest extends TestCase
             . '"OI-9003";complete;;x@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;;;;;;;;' . "\n"
             . '"OI-9004";complete;;y@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;simple;X;1;;;;10;10' . "\n"
             . '"OI-9004";complete;;y@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;child;Y;1;;;;0;0' . "\n");
-        $check = $this->run($this->importProfile(), $bad, RunInterface::MODE_DRY_RUN);
+        $check = $this->process($this->importProfile(), $bad, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_FAILED, $check->getStatus(), $check->getMessage());
         $messages = implode("\n", $this->errorMessages($check));
         self::assertStringContainsString('The grand total 99 is not subtotal + shipping + tax - discount (25).', $messages);

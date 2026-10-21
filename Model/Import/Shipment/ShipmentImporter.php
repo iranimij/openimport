@@ -64,6 +64,7 @@ class ShipmentImporter implements ImporterInterface
     {
         $started = microtime(true);
         $errors = [];
+        $this->records->reset();
         if (!in_array($request->behavior, [Import::BEHAVIOR_APPEND, Import::BEHAVIOR_ADD_UPDATE], true)) {
             $errors[] = new RowError(null, 'behavior', 'Shipments can only be added: use Add/Update.', null, true);
         }

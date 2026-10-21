@@ -16,9 +16,9 @@ if [ "$status" -ne 0 ]; then
   echo "::error title=${title} (exit ${status})::$(cat "$log.tail")"
   # The first fatal error or uncaught exception with the lines after it: a crash prints a long stack trace, and the
   # tail above then shows only its last frames.
-  first="$(sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "$log" | grep -n -m 1 -E 'Fatal error|Uncaught|PHP Fatal|^(Error|Exception|TypeError): |Exception: ' | cut -d: -f1)"
+  first="$(sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "$log" | grep -n -m 1 -E 'Fatal error|Uncaught|PHP Fatal|^(Error|Exception|TypeError): |Exception: |^#0 ' | cut -d: -f1)"
   if [ -n "$first" ]; then
-    sed -n "$((first > 5 ? first - 5 : 1)),$((first + 25))p" "$log" | cut -c1-300 | tail -c 3500 \
+    sed -n "$((first > 12 ? first - 12 : 1)),$((first + 12))p" "$log" | cut -c1-300 | tail -c 3500 \
       | awk 'BEGIN { ORS = "" } { gsub(/%/, "%25"); gsub(/\r/, "%0D"); print $0 "%0A" }' > "$log.first"
     echo "::error title=${title}: first error::$(cat "$log.first")"
   fi

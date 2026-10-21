@@ -8,6 +8,7 @@
  * typeGroups {type: group}: the field keeps one value per group, so a local folder does not turn up as the SFTP
  * folder after switching the source type (and comes back when switching back).
  * noticeByType {type: text}: help text for the chosen type (the field's own notice otherwise).
+ * labelByType {type: text}: label for the chosen type (the field's own label otherwise).
  */
 define([
     'Magento_Ui/js/form/element/abstract',
@@ -22,8 +23,10 @@ define([
             storedNote: '',
             typeGroups: null,
             noticeByType: null,
+            labelByType: null,
             tracks: {
-                storedNote: true
+                storedNote: true,
+                label: true
             }
         },
 
@@ -36,6 +39,7 @@ define([
                     : '';
             }
             this.defaultNotice = this.notice ? this.notice() : '';
+            this.defaultLabel = this.label;
             this.lastGroup = this.group(this.sourceType);
             this.groupValues = {};
             this.refresh();
@@ -58,6 +62,9 @@ define([
             this._super();
             if (this.noticeByType && typeof this.notice === 'function' && this.defaultNotice !== undefined) {
                 this.notice(this.noticeByType[this.sourceType] || this.defaultNotice);
+            }
+            if (this.labelByType && this.defaultLabel !== undefined) {
+                this.label = this.labelByType[this.sourceType] || this.defaultLabel;
             }
             if (!this.typeGroups || this.lastGroup === undefined) {
                 return;

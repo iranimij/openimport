@@ -49,16 +49,17 @@ define([
             offered = _.filter(this.allOptions, function (option) {
                 return this.conditionsHold(option.showWhen);
             }, this);
+            // Magento turns an option without a value into the caption, which then stays: follow its conditions
+            // (also when the list of real options did not change, e.g. no saved connection of a connection-only type).
+            blank = _.find(this.allOptions, function (option) {
+                return option.value === '' || option.value === null;
+            });
+            if (blank && typeof this.caption === 'function') {
+                this.caption(_.contains(offered, blank) ? blank.label : '');
+            }
             if (this.optionKey(offered) !== this.optionKey(this.options())) {
                 value = this.value();
                 this.setOptions(offered);
-                // Magento turns an option without a value into the caption, which then stays: follow its conditions.
-                blank = _.find(this.allOptions, function (option) {
-                    return option.value === '' || option.value === null;
-                });
-                if (blank && typeof this.caption === 'function') {
-                    this.caption(_.contains(offered, blank) ? blank.label : '');
-                }
                 if (offered.length && !_.findWhere(offered, {value: value})) {
                     this.value(offered[0].value);
                 } else {

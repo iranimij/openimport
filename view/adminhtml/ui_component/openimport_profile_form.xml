@@ -705,6 +705,9 @@
                         <item name="onedrive" xsi:type="string" translate="true">The folder in the OneDrive or the SharePoint library, e.g. Supplier/incoming; empty = the top.</item>
                         <item name="rest" xsi:type="string" translate="true">The path after the connection's base address, with its query, e.g. /products?status=active.</item>
                     </item>
+                    <item name="labelByType" xsi:type="array">
+                        <item name="rest" xsi:type="string" translate="true">Path</item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>
@@ -1491,6 +1494,31 @@
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="typeGroups" xsi:type="array">
+                        <item name="sftp" xsi:type="string">remote</item>
+                        <item name="ftp" xsi:type="string">remote</item>
+                        <item name="s3" xsi:type="string">remote</item>
+                        <item name="google_drive" xsi:type="string">remote</item>
+                        <item name="dropbox" xsi:type="string">remote</item>
+                        <item name="onedrive" xsi:type="string">remote</item>
+                        <item name="rest" xsi:type="string">rest</item>
+                    </item>
+                    <item name="noticeByType" xsi:type="array">
+                        <item name="sftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
+                        <item name="ftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
+                        <item name="s3" xsi:type="string" translate="true">The folder in the bucket (key prefix), e.g. exports; empty = the top of the bucket.</item>
+                        <item name="google_drive" xsi:type="string" translate="true">The link of the Drive folder, its id, or a path from My Drive such as Shop/exports.</item>
+                        <item name="dropbox" xsi:type="string" translate="true">The folder from the top of the Dropbox (or of the app folder), e.g. Shop/exports; empty = the top.</item>
+                        <item name="onedrive" xsi:type="string" translate="true">The folder in the OneDrive or the SharePoint library, e.g. Shop/exports; empty = the top.</item>
+                        <item name="rest" xsi:type="string" translate="true">The path after the connection's base address that receives the file or the records, e.g. /import.</item>
+                    </item>
+                    <item name="labelByType" xsi:type="array">
+                        <item name="rest" xsi:type="string" translate="true">Path</item>
+                        <item name="google_drive" xsi:type="string" translate="true">Folder</item>
+                        <item name="dropbox" xsi:type="string" translate="true">Folder</item>
+                        <item name="onedrive" xsi:type="string" translate="true">Folder</item>
+                        <item name="s3" xsi:type="string" translate="true">Folder</item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>

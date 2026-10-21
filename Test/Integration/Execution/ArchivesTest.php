@@ -103,7 +103,7 @@ class ArchivesTest extends TestCase
         $pattern = $this->importProfile(['path' => 'it-zip-' . $tag, 'pattern' => '*.zip'], ['archive_entry' => '*.txt']);
         $failed = $this->process($pattern, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_FAILED, $failed->getStatus());
-        self::assertStringContainsString('readme.txt', $failed->getMessage());
+        self::assertStringContainsString('The file\'s columns are: "about this feed"', $failed->getMessage(), 'readme.txt was read');
 
         $asIs = $this->importProfile(['path' => 'it-zip-' . $tag, 'pattern' => '*.zip'], ['archive' => Unpacker::MODE_NONE]);
         $plain = $this->process($asIs, RunInterface::MODE_DRY_RUN);

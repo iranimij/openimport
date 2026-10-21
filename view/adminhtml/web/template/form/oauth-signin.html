@@ -4,9 +4,9 @@
  * See LICENSE for license details (MIT).
  */
 -->
-<div class="admin__field openimport-google-signin" visible="visible">
+<div class="admin__field openimport-oauth-signin" visible="visible">
     <div class="admin__field-label">
-        <span translate="'Google account'"></span>
+        <span translate="'Account'"></span>
     </div>
     <div class="admin__field-control">
         <p if="account">
@@ -14,7 +14,7 @@
             <strong text="account"></strong>
         </p>
         <a if="signInUrl" class="action-secondary" attr="href: signInUrl">
-            <span translate="'Sign in with Google'"></span>
+            <span text="$t('Sign in with %1').replace('%1', service())"></span>
         </a>
         <p if="!signInUrl" class="note" translate="'Save the connection with its client ID and client secret, then sign in.'"></p>
     </div>

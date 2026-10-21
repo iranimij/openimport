@@ -41,6 +41,9 @@ class RemoteSettingsBuilder
         if ($protocol === 'google_drive') {
             return $this->google($config);
         }
+        if ($protocol === 'dropbox' || $protocol === 'onedrive') {
+            return $this->signedIn($config, $protocol);
+        }
         $host = trim((string) ($config['host'] ?? ''));
         if ($host === '') {
             throw new PipelineException('Enter the server (host name).');
@@ -139,6 +142,43 @@ class RemoteSettingsBuilder
                 'refresh_token' => $this->secrets->get($config, 'refresh_token'),
                 'as_sheet' => !empty($config['as_sheet']) ? '1' : '0',
                 'label' => 'Google Drive' . ($account !== '' ? ' (' . $account . ')' : ''),
+            ]
+        );
+    }
+
+    /**
+     * Dropbox, OneDrive/SharePoint: the shop's OAuth client and the refresh token of "Sign in".
+     *
+     * @param array<string, mixed> $config
+     * @param string $protocol
+     * @return RemoteSettings
+     */
+    private function signedIn(array $config, string $protocol): RemoteSettings
+    {
+        $text = static fn (string $key): string
+            => is_scalar($config[$key] ?? null) ? trim((string) $config[$key]) : '';
+        $account = $text('account');
+        $name = $protocol === 'dropbox'
+            ? 'Dropbox'
+            : ($text('site') !== '' ? 'SharePoint ' . $text('site') : 'OneDrive');
+
+        return new RemoteSettings(
+            $protocol === 'dropbox' ? 'api.dropboxapi.com' : 'graph.microsoft.com',
+            443,
+            $account,
+            '',
+            '',
+            '',
+            true,
+            true,
+            max(5, min(300, (int) ($config['timeout'] ?? 60))),
+            [
+                'client_id' => $text('client_id'),
+                'client_secret' => $this->secrets->get($config, 'client_secret'),
+                'refresh_token' => $this->secrets->get($config, 'refresh_token'),
+                'tenant' => $text('tenant'),
+                'site' => $text('site'),
+                'label' => $name . ($account !== '' ? ' (' . $account . ')' : ''),
             ]
         );
     }

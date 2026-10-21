@@ -18,6 +18,9 @@ All notable changes to this project are documented here. The format follows
   signed JWT) or a Google account (*Sign in with Google*: your own OAuth client, state and PKCE, refresh token stored
   encrypted). Folders by link, id or path, Sheets read as Excel files, exports replace a file of the same name or
   become a Google Sheet, moves into `processed`, deletes go to the bin.
+- Dropbox and OneDrive / SharePoint as import source and export destination, through *Sign in with Dropbox* /
+  *Sign in with Microsoft* with the shop's own app (state, PKCE, refresh token stored encrypted). SharePoint document
+  libraries by site address; uploads in 10 MB parts on OneDrive.
 
 ### Fixed
 - `openimport:secrets:reencrypt` now also encrypts the secrets of export destinations again, and goes on when one

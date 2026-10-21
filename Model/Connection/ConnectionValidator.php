@@ -50,6 +50,21 @@ class ConnectionValidator
         if ($connection->getType() === 's3') {
             return array_merge($problems, $this->s3($text, isset($settings['secrets']['secret_key'])));
         }
+        if (in_array($connection->getType(), ['dropbox', 'onedrive'], true)) {
+            $stored = array_keys((array) ($settings['secrets'] ?? []));
+            if ($text('client_id') === '') {
+                $problems[] = $connection->getType() === 'dropbox'
+                    ? 'Enter the app key of your Dropbox app (dropbox.com/developers/apps).'
+                    : 'Enter the application (client) ID of your app registration (entra.microsoft.com).';
+            }
+            if (!in_array('client_secret', $stored, true)) {
+                $problems[] = $connection->getType() === 'dropbox'
+                    ? 'Enter the app secret of your Dropbox app.'
+                    : 'Enter a client secret of your app registration.';
+            }
+
+            return $problems;
+        }
         if ($connection->getType() === 'google_drive') {
             return array_merge($problems, $this->google($text, array_keys((array) ($settings['secrets'] ?? []))));
         }

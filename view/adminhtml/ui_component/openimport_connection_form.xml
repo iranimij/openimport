@@ -518,12 +518,27 @@
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">google_drive</item>
+                        <item name="1" xsi:type="string">dropbox</item>
+                        <item name="2" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="noticeByType" xsi:type="array">
+                        <item name="google_drive" xsi:type="string" translate="true">Of an OAuth client of the type "Web application" in your Google Cloud project, with the Google Drive API switched on.</item>
+                        <item name="dropbox" xsi:type="string" translate="true">The app key of your Dropbox app (dropbox.com/developers/apps), with the permissions files.content.read and files.content.write.</item>
+                        <item name="onedrive" xsi:type="string" translate="true">The application (client) ID of your app registration in Microsoft Entra ID (entra.microsoft.com), a "Web" platform with the redirect URI below.</item>
                     </item>
                     <item name="forDirection" xsi:type="string">any</item>
                     <item name="typeField" xsi:type="string">type</item>
                     <item name="showWhen" xsi:type="array">
-                        <item name="settings.auth_google" xsi:type="array">
-                            <item name="0" xsi:type="string">oauth</item>
+                        <item name="0" xsi:type="array">
+                            <item name="settings.auth_google" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="type" xsi:type="array">
+                                <item name="0" xsi:type="string">dropbox</item>
+                                <item name="1" xsi:type="string">onedrive</item>
+                            </item>
                         </item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
@@ -532,7 +547,6 @@
             <settings>
                 <label translate="true">Client ID</label>
                 <dataScope>settings.client_id</dataScope>
-                <notice translate="true">Of an OAuth client of the type "Web application" in your Google Cloud project, with the Google Drive API switched on.</notice>
             </settings>
         </field>
         <field name="client_secret" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="64">
@@ -540,12 +554,22 @@
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">google_drive</item>
+                        <item name="1" xsi:type="string">dropbox</item>
+                        <item name="2" xsi:type="string">onedrive</item>
                     </item>
                     <item name="forDirection" xsi:type="string">any</item>
                     <item name="typeField" xsi:type="string">type</item>
                     <item name="showWhen" xsi:type="array">
-                        <item name="settings.auth_google" xsi:type="array">
-                            <item name="0" xsi:type="string">oauth</item>
+                        <item name="0" xsi:type="array">
+                            <item name="settings.auth_google" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="type" xsi:type="array">
+                                <item name="0" xsi:type="string">dropbox</item>
+                                <item name="1" xsi:type="string">onedrive</item>
+                            </item>
                         </item>
                     </item>
                     <item name="secret" xsi:type="boolean">true</item>
@@ -558,46 +582,102 @@
                 <notice translate="true">Stored encrypted, never shown again.</notice>
             </settings>
         </field>
-        <field name="redirect_uri" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="65">
+        <field name="tenant" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="65">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Directory (tenant)</label>
+                <dataScope>settings.tenant</dataScope>
+                <placeholder>common</placeholder>
+                <notice translate="true">Your organisation's directory (tenant) ID or domain; empty = common (any account the app allows).</notice>
+            </settings>
+        </field>
+        <field name="site" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="66">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">SharePoint site</label>
+                <dataScope>settings.site</dataScope>
+                <placeholder>contoso.sharepoint.com/sites/Shop</placeholder>
+                <notice translate="true">Empty = the signed-in user's OneDrive; a site address = its document library.</notice>
+            </settings>
+        </field>
+        <field name="redirect_uri" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="67">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">google_drive</item>
+                        <item name="1" xsi:type="string">dropbox</item>
+                        <item name="2" xsi:type="string">onedrive</item>
                     </item>
                     <item name="forDirection" xsi:type="string">any</item>
                     <item name="typeField" xsi:type="string">type</item>
                     <item name="showWhen" xsi:type="array">
-                        <item name="settings.auth_google" xsi:type="array">
-                            <item name="0" xsi:type="string">oauth</item>
+                        <item name="0" xsi:type="array">
+                            <item name="settings.auth_google" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="type" xsi:type="array">
+                                <item name="0" xsi:type="string">dropbox</item>
+                                <item name="1" xsi:type="string">onedrive</item>
+                            </item>
                         </item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">ui/form/element/text</item>
                 </item>
             </argument>
             <settings>
-                <label translate="true">Authorized redirect URI</label>
+                <label translate="true">Redirect URI</label>
                 <dataScope>redirect_uri</dataScope>
-                <notice translate="true">Add this address to the OAuth client in Google Cloud.</notice>
+                <notice translate="true">Add this address as redirect URI of your OAuth client or app.</notice>
             </settings>
         </field>
-        <field name="google_signin" component="Iranimij_OpenImport/js/form/google-signin" formElement="input" sortOrder="66">
+        <field name="oauth_signin" component="Iranimij_OpenImport/js/form/oauth-signin" formElement="input" sortOrder="68">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">google_drive</item>
+                        <item name="1" xsi:type="string">dropbox</item>
+                        <item name="2" xsi:type="string">onedrive</item>
                     </item>
                     <item name="forDirection" xsi:type="string">any</item>
                     <item name="typeField" xsi:type="string">type</item>
                     <item name="showWhen" xsi:type="array">
-                        <item name="settings.auth_google" xsi:type="array">
-                            <item name="0" xsi:type="string">oauth</item>
+                        <item name="0" xsi:type="array">
+                            <item name="settings.auth_google" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="type" xsi:type="array">
+                                <item name="0" xsi:type="string">dropbox</item>
+                                <item name="1" xsi:type="string">onedrive</item>
+                            </item>
                         </item>
                     </item>
                 </item>
             </argument>
             <settings>
-                <label translate="true">Google account</label>
-                <dataScope>google_signin</dataScope>
+                <label translate="true">Account</label>
+                <dataScope>oauth_signin</dataScope>
             </settings>
         </field>
         <field name="timeout" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="50">

@@ -227,6 +227,17 @@
                 <item name="ftp" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\FtpSource</item>
                 <item name="s3" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\S3Source</item>
                 <item name="google_drive" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\GoogleDriveSource</item>
+                <item name="onedrive" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\OneDriveSource</item>
+                <item name="dropbox" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\DropboxSource</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Model\OAuth\OAuthFlow">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="google_drive" xsi:type="object">Iranimij\OpenImport\Model\Google\GoogleOAuthProvider</item>
+                <item name="dropbox" xsi:type="object">Iranimij\OpenImport\Model\Dropbox\DropboxOAuthProvider</item>
+                <item name="onedrive" xsi:type="object">Iranimij\OpenImport\Model\Microsoft\MicrosoftOAuthProvider</item>
             </argument>
         </arguments>
     </type>
@@ -238,6 +249,8 @@
                 <item name="ftp" xsi:type="string">FTP</item>
                 <item name="s3" xsi:type="string">Amazon S3 / S3-compatible</item>
                 <item name="google_drive" xsi:type="string">Google Drive / Sheets</item>
+                <item name="dropbox" xsi:type="string">Dropbox</item>
+                <item name="onedrive" xsi:type="string">OneDrive / SharePoint</item>
             </argument>
             <argument name="inline" xsi:type="array">
                 <item name="sftp" xsi:type="string">sftp</item>
@@ -264,6 +277,16 @@
     <virtualType name="Iranimij\OpenImport\Model\Execution\Source\GoogleDriveSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
         <arguments>
             <argument name="protocol" xsi:type="string">google_drive</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Execution\Source\DropboxSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
+        <arguments>
+            <argument name="protocol" xsi:type="string">dropbox</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Execution\Source\OneDriveSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
+        <arguments>
+            <argument name="protocol" xsi:type="string">onedrive</argument>
         </arguments>
     </virtualType>
     <virtualType name="Iranimij\OpenImport\Model\Execution\Source\FtpSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
@@ -307,6 +330,16 @@
             <argument name="protocol" xsi:type="string">google_drive</argument>
         </arguments>
     </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Export\Destination\DropboxDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
+        <arguments>
+            <argument name="protocol" xsi:type="string">dropbox</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Export\Destination\OneDriveDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
+        <arguments>
+            <argument name="protocol" xsi:type="string">onedrive</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="Iranimij\OpenImport\Model\Export\Destination\FtpDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
         <arguments>
             <argument name="protocol" xsi:type="string">ftp</argument>
@@ -321,6 +354,8 @@
                 <item name="ftp" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\FtpDestination</item>
                 <item name="s3" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\S3Destination</item>
                 <item name="google_drive" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\GoogleDriveDestination</item>
+                <item name="onedrive" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\OneDriveDestination</item>
+                <item name="dropbox" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\DropboxDestination</item>
                 <item name="email" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\EmailDestination</item>
             </argument>
         </arguments>
@@ -332,6 +367,8 @@
                 <item name="ftp" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\FtpClient</item>
                 <item name="s3" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\S3Client</item>
                 <item name="google_drive" xsi:type="string">Iranimij\OpenImport\Model\Google\DriveClient</item>
+                <item name="dropbox" xsi:type="string">Iranimij\OpenImport\Model\Dropbox\DropboxClient</item>
+                <item name="onedrive" xsi:type="string">Iranimij\OpenImport\Model\Microsoft\OneDriveClient</item>
             </argument>
         </arguments>
     </type>

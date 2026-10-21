@@ -12,7 +12,7 @@ use Iranimij\OpenImport\Api\ConnectionRepositoryInterface;
 use Iranimij\OpenImport\Controller\Adminhtml\Connection\Save;
 use Iranimij\OpenImport\Model\Admin\ConnectionFormMapper;
 use Iranimij\OpenImport\Model\Connection\ConnectionUsage;
-use Iranimij\OpenImport\Model\Google\OAuthFlow;
+use Iranimij\OpenImport\Model\OAuth\OAuthFlow;
 use Iranimij\OpenImport\Model\ConnectionFactory;
 use Iranimij\OpenImport\Model\ResourceModel\Connection\CollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
@@ -90,7 +90,7 @@ class ConnectionFormDataProvider extends AbstractDataProvider
         $data['service_account_note'] = $account !== '' && ($data['settings']['auth_google'] ?? '') !== 'oauth'
             ? $account
             : '';
-        $data['google_signin_url'] = $connectionId > 0 && $connection->getType() === 'google_drive'
+        $data['signin_url'] = $connectionId > 0 && $this->oauth->provider($connection) !== null
             ? $this->url->getUrl('openimport/connection/oauthStart', ['id' => $connectionId])
             : '';
         $profiles = $connectionId > 0 ? $this->usage->profiles($connectionId) : [];

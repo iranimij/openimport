@@ -105,7 +105,8 @@ code.
 Resumed 2026-10-21. Slice 1 (#53) and slice 2 (#54) merged; dev-env #14 (S3 E2E) set back to `main`, merge when
 green.
 
-Now: **1.4 slice 3 · Google Drive / Sheets**, PR on `feat/1.4-google`. Next after it: E2E for Google (the mock server
+Now: **1.4 slice 3 · Google Drive / Sheets**, PR #58 (`feat/1.4-google`), E2E dev-env #15. Stacked on it: **slice 4 ·
+Dropbox, OneDrive/SharePoint** (`feat/1.4-dropbox-onedrive`). Next after it: E2E for Google (the mock server
 from `Test/Integration/_files/google-server.php` as a container in the dev-env CI), then slice 4 (Dropbox, OneDrive:
 OAuth connections like Google, same `OAuthFlow` pattern).
 
@@ -269,6 +270,21 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
   ID/secret, redirect URI, Sign in button). Profile: source/destination `google_drive`.
 - Tests: unit (PKCE RFC 7636 vector, consent URL, key check, settings, validator, form mapper); integration with
   the mock Google server (`GoogleDriveTest`, `GoogleOAuthAdminTest`).
+
+### 1.4 slice 4 · Dropbox, OneDrive and SharePoint (what was built)
+
+- OAuth generalised: `Model/OAuth/OAuthFlow` (moved from Model/Google) takes providers by connection type
+  (`OAuthProviderInterface`: signsIn, consentUrl, exchange, account); `GoogleOAuthProvider`, `DropboxOAuthProvider`,
+  `MicrosoftOAuthProvider`; `OAuthTokens` (form posts, refresh with in-memory cache, PKCE challenge).
+- `DropboxClient`: list_folder (+continue), download/upload (Dropbox-API-Arg, overwrite), move_v2 after
+  create_folder_v2, delete_v2. `OneDriveClient`: Graph path addressing (`root:/a/b:`), the user's OneDrive or a
+  SharePoint site's library (`/sites/{host}:/{path}`), download through Graph's redirect, upload sessions in 10 MB
+  parts, moves by parent id (folder made when missing), deletes to the recycle bin. Scopes ask for
+  Sites.ReadWrite.All only when a site is set.
+- Connection form: client ID/secret, redirect URI and the sign-in button now serve Google (account login), Dropbox
+  and Microsoft (`oauth-signin.js`); OneDrive adds tenant and site.
+- Tests: unit (settings, validator); integration with `Test/Integration/_files/cloud-server.php` (Dropbox + Graph
+  stand-in): sign-in through OAuthFlow, files, parts, redirect download, SharePoint site, a profile, a refused code.
 
 ## Open questions
 

@@ -161,7 +161,7 @@ class ProfileValidatorTest extends TestCase
             'name' => '  ',
             'direction' => 'import',
             'entity' => 'catalog_category',
-            'source_type' => 'dropbox',
+            'source_type' => 'box',
             'format' => 'pdf',
             'after_success' => 'archive',
             'notify' => 'sometimes',
@@ -177,7 +177,7 @@ class ProfileValidatorTest extends TestCase
         self::assertSame([
             'Give the profile a name.',
             'Magento has no import entity "catalog_category".',
-            'The source type "dropbox" is not one of upload, folder, url, sftp, ftp, s3, google_drive.',
+            'The source type "box" is not one of upload, folder, url, sftp, ftp, s3, google_drive, dropbox, onedrive.',
             'The format "pdf" is not one of auto, csv, xlsx, json, xml.',
             'The after-success action "archive" is not one of keep, move, delete.',
             'The notification setting "sometimes" is not one of never, failure, always.',
@@ -312,8 +312,8 @@ class ProfileValidatorTest extends TestCase
 
         self::assertSame([], $validator->validate(new ProfileStub(['format' => 'xlsx', 'export_options' => ['destination' => 'download']] + $base)));
         self::assertSame(
-            ['"dropbox" is not an export destination.', 'OpenImport cannot write json files.'],
-            $validator->validate(new ProfileStub(['format' => 'json', 'export_options' => ['destination' => 'dropbox']] + $base))
+            ['"box" is not an export destination.', 'OpenImport cannot write json files.'],
+            $validator->validate(new ProfileStub(['format' => 'json', 'export_options' => ['destination' => 'box']] + $base))
         );
         self::assertSame(
             ['Enter the server folder to write to.'],

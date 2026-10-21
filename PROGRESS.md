@@ -95,7 +95,7 @@ parallelism only across runs and for exports).
 |---|---|---|
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | **released 1.4.0** (#53, #54, #58–#60, #62, #63; release PR); E2E dev-env #13–#16 |
-| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | in progress: 1 merged (#65), 2 PR #67, 3 PR #68, 4 PR #69, 5 PR open |
+| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | **released 1.5.0** (#65, #67–#70, release PR); E2E dev-env #17 |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
 
 Rule for every slice: one PR, pushed at once; this file updated after each slice (done, exact next step, open
@@ -109,9 +109,10 @@ code.
 (double-click `claude-upgrade.command` first), now also for the 1.4 pages (connections grid and form, Google/Dropbox/
 Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).
 
-**1.5 · Sales and marketing entities** (plan page 15 §3) in progress: slice 1 shipments and tracking
-merged (#65), slice 2 order import (#67), slice 3 URL rewrites (#68, stacked on #67), slice 4 price rules and coupons (#69, stacked on #68), slice 5 small entities (`feat/1.5-small-entities`, stacked on #69) built; next: merge the stack in order, release 1.5.0 (CHANGELOG, comparison, Notion build log, page 03, page 15), then 1.6. Was: 4 price rules and
-coupons, 5 small entities (reviews, newsletter, search terms/synonyms, category positions). Each slice: README,
+**1.5 · Sales and marketing entities** (plan page 15 §3) **released as 1.5.0 on 2026-10-21**: #65 shipments,
+#67 orders, #68 URL rewrites, #69 price rules and coupons, #70 reviews/newsletter/search/positions; E2E dev-env
+#17. Next: **1.6 · Automation and operations** (plan page 15 §3): 1 job chains, 2 triggers, 3 webhook/Slack,
+4 reindex after a run, 5 parallel workers, 6 undo, 7 close. Each slice: README,
 CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs

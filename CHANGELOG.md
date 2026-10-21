@@ -5,6 +5,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-21
+
+Sales and marketing entities: orders, shipments, URL rewrites, price rules and coupons, reviews, newsletter,
+search terms and synonyms, category positions — import and export through Magento's own models and services
+(plan 1.3–1.6, release 1.5).
+
 ### Added
 - Shipments and tracking numbers (`openimport_shipment`): a file ships orders by order number through Magento's
   own shipment service (all open items or one SKU with a quantity, carrier, tracking number, customer e-mail,

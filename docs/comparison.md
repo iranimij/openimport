@@ -17,7 +17,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Features
 
-| Feature | OpenImport 1.4 | Open Source | Commerce | Firebear | Amasty Premium | Xtento |
+| Feature | OpenImport 1.5 | Open Source | Commerce | Firebear | Amasty Premium | Xtento |
 |---|---|---|---|---|---|---|
 | Saved profiles | ✓ | ✗ | ○ scheduled jobs | ✓ | ✓ (Premium) | ✓ |
 | Schedules (cron) | ✓ presets and cron expressions, each due minute exactly once | ✗ | ✓ | ✓ | ○ (Pro and up) | ✓ |
@@ -78,8 +78,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Where the paid tools still have more
 
-Order and tracking import, price rules and URL rewrites, job chains and more triggers, B2B. Sales entities are
-planned for 1.5, automation for 1.6; B2B is declined (Adobe Commerce only). See the [roadmap](https://github.com/iranimij/openimport/milestones).
+Job chains and more triggers, webhook and Slack notifications, reindex after a run, undo, B2B. Automation is
+planned for 1.6; B2B is declined (Adobe Commerce only). See the [roadmap](https://github.com/iranimij/openimport/milestones).
 
 ## Free alternatives for developers
 

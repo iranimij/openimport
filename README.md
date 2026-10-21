@@ -74,7 +74,7 @@ with a CSV, OpenImport does with a mapped file.
 
 ## How it compares
 
-✓ yes · ○ partly or higher tier · ✗ no · **1.4** / **1.5** planned ([roadmap](https://github.com/iranimij/openimport/milestones)).
+✓ yes · ○ partly or higher tier · ✗ no · **1.6** planned ([roadmap](https://github.com/iranimij/openimport/milestones)).
 From the vendors' public docs as of 2026-10-13; details and sources in [docs/comparison.md](docs/comparison.md).
 
 | | **OpenImport** | Magento Open Source | Adobe Commerce | Firebear Improved I/E | Amasty Import & Export | Xtento |

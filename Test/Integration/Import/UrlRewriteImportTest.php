@@ -191,9 +191,9 @@ class UrlRewriteImportTest extends TestCase
         $back = $this->process($profile, $path, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $back->getStatus(), $back->getMessage());
         self::assertSame(
-            [0, 3],
-            [$back->getCount('created'), $back->getCount('updated')],
-            $back->getMessage() . "\n" . implode("\n", $this->errorMessages($back))
+            [0, 0, 3],
+            [$back->getCount('created'), $back->getCount('updated'), $back->getCount('unchanged')],
+            'the exported file is what the shop has: ' . $back->getMessage()
         );
 
         // Conflicts and bad rows are reported, nothing is written.

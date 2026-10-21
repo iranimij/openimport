@@ -136,7 +136,7 @@ class PriceRuleImportTest extends TestCase
         return $rule instanceof CartRule ? $rule : null;
     }
 
-    #[DataFixture('Magento/Catalog/_files/product_simple.php')]
+    #[DataFixture('Magento/Checkout/_files/quote_with_address.php')]
     public function testCartRulesWithCouponsApplyInAQuote(): void
     {
         $tag = 'OI ' . bin2hex(random_bytes(3));
@@ -193,36 +193,25 @@ class PriceRuleImportTest extends TestCase
         self::assertSame('100', $json->getConditions()->asArray()['conditions'][0]['value']);
         self::assertSame(0, (int) $json->getIsActive());
 
-        // The coupon works in a cart: three simple products (30) with the code give 10 % off.
-        $product = Bootstrap::getObjectManager()->get(ProductRepositoryInterface::class)->get('simple');
+        // The coupon works in a cart: the fixture quote (two simple products, 20) with the code gets 10 % off.
         /** @var Quote $quote */
         $quote = Bootstrap::getObjectManager()->create(Quote::class);
-        $quote->setStoreId(1)->setIsActive(true)->setCustomerIsGuest(true)->setCustomerGroupId(0)
-            ->setCustomerEmail('guest@example.com');
-        $quote->getBillingAddress()->setCountryId('DE')->setPostcode('60311')->setCity('Frankfurt');
-        $quote->getShippingAddress()->setCountryId('DE')->setPostcode('60311')->setCity('Frankfurt')
-            ->setCollectShippingRates(true);
-        $quote->addProduct($product, 3);
+        $quote->load('test_order_1', 'reserved_order_id');
+        self::assertNotEmpty($quote->getId(), 'the quote fixture');
         $quote->setCouponCode($code)->collectTotals();
         $address = $quote->getShippingAddress();
         $diagnosis = sprintf(
-            'coupon "%s", applied rules "%s", address rules "%s", base subtotal %s, discount %s, items %d; rule active %s, '
-            . 'websites %s, groups %s, type %s, auto %s, validates %s',
+            'coupon "%s", applied rules "%s", base subtotal %s, discount %s, items %d, group %s; rule validates %s',
             (string) $quote->getCouponCode(),
             (string) $quote->getAppliedRuleIds(),
-            (string) $address->getAppliedRuleIds(),
             (string) $address->getBaseSubtotal(),
             (string) $address->getDiscountAmount(),
             count($address->getAllItems()),
-            (string) $ten->getIsActive(),
-            implode(',', (array) $ten->getWebsiteIds()),
-            implode(',', (array) $ten->getCustomerGroupIds()),
-            (string) $ten->getCouponType(),
-            (string) $ten->getUseAutoGeneration(),
+            (string) $quote->getCustomerGroupId(),
             $ten->validate($address) ? 'yes' : 'no'
         );
         self::assertSame($code, $quote->getCouponCode(), 'the coupon is accepted: ' . $diagnosis);
-        self::assertSame(-3.0, (float) $address->getDiscountAmount(), '30 with 10 % off: ' . $diagnosis);
+        self::assertSame(-2.0, (float) $address->getDiscountAmount(), '20 with 10 % off: ' . $diagnosis);
 
         // Update by name: the discount changes, everything else stays; the export round trip imports as it is.
         $update = $this->file("name;discount_amount\n{$tag} ten;15\n");

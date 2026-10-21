@@ -199,7 +199,18 @@ class OrderImportTest extends TestCase
         ));
         self::assertCount(count($fixture), $imported, 'one exported row per imported item');
         $strip = static fn (array $row): array => array_intersect_key($row, array_flip(self::ROUND_TRIP));
-        self::assertSame(array_map($strip, $fixture), array_map($strip, $imported));
+        $expected = array_map($strip, $fixture);
+        $actual = array_map($strip, $imported);
+        $differences = [];
+        foreach ($expected as $index => $row) {
+            foreach ($row as $column => $value) {
+                if (($actual[$index][$column] ?? null) !== $value) {
+                    $differences[] = sprintf('row %d %s: "%s" became "%s"', $index, $column, $value, $actual[$index][$column] ?? 'n/a');
+                }
+            }
+        }
+        self::assertSame([], $differences, implode("\n", $differences));
+        self::assertSame($expected, $actual);
         $new = Bootstrap::getObjectManager()->create(Order::class)->loadByIncrementId($imported[0]['increment_id']);
         self::assertStringContainsString('Imported by OpenImport', (string) $new->getStatusHistoryCollection()->getFirstItem()->getComment());
     }
@@ -256,8 +267,8 @@ class OrderImportTest extends TestCase
 
         // A dry run names the problems: wrong totals, bad e-mail, unknown status, no items, missing parent.
         $bad = $this->file($header
-            . '"OI-9002";shipped;;nobody;A;B;USD;20;5;0;99;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;simple;X;1;;;;10;10' . "\n"
-            . '"OI-9003";complete;;x@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;;;;;;;;' . "\n"
+            . '"OI-9002";complete;;ok@example.com;A;B;USD;20;5;0;99;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;simple;X;1;;;;10;10' . "\n"
+            . '"OI-9003";shipped;;nobody;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;;;;;;;;' . "\n"
             . '"OI-9004";complete;;y@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;simple;X;1;;;;10;10' . "\n"
             . '"OI-9004";complete;;y@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;child;Y;1;;;;0;0' . "\n");
         $check = $this->process(

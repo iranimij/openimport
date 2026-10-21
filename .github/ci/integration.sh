@@ -38,6 +38,18 @@ composer config --no-plugins allow-plugins.php-http/discovery true
 composer require --no-update --no-interaction "$package:1.0.0"
 "$MODULE_DIR/.github/ci/logged.sh" "composer install" composer install --no-interaction --no-progress --prefer-dist \
   || { echo "composer install failed, retrying once"; composer clear-cache; "$MODULE_DIR/.github/ci/logged.sh" "composer install (retry)" composer install --no-interaction --no-progress --prefer-dist; }
+# libxml2 2.12 and later refuse core's Elasticsearch schema of 2.4.7 ("content model is not determinist": a named
+# element followed by xs:any). Same fix as later Magento releases need: keep only xs:any in those sequences. Only
+# the schema of the test store changes; esconfig.xml files validate as before.
+es_xsd=vendor/magento/module-elasticsearch/etc/esconfig.xsd
+if [ -f "$es_xsd" ]; then
+  php -r 'echo "libxml ", LIBXML_DOTTED_VERSION, PHP_EOL;'
+  php -r '
+    $xsd = file_get_contents($argv[1]);
+    $fixed = preg_replace("#<xs:element name=\"(type|default)\"[^>]*/>\s*#", "", $xsd);
+    if ($fixed !== $xsd) { file_put_contents($argv[1], $fixed); echo "Patched ", $argv[1], PHP_EOL; }
+  ' "$es_xsd"
+fi
 echo "::endgroup::"
 
 echo "::group::Test framework configuration ($SEARCH_ENGINE)"

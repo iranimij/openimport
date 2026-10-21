@@ -81,6 +81,7 @@
                 <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageImporter</item>
                 <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockImporter</item>
                 <item name="openimport_shipment" xsi:type="object">Iranimij\OpenImport\Model\Import\Shipment\ShipmentImporter</item>
+                <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Import\Order\OrderImporter</item>
             </argument>
         </arguments>
     </type>
@@ -107,6 +108,7 @@
                 <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageReader</item>
                 <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockReader</item>
                 <item name="openimport_shipment" xsi:type="object">Iranimij\OpenImport\Model\Import\Shipment\ShipmentRecordReader</item>
+                <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Import\Order\OrderRecordReader</item>
             </argument>
         </arguments>
     </type>

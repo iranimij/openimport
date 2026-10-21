@@ -798,7 +798,8 @@ class ImportRunner
             $skipErrors,
             max(0, $allowed - $ownErrors),
             imagesDirectory: $entity->importEntity() === 'catalog_product' ? $this->imageFolder->absoluteBase() : '',
-            historyLabel: sprintf('openimport-run-%d.csv', $this->runId)
+            historyLabel: sprintf('openimport-run-%d.csv', $this->runId),
+            options: $profile->getImportOptions()
         );
         $result = $this->importers->get($entity->importEntity())->run(
             $request,

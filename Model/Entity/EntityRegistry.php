@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Model\Entity;
 use Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter;
 use Iranimij\OpenImport\Model\Import\Category\CategoryImporter;
 use Iranimij\OpenImport\Model\Import\Cms\CmsImporter;
+use Iranimij\OpenImport\Model\Import\Order\OrderFile;
 use Iranimij\OpenImport\Model\Import\Shipment\ShipmentImporter;
 
 /**
@@ -36,12 +37,13 @@ class EntityRegistry
     /**
      * Entities that cannot be imported with "Replace" (their importers refuse it).
      */
-    public const NO_REPLACE = [self::CATEGORY, self::ATTRIBUTE, self::CMS_PAGE, self::CMS_BLOCK, self::SHIPMENT];
+    public const NO_REPLACE = [self::CATEGORY, self::ATTRIBUTE, self::CMS_PAGE, self::CMS_BLOCK, self::SHIPMENT,
+        self::ORDER];
 
     /**
      * Entities that can only be added (nothing to update or delete).
      */
-    public const ADD_ONLY = [self::SHIPMENT];
+    public const ADD_ONLY = [self::SHIPMENT, self::ORDER];
 
     /**
      * What a Stock & prices profile may change (through core's product import, only existing products).
@@ -114,6 +116,27 @@ class EntityRegistry
             ),
             new EntityInfo(self::CMS_PAGE, ['identifier'], false, [], $cmsSynonyms, null, CmsImporter::PAGE_COLUMNS),
             new EntityInfo(self::CMS_BLOCK, ['identifier'], false, [], $cmsSynonyms, null, CmsImporter::BLOCK_COLUMNS),
+            new EntityInfo(
+                self::ORDER,
+                ['increment_id'],
+                false,
+                [],
+                ['bestellnummer' => 'increment_id', 'order' => 'increment_id', 'order number' => 'increment_id',
+                    'order id' => 'increment_id', 'e mail' => 'customer_email', 'email' => 'customer_email',
+                    'mail' => 'customer_email', 'kunde e mail' => 'customer_email', 'vorname' => 'customer_firstname',
+                    'nachname' => 'customer_lastname', 'währung' => 'order_currency_code', 'currency' => 'order_currency_code',
+                    'datum' => 'created_at', 'date' => 'created_at', 'bestelldatum' => 'created_at',
+                    'gesamt' => 'grand_total', 'total' => 'grand_total', 'gesamtsumme' => 'grand_total',
+                    'zwischensumme' => 'subtotal', 'versandkosten' => 'shipping_amount', 'shipping' => 'shipping_amount',
+                    'steuer' => 'tax_amount', 'tax' => 'tax_amount', 'rabatt' => 'discount_amount',
+                    'discount' => 'discount_amount', 'zahlungsart' => 'payment_method', 'payment' => 'payment_method',
+                    'versandart' => 'shipping_method', 'artikelnummer' => 'item_sku', 'sku' => 'item_sku',
+                    'artikel' => 'item_name', 'product' => 'item_name', 'menge' => 'item_qty_ordered', 'qty' => 'item_qty_ordered',
+                    'quantity' => 'item_qty_ordered', 'preis' => 'item_price', 'price' => 'item_price',
+                    'sendungsnummer' => 'tracking_numbers', 'tracking' => 'tracking_numbers'],
+                null,
+                OrderFile::COLUMNS
+            ),
             new EntityInfo(
                 self::SHIPMENT,
                 ['increment_id'],

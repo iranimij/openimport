@@ -32,6 +32,8 @@ class FieldList
         'openimport_cms_page' => ['identifier', 'title'],
         'openimport_cms_block' => ['identifier', 'title'],
         'openimport_shipment' => ['increment_id'],
+        'openimport_order' => ['increment_id', 'customer_email', 'status', 'billing_firstname', 'billing_lastname',
+            'billing_street', 'billing_city', 'billing_country_id', 'item_sku', 'item_qty_ordered', 'item_price'],
     ];
 
     /**

@@ -173,6 +173,7 @@ class ProfileValidator
             case 'google_drive':
             case 'dropbox':
             case 'onedrive':
+            case 'rest':
                 $problem = $this->connections->selected($config) > 0
                     ? $this->connections->problem($config, $profile->getSourceType())
                     : 'Choose a saved connection for this source.';
@@ -211,7 +212,10 @@ class ProfileValidator
             if ($destination === 'folder' && $out('path') === '') {
                 $problems[] = 'Enter the server folder to write to.';
             }
-            if (in_array($destination, ['s3', 'google_drive', 'dropbox', 'onedrive'], true)) {
+            if ($destination === 'rest' && ($export['send'] ?? '') === 'batches' && $profile->getFormat() !== 'json') {
+                $problems[] = 'Batches of records need the JSON format; choose JSON or send the file.';
+            }
+            if (in_array($destination, ['s3', 'google_drive', 'dropbox', 'onedrive', 'rest'], true)) {
                 $problem = $this->connections->selected($export) > 0
                     ? $this->connections->problem($export, $destination)
                     : 'Choose a saved connection for the destination.';

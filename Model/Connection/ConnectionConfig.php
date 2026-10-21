@@ -28,7 +28,7 @@ class ConnectionConfig
      */
     public const LOGIN_KEYS = ['host', 'port', 'username', 'auth_sftp', 'ssl', 'passive', 'timeout', 'endpoint',
         'region', 'bucket', 'access_key', 'path_style', 'auth_google', 'client_id', 'account', 'tenant', 'site',
-        Secrets::KEY];
+        'base_url', 'auth_rest', 'header_name', 'token_url', 'scope', Secrets::KEY];
 
     /**
      * @param ConnectionRepositoryInterface $connections

@@ -42,7 +42,7 @@ class ConnectionFormMapper
             'name' => $connection->getName(),
             'type' => $connection->getType() ?: 'sftp',
             'settings' => $settings + ['auth_sftp' => 'password', 'passive' => '1', 'ssl' => '0', 'path_style' => '0',
-                'auth_google' => 'service_account'],
+                'auth_google' => 'service_account', 'auth_rest' => 'none'],
         ];
     }
 

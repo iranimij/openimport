@@ -228,6 +228,7 @@
                 <item name="s3" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\S3Source</item>
                 <item name="google_drive" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\GoogleDriveSource</item>
                 <item name="onedrive" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\OneDriveSource</item>
+                <item name="rest" xsi:type="object">Iranimij\OpenImport\Model\Rest\RestSource</item>
                 <item name="dropbox" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\DropboxSource</item>
             </argument>
         </arguments>
@@ -251,6 +252,7 @@
                 <item name="google_drive" xsi:type="string">Google Drive / Sheets</item>
                 <item name="dropbox" xsi:type="string">Dropbox</item>
                 <item name="onedrive" xsi:type="string">OneDrive / SharePoint</item>
+                <item name="rest" xsi:type="string">REST API</item>
             </argument>
             <argument name="inline" xsi:type="array">
                 <item name="sftp" xsi:type="string">sftp</item>
@@ -355,6 +357,7 @@
                 <item name="s3" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\S3Destination</item>
                 <item name="google_drive" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\GoogleDriveDestination</item>
                 <item name="onedrive" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\OneDriveDestination</item>
+                <item name="rest" xsi:type="object">Iranimij\OpenImport\Model\Rest\RestDestination</item>
                 <item name="dropbox" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\DropboxDestination</item>
                 <item name="email" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\EmailDestination</item>
             </argument>

@@ -105,10 +105,11 @@ code.
 Resumed 2026-10-21. Slice 1 (#53) and slice 2 (#54) merged; dev-env #14 (S3 E2E) set back to `main`, merge when
 green.
 
-Now: **1.4 slice 3 · Google Drive / Sheets**, PR #58 (`feat/1.4-google`), E2E dev-env #15. Stacked on it: **slice 4 ·
-Dropbox, OneDrive/SharePoint** (`feat/1.4-dropbox-onedrive`). Next after it: E2E for Google (the mock server
-from `Test/Integration/_files/google-server.php` as a container in the dev-env CI), then slice 4 (Dropbox, OneDrive:
-OAuth connections like Google, same `OAuthFlow` pattern).
+Open PRs (stacked): **slice 3 · Google Drive / Sheets** #58 (`feat/1.4-google`, E2E dev-env #15), **slice 4 ·
+Dropbox, OneDrive/SharePoint** #59 (`feat/1.4-dropbox-onedrive`), **slice 5 · REST API** (`feat/1.4-rest`).
+#58 waits on the Magento 2.4.7 integration jobs: the Sales order fixture crashes after the Google tests (first error
+not visible yet; `logged.sh` now also annotates the first stack trace). Next: fix that, merge #58, #59, slice 5 in
+order (rebase each on main), then slice 6 (archives zip/gz/tar.gz) and slice 7 (ODS, XSLT), then release 1.4.0.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -285,6 +286,17 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
   and Microsoft (`oauth-signin.js`); OneDrive adds tenant and site.
 - Tests: unit (settings, validator); integration with `Test/Integration/_files/cloud-server.php` (Dropbox + Graph
   stand-in): sign-in through OAuthFlow, files, parts, redirect download, SharePoint site, a profile, a refused code.
+
+### 1.4 slice 5 · REST API source and destination (what was built)
+
+- Connection type `rest`: base URL plus a login (none, header token, basic, OAuth2 client credentials with a cached
+  token). `RestClient`: absolute links must stay on the base's host, retries on 429/502/503/504 (Retry-After, at most
+  30 s, 3 times), no redirects (ApiClient and the URL guard as everywhere).
+- `RestSource`: records at a path in the answer, paging by page number, offset, cursor, next-URL field or Link
+  header, a page limit (stops the run with a message, nothing imported); the records go to `rest-api.json` and run
+  through the JSON reader. `RestDestination`: the export file in one request, or JSON batches of N records.
+- Tests: unit (paging helpers); integration against `Test/Integration/_files/rest-server.php` (every paging kind,
+  every login, retries with recorded waits, the page limit, file and batch exports).
 
 ## Open questions
 

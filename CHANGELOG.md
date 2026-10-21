@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-21
+
+Connectors: every file source and destination of the paid import modules (plan 1.3–1.6, release 1.4).
+
 ### Added
 - Saved connections (System › Data Transfer › OpenImport Connections): SFTP and FTP logins with Test connection, shared
   by profiles as source or export destination; secrets encrypted and never shown again; a connection in use cannot be

@@ -17,7 +17,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Features
 
-| Feature | OpenImport 1.3 | Open Source | Commerce | Firebear | Amasty Premium | Xtento |
+| Feature | OpenImport 1.4 | Open Source | Commerce | Firebear | Amasty Premium | Xtento |
 |---|---|---|---|---|---|---|
 | Saved profiles | ✓ | ✗ | ○ scheduled jobs | ✓ | ✓ (Premium) | ✓ |
 | Schedules (cron) | ✓ presets and cron expressions, each due minute exactly once | ✗ | ✓ | ✓ | ○ (Pro and up) | ✓ |
@@ -26,10 +26,14 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | **Dry run with a field-level preview of changes** | **✓ every new profile starts with one** | ○ "Check data" validates only | ○ | ✗ (on the roadmap) | ○ file validation | ○ test mode |
 | **Typed confirmation above a delete/replace threshold** | **✓** | ✗ | ✗ | ✗ | ✗ | ✗ |
 | Delta: only changed rows go to Magento | ✓ per row and store view | ✗ | ✗ | ✓ "import cache" | ✗ | ✗ |
-| CSV / XLSX / JSON / XML | ✓ all four, streamed (flat memory) | CSV | CSV | ✓ plus ODS, XSLT, ZIP | ○ (Pro and up) | ✓ |
+| CSV / XLSX / ODS / JSON / XML | ✓ all five, streamed (flat memory) | CSV | CSV | ✓ | ○ (Pro and up) | ✓ |
+| ZIP, gzip, tar archives in and out; XSLT for XML | ✓ zip-slip and zip-bomb safe, XSLT without file or network access | ✗ | ✗ | ✓ | ○ ZIP | ✓ XSLT |
 | Upload, server folder, URL, SFTP, FTP | ✓ sandboxed folders, SSRF guard, key login | ✗ | ○ FTP for schedules | ✓ | ✓ (Pro and up) | ✓ |
-| Google Sheets | ✓ published links | ✗ | ✗ | ✓ | ○ | ✗ |
-| Google Drive, Dropbox, OneDrive | ✗ (1.4) | ✗ | ✗ | ✓ | ○ | ✗ |
+| Google Sheets | ✓ published links, and private Sheets with a login | ✗ | ✗ | ✓ | ○ | ✗ |
+| Saved connections shared by profiles | ✓ encrypted, Test connection, OAuth with the shop's own app | ✗ | ✗ | ○ | ○ | ○ |
+| Amazon S3 and S3-compatible storage | ✓ own SigV4 client, R2/Wasabi/MinIO | ✗ | ✗ | ✓ | ○ | ✗ |
+| Google Drive, Dropbox, OneDrive / SharePoint | ✓ service account or sign-in, mock-tested in CI | ✗ | ✗ | ✓ | ○ | ✗ |
+| REST API as source and destination | ✓ paging (page, offset, cursor, next, Link), three logins, retries | ✗ | ✗ | ✓ | ○ | ○ |
 | Pictures from web addresses, downloaded once and cached | ✓ SSRF guard, ETag/Last-Modified | ○ downloads every run | ○ downloads every run | ○ downloads, no cache found | ○ downloads, no cache found | ✗ |
 | Configurable products from simple rows (parent column) | ✓ name, variants, own parent rows | ✗ | ✗ | ✓ | ✗ | ✗ |
 | Products missing from the file: disable, out of stock, delete | ✓ per scope (all, website, supplier), under the safety limit | ✗ | ✗ | ✓ | ✗ | ✗ |
@@ -46,7 +50,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | Product attributes and attribute sets (options, store labels) | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | URL rewrites, cart and catalog price rules | ✗ (1.5) | ✗ | ✗ | ✓ | ✓ | ✗ |
-| Export destinations | ✓ download, folder, SFTP, FTP, e-mail | ✗ | ○ | ✓ | ✓ | ✓ |
+| Export destinations | ✓ download, folder, SFTP, FTP, S3, Google Drive/Sheet, Dropbox, OneDrive, REST, e-mail | ✗ | ○ | ✓ | ✓ | ✓ |
 | Run history, error report with your file's line numbers | ✓ original rows in the report | ○ history | ○ last outcome | ✓ | ✓ | ✓ |
 | E-mail on failure or always | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |
 | CLI | ✓ run, status, list, queue, profiles export/import, doctor, secrets | ✗ (REST only) | ✗ | ✓ | ✗ | ○ |
@@ -71,9 +75,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Where the paid tools still have more
 
-Order and tracking import, price rules and URL rewrites, cloud drives (Google Drive, Dropbox, OneDrive, S3) and REST
-API sources, ODS, archives, job chains and more triggers, B2B. Connectors are planned for 1.4, sales entities for 1.5,
-automation for 1.6; B2B is declined (Adobe Commerce only). See the [roadmap](https://github.com/iranimij/openimport/milestones).
+Order and tracking import, price rules and URL rewrites, job chains and more triggers, B2B. Sales entities are
+planned for 1.5, automation for 1.6; B2B is declined (Adobe Commerce only). See the [roadmap](https://github.com/iranimij/openimport/milestones).
 
 ## Free alternatives for developers
 

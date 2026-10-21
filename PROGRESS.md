@@ -61,6 +61,12 @@ colon must be written `\:`, also inside strings.
 from simple rows, products missing from the file, quantities as changes, URL keys and 301s, conditional transforms,
 several files per run, presets. Comparison table updated.
 
+**1.4.0 (2026-10-21):** connectors, plan page 15 slices 1–7 (#53, #54, #58, #59, #60, #62, #63): saved connections,
+S3, Google Drive/Sheets, Dropbox, OneDrive/SharePoint, REST API, archives, ODS and XSLT. Lessons: the GitHub runners'
+libxml2 2.12+ refuses core 2.4.7's `esconfig.xsd` (CI patches it); PHPUnit's TeamCity log names failed tests when a
+fixture crashes before the summary; the OAuth round trip is E2E-testable with a stand-in consent page that redirects
+straight back.
+
 Open for Iman: delete the temporary branch `ci/m5-all` (shows as a dev version on Packagist; cloud sessions cannot
 delete branches), repository settings (squash only, delete branch on merge,
 `main` protected with `ci-ok`), a look at the admin on the Mac. Next product work: Notion "12 · Roadmap 1.x".
@@ -88,7 +94,7 @@ parallelism only across runs and for exports).
 | Release | Slices | Status |
 |---|---|---|
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
-| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | 1 done (#53, E2E dev-env #13); 2 done (#54, E2E dev-env #14); 3 in review |
+| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | **released 1.4.0** (#53, #54, #58–#60, #62, #63; release PR); E2E dev-env #13–#16 |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
 
@@ -99,22 +105,14 @@ code.
 
 ## Exact next step
 
-1.3 released (v1.3.0, #44–#52; E2E dev-env #9–#12). Still open from 1.3: the local browser check on the Mac
-(double-click `claude-upgrade.command` first).
+1.4 released (v1.4.0; module #53–#63; E2E dev-env #13–#16). Still open from 1.3: the local browser check on the Mac
+(double-click `claude-upgrade.command` first), now also for the 1.4 pages (connections grid and form, Google/Dropbox/
+Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).
 
-Resumed 2026-10-21. Slice 1 (#53) and slice 2 (#54) merged; dev-env #14 (S3 E2E) set back to `main`, merge when
-green.
-
-Open PRs (stacked): **slice 3 · Google Drive / Sheets** #58 (`feat/1.4-google`, E2E dev-env #15), **slice 4 ·
-Dropbox, OneDrive/SharePoint** #59 (`feat/1.4-dropbox-onedrive`), **slice 5 · REST API** #60 (`feat/1.4-rest`),
-**slice 6 · archives** #62 (`feat/1.4-archives`), **slice 7 · ODS and XSLT** (`feat/1.4-ods-xslt`), README
-refresh #61 (main). Rule since 2026-10-21: every feature slice
-updates README.md too.
-2.4.7 CI was red on every branch and on main: the runner's libxml2 2.12+ refuses core's `esconfig.xsd` ("content
-model is not determinist"); `.github/ci/integration.sh` patches that schema in the test store. CI also writes a
-TeamCity log so a crash before PHPUnit's summary still names the failed tests. Next: merge #61, #58, #59, #60, #62,
-slice 7 in order (rebase each on main, fix CI), E2E for the new connectors in the dev-env, then release 1.4.0
-(CHANGELOG, comparison table, Notion build log, page 03 and page 15), then 1.5.
+Next: **1.5 · Sales and marketing entities** (plan page 15 §3): slice 1 shipments and tracking (`ShipOrderInterface`),
+2 order import (historic orders as they are; round-trip oracle; full matrix), 3 URL rewrites, 4 price rules and
+coupons, 5 small entities (reviews, newsletter, search terms/synonyms, category positions). Each slice: README,
+CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.

@@ -2347,6 +2347,92 @@
                 </checkbox>
             </formElements>
         </field>
+        <field name="order_number" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="28">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Order numbers</label>
+                <dataScope>import_options.order_number</dataScope>
+                <notice translate="true">Keep: the file's numbers are the shop's order numbers (an order that exists is skipped). Generate: every order gets the next number of its store; the file's number only groups the rows.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="keep" xsi:type="array">
+                                <item name="value" xsi:type="string">keep</item>
+                                <item name="label" xsi:type="string" translate="true">Keep the file's numbers</item>
+                            </option>
+                            <option name="generate" xsi:type="array">
+                                <item name="value" xsi:type="string">generate</item>
+                                <item name="label" xsi:type="string" translate="true">Generate new numbers</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="order_documents" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="28">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Create invoices, shipments and credit memos</label>
+                <dataScope>import_options.order_documents</dataScope>
+                <notice translate="true">From the invoiced, shipped and refunded quantities of the items, through Magento's own services (offline, nothing is charged, no e-mails). The state and status of the file are kept.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="order_stock" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="29">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Reduce stock</label>
+                <dataScope>import_options.order_stock</dataScope>
+                <notice translate="true">Subtract the ordered quantities from the products' stock, as a new order would. Off: historic orders leave the stock alone.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
         <field name="allowed_errors" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

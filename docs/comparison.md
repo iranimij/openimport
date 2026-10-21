@@ -46,7 +46,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | Fast stock & price update of existing products | ✓ | ✗ | ✗ | ○ | ○ | ✓ |
 | Order export (per order or per line, only new or changed) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Shipment and tracking import | ✓ via Magento's shipment service, duplicates skipped | ✗ | ✗ | ✓ | ✓ | ✓ |
-| Order import | ✗ (1.5) | ✗ | ✗ | ✓ | ✓ with invoice/ship actions | ✓ |
+| Order import | ✓ historic orders as they are, round-trip with the export, invoices/shipments/credit memos optional | ✗ | ✗ | ✓ | ✓ with invoice/ship actions | ✓ |
 | Categories (paths, store views) | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
 | Product attributes and attribute sets (options, store labels) | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |

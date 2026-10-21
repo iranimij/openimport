@@ -10,6 +10,13 @@ All notable changes to this project are documented here. The format follows
   own shipment service (all open items or one SKU with a quantity, carrier, tracking number, customer e-mail,
   comment); rows of one order make one shipment; orders already carrying the tracking number are skipped and
   reported. See [Shipments](https://iranimij.github.io/openimport/shipments/).
+- Order import (`openimport_order`, import direction): historic orders land as they are, one row per item in the
+  layout of the order export (state and status, date, totals, addresses, items with parents and product options,
+  payment method recorded). Options: keep the file's order numbers or generate new ones, create invoices, shipments
+  (with tracking numbers) and credit memos from the item quantities through Magento's own services, reduce stock.
+  Orders are only added; existing numbers are skipped and reported; one transaction per order; the dry run checks
+  totals and every column. See [Order import](https://iranimij.github.io/openimport/orders-import/).
+- Import profiles carry import options (`ImportRequest::$options`) for the own importers.
 
 ## [1.4.0] - 2026-10-21
 

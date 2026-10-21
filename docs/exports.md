@@ -59,7 +59,8 @@ postcode, region, country_id, telephone, email, vat_id), and per line `item_id`,
 `item_product_type`, `item_parent_sku`, `item_qty_ordered`, `item_qty_invoiced`, `item_qty_shipped`,
 `item_qty_refunded`, `item_qty_canceled`, `item_price`, `item_price_incl_tax`, `item_row_total`,
 `item_row_total_incl_tax`, `item_discount_amount`, `item_tax_amount`, `item_tax_percent`, `item_weight`,
-`item_product_options`. Amounts are in the order's currency without trailing zeros.
+`item_product_options`. Amounts are in the order's currency without trailing zeros. The same layout is what the
+[order import](orders-import.md) reads.
 
 ## Destinations
 

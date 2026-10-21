@@ -95,7 +95,7 @@ parallelism only across runs and for exports).
 |---|---|---|
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | **released 1.4.0** (#53, #54, #58–#60, #62, #63; release PR); E2E dev-env #13–#16 |
-| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
+| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | in progress: 1 merged (#65), 2 PR open |
 | 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
 
 Rule for every slice: one PR, pushed at once; this file updated after each slice (done, exact next step, open
@@ -110,7 +110,7 @@ code.
 Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).
 
 **1.5 · Sales and marketing entities** (plan page 15 §3) in progress: slice 1 shipments and tracking
-(`feat/1.5-shipments`) built; next 2 order import (historic orders as they are; round-trip oracle; full matrix), 3 URL rewrites, 4 price rules and
+merged (#65), slice 2 order import (`feat/1.5-orders`) built; next 3 URL rewrites, 4 price rules and
 coupons, 5 small entities (reviews, newsletter, search terms/synonyms, category positions). Each slice: README,
 CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
 
@@ -343,6 +343,26 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: integration `Import/ShipmentImportTest` against the Sales order fixture (partial shipment with tracking,
   file imported twice, the rest without SKU with two tracking rows, bad rows refused before anything ships,
   behaviours refused at save); unit validator rule. Docs `docs/shipments.md`, README, comparison, CHANGELOG.
+
+### 1.5 slice 2 · order import (what was built)
+
+- Entity `openimport_order` in the import direction (Add/Update or Only add, `ADD_ONLY`): `Import/Order/OrderFile`
+  groups the rows of a file by `increment_id` (the layout of the order export: order columns on the first row,
+  one item per row, `item_parent_sku` for children), checks every column and the totals (subtotal = Σ row totals,
+  grand total = subtotal + shipping + tax − discount, missing ones filled). `OrderImporter` skips existing numbers
+  (non-critical, run partial), looks up the store, builds `Magento\Sales\Model\Order` like the Sales fixtures
+  (state/status, currency with rate 1, customer by e-mail on the website or guest, group, addresses, payment
+  recorded, items with parents first), saves through `OrderRepository` in one transaction per order, adds the
+  history comment, optionally invoices/ships/refunds through `InvoiceOrderInterface`, `ShipOrderInterface`,
+  `RefundOrderInterface` and sets the file's state and totals again, optionally reduces stock via
+  `StockRegistry`. Numbers: keep the file's or `SalesSequence` next value. `OrderRecords` does the lookups with
+  plain selects. `ImportRequest::$options` carries the profile's import options (`ImportRunner`); profile form
+  fields `order_number`, `order_documents`, `order_stock` (shown for the order entity). Requires
+  `magento/module-sales-sequence` and `magento/module-catalog-inventory`.
+- Tests: integration `Import/OrderImportTest` (round-trip oracle: export the `order_list` fixture per line →
+  import with generated numbers → export → same rows; an order with documents, tracking and stock; the same file
+  twice; dry-run checks; behaviours refused), unit `OrderFileTest` (grouping, totals, checks, columns, money).
+  Docs `docs/orders-import.md`, exports cross-link, README, comparison, CHANGELOG.
 
 ## Open questions
 

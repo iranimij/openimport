@@ -14,6 +14,7 @@ use Iranimij\OpenImport\Model\Http\ApiClient;
 use Iranimij\OpenImport\Model\Http\ApiResponse;
 use Iranimij\OpenImport\Model\OAuth\OAuthTokens;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
+use Magento\Framework\Filesystem\Driver\File;
 
 /**
  * OneDrive and SharePoint document libraries through Microsoft Graph. The drive is the signed-in user's OneDrive, or
@@ -35,11 +36,13 @@ class OneDriveClient implements RemoteClientInterface
      * @param ApiClient $api
      * @param OAuthTokens $tokens
      * @param MicrosoftEndpoints $endpoints
+     * @param File $files
      */
     public function __construct(
         private readonly ApiClient $api,
         private readonly OAuthTokens $tokens,
-        private readonly MicrosoftEndpoints $endpoints
+        private readonly MicrosoftEndpoints $endpoints,
+        private readonly File $files
     ) {
     }
 
@@ -120,7 +123,7 @@ class OneDriveClient implements RemoteClientInterface
      */
     public function upload(string $local, string $remote): void
     {
-        $size = (int) filesize($local);
+        $size = (int) ($this->files->stat($local)['size'] ?? 0);
         if ($size === 0) {
             $this->check($this->send('PUT', $this->item($remote) . ':/content', [], ''), $remote);
 
@@ -137,12 +140,10 @@ class OneDriveClient implements RemoteClientInterface
         if ($target === '') {
             throw new PipelineException(sprintf('Microsoft did not start the upload of %s.', $remote));
         }
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- reads the export file in parts
-        $handle = fopen($local, 'rb');
+        $handle = $this->files->fileOpen($local, 'rb');
         try {
             for ($offset = 0; $offset < $size; $offset += self::PART) {
-                // phpcs:ignore Magento2.Functions.DiscouragedFunction
-                $part = (string) fread($handle, self::PART);
+                $part = (string) $this->files->fileRead($handle, self::PART);
                 $answer = $this->api->send('PUT', $target, [
                     'Content-Range' => sprintf('bytes %d-%d/%d', $offset, $offset + strlen($part) - 1, $size),
                     'Content-Type' => 'application/octet-stream',
@@ -150,8 +151,7 @@ class OneDriveClient implements RemoteClientInterface
                 $this->check($answer, $remote);
             }
         } finally {
-            // phpcs:ignore Magento2.Functions.DiscouragedFunction
-            fclose($handle);
+            $this->files->fileClose($handle);
         }
     }
 
@@ -168,7 +168,7 @@ class OneDriveClient implements RemoteClientInterface
             ['Content-Type' => 'application/json'],
             (string) json_encode([
                 'parentReference' => ['id' => $parent],
-                'name' => basename($to),
+                'name' => $this->name($to),
                 '@microsoft.graph.conflictBehavior' => 'rename',
             ])
         ), $from);
@@ -208,7 +208,7 @@ class OneDriveClient implements RemoteClientInterface
                 $this->item($parent) . ($parent === '' ? '/children' : ':/children'),
                 ['Content-Type' => 'application/json'],
                 (string) json_encode([
-                    'name' => basename($folder),
+                    'name' => $this->name($folder),
                     'folder' => new \stdClass(),
                     '@microsoft.graph.conflictBehavior' => 'fail',
                 ])
@@ -233,6 +233,17 @@ class OneDriveClient implements RemoteClientInterface
         $path = trim($path, '/');
 
         return $this->drive . '/root' . ($path === '' ? '' : ':/' . $this->encode($path));
+    }
+
+    /**
+     * @param string $path
+     * @return string the last segment
+     */
+    private function name(string $path): string
+    {
+        $path = rtrim($path, '/');
+
+        return (string) substr($path, (int) strrpos('/' . $path, '/'));
     }
 
     /**

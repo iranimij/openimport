@@ -336,7 +336,10 @@ class PriceRuleImporter implements ImporterInterface
                 $get('coupon_type')
             )];
         }
-        $codes = array_values(array_filter(array_map('trim', preg_split('/[;,\s]+/', $get('coupon_codes')) ?: [])));
+        $codes = array_values(array_unique(array_filter(array_map(
+            'trim',
+            preg_split('/[;,]/', $get('coupon_codes')) ?: []
+        ))));
         if ($type === '' && ($get('coupon_code') !== '' || $codes !== [])) {
             $type = 'specific';
         }

@@ -140,11 +140,13 @@ class PriceRuleImportTest extends TestCase
     public function testCartRulesWithCouponsApplyInAQuote(): void
     {
         $tag = 'OI ' . bin2hex(random_bytes(3));
+        $code = 'SAVE10-' . bin2hex(random_bytes(3));
+        $list = ['OI-A-' . bin2hex(random_bytes(2)), 'OI-B-' . bin2hex(random_bytes(2))];
         $header = "name;description;is_active;websites;customer_groups;from_date;to_date;priority;coupon_type;coupon_code;coupon_codes;"
             . "uses_per_coupon;uses_per_customer;action;discount_amount;free_shipping;labels;condition_subtotal;condition_skus;action_skus;conditions\n";
         $columns = explode(';', trim($header));
         $file = $this->file($header
-            . "{$tag} ten;Ten percent;1;base;NOT LOGGED IN,General;2020-01-01;;5;specific;SAVE10-{$tag};OI-A-{$tag},OI-B-{$tag};5;1;by_percent;10;no;"
+            . "{$tag} ten;Ten percent;1;base;NOT LOGGED IN,General;2020-01-01;;5;specific;{$code};{$list[0]},{$list[1]};5;1;by_percent;10;no;"
             . "10 % off|default:Ten off;20;;;\n"
             . "{$tag} fixed;;1;all;all;;;0;none;;;0;0;by_fixed;2;matching;;;simple;simple;\n"
             . "{$tag} json;;0;base;General;;;1;;;;;;cart_fixed;5;;;;;;"
@@ -162,7 +164,7 @@ class PriceRuleImportTest extends TestCase
         self::assertSame(3, $live->getCount('created'));
         $ten = $this->cartRule("{$tag} ten");
         self::assertNotNull($ten);
-        self::assertSame("SAVE10-{$tag}", $ten->getPrimaryCoupon()->getCode());
+        self::assertSame($code, $ten->getPrimaryCoupon()->getCode());
         self::assertSame(['by_percent', 10.0, 5, 1], [$ten->getSimpleAction(), (float) $ten->getDiscountAmount(), (int) $ten->getUsesPerCoupon(), (int) $ten->getUsesPerCustomer()]);
         self::assertSame('2020-01-01', substr((string) $ten->getFromDate(), 0, 10));
         $labels = (array) $ten->getStoreLabels();
@@ -174,7 +176,7 @@ class PriceRuleImportTest extends TestCase
         $websiteId = (int) Bootstrap::getObjectManager()->get(StoreManagerInterface::class)->getWebsite('base')->getId();
         self::assertSame([$websiteId], array_map('intval', $ten->getWebsiteIds()));
         $records = Bootstrap::getObjectManager()->get(PriceRuleRecords::class);
-        self::assertSame(["OI-A-{$tag}", "OI-B-{$tag}"], $records->couponCodes((int) $ten->getId()));
+        self::assertSame($list, $records->couponCodes((int) $ten->getId()));
         $conditions = $ten->getConditions()->asArray();
         self::assertSame('base_subtotal', $conditions['conditions'][0]['attribute']);
         self::assertSame('20', $conditions['conditions'][0]['value']);
@@ -195,8 +197,8 @@ class PriceRuleImportTest extends TestCase
         $quote = Bootstrap::getObjectManager()->create(Quote::class);
         $quote->setStoreId(1)->setIsActive(true)->setCustomerIsGuest(true)->setCustomerGroupId(0)
             ->addProduct($product, 3);
-        $quote->setCouponCode("SAVE10-{$tag}")->collectTotals();
-        self::assertSame("SAVE10-{$tag}", $quote->getCouponCode(), 'the coupon is accepted');
+        $quote->setCouponCode($code)->collectTotals();
+        self::assertSame($code, $quote->getCouponCode(), 'the coupon is accepted');
         self::assertSame(27.0, (float) $quote->getSubtotalWithDiscount(), '30 with 10 % off');
 
         // Update by name: the discount changes, everything else stays; the export round trip imports as it is.
@@ -207,13 +209,13 @@ class PriceRuleImportTest extends TestCase
         $ten = $this->cartRule("{$tag} ten");
         self::assertNotNull($ten);
         self::assertSame(15.0, (float) $ten->getDiscountAmount());
-        self::assertSame("SAVE10-{$tag}", $ten->getPrimaryCoupon()->getCode());
+        self::assertSame($code, $ten->getPrimaryCoupon()->getCode());
         self::assertSame('20', $ten->getConditions()->asArray()['conditions'][0]['value'], 'conditions kept');
 
         $rows = $this->export(EntityRegistry::CART_RULE, $tag);
         self::assertCount(3, $rows);
-        self::assertSame("SAVE10-{$tag}", $rows["{$tag} ten"]['coupon_code']);
-        self::assertSame("OI-A-{$tag};OI-B-{$tag}", $rows["{$tag} ten"]['coupon_codes']);
+        self::assertSame($code, $rows["{$tag} ten"]['coupon_code']);
+        self::assertSame(implode(';', $list), $rows["{$tag} ten"]['coupon_codes']);
         self::assertSame('10 % off|default:Ten off', $rows["{$tag} ten"]['labels']);
         self::assertSame('base', $rows["{$tag} ten"]['websites']);
         self::assertSame('NOT LOGGED IN,General', $rows["{$tag} ten"]['customer_groups']);
@@ -225,7 +227,7 @@ class PriceRuleImportTest extends TestCase
         self::assertSame([0, 0, 3], [$back->getCount('created'), $back->getCount('updated'), $back->getCount('unchanged')], $back->getMessage());
         $again = $this->process($this->profile(EntityRegistry::CART_RULE, PriceRuleImporter::CART_COLUMNS), $rows["{$tag} ten"]['_file']);
         self::assertSame(RunInterface::STATUS_SUCCESS, $again->getStatus(), $this->report($again));
-        self::assertSame(["OI-A-{$tag}", "OI-B-{$tag}"], $records->couponCodes((int) $ten->getId()), 'coupons not doubled');
+        self::assertSame($list, $records->couponCodes((int) $ten->getId()), 'coupons not doubled');
 
         // Bad rows are reported, nothing is written.
         $bad = $this->file($header
@@ -255,7 +257,7 @@ class PriceRuleImportTest extends TestCase
         self::assertSame(RunInterface::STATUS_SUCCESS, $gone->getStatus(), $this->report($gone));
         self::assertSame(3, $gone->getCount('deleted'));
         self::assertNull($this->cartRule("{$tag} ten"));
-        self::assertSame([], $records->couponOwners(["SAVE10-{$tag}", "OI-A-{$tag}"]), 'coupons go with the rule');
+        self::assertSame([], $records->couponOwners([$code, $list[0]]), 'coupons go with the rule');
     }
 
     #[DataFixture('Magento/Catalog/_files/product_simple.php')]

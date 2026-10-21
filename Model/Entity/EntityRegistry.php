@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Model\Entity;
 use Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter;
 use Iranimij\OpenImport\Model\Import\Category\CategoryImporter;
 use Iranimij\OpenImport\Model\Import\Cms\CmsImporter;
+use Iranimij\OpenImport\Model\Import\Shipment\ShipmentImporter;
 
 /**
  * The import entities OpenImport supports, with their identifier columns. More can be added through di.xml
@@ -30,11 +31,17 @@ class EntityRegistry
     public const ATTRIBUTE = 'openimport_attribute';
     public const CMS_PAGE = 'openimport_cms_page';
     public const CMS_BLOCK = 'openimport_cms_block';
+    public const SHIPMENT = 'openimport_shipment';
 
     /**
      * Entities that cannot be imported with "Replace" (their importers refuse it).
      */
-    public const NO_REPLACE = [self::CATEGORY, self::ATTRIBUTE, self::CMS_PAGE, self::CMS_BLOCK];
+    public const NO_REPLACE = [self::CATEGORY, self::ATTRIBUTE, self::CMS_PAGE, self::CMS_BLOCK, self::SHIPMENT];
+
+    /**
+     * Entities that can only be added (nothing to update or delete).
+     */
+    public const ADD_ONLY = [self::SHIPMENT];
 
     /**
      * What a Stock & prices profile may change (through core's product import, only existing products).
@@ -107,6 +114,22 @@ class EntityRegistry
             ),
             new EntityInfo(self::CMS_PAGE, ['identifier'], false, [], $cmsSynonyms, null, CmsImporter::PAGE_COLUMNS),
             new EntityInfo(self::CMS_BLOCK, ['identifier'], false, [], $cmsSynonyms, null, CmsImporter::BLOCK_COLUMNS),
+            new EntityInfo(
+                self::SHIPMENT,
+                ['increment_id'],
+                false,
+                [],
+                ['bestellnummer' => 'increment_id', 'bestellung' => 'increment_id', 'order' => 'increment_id',
+                    'order number' => 'increment_id', 'order id' => 'increment_id', 'auftragsnummer' => 'increment_id',
+                    'artikelnummer' => 'item_sku', 'sku' => 'item_sku', 'menge' => 'qty', 'quantity' => 'qty',
+                    'versanddienstleister' => 'carrier_code', 'carrier' => 'carrier_code', 'spediteur' => 'carrier_code',
+                    'sendungsnummer' => 'tracking_number', 'tracking' => 'tracking_number', 'tracking no' => 'tracking_number',
+                    'tracking id' => 'tracking_number', 'trackingnummer' => 'tracking_number', 'paketnummer' => 'tracking_number',
+                    'titel' => 'title', 'service' => 'title', 'benachrichtigen' => 'notify', 'e mail' => 'notify',
+                    'kommentar' => 'comment', 'bemerkung' => 'comment'],
+                null,
+                ShipmentImporter::COLUMNS
+            ),
             new EntityInfo(self::PRODUCT, ['sku'], true, ['sku', 'attribute_set_code', 'product_type'], $productSynonyms),
             new EntityInfo(self::ADVANCED_PRICING, ['sku', 'tier_price_website', 'tier_price_customer_group',
                 'tier_price_qty'], false, [], $productSynonyms),

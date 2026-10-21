@@ -765,3 +765,5 @@
 "XSLT after writing (XML)","XSLT nach dem Schreiben (XML)"
 "XSLT before reading (XML)","XSLT vor dem Lesen (XML)"
 "OpenDocument (.ods)","OpenDocument (.ods)"
+"Shipments and tracking numbers","Lieferungen und Sendungsnummern"
+"Ships orders by order number: all open items or one SKU with a quantity, carrier and tracking number, optional customer e-mail. Orders that already carry the tracking number are skipped.","Versendet Bestellungen nach Bestellnummer: alle offenen Positionen oder eine Artikelnummer mit Menge, Versanddienstleister und Sendungsnummer, optional E-Mail an den Kunden. Bestellungen, die die Sendungsnummer schon tragen, werden übersprungen."

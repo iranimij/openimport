@@ -25,6 +25,7 @@ nav:
   - Categories: categories.md
   - Attributes: attributes.md
   - CMS pages and blocks: cms.md
+  - Shipments and tracking: shipments.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
   - REST API and triggers: api.md

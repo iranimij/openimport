@@ -65,7 +65,7 @@ orders to CSV, XLSX, ODS, JSON or XML, downloaded, dropped in a folder, pushed t
 Entities: products (every type, with images, categories, related products and custom options exactly as core
 import supports them), advanced pricing, customers, customer addresses, customers with addresses, MSI stock sources,
 the fast *Stock & prices* update (existing products only), categories, product attributes and attribute sets, CMS
-pages and blocks (import and export), and order export. Anything Magento's own import can do
+pages and blocks (import and export), order export, and shipments with tracking numbers (import). Anything Magento's own import can do
 with a CSV, OpenImport does with a mapped file.
 
 ## How it compares
@@ -96,7 +96,8 @@ From the vendors' public docs as of 2026-10-13; details and sources in [docs/com
 | Order export (only new or changed) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Categories, attributes and attribute sets, CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | Cart and catalog price rules, URL rewrites | **1.5** | ✗ | ✗ | ✓ | ✓ | ✗ |
-| Order import, tracking import | **1.5** | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Shipment and tracking import | ✓ through Magento's shipment service | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Order import | **1.5** | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Export to download, folder, SFTP, FTP, S3, cloud drives, REST, e-mail | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |
 | Export right after an order is placed | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Start profiles over REST, read run status | ✓ | ○ raw CSV import | ○ | ○ | ○ | ✗ |

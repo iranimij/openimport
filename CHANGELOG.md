@@ -5,6 +5,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Shipments and tracking numbers (`openimport_shipment`): a file ships orders by order number through Magento's
+  own shipment service (all open items or one SKU with a quantity, carrier, tracking number, customer e-mail,
+  comment); rows of one order make one shipment; orders already carrying the tracking number are skipped and
+  reported. See [Shipments](https://iranimij.github.io/openimport/shipments/).
+
 ## [1.4.0] - 2026-10-21
 
 Connectors: every file source and destination of the paid import modules (plan 1.3–1.6, release 1.4).

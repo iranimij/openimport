@@ -462,16 +462,16 @@ class PriceRuleImporter implements ImporterInterface
         $rule->addData($prepared);
         if ($conditions !== null) {
             // A fresh tree: the saved one would otherwise be loaded first and the file's added to it.
-            $rule->setConditions(
-                $rule->getConditionsInstance()->setData(['rule' => $rule, 'id' => '1', 'prefix' => 'conditions'])
-            );
+            $rule->setConditions($rule->getConditionsInstance()->setData([
+                'rule' => $rule, 'id' => '1', 'prefix' => 'conditions', 'conditions' => [],
+            ]));
             $rule->unsetData('conditions_serialized');
             $rule->getConditions()->loadArray($conditions);
         }
         if ($actions !== null) {
-            $rule->setActions(
-                $rule->getActionsInstance()->setData(['rule' => $rule, 'id' => '1', 'prefix' => 'actions'])
-            );
+            $rule->setActions($rule->getActionsInstance()->setData([
+                'rule' => $rule, 'id' => '1', 'prefix' => 'actions', 'actions' => [],
+            ]));
             $rule->unsetData('actions_serialized');
             $rule->getActions()->loadArray($actions);
         }

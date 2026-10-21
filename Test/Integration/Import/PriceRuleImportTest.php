@@ -222,7 +222,7 @@ class PriceRuleImportTest extends TestCase
         self::assertStringContainsString('"attribute":"base_subtotal"', $rows["{$tag} ten"]['conditions']);
         $back = $this->process($this->profile(EntityRegistry::CART_RULE, PriceRuleImporter::CART_COLUMNS), $rows["{$tag} ten"]['_file'], RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $back->getStatus(), $this->report($back));
-        self::assertSame([0, 3], [$back->getCount('created'), $back->getCount('updated')]);
+        self::assertSame([0, 0, 3], [$back->getCount('created'), $back->getCount('updated'), $back->getCount('unchanged')], $back->getMessage());
         $again = $this->process($this->profile(EntityRegistry::CART_RULE, PriceRuleImporter::CART_COLUMNS), $rows["{$tag} ten"]['_file']);
         self::assertSame(RunInterface::STATUS_SUCCESS, $again->getStatus(), $this->report($again));
         self::assertSame(["OI-A-{$tag}", "OI-B-{$tag}"], $records->couponCodes((int) $ten->getId()), 'coupons not doubled');
@@ -290,7 +290,7 @@ class PriceRuleImportTest extends TestCase
         self::assertStringContainsString('"value":"simple"', $rows["{$tag} catalog"]['conditions']);
         $back = $this->process($this->profile(EntityRegistry::CATALOG_RULE, PriceRuleImporter::CATALOG_COLUMNS), $rows["{$tag} catalog"]['_file'], RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_SUCCESS, $back->getStatus(), $this->report($back));
-        self::assertSame([0, 1], [$back->getCount('created'), $back->getCount('updated')]);
+        self::assertSame([0, 0, 1], [$back->getCount('created'), $back->getCount('updated'), $back->getCount('unchanged')], $back->getMessage());
 
         $delete = $this->profile(EntityRegistry::CATALOG_RULE, ['name'], ProfileInterface::BEHAVIOR_DELETE);
         $gone = $this->process($delete, $this->file("name\n{$tag} catalog\n"), RunInterface::MODE_LIVE, ['confirmed' => true]);

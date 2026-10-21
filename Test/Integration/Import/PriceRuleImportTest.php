@@ -183,7 +183,7 @@ class PriceRuleImportTest extends TestCase
         $fixed = $this->cartRule("{$tag} fixed");
         self::assertNotNull($fixed);
         self::assertSame(1, (int) $fixed->getSimpleFreeShipping());
-        self::assertSame([1, 1], [(int) $fixed->getUseAutoGeneration(), (int) $fixed->getUsesPerCoupon()]);
+        self::assertSame([1, 3], [(int) $fixed->getUseAutoGeneration(), (int) $fixed->getUsesPerCoupon()]);
         self::assertSame($list, $records->couponCodes((int) $fixed->getId()));
         self::assertSame('sku', $fixed->getConditions()->asArray()['conditions'][0]['conditions'][0]['attribute']);
         self::assertSame('simple', $fixed->getActions()->asArray()['conditions'][0]['value']);

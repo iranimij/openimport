@@ -50,6 +50,9 @@ class ConnectionValidator
         if ($connection->getType() === 's3') {
             return array_merge($problems, $this->s3($text, isset($settings['secrets']['secret_key'])));
         }
+        if ($connection->getType() === 'rest') {
+            return array_merge($problems, $this->rest($text, array_keys((array) ($settings['secrets'] ?? []))));
+        }
         if (in_array($connection->getType(), ['dropbox', 'onedrive'], true)) {
             $stored = array_keys((array) ($settings['secrets'] ?? []));
             if ($text('client_id') === '') {
@@ -144,5 +147,43 @@ class ConnectionValidator
         }
 
         return [];
+    }
+
+    /**
+     * @param callable $text setting => trimmed text
+     * @param string[] $stored names of the stored secrets
+     * @return string[]
+     */
+    private function rest(callable $text, array $stored): array
+    {
+        $problems = [];
+        if (preg_match('#^https?://[^/\s]+#i', $text('base_url')) !== 1) {
+            $problems[] = 'Enter the base address of the API, e.g. https://api.example.com/v1.';
+        }
+        switch ($text('auth_rest') ?: 'none') {
+            case 'none':
+                break;
+            case 'header':
+                if (!in_array('token', $stored, true)) {
+                    $problems[] = 'Enter the value of the login header (e.g. "Bearer <token>").';
+                }
+                break;
+            case 'basic':
+                if ($text('username') === '' || !in_array('password', $stored, true)) {
+                    $problems[] = 'Enter user name and password of the API.';
+                }
+                break;
+            case 'oauth2':
+                if (preg_match('#^https?://#i', $text('token_url')) !== 1 || $text('client_id') === ''
+                    || !in_array('client_secret', $stored, true)
+                ) {
+                    $problems[] = 'Enter token address, client ID and client secret of the OAuth 2 client.';
+                }
+                break;
+            default:
+                $problems[] = 'Choose how to log in to the API.';
+        }
+
+        return $problems;
     }
 }

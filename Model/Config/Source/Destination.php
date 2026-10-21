@@ -39,6 +39,7 @@ class Destination implements OptionSourceInterface
             'google_drive' => __('Google Drive / Sheets'),
             'dropbox' => __('Dropbox'),
             'onedrive' => __('OneDrive / SharePoint'),
+            'rest' => __('REST API'),
             'email' => __('E-mail attachment'),
         ];
         $options = [];

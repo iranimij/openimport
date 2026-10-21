@@ -54,7 +54,7 @@ interface ProfileInterface
         self::BEHAVIOR_REPLACE, self::BEHAVIOR_DELETE];
 
     public const SOURCE_TYPES = ['upload', 'folder', 'url', 'sftp', 'ftp', 's3', 'google_drive', 'dropbox',
-        'onedrive'];
+        'onedrive', 'rest'];
     public const FORMATS = ['auto', 'csv', 'xlsx', 'json', 'xml'];
     public const ON_ERROR_STOP = 'stop';
     public const ON_ERROR_SKIP = 'skip';

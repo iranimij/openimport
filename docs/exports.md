@@ -10,7 +10,8 @@ on a schedule.
 
 1. **What**: direction Export and the entity.
 2. **Where**: the destination (download from the run page, server folder, SFTP, FTP, Amazon S3 or
-   S3-compatible, Google Drive, Dropbox, OneDrive / SharePoint, e-mail)
+   S3-compatible, Google Drive, Dropbox, OneDrive / SharePoint, a REST API,
+   e-mail)
    and the file name.
    Placeholders in the file name: `{entity}`, `{profile}`, `{date}` (2026-10-14), `{time}` (143000),
    `{datetime}`, `{run}`, `{ext}`. Default `{entity}-{datetime}.{ext}`.
@@ -71,6 +72,8 @@ postcode, region, country_id, telephone, email, vat_id), and per line `item_id`,
   [saved Google connection](connections.md#google-drive-and-google-sheets); optionally as a Google Sheet.
 - **Dropbox**, **OneDrive / SharePoint**: uploaded into the folder of a [saved connection](connections.md); a file of
   the same name is replaced.
+- **REST API**: the file (POST or PUT) or, for JSON exports, the records in batches; see
+  [REST APIs](connections.md#rest-apis).
 - **Amazon S3 / S3-compatible**: uploaded into the folder (key prefix) of the bucket of a
   [saved S3 connection](connections.md#amazon-s3-and-s3-compatible-storage).
 - **E-mail**: attached (up to 10 MB) to an e-mail sent through the store's mail settings, template

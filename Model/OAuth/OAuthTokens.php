@@ -62,6 +62,31 @@ class OAuthTokens
     }
 
     /**
+     * An access token of the client itself (OAuth 2 client credentials grant), for APIs without a person signing in.
+     *
+     * @param string $url token endpoint
+     * @param array<string, string> $fields client_id, client_secret (+ scope)
+     * @param string $service for messages
+     * @return string
+     * @throws PipelineException
+     */
+    public function clientCredentials(string $url, array $fields, string $service): string
+    {
+        $key = hash('sha256', 'cc' . $url . "\n" . json_encode($fields));
+        if (isset($this->cache[$key]) && $this->cache[$key][1] > time() + 60) {
+            return $this->cache[$key][0];
+        }
+        $answer = $this->post($url, ['grant_type' => 'client_credentials'] + array_filter($fields), $service);
+        $token = (string) ($answer['access_token'] ?? '');
+        if ($token === '') {
+            throw new PipelineException(sprintf('%s answered without an access token.', $service));
+        }
+        $this->cache[$key] = [$token, time() + (int) ($answer['expires_in'] ?? 3600)];
+
+        return $token;
+    }
+
+    /**
      * @param string $url
      * @param array<string, string> $fields
      * @param string $service

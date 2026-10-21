@@ -394,6 +394,7 @@
                         <item name="3" xsi:type="string">google_drive</item>
                         <item name="4" xsi:type="string">dropbox</item>
                         <item name="5" xsi:type="string">onedrive</item>
+                        <item name="6" xsi:type="string">rest</item>
                     </item>
                 </item>
             </argument>
@@ -677,6 +678,7 @@
                         <item name="4" xsi:type="string">google_drive</item>
                         <item name="5" xsi:type="string">dropbox</item>
                         <item name="6" xsi:type="string">onedrive</item>
+                        <item name="7" xsi:type="string">rest</item>
                     </item>
                     <item name="requiredWhen" xsi:type="array">
                         <item name="source_type" xsi:type="array">
@@ -691,6 +693,7 @@
                         <item name="google_drive" xsi:type="string">remote</item>
                         <item name="dropbox" xsi:type="string">remote</item>
                         <item name="onedrive" xsi:type="string">remote</item>
+                        <item name="rest" xsi:type="string">rest</item>
                     </item>
                     <item name="noticeByType" xsi:type="array">
                         <item name="folder" xsi:type="string" translate="true">A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.</item>
@@ -700,6 +703,7 @@
                         <item name="google_drive" xsi:type="string" translate="true">The link of the Drive folder, its id, or a path from My Drive such as Supplier/incoming. Google Sheets in it are read as Excel files (name.xlsx).</item>
                         <item name="dropbox" xsi:type="string" translate="true">The folder from the top of the Dropbox (or of the app folder), e.g. Supplier/incoming; empty = the top.</item>
                         <item name="onedrive" xsi:type="string" translate="true">The folder in the OneDrive or the SharePoint library, e.g. Supplier/incoming; empty = the top.</item>
+                        <item name="rest" xsi:type="string" translate="true">The path after the connection's base address, with its query, e.g. /products?status=active.</item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
@@ -709,6 +713,237 @@
                 <dataScope>source_config.path</dataScope>
                 <notice translate="true">Server folder: a folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety. SFTP/FTP: the remote folder, empty = where the login lands.</notice>
                 <placeholder>supplier/incoming</placeholder>
+            </settings>
+        </field>
+        <field name="rest_records" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="45">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Records in the answer</label>
+                <dataScope>source_config.records</dataScope>
+                <placeholder>data.items</placeholder>
+                <notice translate="true">Where the list of records is in the JSON answer, as a dotted path; empty = the answer itself or its first list.</notice>
+            </settings>
+        </field>
+        <field name="rest_paging" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="46">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Pages</label>
+                <dataScope>source_config.paging</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">none</item>
+                                <item name="label" xsi:type="string" translate="true">One answer (no pages)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">page</item>
+                                <item name="label" xsi:type="string" translate="true">Page numbers (?page=1, 2, …)</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">offset</item>
+                                <item name="label" xsi:type="string" translate="true">Offsets (?offset=0, 100, …)</item>
+                            </option>
+                            <option name="3" xsi:type="array">
+                                <item name="value" xsi:type="string">cursor</item>
+                                <item name="label" xsi:type="string" translate="true">A cursor in the answer</item>
+                            </option>
+                            <option name="4" xsi:type="array">
+                                <item name="value" xsi:type="string">next_url</item>
+                                <item name="label" xsi:type="string" translate="true">The next address in the answer</item>
+                            </option>
+                            <option name="5" xsi:type="array">
+                                <item name="value" xsi:type="string">link</item>
+                                <item name="label" xsi:type="string" translate="true">The Link header (rel="next")</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="rest_page_param" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="47">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Page parameter</label>
+                <dataScope>source_config.page_param</dataScope>
+                <placeholder>page</placeholder>
+            </settings>
+        </field>
+        <field name="rest_page_start" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="48">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">First page</label>
+                <dataScope>source_config.page_start</dataScope>
+                <notice translate="true">Empty = 1 for page numbers, 0 for offsets.</notice>
+            </settings>
+        </field>
+        <field name="rest_size_param" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="49">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Page size parameter</label>
+                <dataScope>source_config.size_param</dataScope>
+                <placeholder>per_page</placeholder>
+                <notice translate="true">Optional; with it, a shorter page is the last one.</notice>
+            </settings>
+        </field>
+        <field name="rest_page_size" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="50">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Page size</label>
+                <dataScope>source_config.page_size</dataScope>
+                <placeholder>100</placeholder>
+            </settings>
+        </field>
+        <field name="rest_cursor_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="51">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">cursor</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Cursor in the answer</label>
+                <dataScope>source_config.cursor_path</dataScope>
+                <placeholder>meta.next_cursor</placeholder>
+            </settings>
+        </field>
+        <field name="rest_cursor_param" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="52">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">cursor</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Cursor parameter</label>
+                <dataScope>source_config.cursor_param</dataScope>
+                <placeholder>cursor</placeholder>
+            </settings>
+        </field>
+        <field name="rest_next_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="53">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">next_url</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Next address in the answer</label>
+                <dataScope>source_config.next_path</dataScope>
+                <placeholder>links.next</placeholder>
+            </settings>
+        </field>
+        <field name="rest_max_pages" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="54">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                            <item name="2" xsi:type="string">cursor</item>
+                            <item name="3" xsi:type="string">next_url</item>
+                            <item name="4" xsi:type="string">link</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Pages at most</label>
+                <dataScope>source_config.max_pages</dataScope>
+                <placeholder>100</placeholder>
+                <notice translate="true">A run with more pages stops with an error and imports nothing.</notice>
             </settings>
         </field>
         <field name="source_pattern" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="41">
@@ -947,6 +1182,7 @@
                         <item name="3" xsi:type="string">google_drive</item>
                         <item name="4" xsi:type="string">dropbox</item>
                         <item name="5" xsi:type="string">onedrive</item>
+                        <item name="6" xsi:type="string">rest</item>
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
@@ -1251,6 +1487,7 @@
                         <item name="3" xsi:type="string">google_drive</item>
                         <item name="4" xsi:type="string">dropbox</item>
                         <item name="5" xsi:type="string">onedrive</item>
+                        <item name="6" xsi:type="string">rest</item>
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
@@ -1290,6 +1527,90 @@
                     </settings>
                 </checkbox>
             </formElements>
+        </field>
+        <field name="dest_method" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="32">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Method</label>
+                <dataScope>export_options.method</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">POST</item>
+                                <item name="label" xsi:type="string" translate="true">POST</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">PUT</item>
+                                <item name="label" xsi:type="string" translate="true">PUT</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="dest_send" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="33">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Send</label>
+                <dataScope>export_options.send</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">file</item>
+                                <item name="label" xsi:type="string" translate="true">The file</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">batches</item>
+                                <item name="label" xsi:type="string" translate="true">JSON records in batches</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="dest_batch_size" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="34">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.send" xsi:type="array">
+                            <item name="0" xsi:type="string">batches</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Records per batch</label>
+                <dataScope>export_options.batch_size</dataScope>
+                <placeholder>100</placeholder>
+            </settings>
         </field>
         <field name="dest_emails" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
             <argument name="data" xsi:type="array">

@@ -21,6 +21,10 @@ All notable changes to this project are documented here. The format follows
 - Dropbox and OneDrive / SharePoint as import source and export destination, through *Sign in with Dropbox* /
   *Sign in with Microsoft* with the shop's own app (state, PKCE, refresh token stored encrypted). SharePoint document
   libraries by site address; uploads in 10 MB parts on OneDrive.
+- REST APIs as import source and export destination: saved REST connection (header token, Basic, OAuth 2 client
+  credentials), paging by page numbers, offsets, cursors, next addresses or the Link header, records path, a page
+  limit that stops instead of importing a partial list, retries after 429/503 with Retry-After; exports send the
+  file or JSON batches.
 
 ### Fixed
 - `openimport:secrets:reencrypt` now also encrypts the secrets of export destinations again, and goes on when one

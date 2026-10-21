@@ -177,7 +177,7 @@ class ProfileValidatorTest extends TestCase
         self::assertSame([
             'Give the profile a name.',
             'Magento has no import entity "catalog_category".',
-            'The source type "box" is not one of upload, folder, url, sftp, ftp, s3, google_drive, dropbox, onedrive.',
+            'The source type "box" is not one of upload, folder, url, sftp, ftp, s3, google_drive, dropbox, onedrive, rest.',
             'The format "pdf" is not one of auto, csv, xlsx, json, xml.',
             'The after-success action "archive" is not one of keep, move, delete.',
             'The notification setting "sometimes" is not one of never, failure, always.',

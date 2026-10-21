@@ -126,6 +126,26 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../shipments/">Shipments and tracking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../orders-import/">Order import</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-rewrites/">URL rewrites</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../price-rules/">Price rules and coupons</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../small-entities/">Reviews, newsletter, search, positions</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
                 </li>
               </ul>
@@ -234,7 +254,8 @@ postcode, region, country_id, telephone, email, vat_id), and per line <code>item
 <code>item_product_type</code>, <code>item_parent_sku</code>, <code>item_qty_ordered</code>, <code>item_qty_invoiced</code>, <code>item_qty_shipped</code>,
 <code>item_qty_refunded</code>, <code>item_qty_canceled</code>, <code>item_price</code>, <code>item_price_incl_tax</code>, <code>item_row_total</code>,
 <code>item_row_total_incl_tax</code>, <code>item_discount_amount</code>, <code>item_tax_amount</code>, <code>item_tax_percent</code>, <code>item_weight</code>,
-<code>item_product_options</code>. Amounts are in the order's currency without trailing zeros.</p>
+<code>item_product_options</code>. Amounts are in the order's currency without trailing zeros. The same layout is what the
+<a href="../orders-import/">order import</a> reads.</p>
 <h2 id="destinations">Destinations<a class="headerlink" href="#destinations" title="Permanent link">&para;</a></h2>
 <p><strong>XSLT after writing (XML)</strong> reshapes an XML export into any layout before it is delivered, see
 <a href="../file-formats/#xslt-since-14">XSLT</a>; <strong>Compress</strong> (step 3) packs the file as <code>.zip</code>, <code>.gz</code> or <code>.tar.gz</code> before it

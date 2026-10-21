@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/orders-import/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Order import - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Order import";
+        var mkdocs_page_input_path = "orders-import.md";
+        var mkdocs_page_url = "/openimport/orders-import/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../comparison/">How it compares</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../connections/">Saved connections</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../configurable/">Configurable products</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../missing-products/">Products missing from the file</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stock-changes/">Quantities as changes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-keys/">URL keys and redirects</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../presets/">Presets (Shopify, WooCommerce, Magento 1)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../archives/">Archives (ZIP, gzip, tar)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../categories/">Categories</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../attributes/">Attributes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cms/">CMS pages and blocks</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../shipments/">Shipments and tracking</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Order import</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#the-file">The file</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#options">Options</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-a-run-does">What a run does</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#round-trip">Round trip</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-rewrites/">URL rewrites</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../price-rules/">Price rules and coupons</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../small-entities/">Reviews, newsletter, search, positions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">REST API and triggers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Order import</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/orders-import.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="order-import">Order import<a class="headerlink" href="#order-import" title="Permanent link">&para;</a></h1>
+<p>Since 1.5. Entity <strong>Orders</strong> (<code>openimport_order</code>), direction import. Historic orders — from an old shop, another
+Magento, an ERP, or OpenImport's own order export — land in <code>sales_order</code> <strong>as they are</strong>: the file's state and
+status, created date, totals, addresses, items and the recorded payment method. Nothing is quoted, priced, charged
+or e-mailed; the shop's current prices, taxes, shipping rates and payment settings play no part. Optionally the
+invoices, shipments (with tracking numbers) and credit memos are created from the quantities in the file, and the
+stock is reduced.</p>
+<p>Orders are <strong>only added</strong> (behaviour <em>Add/Update</em> or <em>Only add</em>): an order number that exists is skipped and
+reported, the run ends as <em>partial</em>. Nothing updates, replaces or deletes an order.</p>
+<h2 id="the-file">The file<a class="headerlink" href="#the-file" title="Permanent link">&para;</a></h2>
+<p>One row per order line, the layout of the <a href="../exports/#orders">order export</a>: the first row of an order carries the
+order, every row one item. Rows of one order are grouped by <code>increment_id</code> and may sit anywhere in the file.
+Export an order from a store with the <em>Orders</em> export (per line) to see every column with real values.</p>
+<p>Required for every order: <code>increment_id</code>, <code>customer_email</code>, <code>status</code> (or <code>state</code>), <code>billing_firstname</code>,
+<code>billing_lastname</code>, <code>billing_street</code>, <code>billing_city</code>, <code>billing_country_id</code>, and per row <code>item_sku</code>,
+<code>item_qty_ordered</code>, <code>item_price</code>. The rest is optional.</p>
+<table>
+<thead>
+<tr>
+<th>Columns</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>increment_id</code></td>
+<td>The order number. With <em>Keep the file's numbers</em> it becomes the shop's order number; with <em>Generate new numbers</em> it only groups the rows and the store's next number is used (the file's number is noted in the order comment).</td>
+</tr>
+<tr>
+<td><code>state</code>, <code>status</code></td>
+<td>Any status of Stores › Order Status; the state comes from the status when empty. A state alone takes the state's default status.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>The order date (<code>2024-03-01 14:02:00</code>, in UTC like the export); empty: now.</td>
+</tr>
+<tr>
+<td><code>store_code</code></td>
+<td>The store view (<code>default</code>); empty: the default store view.</td>
+</tr>
+<tr>
+<td><code>customer_email</code>, <code>customer_firstname</code>, <code>customer_lastname</code>, <code>customer_group</code>, <code>customer_is_guest</code></td>
+<td>A customer with that e-mail on the store's website is linked to the order; otherwise the order is a guest order with the names of the file. The group by code (<code>General</code>) or id; empty: the customer's group or <em>NOT LOGGED IN</em>.</td>
+</tr>
+<tr>
+<td><code>order_currency_code</code></td>
+<td>ISO code; empty: the store's base currency. Base amounts are copied from the order amounts (rate 1).</td>
+</tr>
+<tr>
+<td><code>subtotal</code>, <code>discount_amount</code>, <code>shipping_amount</code>, <code>tax_amount</code>, <code>grand_total</code>, <code>total_paid</code>, <code>total_refunded</code>, <code>total_due</code>, <code>total_qty_ordered</code>, <code>weight</code>, <code>subtotal_incl_tax</code>, <code>shipping_incl_tax</code></td>
+<td>Taken from the file. Empty <code>subtotal</code>, <code>total_qty_ordered</code> and <code>grand_total</code> are computed from the items; given ones must match (subtotal = Σ row totals; grand total = subtotal + shipping + tax − discount, 1 cent tolerance). <code>total_due</code> empty: grand total − paid.</td>
+</tr>
+<tr>
+<td><code>discount_description</code>, <code>coupon_code</code></td>
+<td>Recorded on the order; no rule is applied or counted.</td>
+</tr>
+<tr>
+<td><code>shipping_method</code>, <code>shipping_description</code></td>
+<td><code>flatrate_flatrate</code> and its title, as recorded. Nothing is rated.</td>
+</tr>
+<tr>
+<td><code>payment_method</code>, <code>payment_last_trans_id</code>, <code>payment_po_number</code></td>
+<td>The method code (<code>checkmo</code>, <code>banktransfer</code>, <code>paypal_express</code> …), recorded as the order's payment; empty: <code>checkmo</code>. Nothing is charged.</td>
+</tr>
+<tr>
+<td><code>customer_note</code>, <code>remote_ip</code></td>
+<td>Recorded.</td>
+</tr>
+<tr>
+<td><code>tracking_numbers</code>, <code>tracking_carriers</code></td>
+<td><code>;</code>-separated, used by <em>Create invoices, shipments and credit memos</em>: one shipment with these tracking numbers (carrier codes, or <code>custom</code>).</td>
+</tr>
+<tr>
+<td><code>billing_*</code>, <code>shipping_*</code></td>
+<td><code>firstname</code>, <code>lastname</code>, <code>company</code>, <code>street</code> (lines separated by <code>,</code> or a line break), <code>city</code>, <code>postcode</code>, <code>region</code>, <code>country_id</code>, <code>telephone</code>, <code>email</code>, <code>vat_id</code>. No shipping address: the billing address is used.</td>
+</tr>
+<tr>
+<td><code>item_sku</code>, <code>item_name</code>, <code>item_product_type</code>, <code>item_parent_sku</code>, <code>item_qty_ordered</code>, <code>item_qty_invoiced</code>, <code>item_qty_shipped</code>, <code>item_qty_refunded</code>, <code>item_qty_canceled</code>, <code>item_price</code>, <code>item_price_incl_tax</code>, <code>item_row_total</code>, <code>item_row_total_incl_tax</code>, <code>item_discount_amount</code>, <code>item_tax_amount</code>, <code>item_tax_percent</code>, <code>item_weight</code>, <code>item_product_options</code></td>
+<td>One item per row. A SKU that exists in the catalogue links the product (id, type); a SKU that doesn't is kept as an item of a deleted product, as Magento keeps them. <code>item_parent_sku</code> names the parent of a configurable or bundle child in the same order (children carry no row total). <code>item_product_options</code> is the JSON of the export (chosen options, for the admin's order view). Empty <code>item_row_total</code>: price × quantity.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h2>
+<p>Under <em>Import options</em> when the entity is <em>Orders</em>:</p>
+<ul>
+<li><strong>Order numbers</strong>: <em>Keep the file's numbers</em> (the default; an order with that number is skipped) or <em>Generate new
+  numbers</em> from the store's sequence, for a file whose numbers clash with the shop's own.</li>
+<li><strong>Create invoices, shipments and credit memos</strong>: from <code>item_qty_invoiced</code>, <code>item_qty_shipped</code> (with the tracking
+  numbers) and <code>item_qty_refunded</code>, through Magento's own services — offline, nothing is charged or refunded, no
+  e-mails. Afterwards the file's state, status and paid/refunded/due totals are set again, so a <code>complete</code> order
+  stays complete. Off: the order carries the quantities as numbers but has no documents.</li>
+<li><strong>Reduce stock</strong>: subtract the ordered quantities from the products' stock (simple, virtual and downloadable
+  items), as a new order would. Off (the default): historic orders leave the stock alone.</li>
+</ul>
+<h2 id="what-a-run-does">What a run does<a class="headerlink" href="#what-a-run-does" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Every order is checked first: e-mail, status, group, date, currency, numbers, the billing address, items with a
+  quantity and a price, parents present, totals consistent. A <strong>dry run</strong> counts the orders that would be created
+  and names every problem with the file's row number; nothing is written.</li>
+<li>One transaction per order: an order whose creation fails (a database error, a document service refusing) is
+  rolled back and reported; the others are kept.</li>
+<li>Every imported order gets a history comment <em>Imported by OpenImport (order … in the file)</em>.</li>
+<li>Orders that exist already are skipped and reported, so a file can be imported twice without duplicates.</li>
+<li>Auto-match knows the export's column names and <code>Bestellnummer</code>, <code>order number</code>, <code>E-Mail</code>, <code>SKU</code>, <code>Menge</code> and
+  the like.</li>
+</ul>
+<h2 id="round-trip">Round trip<a class="headerlink" href="#round-trip" title="Permanent link">&para;</a></h2>
+<p>The order import is tested against the order export: the test exports Magento's fixture orders per line, imports
+the file with new numbers, exports the new orders and compares the rows. What the export writes, the import reads.
+A migration from another OpenImport store is therefore: export orders per line → import with <em>Keep the file's
+numbers</em> and <em>Create invoices, shipments and credit memos</em>.</p>
+<p>Sample file (two orders, three lines):</p>
+<pre><code class="language-csv">increment_id;status;created_at;customer_email;customer_firstname;customer_lastname;order_currency_code;subtotal;shipping_amount;grand_total;total_paid;shipping_method;payment_method;billing_firstname;billing_lastname;billing_street;billing_city;billing_postcode;billing_country_id;item_sku;item_name;item_qty_ordered;item_qty_invoiced;item_qty_shipped;item_price
+2019-4711;complete;2019-05-02 09:12:00;anna@example.com;Anna;Berg;EUR;39.9;4.9;44.8;44.8;flatrate_flatrate;banktransfer;Anna;Berg;Ringstraße 7;Wien;1010;AT;SHIRT-RED-M;Red shirt M;1;1;1;19.95
+2019-4711;;;;;;;;;;;;;;;;;;;SHIRT-RED-L;Red shirt L;1;1;1;19.95
+2019-4712;canceled;2019-05-03 18:40:00;ben@example.com;Ben;Kurz;EUR;59;0;59;0;flatrate_flatrate;checkmo;Ben;Kurz;Am Markt 2;Graz;8010;AT;JACKET-BLK;Black jacket;1;0;0;59
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../shipments/" class="btn btn-neutral float-left" title="Shipments and tracking"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../url-rewrites/" class="btn btn-neutral float-right" title="URL rewrites">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../shipments/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../url-rewrites/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

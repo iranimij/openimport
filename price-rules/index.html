@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/price-rules/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Price rules and coupons - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Price rules and coupons";
+        var mkdocs_page_input_path = "price-rules.md";
+        var mkdocs_page_url = "/openimport/price-rules/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../comparison/">How it compares</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../connections/">Saved connections</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../configurable/">Configurable products</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../missing-products/">Products missing from the file</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stock-changes/">Quantities as changes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-keys/">URL keys and redirects</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../presets/">Presets (Shopify, WooCommerce, Magento 1)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../archives/">Archives (ZIP, gzip, tar)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../categories/">Categories</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../attributes/">Attributes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cms/">CMS pages and blocks</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../shipments/">Shipments and tracking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../orders-import/">Order import</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-rewrites/">URL rewrites</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Price rules and coupons</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#columns-of-both">Columns of both</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#columns-of-cart-price-rules">Columns of cart price rules</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#conditions-as-json">Conditions as JSON</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-a-run-does">What a run does</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../small-entities/">Reviews, newsletter, search, positions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">REST API and triggers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Price rules and coupons</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/price-rules.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="cart-and-catalog-price-rules">Cart and catalog price rules<a class="headerlink" href="#cart-and-catalog-price-rules" title="Permanent link">&para;</a></h1>
+<p>Since 1.5. Two entities, import and export: <strong>Cart price rules and coupons</strong> (<code>openimport_cart_rule</code>, <em>Marketing ›
+Cart Price Rules</em>) and <strong>Catalog price rules</strong> (<code>openimport_catalog_rule</code>, <em>Marketing › Catalog Price Rules</em>). A
+file of rules — seasonal discounts, a coupon campaign, the price rules of another store — lands in Magento's
+rules through the rule models the admin forms use. The export writes every rule with its conditions as JSON, and
+the file imports back as it is, into the same or another store.</p>
+<p>Rules are matched by <strong>name</strong> (<code>rule_id</code> when the file has one, which the export writes). <em>Add/Update</em> creates or
+updates — empty columns of an existing rule keep their values — <em>Delete</em> removes the rules named in the file,
+<em>Replace</em> is refused. Two rules with the same name in the shop are reported; add the <code>rule_id</code> column to say
+which one.</p>
+<h2 id="columns-of-both">Columns of both<a class="headerlink" href="#columns-of-both" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Required</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>yes</td>
+<td>The rule's name.</td>
+</tr>
+<tr>
+<td><code>rule_id</code></td>
+<td>no</td>
+<td>Magento's id, to update a rule whose name changes.</td>
+</tr>
+<tr>
+<td><code>description</code>, <code>is_active</code>, <code>priority</code>, <code>stop_rules_processing</code></td>
+<td>no</td>
+<td>As in the admin form (<code>priority</code> = <em>Priority</em> / sort order). New rules: active, priority 0.</td>
+</tr>
+<tr>
+<td><code>websites</code></td>
+<td>no</td>
+<td>Website codes, comma-separated, or <code>all</code>. New rules: all websites.</td>
+</tr>
+<tr>
+<td><code>customer_groups</code></td>
+<td>no</td>
+<td>Customer group codes (<code>NOT LOGGED IN</code>, <code>General</code>, …), comma-separated, or <code>all</code>. New rules: all groups.</td>
+</tr>
+<tr>
+<td><code>from_date</code>, <code>to_date</code></td>
+<td>no</td>
+<td><code>2026-11-01</code>; empty: no limit.</td>
+</tr>
+<tr>
+<td><code>action</code></td>
+<td>new rules</td>
+<td>Cart: <code>by_percent</code>, <code>by_fixed</code>, <code>cart_fixed</code>, <code>buy_x_get_y</code>. Catalog: <code>by_percent</code>, <code>by_fixed</code>, <code>to_percent</code>, <code>to_fixed</code>.</td>
+</tr>
+<tr>
+<td><code>discount_amount</code></td>
+<td>new rules</td>
+<td>The percentage or amount.</td>
+</tr>
+<tr>
+<td><code>condition_skus</code></td>
+<td>no</td>
+<td>SKUs, comma-separated: the rule applies when such a product is in the cart (cart) or to these products (catalog).</td>
+</tr>
+<tr>
+<td><code>condition_categories</code></td>
+<td>no</td>
+<td>Category paths (<code>Default Category/Sale</code>), comma-separated, likewise.</td>
+</tr>
+<tr>
+<td><code>conditions</code></td>
+<td>no</td>
+<td>Magento's condition tree as JSON, for everything the simple columns cannot say (see below). When filled, the simple condition columns are ignored.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="columns-of-cart-price-rules">Columns of cart price rules<a class="headerlink" href="#columns-of-cart-price-rules" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>coupon_type</code></td>
+<td><code>none</code> (the default), <code>specific</code> (a code) or <code>auto</code> (Magento generates codes). Empty with a <code>coupon_code</code>: specific.</td>
+</tr>
+<tr>
+<td><code>coupon_code</code></td>
+<td>The coupon code of the rule.</td>
+</tr>
+<tr>
+<td><code>coupon_codes</code></td>
+<td>Several codes of one rule, separated by <code>;</code> or <code>,</code> — a code list from a campaign. The rule then works like Magento's <em>Use Auto Generation</em> (a <code>coupon_code</code> given as well joins the list). Codes the rule has already are kept; a code of another rule is an error.</td>
+</tr>
+<tr>
+<td><code>uses_per_coupon</code>, <code>uses_per_customer</code></td>
+<td>Limits; 0 = unlimited.</td>
+</tr>
+<tr>
+<td><code>discount_qty</code>, <code>discount_step</code></td>
+<td><em>Maximum Qty Discount is Applied To</em>, <em>Discount Qty Step (Buy X)</em>.</td>
+</tr>
+<tr>
+<td><code>apply_to_shipping</code></td>
+<td><code>1</code>/<code>0</code>.</td>
+</tr>
+<tr>
+<td><code>free_shipping</code></td>
+<td><code>no</code>, <code>matching</code> (for matching items only) or <code>cart</code> (for the whole order with matching items).</td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td>What the customer sees: a default label, and per store view <code>code:label</code>, separated by <code>\|</code>: <code>10 % off\|de:10 % Rabatt</code>.</td>
+</tr>
+<tr>
+<td><code>condition_subtotal</code></td>
+<td>The rule applies from this subtotal on (<code>base_subtotal &gt;= X</code>).</td>
+</tr>
+<tr>
+<td><code>action_skus</code>, <code>action_categories</code></td>
+<td>Which items get the discount (<em>Apply the rule only to cart items matching…</em>); empty: all items of the cart.</td>
+</tr>
+<tr>
+<td><code>actions</code></td>
+<td>The action condition tree as JSON (when filled, <code>action_skus</code> and <code>action_categories</code> are ignored).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conditions-as-json">Conditions as JSON<a class="headerlink" href="#conditions-as-json" title="Permanent link">&para;</a></h2>
+<p>The <code>conditions</code> (and <code>actions</code>) columns carry the tree the admin form builds, as Magento stores it: every node
+has a <code>type</code>, a leaf has <code>attribute</code>, <code>operator</code> and <code>value</code>, a group has <code>aggregator</code> (<code>all</code>/<code>any</code>), <code>value</code>
+(<code>1</code> = true) and <code>conditions</code>. Types may be short — <code>Combine</code>, <code>Address</code>, <code>Product\Found</code>, <code>Product\Subselect</code>,
+<code>Product</code> for cart rules, <code>Combine</code> and <code>Product</code> for catalog rules — or full class names; every type must be a
+Magento condition class, anything else is refused with the row number. Operators are Magento's: <code>==</code>, <code>!=</code>, <code>&gt;=</code>,
+<code>&lt;=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>{}</code> (contains), <code>!{}</code>, <code>()</code> (is one of), <code>!()</code>.</p>
+<p>A cart rule for orders of 100 or more <strong>or</strong> any product of category 12:</p>
+<pre><code class="language-json">{&quot;type&quot;:&quot;Combine&quot;,&quot;aggregator&quot;:&quot;any&quot;,&quot;value&quot;:&quot;1&quot;,&quot;conditions&quot;:[
+  {&quot;type&quot;:&quot;Address&quot;,&quot;attribute&quot;:&quot;base_subtotal&quot;,&quot;operator&quot;:&quot;&gt;=&quot;,&quot;value&quot;:&quot;100&quot;},
+  {&quot;type&quot;:&quot;Product\\Found&quot;,&quot;value&quot;:&quot;1&quot;,&quot;aggregator&quot;:&quot;all&quot;,&quot;conditions&quot;:[
+    {&quot;type&quot;:&quot;Product&quot;,&quot;attribute&quot;:&quot;category_ids&quot;,&quot;operator&quot;:&quot;()&quot;,&quot;value&quot;:&quot;12&quot;}]}]}
+</code></pre>
+<p>The export writes exactly this form (with full class names), so the easiest way to a complex rule is: build one in
+the admin, export, copy.</p>
+<h2 id="what-a-run-does">What a run does<a class="headerlink" href="#what-a-run-does" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Every row is checked: name, websites and groups exist, dates, action, numbers, coupon type, the condition JSON
+  (every type), categories exist. A dry run counts created and updated rules and names every problem with the row
+  number; nothing is written.</li>
+<li>Catalog price rules need <strong>applying</strong> after the import, as after a change in the admin: <em>Marketing › Catalog
+  Price Rules › Apply Rules</em>, or the <code>catalogrule_rule</code> indexer (cron does it when the indexer is scheduled).</li>
+<li>Auto-match knows <code>Regel</code>, <code>Gutschein</code>, <code>coupon</code>, <code>Rabatt</code>, <code>discount</code>, <code>percent</code>, <code>Kundengruppen</code>, <code>from</code>, <code>to</code>,
+  <code>SKUs</code>, <code>Mindestbestellwert</code>, <code>subtotal</code> and the like.</li>
+</ul>
+<p>Sample file (cart rules):</p>
+<pre><code class="language-csv">name;coupon_code;action;discount_amount;condition_subtotal;customer_groups;from_date;to_date;labels
+Winter 10;WINTER10;by_percent;10;50;all;2026-12-01;2027-01-31;10 % off|de:10 % Rabatt
+Free shipping over 100;;by_percent;0;100;all;;;Free shipping
+</code></pre>
+<p>(The second rule needs <code>free_shipping</code> = <code>cart</code>; add the column.)</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../url-rewrites/" class="btn btn-neutral float-left" title="URL rewrites"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../small-entities/" class="btn btn-neutral float-right" title="Reviews, newsletter, search, positions">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../url-rewrites/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../small-entities/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

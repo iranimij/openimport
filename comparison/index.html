@@ -128,6 +128,26 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../shipments/">Shipments and tracking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../orders-import/">Order import</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-rewrites/">URL rewrites</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../price-rules/">Price rules and coupons</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../small-entities/">Reviews, newsletter, search, positions</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
                 </li>
               </ul>
@@ -242,7 +262,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 <thead>
 <tr>
 <th>Feature</th>
-<th>OpenImport 1.4</th>
+<th>OpenImport 1.5</th>
 <th>Open Source</th>
 <th>Commerce</th>
 <th>Firebear</th>
@@ -486,8 +506,17 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 <td>✓</td>
 </tr>
 <tr>
-<td>Order import, tracking import</td>
-<td>✗ (1.5)</td>
+<td>Shipment and tracking import</td>
+<td>✓ via Magento's shipment service, duplicates skipped</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Order import</td>
+<td>✓ historic orders as they are, round-trip with the export, invoices/shipments/credit memos optional</td>
 <td>✗</td>
 <td>✗</td>
 <td>✓</td>
@@ -522,12 +551,30 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 <td>✗</td>
 </tr>
 <tr>
-<td>URL rewrites, cart and catalog price rules</td>
-<td>✗ (1.5)</td>
+<td>URL rewrites (custom, product, category, CMS page; 301/302; conflicts with generated URLs reported)</td>
+<td>✓ import and export</td>
 <td>✗</td>
 <td>✗</td>
 <td>✓</td>
 <td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Cart price rules with coupons and labels, catalog price rules; conditions as simple columns or Magento's tree as JSON</td>
+<td>✓ import and export</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Product reviews with ratings, newsletter subscribers, search terms and synonyms, product positions in categories</td>
+<td>✓ import and export, round trips</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>○ reviews, newsletter</td>
 <td>✗</td>
 </tr>
 <tr>
@@ -643,8 +690,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
   credentials never leave the database. See <a href="../security/">Security</a>.</li>
 </ul>
 <h2 id="where-the-paid-tools-still-have-more">Where the paid tools still have more<a class="headerlink" href="#where-the-paid-tools-still-have-more" title="Permanent link">&para;</a></h2>
-<p>Order and tracking import, price rules and URL rewrites, job chains and more triggers, B2B. Sales entities are
-planned for 1.5, automation for 1.6; B2B is declined (Adobe Commerce only). See the <a href="https://github.com/iranimij/openimport/milestones">roadmap</a>.</p>
+<p>Job chains and more triggers, webhook and Slack notifications, reindex after a run, undo, B2B. Automation is
+planned for 1.6; B2B is declined (Adobe Commerce only). See the <a href="https://github.com/iranimij/openimport/milestones">roadmap</a>.</p>
 <h2 id="free-alternatives-for-developers">Free alternatives for developers<a class="headerlink" href="#free-alternatives-for-developers" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

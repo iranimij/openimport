@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://iranimij.github.io/openimport/url-rewrites/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>URL rewrites - OpenImport</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "URL rewrites";
+        var mkdocs_page_input_path = "url-rewrites.md";
+        var mkdocs_page_url = "/openimport/url-rewrites/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenImport
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../comparison/">How it compares</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../file-formats/">File formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms and expressions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../mapping/">Mapping and filters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../runs/">Runs, dry runs and safety</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../sources/">Sources</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../connections/">Saved connections</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../images/">Product pictures</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../configurable/">Configurable products</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../missing-products/">Products missing from the file</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stock-changes/">Quantities as changes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../url-keys/">URL keys and redirects</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../presets/">Presets (Shopify, WooCommerce, Magento 1)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../exports/">Exports</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../archives/">Archives (ZIP, gzip, tar)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../categories/">Categories</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../attributes/">Attributes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cms/">CMS pages and blocks</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../shipments/">Shipments and tracking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../orders-import/">Order import</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">URL rewrites</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#columns">Columns</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-a-run-does">What a run does</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#export">Export</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../price-rules/">Price rules and coupons</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../small-entities/">Reviews, newsletter, search, positions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../schedules/">Schedules and cron</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">Command line</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">REST API and triggers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../admin/">Admin</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../security/">Security</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-bridge/">Core bridge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../core-facts/">Core facts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../baseline/">Baseline</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenImport</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">URL rewrites</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/iranimij/openimport/edit/main/docs/url-rewrites.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="url-rewrites">URL rewrites<a class="headerlink" href="#url-rewrites" title="Permanent link">&para;</a></h1>
+<p>Since 1.5. Entity <strong>URL rewrites</strong> (<code>openimport_url_rewrite</code>), import and export. A file of old addresses and where
+they should go — after a relaunch, a shop migration, a campaign — lands in Magento's URL rewrites (<em>Marketing ›
+URL Rewrites</em>): permanent (301) and temporary (302) redirects, or plain rewrites that show another page under the
+address. The export writes every rewrite of the shop, Magento's generated ones included, and imports back as it is.</p>
+<h2 id="columns">Columns<a class="headerlink" href="#columns" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Required</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>request_path</code></td>
+<td>yes</td>
+<td>The address as the visitor types it, after the store's base URL: <code>old-shirts.html</code>, <code>sale/summer</code>. No spaces, <code>#</code> or <code>//</code>.</td>
+</tr>
+<tr>
+<td><code>store_code</code></td>
+<td>no</td>
+<td>The store view (<code>default</code>, <code>de</code>); empty: the default store view. A rewrite exists once per request path and store view.</td>
+</tr>
+<tr>
+<td><code>target_path</code></td>
+<td>custom</td>
+<td>Where it goes: a path of the shop (<code>new-shirts.html</code>, <code>catalog/category/view/id/5</code>) or, for a redirect, a full address (<code>https://example.com/promo</code>). Empty when the row names a product, category or CMS page.</td>
+</tr>
+<tr>
+<td><code>redirect_type</code></td>
+<td>no</td>
+<td><code>301</code> (permanent), <code>302</code> (temporary), or empty/<code>0</code> for a plain rewrite that shows the target under the request path. Words work too: permanent, temporary.</td>
+</tr>
+<tr>
+<td><code>product_sku</code></td>
+<td>no</td>
+<td>The product the address belongs to. With a redirect, the target is the product's current URL in that store view (<code>blue-shirt.html</code>); without, its canonical path.</td>
+</tr>
+<tr>
+<td><code>category_path</code></td>
+<td>no</td>
+<td>The category by path (<code>Default Category/Men/Shirts</code>), same as the category import.</td>
+</tr>
+<tr>
+<td><code>cms_page</code></td>
+<td>no</td>
+<td>The CMS page by identifier (<code>about-us</code>).</td>
+</tr>
+<tr>
+<td><code>entity_type</code></td>
+<td>no</td>
+<td><code>custom</code>, <code>product</code>, <code>category</code> or <code>cms-page</code>; normally left empty, the filled column decides. The export writes it.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>no</td>
+<td>A note shown in the admin grid.</td>
+</tr>
+<tr>
+<td><code>autogenerated</code>, <code>metadata</code></td>
+<td>no</td>
+<td>What the export writes for Magento's generated URLs (<code>1</code>, and the category of a product-in-category URL as JSON). Leave empty in your own files.</td>
+</tr>
+</tbody>
+</table>
+<p>One of <code>product_sku</code>, <code>category_path</code> and <code>cms_page</code> at most; none of them makes a custom rewrite, which needs a
+<code>target_path</code>.</p>
+<h2 id="what-a-run-does">What a run does<a class="headerlink" href="#what-a-run-does" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Every row is checked: the path, the store view, the redirect type, the product/category/page exists, the target
+  is not the request path itself, the same address is not in the file twice. A dry run counts what would be
+  created and updated and names every problem with the row number.</li>
+<li><strong>Add/Update</strong> creates a rewrite or updates the one that answers the request path in that store view (target,
+  redirect type, entity, description). <strong>Delete</strong> removes the rewrites of the file. Replace is refused at save.</li>
+<li><strong>Magento's generated URLs are never changed or deleted.</strong> A request path that is the URL Magento generated for
+  another product, category or page is a conflict, reported with the owner: <em>"blue-shirt.html" is the URL Magento
+  generated for product SHIRT-BLUE; it cannot be changed.</em> Magento regenerates those URLs on every save, so a
+  change here would not last; change the product's URL key instead (the product import does that, with a 301 for
+  the old address, see <a href="../url-keys/">URL keys and redirects</a>).</li>
+<li>Auto-match knows <code>old URL</code>, <code>new URL</code>, <code>from</code>, <code>to</code>, <code>redirect</code>, <code>SKU</code>, <code>alte URL</code>, <code>neue URL</code>, <code>Weiterleitung</code>
+  and the like.</li>
+</ul>
+<p>Sample file:</p>
+<pre><code class="language-csv">request_path;target_path;redirect_type;product_sku;description
+old-shop/blue-shirt-xl.html;;301;SHIRT-BLUE-XL;Address from the old shop
+summer;sale/summer.html;302;;Campaign, remove in September
+shirts;catalog/category/view/id/12;;;Short address for the shirts category
+</code></pre>
+<h2 id="export">Export<a class="headerlink" href="#export" title="Permanent link">&para;</a></h2>
+<p>The export writes every rewrite with the store view code and, for product, category and CMS page rewrites, the SKU,
+category path or page identifier instead of Magento's internal ids, so the file is readable and imports into
+another store whose ids differ. Filter it in step 3 (for example <code>autogenerated</code> equals <code>0</code> for your own rewrites
+only, or <code>request_path</code> starts with a prefix).</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../orders-import/" class="btn btn-neutral float-left" title="Order import"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../price-rules/" class="btn btn-neutral float-right" title="Price rules and coupons">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/iranimij/openimport" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../orders-import/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../price-rules/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

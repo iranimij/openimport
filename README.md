@@ -66,8 +66,9 @@ Entities: products (every type, with images, categories, related products and cu
 import supports them), advanced pricing, customers, customer addresses, customers with addresses, MSI stock sources,
 the fast *Stock & prices* update (existing products only), categories, product attributes and attribute sets, CMS
 pages and blocks (import and export), orders (export, and import of historic orders as they are, with optional invoices,
-shipments and credit memos), shipments with tracking numbers (import), URL rewrites, cart price rules with coupons and catalog price rules (import and
-export). Anything
+shipments and credit memos), shipments with tracking numbers (import), URL rewrites, cart price rules with coupons, catalog price rules, product
+reviews with ratings, newsletter subscribers, search terms and synonyms, and product positions in categories (import
+and export). Anything
 Magento's own import can do
 with a CSV, OpenImport does with a mapped file.
 
@@ -100,6 +101,7 @@ From the vendors' public docs as of 2026-10-13; details and sources in [docs/com
 | Categories, attributes and attribute sets, CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | URL rewrites (301/302, custom and per product, category, CMS page) | ✓ import and export | ✗ | ✗ | ✓ | ✓ | ✗ |
 | Cart price rules with coupons, catalog price rules (conditions as columns or JSON) | ✓ import and export | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Reviews with ratings, newsletter subscribers, search terms and synonyms, product positions in categories | ✓ import and export | ✗ | ✗ | ✓ | ○ | ✗ |
 | Shipment and tracking import | ✓ through Magento's shipment service | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Order import (historic orders as they are, documents optional) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
 | Export to download, folder, SFTP, FTP, S3, cloud drives, REST, e-mail | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |

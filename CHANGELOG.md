@@ -28,6 +28,11 @@ All notable changes to this project are documented here. The format follows
   columns (subtotal, SKUs, categories, the items the discount applies to) or Magento's condition tree as JSON
   with short type names; every type checked. Add/Update, Delete. See
   [Price rules](https://iranimij.github.io/openimport/price-rules/).
+- Product reviews with ratings (`openimport_review`), newsletter subscribers (`openimport_newsletter`, no e-mail
+  sent), search terms (`openimport_search_term`), search synonyms (`openimport_search_synonym`, groups merged as
+  the admin does) and product positions in categories (`openimport_category_position`): import (Add/Update,
+  Delete) and export, each a round trip. See
+  [Reviews, newsletter, search, positions](https://iranimij.github.io/openimport/small-entities/).
 
 ## [1.4.0] - 2026-10-21
 

@@ -23,6 +23,9 @@
             <module name="Magento_UrlRewrite"/>
             <module name="Magento_SalesRule"/>
             <module name="Magento_CatalogRule"/>
+            <module name="Magento_Review"/>
+            <module name="Magento_Newsletter"/>
+            <module name="Magento_Search"/>
             <module name="Magento_SalesSequence"/>
             <module name="Magento_CatalogInventory"/>
             <module name="Magento_AdminNotification"/>

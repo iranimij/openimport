@@ -33,6 +33,8 @@ class FieldList
         'openimport_cms_block' => ['identifier', 'title'],
         'openimport_shipment' => ['increment_id'],
         'openimport_url_rewrite' => ['request_path'],
+        'openimport_cart_rule' => ['name', 'action', 'discount_amount'],
+        'openimport_catalog_rule' => ['name', 'action', 'discount_amount'],
         'openimport_order' => ['increment_id', 'customer_email', 'status', 'billing_firstname', 'billing_lastname',
             'billing_street', 'billing_city', 'billing_country_id', 'item_sku', 'item_qty_ordered', 'item_price'],
     ];

@@ -22,6 +22,12 @@ All notable changes to this project are documented here. The format follows
   Delete; Magento's generated URLs are never changed or deleted and a request path that is one is reported as a
   conflict naming the owner. The export writes every rewrite with SKUs, category paths and page identifiers
   instead of ids. See [URL rewrites](https://iranimij.github.io/openimport/url-rewrites/).
+- Cart price rules with coupons (`openimport_cart_rule`) and catalog price rules (`openimport_catalog_rule`),
+  import and export, matched by name (or `rule_id`): discount, websites and customer groups by code, dates,
+  priority, coupon code or a list of codes, usage limits, free shipping, store labels; conditions from simple
+  columns (subtotal, SKUs, categories, the items the discount applies to) or Magento's condition tree as JSON
+  with short type names; every type checked. Add/Update, Delete. See
+  [Price rules](https://iranimij.github.io/openimport/price-rules/).
 
 ## [1.4.0] - 2026-10-21
 

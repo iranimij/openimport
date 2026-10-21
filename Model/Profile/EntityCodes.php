@@ -49,6 +49,8 @@ class EntityCodes
         $codes[] = EntityRegistry::CMS_PAGE;
         $codes[] = EntityRegistry::CMS_BLOCK;
         $codes[] = EntityRegistry::URL_REWRITE;
+        $codes[] = EntityRegistry::CART_RULE;
+        $codes[] = EntityRegistry::CATALOG_RULE;
         if ($direction !== 'export') {
             // OpenImport's own order and shipment imports (through Magento's models and sales services).
             $codes[] = EntityRegistry::ORDER;

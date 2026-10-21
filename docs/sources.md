@@ -18,7 +18,8 @@ Step 2 of the profile form. Every source delivers one file per run; the run keep
 For SFTP and FTP, **Saved connection** picks a login saved under System › Data Transfer › OpenImport Connections
 instead of entering it in the profile (since 1.4); see [Saved connections](connections.md).
 
-Any source may deliver a ZIP, gzip or tar archive: the file inside is read, see [Archives](archives.md).
+Any source may deliver a ZIP, gzip or tar archive: the file inside is read, see [Archives](archives.md). XML files
+can go through an [XSLT stylesheet](file-formats.md#xslt-since-14) before they are read.
 
 **Test connection** checks the settings as they are in the form (saved or not) and says what the next run would read,
 without importing anything.

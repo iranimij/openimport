@@ -25,6 +25,7 @@ class Format implements OptionSourceInterface
             'auto' => 'Detect from the file',
             'csv' => 'CSV / text',
             'xlsx' => 'Excel (.xlsx)',
+            'ods' => 'OpenDocument (.ods)',
             'json' => 'JSON',
             'xml' => 'XML',
         ] as $value => $label) {

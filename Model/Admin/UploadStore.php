@@ -20,7 +20,7 @@ use Magento\Framework\Filesystem;
 class UploadStore
 {
     public const FOLDER = 'openimport/uploads';
-    public const EXTENSIONS = ['csv', 'tsv', 'txt', 'xlsx', 'json', 'xml', 'zip', 'gz', 'tgz', 'tar'];
+    public const EXTENSIONS = ['csv', 'tsv', 'txt', 'xlsx', 'ods', 'json', 'xml', 'zip', 'gz', 'tgz', 'tar'];
 
     /**
      * @param Filesystem $filesystem

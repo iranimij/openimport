@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Test\Unit\Model\Admin;
 use Iranimij\OpenImport\Model\Admin\FileSample;
 use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Storage\TempFolder;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
 use Magento\Framework\Filesystem\Driver\File;
 use Iranimij\OpenImport\Model\Admin\MappingPreview;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
@@ -112,7 +113,7 @@ class MappingPreviewTest extends TestCase
                 }
             }
         };
-        $files = new FileSample(new ReaderFactory(), new Unpacker(new File(), $tempFolder));
+        $files = new FileSample(new ReaderFactory(), new Unpacker(new File(), $tempFolder), new XsltStep(new File()), $tempFolder);
         $sample = $files->read($this->file, 'feed.csv', 'auto', ['delimiter' => ';'], 3);
 
         self::assertSame('csv', $sample['format']);
@@ -141,6 +142,21 @@ class MappingPreviewTest extends TestCase
         }
         self::assertSame('feed.csv', $zipped['inner']);
         self::assertSame($sample['rows'], $zipped['rows']);
+
+        // XML through a stylesheet before the reader sees it.
+        $xml = sys_get_temp_dir() . '/openimport-sample-' . bin2hex(random_bytes(4)) . '.xml';
+        file_put_contents($xml, '<shop><item id="A1"><n>One</n></item><item id="B2"><n>Two</n></item></shop>');
+        $xsl = '<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"><xsl:template match="/">'
+            . '<products><xsl:for-each select="shop/item"><product><sku><xsl:value-of select="@id"/></sku>'
+            . '<name><xsl:value-of select="n"/></name></product></xsl:for-each></products></xsl:template></xsl:stylesheet>';
+        try {
+            $transformed = $files->read($xml, 'shop.xml', 'auto', ['xslt' => $xsl], 3);
+        } finally {
+            unlink($xml);
+        }
+        self::assertSame('xml', $transformed['format']);
+        self::assertSame(['sku', 'name'], $transformed['columns']);
+        self::assertSame(['A1', 'B2'], array_column($transformed['rows'], 'sku'));
     }
 
     public function testFormulaGuard(): void

@@ -29,6 +29,13 @@ All notable changes to this project are documented here. The format follows
   (*File inside the archive*: a name or pattern, else the first CSV, Excel, ODS, JSON or XML file); exports can be
   packed as ZIP, gzip or tar.gz (*Compress*). Zip-slip-safe (fixed file name), size counted while unpacking (1 GB),
   nested and password-protected archives refused. See [Archives](https://iranimij.github.io/openimport/archives/).
+- OpenDocument spreadsheets (`.ods`, LibreOffice Calc) as import format (typed values, repeated cells and rows,
+  sheet by name or position, streamed) and export format (own writer, bold header row). Detected by the file's
+  `mimetype` entry when the name says nothing.
+- XSLT: *XSLT before reading (XML)* turns a supplier's XML into records before the reader sees it, *XSLT after
+  writing (XML)* reshapes an XML export before delivery. libxslt runs with no file, network or PHP access
+  (`document()`, `xsl:include`, `xsl:import` refused), no DOCTYPE, a 64 MB file limit; stylesheets are checked at
+  save. See [File formats](https://iranimij.github.io/openimport/file-formats/#xslt-since-14).
 
 ### Fixed
 - `openimport:secrets:reencrypt` now also encrypts the secrets of export destinations again, and goes on when one

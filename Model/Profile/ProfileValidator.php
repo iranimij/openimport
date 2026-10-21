@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Model\Profile;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Archive\Packer;
 use Iranimij\OpenImport\Model\Archive\Unpacker;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
 use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
 use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
@@ -42,6 +43,7 @@ class ProfileValidator
      * @param DestinationPool $destinations
      * @param WriterFactory $writers
      * @param ConnectionConfig $connections
+     * @param XsltStep $xslt
      */
     public function __construct(
         private readonly MappingCompiler $mappingCompiler,
@@ -50,7 +52,8 @@ class ProfileValidator
         private readonly EntityCodes $entityCodes,
         private readonly DestinationPool $destinations,
         private readonly WriterFactory $writers,
-        private readonly ConnectionConfig $connections
+        private readonly ConnectionConfig $connections,
+        private readonly XsltStep $xslt
     ) {
     }
 
@@ -106,6 +109,11 @@ class ProfileValidator
         $archive = (string) ($profile->getFormatOptions()['archive'] ?? Unpacker::MODE_AUTO);
         if ($import && !in_array($archive, [Unpacker::MODE_AUTO, Unpacker::MODE_NONE], true)) {
             $problems[] = sprintf('The archive setting "%s" is not one of auto, none.', $archive);
+        }
+        $xsltOptions = $import ? $profile->getFormatOptions() : $profile->getExportOptions();
+        $stylesheet = trim((string) ($xsltOptions[XsltStep::OPTION] ?? ''));
+        if ($stylesheet !== '' && ($xsltProblem = $this->xslt->check($stylesheet)) !== '') {
+            $problems[] = $xsltProblem;
         }
         $compress = (string) ($profile->getExportOptions()['compress'] ?? Packer::NONE);
         if (!$import && !in_array($compress, array_merge([Packer::NONE], Packer::KINDS), true)) {

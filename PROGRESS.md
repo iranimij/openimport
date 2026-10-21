@@ -107,12 +107,14 @@ green.
 
 Open PRs (stacked): **slice 3 · Google Drive / Sheets** #58 (`feat/1.4-google`, E2E dev-env #15), **slice 4 ·
 Dropbox, OneDrive/SharePoint** #59 (`feat/1.4-dropbox-onedrive`), **slice 5 · REST API** #60 (`feat/1.4-rest`),
-**slice 6 · archives** (`feat/1.4-archives`), README refresh #61 (main). Rule since 2026-10-21: every feature slice
+**slice 6 · archives** #62 (`feat/1.4-archives`), **slice 7 · ODS and XSLT** (`feat/1.4-ods-xslt`), README
+refresh #61 (main). Rule since 2026-10-21: every feature slice
 updates README.md too.
 2.4.7 CI was red on every branch and on main: the runner's libxml2 2.12+ refuses core's `esconfig.xsd` ("content
 model is not determinist"); `.github/ci/integration.sh` patches that schema in the test store. CI also writes a
-TeamCity log so a crash before PHPUnit's summary still names the failed tests. Next: merge #61, #58, #59, #60, slice
-6 in order (rebase each on main), then slice 7 (ODS, XSLT), then release 1.4.0.
+TeamCity log so a crash before PHPUnit's summary still names the failed tests. Next: merge #61, #58, #59, #60, #62,
+slice 7 in order (rebase each on main, fix CI), E2E for the new connectors in the dev-env, then release 1.4.0
+(CHANGELOG, comparison table, Notion build log, page 03 and page 15), then 1.5.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -315,6 +317,21 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: unit with real archives (zip-slip, bomb, entries limit, password, damaged, gzip, tar long names, links,
   truncated tar, round trips through the Packer); integration `Execution/ArchivesTest` (ZIP and gzip from a folder
   through a live run, pattern, "read as it is", broken ZIP, packed export). Docs `docs/archives.md`.
+
+### 1.4 slice 7 · ODS and XSLT (what was built)
+
+- `Reader/OdsReader` (content.xml streamed with XMLReader: tables by name or position, repeated columns and rows
+  expanded with empty runs dropped, typed values, paragraphs, annotations skipped, no DOCTYPE, 512 MB limit,
+  mimetype checked) and `Writer/OdsWriter` (mimetype stored first, manifest, styles, bold frozen header, numbers
+  as floats, text:s/text:tab). Format `ods` everywhere (factory, sniffing by the mimetype entry, profile formats,
+  uploads, URL content type, sheet field, form sample sheets, strict columns).
+- `Xslt/XsltStep`: XSLTProcessor with all security prefs on (no read/write file, no network), no PHP functions,
+  no DOCTYPE, include/import refused, 64 MB file limit, `check()` at save; `transform()` before the reader
+  (`RunProcessor::prepare`, `FileSample`) and `transformInPlace()` after the XML writer (`ExportRunner`). Form:
+  `format_options.xslt`, `export_options.xslt` (textareas).
+- Tests: unit (ODS reader with Calc-style content, ODS writer round trip, XSLT with eight hostile stylesheets),
+  integration `Execution/OdsXsltTest` (ODS export → edit → ODS import, XSLT in and out through live runs, hostile
+  stylesheet refused at save). Docs: file-formats (ODS, XSLT), security, sources, exports; README; CHANGELOG.
 
 ## Open questions
 

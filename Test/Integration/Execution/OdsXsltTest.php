@@ -56,7 +56,7 @@ class OdsXsltTest extends TestCase
             ->setFormatOptions($data['format_options'] ?? [])
             ->setSourceType('folder')
             ->setSourceConfig($data['source_config'])
-            ->setMapping([
+            ->setMapping($data['mapping'] ?? [
                 ['target' => 'sku', 'source' => 'sku'],
                 ['target' => 'name', 'source' => 'name'],
                 ['target' => 'price', 'source' => 'price'],
@@ -125,7 +125,11 @@ class OdsXsltTest extends TestCase
         $zip->addFromString('content.xml', $content);
         $zip->close();
 
-        $import = $this->process($this->importProfile(['source_config' => ['path' => 'it-ods-' . $tag, 'pattern' => '*.ods']]));
+        // Names only: the store's fixtures hold products without a price, which core refuses on re-import.
+        $import = $this->process($this->importProfile([
+            'source_config' => ['path' => 'it-ods-' . $tag, 'pattern' => '*.ods'],
+            'mapping' => [['target' => 'sku', 'source' => 'sku'], ['target' => 'name', 'source' => 'name']],
+        ]));
         self::assertSame(RunInterface::STATUS_SUCCESS, $import->getStatus(), $import->getMessage());
         self::assertSame(1, $import->getCount('updated'));
         $product = Bootstrap::getObjectManager()->get(ProductRepositoryInterface::class)->get($firstSku, false, null, true);

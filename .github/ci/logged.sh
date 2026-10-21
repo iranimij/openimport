@@ -14,6 +14,14 @@ if [ "$status" -ne 0 ]; then
     | tail -n 60 | tail -c 3500 \
     | awk 'BEGIN { ORS = "" } { gsub(/%/, "%25"); gsub(/\r/, "%0D"); print $0 "%0A" }' > "$log.tail"
   echo "::error title=${title} (exit ${status})::$(cat "$log.tail")"
+  # The first fatal error or uncaught exception with the lines after it: a crash prints a long stack trace, and the
+  # tail above then shows only its last frames.
+  first="$(sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "$log" | grep -n -m 1 -E 'Fatal error|Uncaught|PHP Fatal|^(Error|Exception|TypeError): |Exception: ' | cut -d: -f1)"
+  if [ -n "$first" ]; then
+    sed -n "$((first > 5 ? first - 5 : 1)),$((first + 25))p" "$log" | cut -c1-300 | tail -c 3500 \
+      | awk 'BEGIN { ORS = "" } { gsub(/%/, "%25"); gsub(/\r/, "%0D"); print $0 "%0A" }' > "$log.first"
+    echo "::error title=${title}: first error::$(cat "$log.first")"
+  fi
   # PHPUnit: one more annotation per failed test (its own 1,500 characters, long lines cut), so a failure with a big
   # message (an HTML page) does not push the others out of the tail.
   if command -v php >/dev/null; then

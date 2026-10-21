@@ -22,6 +22,7 @@ use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Filesystem;
 use Magento\Sales\Model\Order;
 use Magento\TestFramework\Fixture\AppArea;
@@ -65,11 +66,16 @@ class OrderImportTest extends TestCase
 
     /**
      * @param array<string, mixed> $options
+     * @param string $behavior
+     * @param string[] $columns
      */
-    private function importProfile(array $options = [], string $behavior = ProfileInterface::BEHAVIOR_ADD_UPDATE): ProfileInterface
-    {
+    private function importProfile(
+        array $options = [],
+        string $behavior = ProfileInterface::BEHAVIOR_ADD_UPDATE,
+        array $columns = OrderFile::COLUMNS
+    ): ProfileInterface {
         $mapping = [];
-        foreach (OrderFile::COLUMNS as $column) {
+        foreach ($columns as $column) {
             $mapping[] = ['target' => $column, 'source' => $column];
         }
         $profile = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class)->create()
@@ -157,6 +163,13 @@ class OrderImportTest extends TestCase
     #[DataFixture('Magento/Sales/_files/order_list.php')]
     public function testRoundTripExportImportExport(): void
     {
+        // The Sales fixtures carry a subtotal of 100 over one item with a row total of 10; the import checks totals.
+        $connection = Bootstrap::getObjectManager()->get(ResourceConnection::class)->getConnection();
+        $connection->update(
+            $connection->getTableName('sales_order'),
+            ['subtotal' => 10, 'base_subtotal' => 10, 'grand_total' => 10, 'base_grand_total' => 10, 'total_qty_ordered' => 2],
+            ['increment_id IN (?)' => ['100000001', '100000002', '100000003', '100000004']]
+        );
         $before = $this->rows($this->process($this->exportProfile()));
         $fixture = array_values(array_filter($before, static fn (array $row): bool => (int) $row['increment_id'] <= 100000004));
         self::assertNotEmpty($fixture);
@@ -194,11 +207,12 @@ class OrderImportTest extends TestCase
             . 'Flat Rate;checkmo;DHL-1;dhl;Hanna;Beispiel;"Hauptstraße 1";Frankfurt;60311;DE;069123;Hanna;Beispiel;'
             . '"Hauptstraße 1";Frankfurt;60311;DE;simple;Simple Product;2;2;2;1;10;20' . "\n";
         $file = $this->file($header . $order);
+        $columns = explode(';', trim($header));
         $profile = $this->importProfile([
             OrderImporter::OPTION_NUMBER => 'keep',
             OrderImporter::OPTION_DOCUMENTS => '1',
             OrderImporter::OPTION_STOCK => '1',
-        ]);
+        ], ProfileInterface::BEHAVIOR_ADD_UPDATE, $columns);
 
         $run = $this->process($profile, $file);
         self::assertSame(RunInterface::STATUS_SUCCESS, $run->getStatus(), $run->getMessage());
@@ -234,7 +248,11 @@ class OrderImportTest extends TestCase
             . '"OI-9003";complete;;x@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;;;;;;;;' . "\n"
             . '"OI-9004";complete;;y@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;simple;X;1;;;;10;10' . "\n"
             . '"OI-9004";complete;;y@example.com;A;B;USD;10;0;0;10;;;;checkmo;;;A;B;Street 1;City;1;DE;1;;;;;;;child;Y;1;;;;0;0' . "\n");
-        $check = $this->process($this->importProfile(), $bad, RunInterface::MODE_DRY_RUN);
+        $check = $this->process(
+            $this->importProfile([], ProfileInterface::BEHAVIOR_ADD_UPDATE, $columns),
+            $bad,
+            RunInterface::MODE_DRY_RUN
+        );
         self::assertSame(RunInterface::STATUS_FAILED, $check->getStatus(), $check->getMessage());
         $messages = implode("\n", $this->errorMessages($check));
         self::assertStringContainsString('The grand total 99 is not subtotal + shipping + tax - discount (25).', $messages);

@@ -31,11 +31,12 @@ function answer(int $status, array $data, array $headers = []): void
 {
     global $state, $stateFile;
     file_put_contents($stateFile, json_encode($state));
-    http_response_code($status);
     header('Content-Type: application/json');
     foreach ($headers as $name => $value) {
         header($name . ': ' . $value);
     }
+    // After the headers: PHP turns a Location header into a 302 otherwise.
+    http_response_code($status);
     echo json_encode($data);
     exit;
 }

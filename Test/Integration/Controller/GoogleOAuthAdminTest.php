@@ -113,7 +113,8 @@ class GoogleOAuthAdminTest extends AbstractBackendController
         $this->getRequest()->setParams(['state' => $query['state'], 'code' => 'good-code']);
         $this->dispatch('backend/openimport/connection/oauthCallback');
         $this->assertSessionMessages(
-            self::containsEqual(sprintf('"%s" is signed in to Google as shop@example.com.', $connection->getName())),
+            // Session messages are HTML-escaped.
+            self::containsEqual(sprintf('&quot;%s&quot; is signed in to Google as shop@example.com.', $connection->getName())),
             MessageInterface::TYPE_SUCCESS
         );
         $stored = $this->_objectManager->get(ConnectionRepositoryInterface::class)->getById((int) $connection->getConnectionId());

@@ -22,6 +22,19 @@ if [ "$status" -ne 0 ]; then
       | awk 'BEGIN { ORS = "" } { gsub(/%/, "%25"); gsub(/\r/, "%0D"); print $0 "%0A" }' > "$log.first"
     echo "::error title=${title}: first error::$(cat "$log.first")"
   fi
+  # PHPUnit's TeamCity log (when the caller sets OI_TEAMCITY_LOG): the first failed tests with their messages, also
+  # when the run crashed before the summary.
+  if [ -n "${OI_TEAMCITY_LOG:-}" ] && [ -s "$OI_TEAMCITY_LOG" ] && command -v php >/dev/null; then
+    php -r '
+      $unescape = static fn ($v) => strtr($v, ["|n" => "\n", "|r" => "", "|\x27" => "\x27", "||" => "|", "|[" => "[", "|]" => "]"]);
+      preg_match_all("/^##teamcity\[testFailed name=\x27((?:[^\x27|]|\|.)*)\x27 message=\x27((?:[^\x27|]|\|.)*)\x27(?: details=\x27((?:[^\x27|]|\|.)*)\x27)?/m", file_get_contents($argv[1]), $m, PREG_SET_ORDER);
+      echo "::error title=TeamCity log::" . count($m) . " failed test(s): " . str_replace(["%", ":", "\n"], ["%25", "%3A", " "], implode(", ", array_slice(array_map(fn ($x) => $unescape($x[1]), $m), 0, 40))) . "\n";
+      foreach (array_slice($m, 0, 8) as $x) {
+        $lines = array_slice(explode("\n", $unescape($x[2]) . "\n" . $unescape($x[3] ?? "")), 0, 14);
+        $body = substr(implode("\n", array_map(fn ($l) => substr($l, 0, 300), $lines)), 0, 2500);
+        echo "::error title=" . str_replace(["%", ":", ","], ["%25", "%3A", "%2C"], substr($unescape($x[1]), 0, 120)) . "::" . str_replace(["%", "\r", "\n"], ["%25", "%0D", "%0A"], $body) . "\n";
+      }' "$OI_TEAMCITY_LOG"
+  fi
   # PHPUnit: one more annotation per failed test (its own 1,500 characters, long lines cut), so a failure with a big
   # message (an HTML page) does not push the others out of the tail.
   if command -v php >/dev/null; then

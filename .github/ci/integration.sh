@@ -67,6 +67,9 @@ echo "::group::Unit tests (Magento's unit test framework)"
 echo "::endgroup::"
 
 echo "::group::Integration tests"
+# The TeamCity log is written while the tests run, so a crash before PHPUnit's summary still names the failed tests.
+export OI_TEAMCITY_LOG="${RUNNER_TEMP:-/tmp}/integration-teamcity.log"
 "$MODULE_DIR/.github/ci/logged.sh" "Integration $MAGENTO_VERSION" \
-  php -d memory_limit=-1 ../../../vendor/bin/phpunit -c phpunit.xml ${PHPUNIT_ARGS:-} "../../../vendor/$package/Test/Integration"
+  php -d memory_limit=-1 ../../../vendor/bin/phpunit -c phpunit.xml --log-teamcity "$OI_TEAMCITY_LOG" ${PHPUNIT_ARGS:-} \
+  "../../../vendor/$package/Test/Integration"
 echo "::endgroup::"

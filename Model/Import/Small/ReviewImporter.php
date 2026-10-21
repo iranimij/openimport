@@ -206,14 +206,15 @@ class ReviewImporter extends SmallImporter
         if ($prepared['id'] !== null && !$review->hasData('stores')) {
             $review->setData('stores', $this->source->storesOf((int) $prepared['id']));
         }
-        if ($prepared['created_at'] !== null) {
-            $review->setCreatedAt($prepared['created_at']);
-        }
+
         if ($prepared['customer_id'] !== null) {
             $review->setData('customer_id', $prepared['customer_id']);
         }
         $review->setData('store_id', $review->getData('store_id') ?: ($this->records->storeId('') ?? 0));
         $this->reviewResource->save($review);
+        if ($prepared['created_at'] !== null) {
+            $this->source->setCreatedAt((int) $review->getId(), $prepared['created_at']);
+        }
         if ($prepared['ratings'] !== null) {
             $this->source->deleteVotes((int) $review->getId());
             foreach ($prepared['ratings'] as $ratingId => $optionId) {

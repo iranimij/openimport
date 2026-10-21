@@ -54,7 +54,7 @@ class SynonymImporter extends SmallImporter
             static fn (string $word): string => mb_strtolower(trim($word)),
             preg_split('/[,;]/', $row['synonyms'] ?? '') ?: []
         ))));
-        if (count($words) < 2) {
+        if ($words === [] || (count($words) < 2 && $behavior !== Import::BEHAVIOR_DELETE)) {
             return ['error' => ['synonyms', 'a synonym group needs at least two words, separated by commas']];
         }
         $scope = $this->source->scope($row['scope'] ?? '');

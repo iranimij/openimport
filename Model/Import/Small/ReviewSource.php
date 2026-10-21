@@ -163,6 +163,38 @@ class ReviewSource implements SmallSourceInterface
     }
 
     /**
+     * Magento stores every review under store 0 as well; the file names the store views, or "all" alone.
+     *
+     * @param int[] $storeIds
+     * @return string
+     */
+    public function storeCodes(array $storeIds): string
+    {
+        $views = array_values(array_filter($storeIds, static fn (int $id): bool => $id !== 0));
+
+        return $views === []
+            ? 'all'
+            : implode(',', array_map(fn (int $storeId): string => $this->records->storeCode($storeId), $views));
+    }
+
+    /**
+     * The review's date, which the resource model sets to "now" on every new review.
+     *
+     * @param int $reviewId
+     * @param string $createdAt
+     * @return void
+     */
+    public function setCreatedAt(int $reviewId, string $createdAt): void
+    {
+        $connection = $this->records->resource()->getConnection();
+        $connection->update(
+            $this->records->resource()->getTableName('review'),
+            ['created_at' => $createdAt],
+            ['review_id = ?' => $reviewId]
+        );
+    }
+
+    /**
      * @param int $reviewId
      * @return void
      */
@@ -228,10 +260,7 @@ class ReviewSource implements SmallSourceInterface
             'title' => (string) $review['title'],
             'detail' => (string) $review['detail'],
             'status' => $status,
-            'store_codes' => implode(',', array_map(
-                fn (int $storeId): string => $this->records->storeCode($storeId),
-                $this->storesOf($id)
-            )),
+            'store_codes' => $this->storeCodes($this->storesOf($id)),
             'created_at' => (string) $review['created_at'],
             'customer_email' => $customerId === null ? '' : (string) ($this->records->customerEmail($customerId) ?? ''),
             'ratings' => implode(',', $ratings),

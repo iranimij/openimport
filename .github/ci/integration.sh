@@ -46,7 +46,7 @@ if [ -f "$es_xsd" ]; then
   php -r 'echo "libxml ", LIBXML_DOTTED_VERSION, PHP_EOL;'
   php -r '
     $xsd = file_get_contents($argv[1]);
-    $fixed = preg_replace("#<xs:element name=\"(type|default)\"[^>]*/>\s*#", "", $xsd);
+    $fixed = preg_replace("#<xs:element [^>]*name=\"(type|default)\"[^>]*/>\s*#", "", $xsd);
     if ($fixed !== $xsd) { file_put_contents($argv[1], $fixed); echo "Patched ", $argv[1], PHP_EOL; }
   ' "$es_xsd"
 fi

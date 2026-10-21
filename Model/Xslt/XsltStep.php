@@ -93,6 +93,9 @@ class XsltStep
         try {
             $result = $processor->transformToXml($document);
             $error = libxml_get_last_error();
+        } catch (\Error $exception) {
+            // PHP 8.4 throws for php:function() calls when no functions are registered (none ever are).
+            throw new ReaderException('The XSLT stylesheet failed on this file: ' . $exception->getMessage());
         } finally {
             libxml_clear_errors();
             libxml_use_internal_errors($previous);

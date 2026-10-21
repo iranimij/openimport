@@ -47,4 +47,28 @@ class ConnectionFormMapperTest extends TestCase
         $again = $mapper->fromForm(['name' => 'Supplier', 'type' => 'sftp', 'settings' => ['host' => 'h', 'password' => '']], $connection);
         self::assertSame(['password' => 'enc(pa55)'], $again->getSettings()['secrets'], 'an empty field keeps the password');
     }
+
+    public function testAServiceAccountKeyNamesTheAccountAndAnotherLoginForgetsTheOldOne(): void
+    {
+        $mapper = new ConnectionFormMapper(new Secrets(new FakeEncryptor()));
+        $key = (string) json_encode(['type' => 'service_account', 'client_email' => 'importer@p.iam.gserviceaccount.com']);
+        $connection = $mapper->fromForm([
+            'name' => 'Drive',
+            'type' => 'google_drive',
+            'settings' => ['auth_google' => 'service_account', 'service_account_json' => $key, 'account' => 'forged'],
+        ], new ConnectionStub());
+        self::assertSame('importer@p.iam.gserviceaccount.com', $connection->getSettings()['account']);
+        self::assertSame('importer@p.iam.gserviceaccount.com', $mapper->toForm($connection)['settings']['account']);
+        self::assertSame('1', $mapper->toForm($connection)['settings']['service_account_json_stored']);
+
+        $kept = $mapper->fromForm(['name' => 'Drive', 'type' => 'google_drive', 'settings' => ['auth_google' => 'service_account']], $connection);
+        self::assertSame('importer@p.iam.gserviceaccount.com', $kept->getSettings()['account'], 'kept without a new key');
+
+        $user = $mapper->fromForm([
+            'name' => 'Drive',
+            'type' => 'google_drive',
+            'settings' => ['auth_google' => 'oauth', 'client_id' => 'c-1', 'client_secret' => 's'],
+        ], $kept->setSettings($kept->getSettings() + ['secrets' => []]));
+        self::assertArrayNotHasKey('account', $user->getSettings(), 'another kind of login');
+    }
 }

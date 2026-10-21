@@ -9,7 +9,8 @@ on a schedule.
 ## Steps
 
 1. **What**: direction Export and the entity.
-2. **Where**: the destination (download from the run page, server folder, SFTP, FTP, Amazon S3 or S3-compatible, e-mail)
+2. **Where**: the destination (download from the run page, server folder, SFTP, FTP, Amazon S3 or S3-compatible, Google Drive,
+   e-mail)
    and the file name.
    Placeholders in the file name: `{entity}`, `{profile}`, `{date}` (2026-10-14), `{time}` (143000),
    `{datetime}`, `{run}`, `{ext}`. Default `{entity}-{datetime}.{ext}`.
@@ -66,6 +67,8 @@ postcode, region, country_id, telephone, email, vat_id), and per line `item_id`,
   the same name is kept and the new one gets the date and time, or overwritten (profile setting).
 - **SFTP / FTP**: uploaded into the remote folder; same login settings and secrets as sources, or a
   [saved connection](connections.md).
+- **Google Drive / Sheets**: uploaded into the Drive folder of a
+  [saved Google connection](connections.md#google-drive-and-google-sheets); optionally as a Google Sheet.
 - **Amazon S3 / S3-compatible**: uploaded into the folder (key prefix) of the bucket of a
   [saved S3 connection](connections.md#amazon-s3-and-s3-compatible-storage).
 - **E-mail**: attached (up to 10 MB) to an e-mail sent through the store's mail settings, template

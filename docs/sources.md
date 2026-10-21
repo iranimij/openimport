@@ -10,6 +10,7 @@ Step 2 of the profile form. Every source delivers one file per run; the run keep
 | **Web address (URL)** | address, login (none, user name and password, bearer token), sheet gid | http and https. A Google Sheets link (shared "anyone with the link" or published) is read as CSV; `gid` picks the sheet. |
 | **SFTP** | server, port, user name, password or private key (+ passphrase), remote folder, pattern, which file, move-to | Key login with an OpenSSH or PEM key, pasted into its multi-line field (a key that lost its line breaks is repaired before the login). |
 | **FTP** | server, port, user name, password, explicit TLS (FTPS), passive mode, remote folder, pattern, which file, move-to | |
+| **Google Drive / Sheets (login)** | saved Google connection, folder link, id or path, pattern, which file, move-to | Private files and Sheets (Sheets are read as Excel files); see [Google Drive and Google Sheets](connections.md#google-drive-and-google-sheets). |
 | **Amazon S3 / S3-compatible** | saved S3 connection, folder in the bucket, pattern, which file, move-to | Amazon S3, Cloudflare R2, Wasabi, MinIO, Garage and other S3-compatible services; the login is always a [saved connection](connections.md#amazon-s3-and-s3-compatible-storage). |
 
 For SFTP and FTP, **Saved connection** picks a login saved under System › Data Transfer › OpenImport Connections

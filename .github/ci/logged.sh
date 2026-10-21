@@ -14,6 +14,27 @@ if [ "$status" -ne 0 ]; then
     | tail -n 60 | tail -c 3500 \
     | awk 'BEGIN { ORS = "" } { gsub(/%/, "%25"); gsub(/\r/, "%0D"); print $0 "%0A" }' > "$log.tail"
   echo "::error title=${title} (exit ${status})::$(cat "$log.tail")"
+  # The first fatal error or uncaught exception with the lines after it: a crash prints a long stack trace, and the
+  # tail above then shows only its last frames.
+  first="$(sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "$log" | grep -n -m 1 -E 'Fatal error|Uncaught|PHP Fatal|^(Error|Exception|TypeError): |Exception: |^#0 ' | cut -d: -f1)"
+  if [ -n "$first" ]; then
+    sed -n "$((first > 12 ? first - 12 : 1)),$((first + 12))p" "$log" | cut -c1-300 | tail -c 3500 \
+      | awk 'BEGIN { ORS = "" } { gsub(/%/, "%25"); gsub(/\r/, "%0D"); print $0 "%0A" }' > "$log.first"
+    echo "::error title=${title}: first error::$(cat "$log.first")"
+  fi
+  # PHPUnit's TeamCity log (when the caller sets OI_TEAMCITY_LOG): the first failed tests with their messages, also
+  # when the run crashed before the summary.
+  if [ -n "${OI_TEAMCITY_LOG:-}" ] && [ -s "$OI_TEAMCITY_LOG" ] && command -v php >/dev/null; then
+    php -r '
+      $unescape = static fn ($v) => strtr($v, ["|n" => "\n", "|r" => "", "|\x27" => "\x27", "||" => "|", "|[" => "[", "|]" => "]"]);
+      preg_match_all("/^##teamcity\[testFailed name=\x27((?:[^\x27|]|\|.)*)\x27 message=\x27((?:[^\x27|]|\|.)*)\x27(?: details=\x27((?:[^\x27|]|\|.)*)\x27)?/m", file_get_contents($argv[1]), $m, PREG_SET_ORDER);
+      echo "::error title=TeamCity log::" . count($m) . " failed test(s): " . str_replace(["%", ":", "\n"], ["%25", "%3A", " "], implode(", ", array_slice(array_map(fn ($x) => $unescape($x[1]), $m), 0, 40))) . "\n";
+      foreach (array_slice($m, 0, 8) as $x) {
+        $lines = array_slice(explode("\n", $unescape($x[2]) . "\n" . $unescape($x[3] ?? "")), 0, 14);
+        $body = substr(implode("\n", array_map(fn ($l) => substr($l, 0, 300), $lines)), 0, 2500);
+        echo "::error title=" . str_replace(["%", ":", ","], ["%25", "%3A", "%2C"], substr($unescape($x[1]), 0, 120)) . "::" . str_replace(["%", "\r", "\n"], ["%25", "%0D", "%0A"], $body) . "\n";
+      }' "$OI_TEAMCITY_LOG"
+  fi
   # PHPUnit: one more annotation per failed test (its own 1,500 characters, long lines cut), so a failure with a big
   # message (an HTML page) does not push the others out of the tail.
   if command -v php >/dev/null; then

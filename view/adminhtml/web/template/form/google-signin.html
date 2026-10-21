@@ -1,0 +1,21 @@
+<!--
+/**
+ * Copyright © Iman Aboheydary. All rights reserved.
+ * See LICENSE for license details (MIT).
+ */
+-->
+<div class="admin__field openimport-google-signin" visible="visible">
+    <div class="admin__field-label">
+        <span translate="'Google account'"></span>
+    </div>
+    <div class="admin__field-control">
+        <p if="account">
+            <span translate="'Signed in as'"></span>
+            <strong text="account"></strong>
+        </p>
+        <a if="signInUrl" class="action-secondary" attr="href: signInUrl">
+            <span translate="'Sign in with Google'"></span>
+        </a>
+        <p if="!signInUrl" class="note" translate="'Save the connection with its client ID and client secret, then sign in.'"></p>
+    </div>
+</div>

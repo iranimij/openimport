@@ -196,18 +196,31 @@ class PriceRuleImportTest extends TestCase
         /** @var Quote $quote */
         $quote = Bootstrap::getObjectManager()->create(Quote::class);
         $quote->setStoreId(1)->setIsActive(true)->setCustomerIsGuest(true)->setCustomerGroupId(0)
-            ->addProduct($product, 3);
-        $quote->getBillingAddress();
-        $quote->getShippingAddress()->setCollectShippingRates(true);
+            ->setCustomerEmail('guest@example.com');
+        $quote->getBillingAddress()->setCountryId('DE')->setPostcode('60311')->setCity('Frankfurt');
+        $quote->getShippingAddress()->setCountryId('DE')->setPostcode('60311')->setCity('Frankfurt')
+            ->setCollectShippingRates(true);
+        $quote->addProduct($product, 3);
         $quote->setCouponCode($code)->collectTotals();
-        self::assertSame($code, $quote->getCouponCode(), 'the coupon is accepted');
         $address = $quote->getShippingAddress();
-        self::assertContains(
-            (string) $ten->getId(),
-            explode(',', (string) ($quote->getAppliedRuleIds() ?: $address->getAppliedRuleIds())),
-            'the rule applied; discount ' . $address->getDiscountAmount() . ', subtotal ' . $address->getSubtotal()
+        $diagnosis = sprintf(
+            'coupon "%s", applied rules "%s", address rules "%s", base subtotal %s, discount %s, items %d; rule active %s, '
+            . 'websites %s, groups %s, type %s, auto %s, validates %s',
+            (string) $quote->getCouponCode(),
+            (string) $quote->getAppliedRuleIds(),
+            (string) $address->getAppliedRuleIds(),
+            (string) $address->getBaseSubtotal(),
+            (string) $address->getDiscountAmount(),
+            count($address->getAllItems()),
+            (string) $ten->getIsActive(),
+            implode(',', (array) $ten->getWebsiteIds()),
+            implode(',', (array) $ten->getCustomerGroupIds()),
+            (string) $ten->getCouponType(),
+            (string) $ten->getUseAutoGeneration(),
+            $ten->validate($address) ? 'yes' : 'no'
         );
-        self::assertSame(-3.0, (float) $address->getDiscountAmount(), '30 with 10 % off');
+        self::assertSame($code, $quote->getCouponCode(), 'the coupon is accepted: ' . $diagnosis);
+        self::assertSame(-3.0, (float) $address->getDiscountAmount(), '30 with 10 % off: ' . $diagnosis);
 
         // Update by name: the discount changes, everything else stays; the export round trip imports as it is.
         $update = $this->file("name;discount_amount\n{$tag} ten;15\n");

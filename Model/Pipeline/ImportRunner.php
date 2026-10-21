@@ -227,7 +227,7 @@ class ImportRunner
                 $this->readerFactory->options($profile->getFormatOptions())
             );
             // CSV and XLSX have a fixed header; JSON and XML records may add fields after the sample.
-            $strictColumns = in_array($format, ['csv', 'xlsx'], true) ? $reader->columns() : null;
+            $strictColumns = in_array($format, ['csv', 'xlsx', 'ods'], true) ? $reader->columns() : null;
         } catch (ReaderException $exception) {
             throw new PipelineException($exception->getMessage(), 0, $exception);
         }

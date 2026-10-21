@@ -1749,6 +1749,7 @@
                                 <item name="0" xsi:type="string">auto</item>
                                 <item name="1" xsi:type="string">csv</item>
                                 <item name="2" xsi:type="string">xlsx</item>
+                                <item name="3" xsi:type="string">ods</item>
                             </item>
                         </item>
                         <item name="1" xsi:type="array">
@@ -1786,12 +1787,13 @@
                         <item name="format" xsi:type="array">
                             <item name="0" xsi:type="string">auto</item>
                             <item name="1" xsi:type="string">xlsx</item>
+                            <item name="2" xsi:type="string">ods</item>
                         </item>
                     </item>
                 </item>
             </argument>
             <settings>
-                <label translate="true">Sheet (Excel)</label>
+                <label translate="true">Sheet (Excel, OpenDocument)</label>
                 <dataScope>format_options.sheet</dataScope>
                 <notice translate="true">Name or position; empty = first sheet.</notice>
             </settings>
@@ -1937,7 +1939,45 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="archive" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="64">
+        <field name="xslt" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="63">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="format" xsi:type="array">
+                            <item name="0" xsi:type="string">auto</item>
+                            <item name="1" xsi:type="string">xml</item>
+                        </item>
+                    </item>
+                    <item name="rows" xsi:type="number">8</item>
+                    <item name="placeholder" xsi:type="string">&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt; …</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">XSLT before reading (XML)</label>
+                <dataScope>format_options.xslt</dataScope>
+                <notice translate="true">An XSLT 1.0 stylesheet that turns the file into the XML OpenImport reads (one element per record). No document(), include or import; the file must fit in memory. Empty = none.</notice>
+            </settings>
+        </field>
+        <field name="out_xslt" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="64">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">xml</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">format</item>
+                    <item name="rows" xsi:type="number">8</item>
+                    <item name="placeholder" xsi:type="string">&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt; …</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">XSLT after writing (XML)</label>
+                <dataScope>export_options.xslt</dataScope>
+                <notice translate="true">An XSLT 1.0 stylesheet applied to the written XML (root and record names as set above) before it is delivered: any layout a partner wants. Empty = none.</notice>
+            </settings>
+        </field>
+        <field name="archive" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="65">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1966,7 +2006,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="archive_entry" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="65">
+        <field name="archive_entry" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="66">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1986,7 +2026,7 @@
                 <placeholder>*.csv</placeholder>
             </settings>
         </field>
-        <field name="out_compress" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="66">
+        <field name="out_compress" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="67">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">export</item>

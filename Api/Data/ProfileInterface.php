@@ -55,7 +55,7 @@ interface ProfileInterface
 
     public const SOURCE_TYPES = ['upload', 'folder', 'url', 'sftp', 'ftp', 's3', 'google_drive', 'dropbox',
         'onedrive', 'rest'];
-    public const FORMATS = ['auto', 'csv', 'xlsx', 'json', 'xml'];
+    public const FORMATS = ['auto', 'csv', 'xlsx', 'ods', 'json', 'xml'];
     public const ON_ERROR_STOP = 'stop';
     public const ON_ERROR_SKIP = 'skip';
     public const AFTER_SUCCESS_OPTIONS = ['keep', 'move', 'delete'];

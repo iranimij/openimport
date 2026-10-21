@@ -18,10 +18,12 @@ use Iranimij\OpenImport\Model\Filter\RowFilter;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Pipeline\ProfileCompiler;
 use Iranimij\OpenImport\Model\Pipeline\RunOutcome;
+use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\ResourceModel\Run as RunResource;
 use Iranimij\OpenImport\Model\Writer\WriterException;
 use Iranimij\OpenImport\Model\Writer\WriterFactory;
 use Iranimij\OpenImport\Model\Writer\WriterInterface;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
 
 /**
  * Runs one export: entity rows → row filters → mapping → writer, streamed into the run folder. A dry run writes
@@ -50,6 +52,7 @@ class ExportRunner
      * @param FileNamer $namer
      * @param DestinationPool $destinations
      * @param Packer $packer
+     * @param XsltStep $xslt
      */
     public function __construct(
         private readonly EntitySourcePool $sources,
@@ -60,7 +63,8 @@ class ExportRunner
         private readonly Config $config,
         private readonly FileNamer $namer,
         private readonly DestinationPool $destinations,
-        private readonly Packer $packer
+        private readonly Packer $packer,
+        private readonly XsltStep $xslt
     ) {
     }
 
@@ -133,7 +137,15 @@ class ExportRunner
                     : sprintf('Nothing to export: %d record(s) read, all %d skipped by the row filters.', $this->counts['read'], $this->counts['filtered'])
             ), ''];
         }
-        $compress = (string) ($profile->getExportOptions()['compress'] ?? Packer::NONE);
+        $exportOptions = $profile->getExportOptions();
+        if ($this->xslt->applies($profile->getFormat(), $path, $exportOptions)) {
+            try {
+                $this->xslt->transformInPlace($path, (string) $exportOptions[XsltStep::OPTION]);
+            } catch (ReaderException $exception) {
+                throw new PipelineException($exception->getMessage(), 0, $exception);
+            }
+        }
+        $compress = (string) ($exportOptions['compress'] ?? Packer::NONE);
         if (in_array($compress, Packer::KINDS, true)) {
             try {
                 $path = $this->packer->pack($path, $compress);

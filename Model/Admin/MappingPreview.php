@@ -43,7 +43,7 @@ class MappingPreview
         try {
             $format = $profile->getFormat() === 'auto' ? $this->readers->detect($file, $name) : $profile->getFormat();
             $reader = $this->readers->create($file, $format, $this->readers->options($profile->getFormatOptions()));
-            $columns = in_array($format, ['csv', 'xlsx'], true) ? $reader->columns() : null;
+            $columns = in_array($format, ['csv', 'xlsx', 'ods'], true) ? $reader->columns() : null;
             [$mapping] = $this->compiler->mapping($profile, $columns);
             $filter = $this->compiler->filter($profile, $columns);
         } catch (ReaderException | PipelineException $exception) {

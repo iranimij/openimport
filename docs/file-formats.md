@@ -36,6 +36,20 @@ says "row 18" and row 18 is what the merchant sees in Excel or a text editor.
 - Workbooks that would unpack to more than 512 MB are refused.
 - The sheet is streamed with PHP's XMLReader; only the shared strings table is held in memory.
 
+## OpenDocument (.ods)
+
+Since 1.4. LibreOffice Calc, Collabora and OnlyOffice spreadsheets, with the same options as Excel (sheet by name or
+position, header row).
+
+- Typed cells are read by their value: numbers without display formatting (`12.5`, not `12,50 €`), dates and times
+  as `2024-01-31` or `2024-01-31 14:30:00`, booleans as `1` / `0`; everything else as the cell's text (several
+  paragraphs joined by a line break). Comments (annotations) are left out.
+- Repeated cells and rows, as Calc writes them for the unused area, are expanded; empty rows and trailing empty
+  cells are dropped. Row numbers are the sheet's own.
+- Exports write one sheet with a bold header row; numbers as numbers, text as text (formula guard as for CSV).
+- Streamed with XMLReader; files with a DOCTYPE, files that are no spreadsheet (an `.odt` text) and files that
+  would unpack to more than 512 MB are refused.
+
 ## JSON
 
 | Option | Default | Notes |
@@ -60,6 +74,35 @@ says "row 18" and row 18 is what the merchant sees in Excel or a text editor.
 - CDATA is read as text.
 - The file is streamed record by record: memory does not grow with the file size.
 - Files with a DOCTYPE are refused, and the parser never loads anything from the network (no XML entity attacks).
+
+### XSLT (since 1.4)
+
+A supplier's XML rarely has one element per record. *XSLT before reading (XML)* in step 3 takes an XSLT 1.0
+stylesheet that turns the file into the XML OpenImport reads, before the reader and the sample see it; *XSLT after
+writing (XML)* in an export profile reshapes the written file (root and record names as set) into any layout a
+partner wants, before it is delivered. Example for an import:
+
+```xml
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:template match="/">
+    <products>
+      <xsl:for-each select="lieferung/artikel">
+        <product>
+          <sku><xsl:value-of select="@nr"/></sku>
+          <name><xsl:value-of select="bezeichnung"/></name>
+          <price><xsl:value-of select="translate(vk, ',', '.')"/></price>
+        </product>
+      </xsl:for-each>
+    </products>
+  </xsl:template>
+</xsl:stylesheet>
+```
+
+Safety: the stylesheet and the file are parsed without network access and without DOCTYPE; the processor may read
+nothing from disk or the network (`document()`, `xsl:include` and `xsl:import` are refused) and write nothing; PHP
+functions are not available. The whole file is held in memory for the transformation, so files above 64 MB are
+refused (`Iranimij\OpenImport\Model\Xslt\XsltStep` in `di.xml`); the stylesheet is checked when the profile is
+saved. Needs PHP's `ext-xsl`, which Magento requires anyway.
 
 ## Column names in JSON and XML files
 

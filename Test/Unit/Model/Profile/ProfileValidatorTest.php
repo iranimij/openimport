@@ -22,6 +22,8 @@ use Iranimij\OpenImport\Model\Export\DestinationPool;
 use Iranimij\OpenImport\Model\Writer\CsvWriter;
 use Iranimij\OpenImport\Model\Writer\WriterFactory;
 use Iranimij\OpenImport\Model\Writer\XlsxWriter;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
+use Magento\Framework\Filesystem\Driver\File;
 use Iranimij\OpenImport\Test\Unit\Model\Connection\ConnectionStub;
 use Iranimij\OpenImport\Test\Unit\Model\Connection\FakeConnectionRepository;
 use Iranimij\OpenImport\Test\Unit\Model\FakeObjectManager;
@@ -59,7 +61,8 @@ class ProfileValidatorTest extends TestCase
                     new ConnectionStub(6, 'Feeds bucket', 's3', ['bucket' => 'feeds']),
                 ]),
                 new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3'])
-            )
+            ),
+            new XsltStep(new File())
         );
     }
 
@@ -178,7 +181,7 @@ class ProfileValidatorTest extends TestCase
             'Give the profile a name.',
             'Magento has no import entity "catalog_category".',
             'The source type "box" is not one of upload, folder, url, sftp, ftp, s3, google_drive, dropbox, onedrive, rest.',
-            'The format "pdf" is not one of auto, csv, xlsx, json, xml.',
+            'The format "pdf" is not one of auto, csv, xlsx, ods, json, xml.',
             'The after-success action "archive" is not one of keep, move, delete.',
             'The notification setting "sometimes" is not one of never, failure, always.',
             'The behaviour "merge" is not one of add_update, only_add, only_update, replace, delete.',
@@ -350,5 +353,30 @@ class ProfileValidatorTest extends TestCase
             'row_filters' => [],
         ] + $this->valid()));
         self::assertNotEmpty(array_filter($export, static fn (string $p): bool => str_contains($p, 'scheduled export needs a destination')));
+    }
+
+    public function testArchiveCompressionAndXsltSettings(): void
+    {
+        $xsl = '<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">'
+            . '<xsl:template match="/"><r/></xsl:template></xsl:stylesheet>';
+        self::assertSame([], $this->validator()->validate(new ProfileStub(
+            ['format' => 'xml', 'format_options' => ['archive' => 'none', 'archive_entry' => '*.xml', 'xslt' => $xsl]]
+            + $this->valid()
+        )));
+        $problems = $this->validator()->validate(new ProfileStub(
+            ['format_options' => ['archive' => 'maybe', 'xslt' => '<xsl:stylesheet><xsl:include href="a.xsl"/></xsl:stylesheet>']]
+            + $this->valid()
+        ));
+        self::assertContains('The archive setting "maybe" is not one of auto, none.', $problems);
+        self::assertContains('The XSLT stylesheet may not include or import other files.', $problems);
+        $problems = $this->validator()->validate(new ProfileStub(
+            ['format_options' => ['xslt' => 'not xml']] + $this->valid()
+        ));
+        self::assertStringContainsString('The XSLT stylesheet is not well-formed XML', $problems[0] ?? '');
+
+        $export = $this->validator()->validate(new ProfileStub(
+            ['direction' => 'export', 'export_options' => ['compress' => 'rar', 'xslt' => $xsl]] + $this->valid()
+        ));
+        self::assertSame(['"rar" is not a compression OpenImport writes (zip, gz, tar.gz).'], $export);
     }
 }

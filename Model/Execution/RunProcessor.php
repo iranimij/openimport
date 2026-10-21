@@ -12,7 +12,6 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
-use Iranimij\OpenImport\Model\Archive\ArchiveException;
 use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Export\ExportRunner;
@@ -21,7 +20,9 @@ use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Pipeline\RunOutcome;
 use Iranimij\OpenImport\Model\ResourceModel\Run as RunResource;
+use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Storage\LockManager;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Psr\Log\LoggerInterface;
 
@@ -45,6 +46,7 @@ class RunProcessor
      * @param EntityRegistry $entities
      * @param FileBatch $fileBatch
      * @param Unpacker $unpacker
+     * @param XsltStep $xslt
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -59,7 +61,8 @@ class RunProcessor
         private readonly ExportRunner $exportRunner,
         private readonly EntityRegistry $entities,
         private readonly FileBatch $fileBatch,
-        private readonly Unpacker $unpacker
+        private readonly Unpacker $unpacker,
+        private readonly XsltStep $xslt
     ) {
     }
 
@@ -199,7 +202,7 @@ class RunProcessor
         }
         $batchNote = $this->fileBatch->start($profile, $run);
         $fetched = $this->sources->fetch($profile, $run, $folder);
-        [$readPath, $readName, $archiveNote] = $this->unpack($profile, $fetched, $folder);
+        [$readPath, $readName, $archiveNote] = $this->prepare($profile, $fetched, $folder);
         $staged = $this->runFiles->stageSource($runId, $readPath, $readName);
         $run->setSourceFile($this->runFiles->relative($staged));
         if ($archiveNote !== null) {
@@ -238,7 +241,8 @@ class RunProcessor
     }
 
     /**
-     * The file to read: the fetched file, or the file taken out of it when it is an archive.
+     * The file to read: the fetched file, the file taken out of it when it is an archive, and that one transformed
+     * when the profile has an XSLT stylesheet.
      *
      * @param ProfileInterface $profile
      * @param FetchedFile $fetched
@@ -246,19 +250,26 @@ class RunProcessor
      * @return array{0: string, 1: string, 2: string|null} path, name, note for the run message
      * @throws PipelineException
      */
-    private function unpack(ProfileInterface $profile, FetchedFile $fetched, string $folder): array
+    private function prepare(ProfileInterface $profile, FetchedFile $fetched, string $folder): array
     {
         $options = $profile->getFormatOptions();
-        if ($this->unpacker->kindFor($fetched->path, $fetched->name, $options) === '') {
-            return [$fetched->path, $fetched->name, null];
-        }
+        $path = $fetched->path;
+        $name = $fetched->name;
+        $note = null;
         try {
-            $unpacked = $this->unpacker->unpack($fetched->path, $fetched->name, $folder, $options);
-        } catch (ArchiveException $exception) {
+            if ($this->unpacker->kindFor($path, $name, $options) !== '') {
+                $unpacked = $this->unpacker->unpack($path, $name, $folder, $options);
+                [$path, $name, $note] = [$unpacked->path, $unpacked->name, $unpacked->note()];
+            }
+            if ($this->xslt->applies($profile->getFormat(), $name, $options)) {
+                $this->xslt->transform($path, (string) $options[XsltStep::OPTION], $folder . '/transformed.xml');
+                $path = $folder . '/transformed.xml';
+            }
+        } catch (ReaderException $exception) {
             throw new PipelineException($exception->getMessage(), 0, $exception);
         }
 
-        return [$unpacked->path, $unpacked->name, $unpacked->note()];
+        return [$path, $name, $note];
     }
 
     /**

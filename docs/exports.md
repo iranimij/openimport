@@ -63,8 +63,9 @@ postcode, region, country_id, telephone, email, vat_id), and per line `item_id`,
 
 ## Destinations
 
-**Compress** (step 3) packs the file as `.zip`, `.gz` or `.tar.gz` before it goes to any destination; see
-[Archives](archives.md).
+**XSLT after writing (XML)** reshapes an XML export into any layout before it is delivered, see
+[XSLT](file-formats.md#xslt-since-14); **Compress** (step 3) packs the file as `.zip`, `.gz` or `.tar.gz` before it
+goes to any destination; see [Archives](archives.md).
 
 - **Download**: the file stays in the run folder, with a button on the run page.
 - **Server folder**: under `var/openimport/<path>` or an allowed absolute folder (created when missing). A file of

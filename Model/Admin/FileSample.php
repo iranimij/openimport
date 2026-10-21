@@ -9,9 +9,12 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\Admin;
 
 use Iranimij\OpenImport\Model\Archive\Unpacker;
+use Iranimij\OpenImport\Model\Reader\OdsReader;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Reader\XlsxReader;
+use Iranimij\OpenImport\Model\Storage\TempFolder;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
 
 /**
  * The first rows of a file for the profile form, read on the server with the same streaming readers as a run (the
@@ -24,10 +27,14 @@ class FileSample
     /**
      * @param ReaderFactory $readers
      * @param Unpacker $unpacker
+     * @param XsltStep $xslt
+     * @param TempFolder $tempFolder
      */
     public function __construct(
         private readonly ReaderFactory $readers,
-        private readonly Unpacker $unpacker
+        private readonly Unpacker $unpacker,
+        private readonly XsltStep $xslt,
+        private readonly TempFolder $tempFolder
     ) {
     }
 
@@ -49,8 +56,19 @@ class FileSample
             $file,
             $name,
             $options,
-            fn (string $path, string $readName): array
-                => $this->sample($path, $readName, $format, $options, $rows) + ['inner' => $inner ?? $readName]
+            function (string $path, string $readName) use ($format, $options, $rows, $inner): array {
+                $sample = fn (string $file): array
+                    => $this->sample($file, $readName, $format, $options, $rows) + ['inner' => $inner ?? $readName];
+                if (!$this->xslt->applies($format, $readName, $options)) {
+                    return $sample($path);
+                }
+
+                return $this->tempFolder->with('xslt', function (string $folder) use ($path, $options, $sample) {
+                    $this->xslt->transform($path, (string) $options[XsltStep::OPTION], $folder . '/transformed.xml');
+
+                    return $sample($folder . '/transformed.xml');
+                });
+            }
         );
     }
 
@@ -80,7 +98,7 @@ class FileSample
             'detected' => $reader->detected(),
             'columns' => $reader->columns(),
             'rows' => $sample,
-            'sheets' => $reader instanceof XlsxReader ? $reader->sheetNames() : [],
+            'sheets' => $reader instanceof XlsxReader || $reader instanceof OdsReader ? $reader->sheetNames() : [],
         ];
     }
 }

@@ -41,6 +41,9 @@ form shows "stored" and lets you replace a secret, not read it) or the error rep
 
 - **XML:** streamed with `XMLReader`; documents with a `DOCTYPE` are refused, so there is no entity expansion and no
   external entity. The parser never resolves URLs.
+- **Archives (ZIP, gzip, tar):** the file inside is written under a fixed name (entry names never become paths: no
+  zip-slip), its size is counted while unpacking (1 GB limit, zip bombs), links are skipped, nested archives and
+  password-protected entries are refused. See [Archives](archives.md).
 - **XLSX:** read from the zip with size checks; a workbook whose parts would unpack to more than 512 MB is refused
   (zip bombs). Only the parts the reader needs are opened.
 - **CSV written by the module** (error reports, exports): cells starting with `= + - @` or a tab are prefixed with an

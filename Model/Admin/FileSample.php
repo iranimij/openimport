@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Model\Admin;
 
+use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Reader\XlsxReader;
@@ -22,9 +23,11 @@ class FileSample
 
     /**
      * @param ReaderFactory $readers
+     * @param Unpacker $unpacker
      */
     public function __construct(
-        private readonly ReaderFactory $readers
+        private readonly ReaderFactory $readers,
+        private readonly Unpacker $unpacker
     ) {
     }
 
@@ -35,10 +38,32 @@ class FileSample
      * @param array<string, mixed> $options stored format options
      * @param int $rows
      * @return array{format: string, detected: array<string, string>, columns: string[],
-     *               rows: array<int, array<string, string>>, sheets: string[]}
+     *               rows: array<int, array<string, string>>, sheets: string[], inner: string}
      * @throws ReaderException
      */
     public function read(string $file, string $name, string $format, array $options, int $rows = self::ROWS): array
+    {
+        $inner = $this->unpacker->kindFor($file, $name, $options) === '' ? '' : null;
+
+        return $this->unpacker->withFile(
+            $file,
+            $name,
+            $options,
+            fn (string $path, string $readName): array
+                => $this->sample($path, $readName, $format, $options, $rows) + ['inner' => $inner ?? $readName]
+        );
+    }
+
+    /**
+     * @param string $file
+     * @param string $name
+     * @param string $format
+     * @param array<string, mixed> $options
+     * @param int $rows
+     * @return array{format: string, detected: array<string, string>, columns: string[],
+     *               rows: array<int, array<string, string>>, sheets: string[]}
+     */
+    private function sample(string $file, string $name, string $format, array $options, int $rows): array
     {
         $format = $format === '' || $format === 'auto' ? $this->readers->detect($file, $name) : $format;
         $reader = $this->readers->create($file, $format, $this->readers->options($options));

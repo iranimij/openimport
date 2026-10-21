@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\Profile;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
+use Iranimij\OpenImport\Model\Archive\Packer;
+use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
 use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
@@ -100,6 +102,14 @@ class ProfileValidator
                 $problems[] = 'A scheduled export needs a destination: choose a server folder, SFTP, FTP or e-mail, '
                     . 'or set the schedule to "Manual only".';
             }
+        }
+        $archive = (string) ($profile->getFormatOptions()['archive'] ?? Unpacker::MODE_AUTO);
+        if ($import && !in_array($archive, [Unpacker::MODE_AUTO, Unpacker::MODE_NONE], true)) {
+            $problems[] = sprintf('The archive setting "%s" is not one of auto, none.', $archive);
+        }
+        $compress = (string) ($profile->getExportOptions()['compress'] ?? Packer::NONE);
+        if (!$import && !in_array($compress, array_merge([Packer::NONE], Packer::KINDS), true)) {
+            $problems[] = sprintf('"%s" is not a compression OpenImport writes (zip, gz, tar.gz).', $compress);
         }
         foreach (array_filter(array_map('trim', explode(',', $profile->getNotifyEmails()))) as $email) {
             if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {

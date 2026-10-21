@@ -375,6 +375,42 @@ class Profile extends AbstractModel implements ProfileInterface
     /**
      * @inheritDoc
      */
+    public function getThenProfileId(): ?int
+    {
+        $id = $this->getData(self::THEN_PROFILE_ID);
+
+        return $id === null || $id === '' || (int) $id === 0 ? null : (int) $id;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setThenProfileId(?int $profileId): ProfileInterface
+    {
+        return $this->setData(self::THEN_PROFILE_ID, $profileId === null || $profileId === 0 ? null : $profileId);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getThenWhen(): string
+    {
+        $when = (string) $this->getData(self::THEN_WHEN);
+
+        return $when === self::THEN_ALWAYS ? self::THEN_ALWAYS : self::THEN_SUCCESS;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setThenWhen(string $when): ProfileInterface
+    {
+        return $this->setData(self::THEN_WHEN, $when === self::THEN_ALWAYS ? self::THEN_ALWAYS : self::THEN_SUCCESS);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getMapping(): array
     {
         $mapping = $this->getData(self::MAPPING);

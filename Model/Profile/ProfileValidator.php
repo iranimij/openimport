@@ -11,6 +11,7 @@ namespace Iranimij\OpenImport\Model\Profile;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Archive\Packer;
 use Iranimij\OpenImport\Model\Archive\Unpacker;
+use Iranimij\OpenImport\Model\Chain\ChainLinks;
 use Iranimij\OpenImport\Model\Xslt\XsltStep;
 use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
 use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
@@ -44,6 +45,7 @@ class ProfileValidator
      * @param WriterFactory $writers
      * @param ConnectionConfig $connections
      * @param XsltStep $xslt
+     * @param ChainLinks $chains
      */
     public function __construct(
         private readonly MappingCompiler $mappingCompiler,
@@ -53,7 +55,8 @@ class ProfileValidator
         private readonly DestinationPool $destinations,
         private readonly WriterFactory $writers,
         private readonly ConnectionConfig $connections,
-        private readonly XsltStep $xslt
+        private readonly XsltStep $xslt,
+        private readonly ChainLinks $chains
     ) {
     }
 
@@ -106,6 +109,7 @@ class ProfileValidator
                     . 'or set the schedule to "Manual only".';
             }
         }
+        $problems = array_merge($problems, $this->chain($profile));
         $archive = (string) ($profile->getFormatOptions()['archive'] ?? Unpacker::MODE_AUTO);
         if ($import && !in_array($archive, [Unpacker::MODE_AUTO, Unpacker::MODE_NONE], true)) {
             $problems[] = sprintf('The archive setting "%s" is not one of auto, none.', $archive);
@@ -278,6 +282,53 @@ class ProfileValidator
         $pick = $text('pick');
         if ($pick !== '' && !in_array($pick, FileSelector::PICKS, true)) {
             $problems[] = sprintf('"%s" is not a way to choose the file.', $pick);
+        }
+
+        return $problems;
+    }
+
+    /**
+     * The "then run" link: the next profile exists, is not this one, can run unattended, and the chain does not
+     * come back to this profile.
+     *
+     * @param ProfileInterface $profile
+     * @return string[]
+     */
+    private function chain(ProfileInterface $profile): array
+    {
+        $nextId = $profile->getThenProfileId();
+        if ($nextId === null) {
+            return [];
+        }
+        $ownId = $profile->getProfileId() === null ? null : (int) $profile->getProfileId();
+        if ($nextId === $ownId) {
+            return ['A profile cannot run itself afterwards.'];
+        }
+        $next = $this->chains->profile($nextId);
+        if ($next === null) {
+            return [sprintf('There is no profile with id %d to run afterwards.', $nextId)];
+        }
+        $problems = [];
+        if ($next['direction'] === ProfileInterface::DIRECTION_IMPORT && $next['source_type'] === 'upload') {
+            $problems[] = sprintf(
+                '"%s" reads an uploaded file, so it cannot run afterwards: give it a server folder, web address, '
+                . 'SFTP, FTP or cloud source.',
+                $next['name']
+            );
+        }
+        if ($ownId !== null) {
+            [$ids, $again] = $this->chains->path($ownId, $nextId);
+            if ($again !== null) {
+                $ids[] = $again;
+                $names = array_map(fn (int $id): string => $this->chains->profile($id)['name'] ?? ('#' . $id), $ids);
+                $problems[] = sprintf(
+                    'The chain would loop: %s. A profile cannot run again in the same chain.',
+                    implode(' → ', $names)
+                );
+            }
+        }
+        if (!in_array($profile->getThenWhen(), [ProfileInterface::THEN_SUCCESS, ProfileInterface::THEN_ALWAYS], true)) {
+            $problems[] = 'When to run the next profile must be "success" or "always".';
         }
 
         return $problems;

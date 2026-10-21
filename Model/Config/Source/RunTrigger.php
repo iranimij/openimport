@@ -21,6 +21,7 @@ class RunTrigger implements OptionSourceInterface
         'cli' => 'Command line',
         'api' => 'API',
         'event' => 'Order placed',
+        'chain' => 'Job chain',
     ];
 
     /**

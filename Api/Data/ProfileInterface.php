@@ -36,6 +36,11 @@ interface ProfileInterface
     public const ROW_FILTERS = 'row_filters';
     public const EXPORT_OPTIONS = 'export_options';
     public const IMPORT_OPTIONS = 'import_options';
+    public const THEN_PROFILE_ID = 'then_profile_id';
+    public const THEN_WHEN = 'then_when';
+
+    public const THEN_SUCCESS = 'success';
+    public const THEN_ALWAYS = 'always';
     public const CREATED_BY = 'created_by';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
@@ -287,6 +292,32 @@ interface ProfileInterface
      * @return $this
      */
     public function setImportOptions(array $options): self;
+
+    /**
+     * The profile that runs after this one (job chain), null for none.
+     *
+     * @return int|null
+     */
+    public function getThenProfileId(): ?int;
+
+    /**
+     * @param int|null $profileId
+     * @return $this
+     */
+    public function setThenProfileId(?int $profileId): self;
+
+    /**
+     * When the next profile runs: THEN_SUCCESS (after a successful or partial run) or THEN_ALWAYS.
+     *
+     * @return string
+     */
+    public function getThenWhen(): string;
+
+    /**
+     * @param string $when
+     * @return $this
+     */
+    public function setThenWhen(string $when): self;
 
     /**
      * Mapping rows in order: target, source, static, transforms, required, value_map_case_sensitive,

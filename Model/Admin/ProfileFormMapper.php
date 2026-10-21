@@ -117,6 +117,8 @@ class ProfileFormMapper
             'after_success' => $profile->getAfterSuccess(),
             'notify' => $profile->getNotify(),
             'notify_emails' => $profile->getNotifyEmails(),
+            'then_profile_id' => (string) ($profile->getThenProfileId() ?? ''),
+            'then_when' => $profile->getThenWhen(),
             'filter_mode' => (string) ($filters['mode'] ?? 'include'),
             'filter_match' => (string) ($filters['match'] ?? 'all'),
             'mapping' => $mapping,
@@ -148,7 +150,9 @@ class ProfileFormMapper
             ->setSafetyThreshold($text('safety_threshold') === '' ? null : (int) $text('safety_threshold'))
             ->setAfterSuccess($text('after_success', 'keep'))
             ->setNotify($text('notify', 'failure'))
-            ->setNotifyEmails($text('notify_emails'));
+            ->setNotifyEmails($text('notify_emails'))
+            ->setThenProfileId(ctype_digit($text('then_profile_id')) ? (int) $text('then_profile_id') : null)
+            ->setThenWhen($text('then_when', ProfileInterface::THEN_SUCCESS));
 
         $preset = $text('schedule_preset');
         $profile->setSchedule(match ($preset) {

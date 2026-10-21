@@ -62,6 +62,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | Spreadsheet formula-injection guard | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | Encrypted credentials, never shown again | ✓ | — | — | ○ | ○ | ○ |
 | Event-triggered export (order placed → file) | ✓ debounced, one run per minute | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Job chains (run B after A) | ✓ after success or always, parent run, loops refused at save | ✗ | ✗ | ✓ | ✗ | ✗ |
 | Trigger profiles by REST, read run status | ✓ | ○ raw CSV/JSON import API | ○ | ○ | ○ | ✗ |
 | B2B entities | ✗ | ✗ | ○ | ✓ (add-on) | ✗ | ✗ |
 
@@ -78,8 +79,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Where the paid tools still have more
 
-Job chains and more triggers, webhook and Slack notifications, reindex after a run, undo, B2B. Automation is
-planned for 1.6; B2B is declined (Adobe Commerce only). See the [roadmap](https://github.com/iranimij/openimport/milestones).
+More triggers, webhook and Slack notifications, reindex after a run, undo, B2B. Automation is
+planned for 1.6 (job chains shipped); B2B is declined (Adobe Commerce only). See the [roadmap](https://github.com/iranimij/openimport/milestones).
 
 ## Free alternatives for developers
 

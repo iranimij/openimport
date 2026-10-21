@@ -47,8 +47,20 @@ class ProfileJsonTest extends TestCase
         });
         $repository->method('save')->willReturnCallback(function (ProfileInterface $profile): ProfileInterface {
             $this->saved[] = $profile->getName();
+            if ($profile->getProfileId() === null && $profile instanceof ProfileStub) {
+                $profile->assignId(100 + count($this->saved));
+            }
+            $this->stored[$profile->getName()] = $profile;
 
             return $profile;
+        });
+        $repository->method('getById')->willReturnCallback(function (int $id): ProfileInterface {
+            foreach ($this->stored as $profile) {
+                if ($profile->getProfileId() === $id) {
+                    return $profile;
+                }
+            }
+            throw new NoSuchEntityException(__('no'));
         });
         $factory = $this->createMock(ProfileInterfaceFactory::class);
         $factory->method('create')->willReturnCallback(static fn (): ProfileInterface => new ProfileStub());
@@ -152,5 +164,33 @@ class ProfileJsonTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('not an OpenImport profile export');
         $json->prepare('[1, 2]');
+    }
+
+    public function testJobChainsTravelByName(): void
+    {
+        $this->stored['Stock report'] = new ProfileStub(['profile_id' => 2, 'name' => 'Stock report', 'entity' => 'catalog_product']);
+        $json = $this->json();
+        $nightly = new ProfileStub(['profile_id' => 1, 'name' => 'Nightly', 'entity' => 'catalog_product',
+            'then_profile_id' => 2, 'then_when' => 'always']);
+        $array = $json->toArray($nightly);
+        self::assertSame(['Stock report', 'always'], [$array['then_profile'], $array['then_when']]);
+        self::assertSame('', $json->toArray(new ProfileStub(['name' => 'Alone', 'entity' => 'customer']))['then_profile']);
+
+        // Two new profiles of one file linked to each other and to a stored one; an unknown name is a problem.
+        $prepared = $json->prepare(json_encode(['openimport' => 1, 'profiles' => [
+            ['name' => 'First', 'entity' => 'catalog_product', 'then_profile' => 'Second'],
+            ['name' => 'Second', 'entity' => 'catalog_product', 'then_profile' => 'Stock report', 'then_when' => 'always'],
+        ]]));
+        self::assertNull($prepared[0][0]->getThenProfileId(), 'linked after the save');
+        self::assertSame(2, $prepared[1][0]->getThenProfileId());
+        self::assertSame('always', $prepared[1][0]->getThenWhen());
+        $json->save($prepared);
+        self::assertSame($this->stored['Second']->getProfileId(), $this->stored['First']->getThenProfileId());
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Lonely: there is no profile named "Nobody" to run next.');
+        $json->prepare(json_encode(['openimport' => 1, 'profiles' => [
+            ['name' => 'Lonely', 'entity' => 'catalog_product', 'then_profile' => 'Nobody'],
+        ]]));
     }
 }

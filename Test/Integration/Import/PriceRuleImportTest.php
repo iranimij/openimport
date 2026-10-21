@@ -199,7 +199,13 @@ class PriceRuleImportTest extends TestCase
             ->addProduct($product, 3);
         $quote->setCouponCode($code)->collectTotals();
         self::assertSame($code, $quote->getCouponCode(), 'the coupon is accepted');
-        self::assertSame(27.0, (float) $quote->getSubtotalWithDiscount(), '30 with 10 % off');
+        $address = $quote->getShippingAddress();
+        self::assertContains(
+            (string) $ten->getId(),
+            explode(',', (string) ($quote->getAppliedRuleIds() ?: $address->getAppliedRuleIds())),
+            'the rule applied; discount ' . $address->getDiscountAmount() . ', subtotal ' . $address->getSubtotal()
+        );
+        self::assertSame(-3.0, (float) $address->getDiscountAmount(), '30 with 10 % off');
 
         // Update by name: the discount changes, everything else stays; the export round trip imports as it is.
         $update = $this->file("name;discount_amount\n{$tag} ten;15\n");

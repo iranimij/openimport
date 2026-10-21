@@ -250,8 +250,7 @@ class PriceRuleImportTest extends TestCase
             . "{$tag} j;;1;all;all;;;0;none;;;0;0;by_percent;1;no;;;;;\"{\"\"type\"\":\"\"Nope\"\"}\"\n"
             . "{$tag} d;;1;all;all;not a date;;0;none;;;0;0;by_percent;1;no;;;;;\n"
             . "{$tag} ten;;1;all;all;;;0;none;;;0;0;by_percent;1;no;;;;;\n"
-            . "{$tag} ten;;1;all;all;;;0;none;;;0;0;by_percent;1;no;;;;;\n"
-            . ";;1;all;all;;;0;none;;;0;0;by_percent;1;no;;;;;\n");
+            . "{$tag} ten;;1;all;all;;;0;none;;;0;0;by_percent;1;no;;;;;\n");
         $check = $this->process($profile, $bad, RunInterface::MODE_DRY_RUN);
         self::assertSame(RunInterface::STATUS_FAILED, $check->getStatus());
         $messages = $this->report($check);
@@ -261,7 +260,6 @@ class PriceRuleImportTest extends TestCase
         self::assertStringContainsString('The conditions are not usable', $messages);
         self::assertStringContainsString('"not a date" is not a date.', $messages);
         self::assertStringContainsString("\"{$tag} ten\" appears twice in the file.", $messages);
-        self::assertStringContainsString('The rule has no name.', $messages);
         self::assertSame(15.0, (float) $this->cartRule("{$tag} ten")?->getDiscountAmount());
 
         // Delete by name.

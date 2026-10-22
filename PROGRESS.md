@@ -125,11 +125,10 @@ Next: **1.6 · Automation and operations** (plan page 15 §3): 1 job chains, 2 t
 4 reindex after a run, 5 parallel workers, 6 undo, 7 close. Slice 1 job chains merged (#72). Each slice: README,
 CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
 
-**Browser review 4** (Notion page 17, 2026-10-22): the fixes for released code go out as **1.5.2** from
-`release/1.5` (#77: grid search, picture columns, run counts, CR files, extra cells, empty files, overlong lines,
-apostrophe removed on import, JSON import keeps new profiles off, decimal stock, core messages, picture paths,
-order countries, run file permission). The 1.6-only fixes (mass action with triggers, `on_place` true, step 6
-summary, chain notes, run links) are on `fix/1.6-review4`. Then 1.6 slice 3 is paused until Iman says go.
+**Browser review 4** (Notion page 17, 2026-10-22): every finding fixed and re-tested in Chrome. Released code:
+**1.5.2** (#77) and **1.5.3** (#80, a core-message fix the re-test found), both from `release/1.5` and merged back
+into main (#79, #78). 1.6-only fixes (mass action with triggers, `on_place` true, step 6 summary, chain notes, run
+links) in #78. 1.6 stays paused after slice 2 until Iman says go; next is slice 3 webhook/Slack (15 · Plan §3.1).
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.

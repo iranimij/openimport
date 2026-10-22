@@ -18,7 +18,8 @@ Fixes from the third hands-on browser review of 1.5.0 (Notion "16 · Browser rev
 - Orders: an order without shipping columns gets the billing address as its shipping address, as documented.
   Without it Magento's admin order view failed with "An error has happened during application run".
 - Profile form: the "Order numbers" option (keep the file's numbers or generate new ones) was missing for order
-  imports. A select without a default value no longer disappears from the form.
+  imports. A select without a default value no longer disappears from the form, and every field of a step has its
+  own position (fields sharing one could swap places).
 - Dry run: a record spread over several lines (an order with its items) counts once, and records the importer
   refuses (an invalid e-mail, an unknown product) are listed under the errors only, no longer also as "New".
 - Profiles grid: the "Source / destination" filter also finds exports by destination ("Export to: E-mail"…).

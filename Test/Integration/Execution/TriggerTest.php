@@ -38,12 +38,17 @@ use PHPUnit\Framework\TestCase;
 #[AppIsolation(true)]
 class TriggerTest extends TestCase
 {
-    /** @var int[] profiles this test made, removed afterwards so they never run after other tests' saves */
-    private array $made = [];
+    /**
+     * Profiles this test made, removed afterwards so they never run after other tests' saves. Nullable: Magento's
+     * test framework sets the properties of a test case to null once its tests are done.
+     *
+     * @var int[]|null
+     */
+    private ?array $made = [];
 
     protected function tearDown(): void
     {
-        if ($this->made === []) {
+        if (empty($this->made)) {
             return;
         }
         $connection = Bootstrap::getObjectManager()->get(ResourceConnection::class)->getConnection();

@@ -246,6 +246,22 @@ class SmallEntitiesImportTest extends TestCase
         self::assertStringContainsString('rating Quality has no value 9', $messages);
         self::assertStringContainsString('needs a nickname, a title and a text', $messages);
 
+        // A review saved for store 0 alone (as before 1.5.1) is shown nowhere: it exports without store views, and
+        // a file with "all" repairs it.
+        $resource = Bootstrap::getObjectManager()->get(ResourceConnection::class);
+        $benId = (int) Bootstrap::getObjectManager()->get(ReviewSource::class)->byKey(1, "Ben {$tag}", 'Meh')['review_id'];
+        $resource->getConnection()->delete(
+            $resource->getTableName('review_store'),
+            ['review_id = ?' => $benId, 'store_id <> ?' => 0]
+        );
+        self::assertSame('', Bootstrap::getObjectManager()->get(ReviewSource::class)->find("simple|Ben {$tag}|Meh")['store_codes']);
+        $repair = $this->process(
+            $this->profile(EntityRegistry::REVIEW, ['product_sku', 'nickname', 'title', 'store_codes']),
+            $this->file("product_sku;nickname;title;store_codes\nsimple;Ben {$tag};Meh;all\n")
+        );
+        self::assertSame(1, $repair->getCount('updated'), $this->report($repair));
+        self::assertSame('all', Bootstrap::getObjectManager()->get(ReviewSource::class)->find("simple|Ben {$tag}|Meh")['store_codes']);
+
         // A rating that the review's store views do not show is imported, with a note on the row.
         $hidden = $this->process(
             $this->profile(EntityRegistry::REVIEW, explode(';', trim($header))),

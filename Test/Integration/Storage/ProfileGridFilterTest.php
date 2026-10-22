@@ -13,6 +13,8 @@ use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Model\Config\Source\SourceOrDestinationFilter;
 use Iranimij\OpenImport\Model\ResourceModel\Profile\Grid\Collection;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\TestFramework\Fixture\AppArea;
 use Magento\TestFramework\Fixture\DbIsolation;
 use Magento\TestFramework\Helper\Bootstrap;
@@ -46,9 +48,15 @@ class ProfileGridFilterTest extends TestCase
      */
     private function names(string $filter, string $tag): array
     {
-        $collection = Bootstrap::getObjectManager()->create(Collection::class);
-        $collection->addFieldToFilter('source_type', ['eq' => $filter]);
+        $objects = Bootstrap::getObjectManager();
+        $collection = $objects->create(Collection::class);
         $collection->addFieldToFilter('main_table.name', ['like' => $tag . '%']);
+        // Through the grid's filter pool, as the admin grid does: it joins a filter's conditions with OR.
+        $criteria = $objects->create(SearchCriteriaBuilder::class)->addFilter(
+            $objects->create(FilterBuilder::class)->setField('source_type')->setConditionType('eq')
+                ->setValue($filter)->create()
+        )->create();
+        $objects->get('Iranimij\OpenImport\Ui\DataProvider\GridFilterPool')->applyFilters($collection, $criteria);
         $names = array_map(static fn ($item): string => (string) $item->getData('name'), $collection->getItems());
         sort($names);
 
@@ -69,6 +77,8 @@ class ProfileGridFilterTest extends TestCase
             $this->names(SourceOrDestinationFilter::EXPORT_PREFIX . 'download', $tag)
         );
         self::assertSame([], $this->names(SourceOrDestinationFilter::EXPORT_PREFIX . 'email', $tag));
+        self::assertSame([], $this->names(SourceOrDestinationFilter::EXPORT_PREFIX . 'folder', $tag));
+        self::assertSame([], $this->names(SourceOrDestinationFilter::IMPORT_PREFIX . 'sftp', $tag));
 
         $values = array_column(
             Bootstrap::getObjectManager()->get(SourceOrDestinationFilter::class)->toOptionArray(),

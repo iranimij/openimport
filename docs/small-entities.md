@@ -12,7 +12,7 @@ Reviews with ratings, matched by **product SKU, nickname and title** (or `review
 | `product_sku` | yes | The reviewed product. |
 | `nickname`, `title`, `detail` | new reviews | Author name, summary, text. |
 | `status` | no | `approved`, `pending` or `not approved`; new reviews: approved. |
-| `store_codes` | no | Store views the review is shown in, comma-separated, or `all` (every store view); new reviews: all. |
+| `store_codes` | no | Store views the review is shown in, comma-separated, or `all` (every store view); new reviews: all. The export leaves it empty for a review shown in no store view (reviews imported with 1.5.0): import `all` for those to show them. |
 | `created_at` | no | The date (`2025-02-03 10:00:00`); empty: now. |
 | `customer_email` | no | Links the customer with that e-mail on the store view's website (the review stays a guest review when empty). |
 | `ratings` | no | `Quality:4, Value:5` — the shop's ratings (Stores › Rating) by name with a value from 1 to 5. Replaces the review's votes. A rating that is switched off or not shown in the review's store views (Rating Visibility) is imported with a note on the row: its stars only appear once the rating is shown there. |

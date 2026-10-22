@@ -126,6 +126,17 @@ define([
                     : this.value('schedule_preset') === 'daily'
                         ? $t('Every day at %1').replace('%1', this.value('schedule_time') || '02:00')
                         : this.chosen('schedule_preset'),
+                shortEvents = {
+                    'product_saved': $t('product saved'),
+                    'stock_changed': $t('stock changed'),
+                    'customer_registered': $t('customer registered'),
+                    'customer_saved': $t('customer saved'),
+                    'order_placed': $t('order placed'),
+                    'order_status_changed': $t('order status changed')
+                },
+                events = _.map(_.toArray(this.value('triggers.events') || []), function (event) {
+                    return shortEvents[event] || event;
+                }),
                 parts;
 
             parts = {
@@ -145,8 +156,13 @@ define([
                     ? [filters ? $t('%1 filters').replace('%1', filters) : $t('no filters')]
                     : [this.chosen('behavior'), this.chosen('on_error'),
                         filters ? $t('%1 filters').replace('%1', filters) : ''],
-                when: [schedule || $t('Manual only'), schedule && this.value('schedule_preset')
-                    ? (String(this.value('is_active')) === '1' ? $t('switched on') : $t('switched off')) : '']
+                when: [
+                    schedule || (events.length ? '' : $t('Manual only')),
+                    events.length ? $t(schedule ? 'after: %1' : 'After: %1').replace('%1', events.join(', ')) : '',
+                    (schedule && this.value('schedule_preset')) || events.length
+                        ? (String(this.value('is_active')) === '1' ? $t('switched on') : $t('switched off')) : '',
+                    this.value('then_profile_id') ? $t('then: %1').replace('%1', this.chosen('then_profile_id')) : ''
+                ]
             };
 
             return _.mapObject(parts, function (list) {

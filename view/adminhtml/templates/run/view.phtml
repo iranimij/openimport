@@ -47,6 +47,10 @@ $run = $view->run();
                 · <?= $escaper->escapeHtml(__('file %1', (string) $run->getOptions()['original_name'])) ?>
             <?php endif; ?>
             · <?= $escaper->escapeHtml(__('started by %1', $view->startedBy())) ?>
+            <?php if ($run->getParentRunId() !== null): ?>
+                <?= $escaper->escapeHtml(__('after')) ?>
+                <a href="<?= $escaper->escapeUrl($view->runUrl((int) $run->getParentRunId())) ?>"><?= $escaper->escapeHtml(__('run #%1', (int) $run->getParentRunId())) ?></a>
+            <?php endif; ?>
             <?php if ($view->duration() !== ''): ?>
                 · <?= $escaper->escapeHtml(__('took %1', $view->duration())) ?>
             <?php endif; ?>
@@ -66,7 +70,7 @@ $run = $view->run();
             <?php $failed = in_array($run->getStatus(), ['failed', 'needs_confirmation'], true); ?>
             <div class="message <?= $escaper->escapeHtmlAttr($failed ? 'message-warning' : 'message-notice') ?>">
                 <?php foreach ($lines as $line): ?>
-                    <?= $escaper->escapeHtml($line) ?><br/>
+                    <?= /* @noEscape */ $view->linkRuns($escaper->escapeHtml($line), $escaper) ?><br/>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>

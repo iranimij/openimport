@@ -355,4 +355,31 @@ class AdminTest extends AbstractBackendController
         $this->post('backend/openimport/run/confirm', ['id' => $run->getRunId(), 'confirmation' => 'remove']);
         $this->assertSessionMessages(self::containsEqual('Type DELETE to confirm.'), MessageInterface::TYPE_ERROR);
     }
+
+    public function testMassActionSwitchesOnProfilesThatRunAfterEvents(): void
+    {
+        $repository = $this->_objectManager->get(ProfileRepositoryInterface::class);
+        $tag = bin2hex(random_bytes(3));
+        $events = $repository->save($this->_objectManager->get(ProfileInterfaceFactory::class)->create()
+            ->setName('Mass events ' . $tag)->setDirection(ProfileInterface::DIRECTION_EXPORT)
+            ->setEntity('catalog_product')->setFormat('csv')
+            ->setExportOptions(['destination' => 'folder', 'path' => 'mass-' . $tag])
+            ->setTriggers([ProfileInterface::TRIGGER_EVENTS => ['product_saved']]));
+        $manual = $repository->save($this->_objectManager->get(ProfileInterfaceFactory::class)->create()
+            ->setName('Mass manual ' . $tag)->setDirection(ProfileInterface::DIRECTION_EXPORT)
+            ->setEntity('catalog_product')->setFormat('csv')
+            ->setExportOptions(['destination' => 'folder', 'path' => 'mass-' . $tag]));
+
+        $this->post('backend/openimport/profile/massSchedule', [
+            'on' => '1',
+            'namespace' => 'openimport_profile_listing',
+            'selected' => [(int) $events->getProfileId(), (int) $manual->getProfileId()],
+        ]);
+        $this->assertSessionMessages(
+            self::containsEqual('Automatic runs switched on for 1 profile(s).'),
+            MessageInterface::TYPE_SUCCESS
+        );
+        self::assertTrue($repository->getById((int) $events->getProfileId())->isActive());
+        self::assertFalse($repository->getById((int) $manual->getProfileId())->isActive());
+    }
 }

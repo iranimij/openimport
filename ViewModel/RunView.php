@@ -284,6 +284,32 @@ class RunView implements ArgumentInterface
     }
 
     /**
+     * Turns "queued as run 48" in an escaped message line into a link to that run.
+     *
+     * @param string $escapedLine the line, already HTML-escaped
+     * @param Escaper $escaper
+     * @return string
+     */
+    public function linkRuns(string $escapedLine, Escaper $escaper): string
+    {
+        return (string) preg_replace_callback(
+            '/queued as run (\d+)/',
+            fn (array $match): string => 'queued as <a href="'
+                . $escaper->escapeUrl($this->runUrl((int) $match[1])) . '">run ' . $match[1] . '</a>',
+            $escapedLine
+        );
+    }
+
+    /**
+     * @param int $runId
+     * @return string
+     */
+    public function runUrl(int $runId): string
+    {
+        return $this->urlBuilder->getUrl('openimport/run/view', ['id' => $runId]);
+    }
+
+    /**
      * "Run again" for a finished run whose profile still exists: the same mode, a fresh read of the source.
      *
      * @return bool

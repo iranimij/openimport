@@ -79,7 +79,11 @@ instead of) its schedule. Cron runs it within a minute.
 - A failing trigger never breaks the save that raised it; the error goes to `var/log/openimport.log`.
 
 Order exports from 1.1 with **Also run after every order** keep working: the switch acts like the trigger *An order
-is placed*.
+is placed*, also when it was saved as `true` or `1` by a JSON file or the API. The form shows the old switch only
+while it is on; switch it off and choose *An order is placed* instead.
+
+The step 6 header sums it up: *Manual only · after: product saved · switched on · then: Stock update*. The mass
+actions of the profile grid switch automatic runs (schedule and triggers) on and off.
 
 ## Job chains
 
@@ -94,7 +98,10 @@ profile has the schedule, every next one has none.
   as always, which also holds the rest of the chain until an admin confirms it.
 - Saving refuses a chain that comes back to a profile (*The chain would loop: A → B → A*), a profile that runs
   itself, a next profile that reads uploaded files (nothing would be there to read), and more than 20 links.
-- The run page says what happened next: *Then: "Stock update" queued as run 512*, or why nothing started.
+- The run page says what happened next: *Then: "Stock update" queued as run 512* (a link to that run), or why
+  nothing started; the next run's page links back to the run that started it.
+- Deleting a profile that another profile runs next asks with the names of those profiles; their chain stops there.
+- The *Then run* list leaves out imports that read uploaded files.
 - Profiles exported as JSON carry the chain by profile name; an import links the profiles of the file to each
   other once they are saved.
 

@@ -35,7 +35,7 @@ calls the endpoint, so the import starts at once instead of at the next schedule
 
 ## Export right after an order is placed
 
-Order export profiles have the setting **Also run after every order**. When an order is placed (storefront, admin or
+Order export profiles from before 1.6 have the setting **Also run after every order** (since 1.6 the form shows it only while it is on; new profiles use step 6 › *Also run when* › *An order is placed*). When an order is placed (storefront, admin or
 API), the profile is queued; cron runs it within a minute. Ten orders in that minute make one run, not ten. Combine
 it with *Which orders: Only orders not exported before by this profile* so every file holds just the new orders.
 

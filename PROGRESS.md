@@ -96,7 +96,7 @@ parallelism only across runs and for exports).
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | **released 1.4.0** (#53, #54, #58–#60, #62, #63; release PR); E2E dev-env #13–#16 |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | **released 1.5.0** (#65, #67–#70, release PR); E2E dev-env #17 |
-| 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | in progress: 1 done, 2 PR open |
+| 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | paused after slice 2: 1 done (#72), 2 done (#76) |
 
 Rule for every slice: one PR, pushed at once; this file updated after each slice (done, exact next step, open
 questions, failing/skipped tests, CI link); unit ≥ 85 % on new namespaces, integration on all seven pairs, oracle or
@@ -124,6 +124,11 @@ switch) follow on main after the merge back.
 Next: **1.6 · Automation and operations** (plan page 15 §3): 1 job chains, 2 triggers, 3 webhook/Slack,
 4 reindex after a run, 5 parallel workers, 6 undo, 7 close. Slice 1 job chains merged (#72). Each slice: README,
 CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
+
+**Browser review 4** (Notion page 17, 2026-10-22): every finding fixed and re-tested in Chrome. Released code:
+**1.5.2** (#77) and **1.5.3** (#80, a core-message fix the re-test found), both from `release/1.5` and merged back
+into main (#79, #78). 1.6-only fixes (mass action with triggers, `on_place` true, step 6 summary, chain notes, run
+links) in #78. 1.6 stays paused after slice 2 until Iman says go; next is slice 3 webhook/Slack (15 · Plan §3.1).
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.

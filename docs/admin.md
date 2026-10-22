@@ -9,9 +9,9 @@ The profile list shows each profile's direction, what it imports or exports, its
 Above it, a status line says how the last 24 hours went (failed runs link to the runs), what is waiting, and whether
 the cron runs. A click on a row opens the profile. Row actions: *Edit*, *Dry run*, *Run now* (the dialog names the
 file it imports and how the last dry run went), *Duplicate* (the copy starts with its schedule off) and *Delete*
-(runs and error reports are kept). Mass actions: switch schedules on or off, delete. The search box finds profiles
-by name (the runs grid: by profile name). **Import profiles from JSON** takes a file from *Download as JSON* or
-`openimport:profile:export`; new profiles from a file start switched off.
+(runs and error reports are kept). Mass actions: switch automatic runs (schedule and triggers) on or off, delete.
+The search box finds profiles by name (the runs grid: by profile name). **Import profiles from JSON** takes a file
+from *Download as JSON* or `openimport:profile:export`; new profiles from a file start switched off.
 
 The form has a step navigation at the top; each step header says what the step holds, and its **?** opens the
 matching page of this documentation. Fields show only where they matter (an export has no import rules, a CSV no

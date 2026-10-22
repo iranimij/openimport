@@ -107,7 +107,7 @@ class TriggerQueue
         if ($event === TriggerEvents::ORDER_PLACED) {
             $where .= ' OR (' . $connection->quoteInto('direction = ?', ProfileInterface::DIRECTION_EXPORT)
                 . ' AND ' . $connection->quoteInto('entity = ?', EntityRegistry::ORDER)
-                . ' AND ' . $connection->quoteInto('export_options LIKE ?', '%"on_place":"1"%') . ')';
+                . ' AND ' . $connection->quoteInto('export_options LIKE ?', '%"on_place"%') . ')';
         }
         $rows = $connection->fetchAll(
             $connection->select()
@@ -121,7 +121,12 @@ class TriggerQueue
             $events = array_map('strval', (array) ($triggers[ProfileInterface::TRIGGER_EVENTS] ?? []));
             $wanted = (int) $row['is_active'] === 1 && in_array($event, $events, true);
             if (!$wanted && $event === TriggerEvents::ORDER_PLACED) {
-                $wanted = (string) ($this->json->decode($row['export_options'])['order']['on_place'] ?? '0') === '1';
+                // Saved by the form as "1"; by JSON files, the CLI or the API also as 1 or true.
+                $wanted = in_array(
+                    $this->json->decode($row['export_options'])['order']['on_place'] ?? null,
+                    ['1', 1, true, 'true'],
+                    true
+                );
             }
             if ($wanted && $event === TriggerEvents::ORDER_STATUS_CHANGED) {
                 $statuses = array_map('strval', (array) ($triggers[ProfileInterface::TRIGGER_ORDER_STATUSES] ?? []));

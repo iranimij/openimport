@@ -874,9 +874,9 @@ class ImportRunner
         if (!$result->imported) {
             return $this->outcome(
                 RunInterface::STATUS_FAILED,
-                $this->importers->isOwn($entity->importEntity())
+                ($this->importers->isOwn($entity->importEntity())
                     ? ($result->valid ? 'The rows were not imported.' : 'The rows have errors. Nothing was imported.')
-                    : ($result->valid ? 'Magento did not import the rows.' : 'Magento refused the rows. Nothing was imported.')
+                    : ($result->valid ? 'Magento did not import the rows.' : 'Magento refused the rows. Nothing was imported.'))
                 . $this->firstProblem($result->valid),
                 $result->historyId
             );

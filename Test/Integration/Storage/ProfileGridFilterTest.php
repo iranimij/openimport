@@ -12,7 +12,6 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Model\Config\Source\SourceOrDestinationFilter;
-use Iranimij\OpenImport\Model\ResourceModel\Profile\Grid\Collection;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\TestFramework\Fixture\AppArea;
@@ -48,19 +47,61 @@ class ProfileGridFilterTest extends TestCase
      */
     private function names(string $filter, string $tag): array
     {
+        return $this->search([
+            ['name', 'like', $tag . '%'],
+            ['source_type', 'eq', $filter],
+        ]);
+    }
+
+    /**
+     * Through the grid's own Reporting object and filter pool, as the admin grid does (the pool joins a filter's
+     * conditions with OR, the keyword search needs OpenImport's applier).
+     *
+     * @param array<int, array{0: string, 1: string, 2: string}> $filters field, condition type, value
+     * @return string[]
+     */
+    private function search(array $filters, string $request = 'openimport_profile_listing_data_source'): array
+    {
         $objects = Bootstrap::getObjectManager();
-        $collection = $objects->create(Collection::class);
-        $collection->addFieldToFilter('main_table.name', ['like' => $tag . '%']);
-        // Through the grid's filter pool, as the admin grid does: it joins a filter's conditions with OR.
-        $criteria = $objects->create(SearchCriteriaBuilder::class)->addFilter(
-            $objects->create(FilterBuilder::class)->setField('source_type')->setConditionType('eq')
-                ->setValue($filter)->create()
-        )->create();
-        $objects->get('Iranimij\OpenImport\Ui\DataProvider\GridFilterPool')->applyFilters($collection, $criteria);
-        $names = array_map(static fn ($item): string => (string) $item->getData('name'), $collection->getItems());
+        $builder = $objects->create(SearchCriteriaBuilder::class);
+        foreach ($filters as [$field, $type, $value]) {
+            $builder->addFilter(
+                $objects->create(FilterBuilder::class)->setField($field)->setConditionType($type)->setValue($value)
+                    ->create()
+            );
+        }
+        $criteria = $builder->create();
+        $criteria->setRequestName($request);
+        $result = $objects->get('Iranimij\OpenImport\Ui\DataProvider\GridReporting')->search($criteria);
+        $names = array_map(
+            static fn ($item): string => (string) ($item->getData('name') ?? $item->getData('profile_name')),
+            $result->getItems()
+        );
         sort($names);
 
         return $names;
+    }
+
+    public function testKeywordSearchFindsProfilesByName(): void
+    {
+        $tag = 'Kw' . bin2hex(random_bytes(3));
+        $this->profile($tag . ' alpha', ProfileInterface::DIRECTION_IMPORT);
+        $this->profile($tag . ' beta', ProfileInterface::DIRECTION_EXPORT, ['destination' => 'download']);
+        $this->profile('Other ' . bin2hex(random_bytes(3)), ProfileInterface::DIRECTION_IMPORT);
+
+        self::assertSame([$tag . ' alpha', $tag . ' beta'], $this->search([['fulltext', 'fulltext', $tag]]));
+        self::assertSame([$tag . ' beta'], $this->search([['fulltext', 'fulltext', $tag . ' be']]));
+        // The data provider the listing XML names uses that Reporting object.
+        $provider = Bootstrap::getObjectManager()->create('Iranimij\OpenImport\Ui\DataProvider\GridDataProvider', [
+            'name' => 'openimport_profile_listing_data_source',
+            'primaryFieldName' => 'profile_id',
+            'requestFieldName' => 'id',
+        ]);
+        $provider->addFilter(
+            Bootstrap::getObjectManager()->create(FilterBuilder::class)->setField('fulltext')
+                ->setConditionType('fulltext')->setValue($tag)->create()
+        );
+        self::assertSame(2, (int) $provider->getData()['totalRecords']);
     }
 
     public function testImportsBySourceExportsByDestination(): void

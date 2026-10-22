@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Reader\OdsReader;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
+use Iranimij\OpenImport\Model\Reader\ReaderInterface;
 use Iranimij\OpenImport\Model\Reader\XlsxReader;
 use Iranimij\OpenImport\Model\Storage\TempFolder;
 use Iranimij\OpenImport\Model\Xslt\XsltStep;
@@ -79,26 +80,39 @@ class FileSample
      * @param array<string, mixed> $options
      * @param int $rows
      * @return array{format: string, detected: array<string, string>, columns: string[],
-     *               rows: array<int, array<string, string>>, sheets: string[]}
+     *               rows: array<int, array<string, string>>, sheets: string[], warnings: string[], empty: bool}
      */
     private function sample(string $file, string $name, string $format, array $options, int $rows): array
     {
         $format = $format === '' || $format === 'auto' ? $this->readers->detect($file, $name) : $format;
         $reader = $this->readers->create($file, $format, $this->readers->options($options));
         $sample = [];
+        $warnings = [];
         foreach ($reader->rows() as $line => $row) {
+            if (isset($row[ReaderInterface::EXTRA_CELLS])) {
+                // phpcs:ignore Generic.Files.LineLength.TooLong
+                $warnings[] = (string) __(
+                    'Row %1 has more cells than the first row has columns (%2). A value probably contains the delimiter without quotes; the run reports this row as an error.',
+                    $line,
+                    $row[ReaderInterface::EXTRA_CELLS]
+                );
+                unset($row[ReaderInterface::EXTRA_CELLS]);
+            }
             $sample[] = ['__row' => (string) $line] + $row;
             if (count($sample) >= $rows) {
                 break;
             }
         }
+        $columns = $reader->columns();
 
         return [
             'format' => $format,
             'detected' => $reader->detected(),
-            'columns' => $reader->columns(),
+            'columns' => $columns,
             'rows' => $sample,
             'sheets' => $reader instanceof XlsxReader || $reader instanceof OdsReader ? $reader->sheetNames() : [],
+            'warnings' => $warnings,
+            'empty' => $columns === [],
         ];
     }
 }

@@ -41,11 +41,22 @@ class ConnectionOptions implements OptionSourceInterface
             'label' => __('Enter the login here'),
             'showWhen' => [$this->typePath => ['not' => $this->types->connectionOnly()]],
         ]];
+        $have = [];
         foreach ($this->connections->getAll() as $connection) {
+            $have[$connection->getType()] = true;
             $options[] = [
                 'value' => (string) $connection->getConnectionId(),
                 'label' => $connection->getName(),
                 'showWhen' => [$this->typePath => [$connection->getType()]],
+            ];
+        }
+        // Kinds that only work with a saved connection, and none is saved yet: say where to add one.
+        $missing = array_values(array_diff($this->types->connectionOnly(), array_keys($have)));
+        if ($missing !== []) {
+            $options[] = [
+                'value' => '',
+                'label' => __('None saved yet: add one under System › Data Transfer › OpenImport Connections'),
+                'showWhen' => [$this->typePath => $missing],
             ];
         }
 

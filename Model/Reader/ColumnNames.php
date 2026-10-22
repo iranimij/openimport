@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Model\Reader;
 
+use Iranimij\OpenImport\Model\Value\FormulaGuard;
+
 /**
  * Turns raw header cells into usable, unique column names.
  */
@@ -70,7 +72,15 @@ class ColumnNames
     {
         $row = [];
         foreach ($names as $index => $name) {
-            $row[$name] = (string) ($cells[$index] ?? '');
+            $row[$name] = FormulaGuard::unprotect((string) ($cells[$index] ?? ''));
+        }
+        // Filled cells right of the last column: usually a value with an unquoted delimiter, which shifts the row.
+        $extra = array_filter(
+            array_slice($cells, count($names)),
+            static fn ($cell): bool => $cell !== null && trim((string) $cell) !== ''
+        );
+        if ($extra !== []) {
+            $row[ReaderInterface::EXTRA_CELLS] = implode(' | ', array_map('strval', $extra));
         }
 
         return $row;

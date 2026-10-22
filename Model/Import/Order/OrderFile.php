@@ -115,9 +115,10 @@ class OrderFile
      * @param array<string, array<string, string>> $statuses
      * @param array<string, int> $groups
      * @param RowError[] $errors
+     * @param array<string, true> $countries upper-case country codes; empty: not checked
      * @return bool
      */
-    public function check(array &$order, array $statuses, array $groups, array &$errors): bool
+    public function check(array &$order, array $statuses, array $groups, array &$errors, array $countries = []): bool
     {
         $before = count($errors);
         $row = (int) $order['row'];
@@ -152,6 +153,15 @@ class OrderFile
         foreach (['firstname', 'lastname', 'street', 'city', 'country_id'] as $column) {
             if ($order['billing'][$column] === '') {
                 $error('billing_' . $column, sprintf('The billing address has no %s.', str_replace('_id', '', $column)));
+            }
+        }
+        foreach (['billing', 'shipping'] as $type) {
+            $country = (string) ($order[$type]['country_id'] ?? '');
+            if ($countries !== [] && $country !== '' && !isset($countries[strtoupper($country)])) {
+                $error($type . '_country_id', sprintf(
+                    '"%s" is not a country code Magento knows; use two letters such as DE, AT or US.',
+                    $country
+                ));
             }
         }
         if ($order['items'] === []) {

@@ -41,7 +41,9 @@ class StockChangeStepTest extends TestCase
         self::assertTrue($step->begin($this->profile('catalog_product'), 'add_update', true));
         self::assertTrue($step->begin($this->profile('stock_sources'), 'add_update', false));
         self::assertFalse($step->begin($this->profile('customer'), 'add_update', false));
-        self::assertFalse($step->begin($this->profile('catalog_product', ['import_options' => ['qty_mode' => 'set']]), 'add_update', false));
+        // Plain quantities: the step only checks decimals.
+        self::assertTrue($step->begin($this->profile('catalog_product', ['import_options' => ['qty_mode' => 'set']]), 'add_update', false));
+        self::assertSame(['sku', 'price'], $step->columns(['sku', 'price']), 'no quantity column needed then');
         self::assertFalse($step->begin($this->profile(), 'delete', false));
     }
 
@@ -80,7 +82,7 @@ class StockChangeStepTest extends TestCase
 
     public function testChangesAddToTheCurrentQuantity(): void
     {
-        $reader = new FakeQuantityReader(['a-1' => 10.0, 'a-2' => 2.0]);
+        $reader = new FakeQuantityReader(['a-1' => 10.0, 'a-2' => 2.0], [], ['a-1' => true]);
         $step = new StockChangeStep($reader, new QuantityChange());
         $step->begin($this->profile(), 'add_update', false);
         $records = [
@@ -132,5 +134,25 @@ class StockChangeStepTest extends TestCase
         $step->begin($this->profile(), 'add_update', false);
         $step->apply([new StepRecord(2, 'A', [['sku' => 'A', 'qty' => '']])], $this->noTick());
         self::assertSame('', $step->summary());
+    }
+
+    public function testDecimalsOnlyForProductsThatUseThem(): void
+    {
+        $reader = new FakeQuantityReader(['whole' => 12.0, 'kg' => 1.0], [], ['whole' => false, 'kg' => true]);
+        foreach (['add' => ['+1.5', '+2'], 'set' => ['13.5', '14.0000']] as $mode => [$fraction, $whole]) {
+            $step = new StockChangeStep($reader, new QuantityChange());
+            $step->begin($this->profile('openimport_stock_price', ['import_options' => ['qty_mode' => $mode]]), 'add_update', false);
+            $records = [
+                new StepRecord(2, 'WHOLE', [['sku' => 'WHOLE', 'qty' => $fraction]]),
+                new StepRecord(3, 'KG', [['sku' => 'KG', 'qty' => $fraction]]),
+                new StepRecord(4, 'NEW', [['sku' => 'NEW', 'qty' => $fraction, 'is_qty_decimal' => '1']]),
+                new StepRecord(5, 'WHOLE2', [['sku' => 'WHOLE', 'qty' => $whole]]),
+            ];
+            $step->apply($records, $this->noTick());
+            self::assertStringContainsString('WHOLE is sold in whole pieces: "' . $fraction . '" has decimals', (string) $records[0]->error(), $mode);
+            self::assertEmpty($records[1]->error(), $mode);
+            self::assertEmpty($records[2]->error(), $mode . ': the row itself switches decimals on');
+            self::assertEmpty($records[3]->error(), $mode);
+        }
     }
 }

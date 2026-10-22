@@ -29,4 +29,17 @@ class CoreMessagesTest extends TestCase
         self::assertSame(1, $errors[1]->row);
         self::assertSame("Value for 'weight' attribute contains incorrect value", $errors[2]->message);
     }
+
+    public function testAttributeAndPictureMessagesNameTheColumn(): void
+    {
+        $errors = (new CoreMessages())->explain([
+            new RowError(2, 'invalidAttributeType', "Value for 'name' attribute contains incorrect value", null, true),
+            new RowError(3, 'invalidMediaUrlPath', 'Wrong URL/path used for attribute image', null, true),
+        ]);
+
+        self::assertSame('name', $errors[0]->column);
+        self::assertStringStartsWith('Magento does not accept this value for name', $errors[0]->message);
+        self::assertSame('image', $errors[1]->column);
+        self::assertStringStartsWith('The picture in image is neither a web address', $errors[1]->message);
+    }
 }

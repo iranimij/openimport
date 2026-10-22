@@ -75,6 +75,9 @@ class ProfilesImportCommand extends Command
         }
         [$created, $updated] = $this->json->save($prepared);
         $output->writeln(sprintf('%d profile(s) created, %d updated.', $created, $updated));
+        if ($created > 0) {
+            $output->writeln('New profiles are switched off: switch them on after a dry run you are happy with.');
+        }
 
         return Command::SUCCESS;
     }

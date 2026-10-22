@@ -62,7 +62,10 @@ class RestClient
     {
         $base = rtrim(trim((string) ($config['base_url'] ?? '')), '/');
         if (preg_match('#^https?://[^/]+#i', $base, $baseHost) !== 1) {
-            throw new PipelineException('The REST connection needs a base address such as https://api.example.com/v1.');
+            throw new PipelineException($base === '' && empty($config['connection_id'])
+                ? 'Choose a saved REST connection under "Saved connection" (add one under System › Data Transfer › '
+                    . 'OpenImport Connections).'
+                : 'The REST connection needs a base address such as https://api.example.com/v1.');
         }
         $path = trim($path);
         if (preg_match('#^https?://[^/]+#i', $path, $host) === 1) {

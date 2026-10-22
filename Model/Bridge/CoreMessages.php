@@ -47,6 +47,15 @@ class CoreMessages
     ];
 
     /**
+     * The product validator passes its formatted message as the error code ("Value for 'name' attribute contains
+     * incorrect value"): such codes are matched by their template.
+     */
+    private const FORMATTED = [
+        "/^Value for '[a-z0-9_]+' attribute contains incorrect value/" => 'invalidAttributeType',
+        '/^Wrong URL\/path used for attribute [a-z0-9_]+/' => 'invalidMediaUrlPath',
+    ];
+
+    /**
      * @param RowError[] $errors
      * @return RowError[]
      */
@@ -55,7 +64,7 @@ class CoreMessages
         $seen = [];
         $explained = [];
         foreach ($errors as $error) {
-            $plain = self::PLAIN[$error->code] ?? null;
+            $plain = self::PLAIN[$error->code] ?? self::PLAIN[$this->formattedCode($error->code)] ?? null;
             if ($plain !== null) {
                 $column = $error->column ?? ($plain[0] !== '' ? $plain[0] : $this->quotedName($error->message));
                 $error = new RowError(
@@ -75,6 +84,21 @@ class CoreMessages
         }
 
         return $explained;
+    }
+
+    /**
+     * @param string $code
+     * @return string the core code of a formatted message, "" for none
+     */
+    private function formattedCode(string $code): string
+    {
+        foreach (self::FORMATTED as $pattern => $known) {
+            if (preg_match($pattern, $code) === 1) {
+                return $known;
+            }
+        }
+
+        return '';
     }
 
     /**

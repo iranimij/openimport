@@ -42,4 +42,19 @@ class CoreMessagesTest extends TestCase
         self::assertSame('image', $errors[1]->column);
         self::assertStringStartsWith('The picture in image is neither a web address', $errors[1]->message);
     }
+
+    public function testFormattedMessagesAsCodesAreExplained(): void
+    {
+        $name = "Value for 'name' attribute contains incorrect value";
+        $picture = 'Wrong URL/path used for attribute small_image';
+        $errors = (new CoreMessages())->explain([
+            new RowError(3, $name, $name, 'name', false),
+            new RowError(4, $picture, $picture, null, false),
+        ]);
+
+        self::assertSame('name', $errors[0]->column);
+        self::assertStringStartsWith('Magento does not accept this value for name', $errors[0]->message);
+        self::assertSame('small_image', $errors[1]->column);
+        self::assertStringStartsWith('The picture in small_image is neither', $errors[1]->message);
+    }
 }

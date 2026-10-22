@@ -5,6 +5,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.5.3] - 2026-10-22
+
+### Fixed
+- Magento's "Value for 'name' attribute contains incorrect value" and "Wrong URL/path used for attribute …" are
+  explained in plain words for the column. 1.5.2 did this only when Magento sent its short error code; the product
+  import sends the formatted message instead.
+
 ## [1.5.2] - 2026-10-22
 
 Fixes from the fourth hands-on review (Notion "17 · Browser review 4").

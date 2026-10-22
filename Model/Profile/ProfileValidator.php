@@ -12,6 +12,7 @@ use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Archive\Packer;
 use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Chain\ChainLinks;
+use Iranimij\OpenImport\Model\Trigger\TriggerEvents;
 use Iranimij\OpenImport\Model\Xslt\XsltStep;
 use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
 use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
@@ -109,6 +110,7 @@ class ProfileValidator
                     . 'or set the schedule to "Manual only".';
             }
         }
+        $problems = array_merge($problems, $this->triggers($profile, $import));
         $problems = array_merge($problems, $this->chain($profile));
         $archive = (string) ($profile->getFormatOptions()['archive'] ?? Unpacker::MODE_AUTO);
         if ($import && !in_array($archive, [Unpacker::MODE_AUTO, Unpacker::MODE_NONE], true)) {
@@ -282,6 +284,41 @@ class ProfileValidator
         $pick = $text('pick');
         if ($pick !== '' && !in_array($pick, FileSelector::PICKS, true)) {
             $problems[] = sprintf('"%s" is not a way to choose the file.', $pick);
+        }
+
+        return $problems;
+    }
+
+    /**
+     * Shop events that start runs: known events only; like a schedule, a switched-on profile with triggers needs a
+     * source that changes by itself and, for an export, a destination.
+     *
+     * @param ProfileInterface $profile
+     * @param bool $import
+     * @return string[]
+     */
+    private function triggers(ProfileInterface $profile, bool $import): array
+    {
+        $events = $profile->getTriggers()[ProfileInterface::TRIGGER_EVENTS];
+        $problems = [];
+        foreach (array_diff($events, array_keys(TriggerEvents::LABELS)) as $unknown) {
+            $problems[] = sprintf(
+                '"%s" is not an event a profile can run after (%s).',
+                $unknown,
+                implode(', ', array_keys(TriggerEvents::LABELS))
+            );
+        }
+        if ($events === [] || !$profile->isActive()) {
+            return $problems;
+        }
+        if ($import && $profile->getSourceType() === 'upload') {
+            $problems[] = 'An uploaded file cannot run after shop events (it would import the same file again and '
+                . 'again): choose a server folder, web address, SFTP or FTP as the source, or remove the events '
+                . 'under "Also run when".';
+        }
+        if (!$import && ($profile->getExportOptions()['destination'] ?? 'download') === 'download') {
+            $problems[] = 'An export that runs after shop events needs a destination: choose a server folder, SFTP, '
+                . 'FTP or e-mail, or remove the events under "Also run when".';
         }
 
         return $problems;

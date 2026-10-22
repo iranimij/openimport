@@ -20,7 +20,7 @@ class RunTrigger implements OptionSourceInterface
         'schedule' => 'Schedule',
         'cli' => 'Command line',
         'api' => 'API',
-        'event' => 'Order placed',
+        'event' => 'Event',
         'chain' => 'Job chain',
     ];
 

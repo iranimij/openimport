@@ -56,7 +56,7 @@ orders to CSV, XLSX, ODS, JSON or XML, downloaded, dropped in a folder, pushed t
 | **Dry run** | Every new profile starts with one. Field-level before/after preview, counts of new, changed, unchanged and deleted records, error report with your file's line numbers. |
 | **Safety** | Runs that would delete or replace more than a threshold wait for a typed confirmation. Formula-injection guard on every CSV the module writes. |
 | **Delta** | Only rows that changed since the last run are sent to Magento (per line, per store view). |
-| **Schedules** | Cron expressions and presets, each due minute runs exactly once, catch-up after a missed window, one run per profile at a time; job chains (then run profile B, after success or always). |
+| **Schedules** | Cron expressions and presets, each due minute runs exactly once, catch-up after a missed window, one run per profile at a time; job chains (then run profile B, after success or always); triggers (run when a product, stock, customer or order changes). |
 | **Exports** | Core entities and orders (one row per order or per line, only new or changed orders), renamed and transformed columns, to CSV, XLSX, JSON, XML and nine destinations (download, folder, SFTP, FTP, S3, Google Drive or a Google Sheet, Dropbox, OneDrive, a REST API, e-mail). |
 | **Operations** | Run history, e-mail on failure or always, a system message when cron stops, `openimport:doctor`, housekeeping of old run files. |
 | **REST API** | `POST /V1/openimport/profiles/{id}/runs` starts a profile, `GET /V1/openimport/runs/{id}` reports on it; order exports can run after every placed order. |

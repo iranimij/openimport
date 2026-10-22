@@ -43,6 +43,7 @@
                 comment="Profile to run next (job chain)"/>
         <column xsi:type="varchar" name="then_when" length="16" nullable="false" default="success"
                 comment="success or always"/>
+        <column xsi:type="text" name="triggers" nullable="true" comment="Shop events that start a run (JSON)"/>
         <column xsi:type="varchar" name="created_by" length="255" nullable="true" comment="Admin user name"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
                 comment="Created at"/>

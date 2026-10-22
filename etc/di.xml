@@ -490,4 +490,31 @@
             <argument name="processor" xsi:type="object">Iranimij\OpenImport\Model\Execution\RunProcessor\Proxy</argument>
         </arguments>
     </type>
+
+    <!-- Triggers: one observer class, one instance per shop event (etc/events.xml). -->
+    <virtualType name="Iranimij\OpenImport\Observer\ProductSavedTrigger" type="Iranimij\OpenImport\Observer\TriggerRuns">
+        <arguments>
+            <argument name="event" xsi:type="const">Iranimij\OpenImport\Model\Trigger\TriggerEvents::PRODUCT_SAVED</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Observer\StockChangedTrigger" type="Iranimij\OpenImport\Observer\TriggerRuns">
+        <arguments>
+            <argument name="event" xsi:type="const">Iranimij\OpenImport\Model\Trigger\TriggerEvents::STOCK_CHANGED</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Observer\CustomerRegisteredTrigger" type="Iranimij\OpenImport\Observer\TriggerRuns">
+        <arguments>
+            <argument name="event" xsi:type="const">Iranimij\OpenImport\Model\Trigger\TriggerEvents::CUSTOMER_REGISTERED</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Observer\CustomerSavedTrigger" type="Iranimij\OpenImport\Observer\TriggerRuns">
+        <arguments>
+            <argument name="event" xsi:type="const">Iranimij\OpenImport\Model\Trigger\TriggerEvents::CUSTOMER_SAVED</argument>
+        </arguments>
+    </virtualType>
+    <type name="Iranimij\OpenImport\Model\Trigger\TriggerQueue">
+        <arguments>
+            <argument name="logger" xsi:type="object">Iranimij\OpenImport\Logger</argument>
+        </arguments>
+    </type>
 </config>

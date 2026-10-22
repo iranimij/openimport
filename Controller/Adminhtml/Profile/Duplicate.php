@@ -73,10 +73,11 @@ class Duplicate extends Action implements HttpPostActionInterface
                 ->setImportOptions($original->getImportOptions())
                 ->setThenProfileId($original->getThenProfileId())
                 ->setThenWhen($original->getThenWhen())
+                ->setTriggers($original->getTriggers())
                 ->setMapping($original->getMapping())
                 ->setValueMaps($original->getValueMaps());
             $copy = $this->profiles->save($copy);
-            $this->messageManager->addSuccessMessage((string) __('Copied to "%1". Its schedule is off until you switch it on.', $name));
+            $this->messageManager->addSuccessMessage((string) __('Copied to "%1". Its automatic runs are off until you switch them on.', $name));
             return $redirect->setPath('*/*/edit', ['id' => $copy->getProfileId()]);
         } catch (LocalizedException $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());

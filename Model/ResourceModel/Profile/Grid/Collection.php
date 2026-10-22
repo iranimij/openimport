@@ -40,29 +40,45 @@ class Collection extends SearchResult
     {
         $value = is_array($condition) ? ($condition['eq'] ?? null) : $condition;
         if (in_array($field, ['source_type', 'main_table.source_type'], true) && is_string($value)) {
-            $connection = $this->getConnection();
-            if (str_starts_with($value, SourceOrDestinationFilter::EXPORT_PREFIX)) {
-                // No destination stored means a download, the default.
-                $destination = "COALESCE(CASE WHEN JSON_VALID(main_table.export_options) THEN JSON_UNQUOTE("
-                    . "JSON_EXTRACT(main_table.export_options, '$.destination')) END, 'download')";
-                $this->getSelect()
-                    ->where('main_table.direction = ?', 'export')
-                    ->where($destination . ' = ?', substr($value, strlen(SourceOrDestinationFilter::EXPORT_PREFIX)));
-
-                return $this;
-            }
-            if (str_starts_with($value, SourceOrDestinationFilter::IMPORT_PREFIX)) {
-                $this->getSelect()
-                    ->where('main_table.direction = ?', 'import')
-                    ->where(
-                        $connection->quoteIdentifier('main_table.source_type') . ' = ?',
-                        substr($value, strlen(SourceOrDestinationFilter::IMPORT_PREFIX))
-                    );
+            $where = $this->sourceOrDestination($value);
+            if ($where !== null) {
+                // One condition: the grid's filter pool joins the conditions a filter adds with OR.
+                $this->getSelect()->where($where);
 
                 return $this;
             }
         }
 
         return parent::addFieldToFilter($field, $condition);
+    }
+
+    /**
+     * "in:sftp" → imports reading from SFTP, "out:email" → exports sent by e-mail (no destination: a download).
+     *
+     * @param string $value
+     * @return string|null the SQL condition, null for any other value
+     */
+    private function sourceOrDestination(string $value): ?string
+    {
+        $connection = $this->getConnection();
+        if (str_starts_with($value, SourceOrDestinationFilter::EXPORT_PREFIX)) {
+            $destination = "COALESCE(CASE WHEN JSON_VALID(main_table.export_options) THEN JSON_UNQUOTE("
+                . "JSON_EXTRACT(main_table.export_options, '$.destination')) END, 'download')";
+
+            return $connection->quoteInto('main_table.direction = ?', 'export') . ' AND '
+                . $connection->quoteInto(
+                    $destination . ' = ?',
+                    substr($value, strlen(SourceOrDestinationFilter::EXPORT_PREFIX))
+                );
+        }
+        if (str_starts_with($value, SourceOrDestinationFilter::IMPORT_PREFIX)) {
+            return $connection->quoteInto('main_table.direction = ?', 'import') . ' AND '
+                . $connection->quoteInto(
+                    'main_table.source_type = ?',
+                    substr($value, strlen(SourceOrDestinationFilter::IMPORT_PREFIX))
+                );
+        }
+
+        return null;
     }
 }

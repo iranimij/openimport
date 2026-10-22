@@ -714,6 +714,9 @@
                     <item name="labelByType" xsi:type="array">
                         <item name="rest" xsi:type="string" translate="true">Path</item>
                     </item>
+                    <item name="placeholderByType" xsi:type="array">
+                        <item name="rest" xsi:type="string">/products?status=active</item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>

@@ -227,7 +227,7 @@ class AdminTest extends AbstractBackendController
     {
         $this->post('backend/openimport/profile/fields', [
             'entity' => 'catalog_product',
-            'columns' => ['Artikelnummer', 'Bezeichnung', 'Preis', 'name_default'],
+            'columns' => ['Artikelnummer', 'Bezeichnung', 'Preis', 'name_default', 'Bild', 'additional_images'],
         ]);
         $data = $this->json();
         self::assertSame('sku', $data['fields'][0]['code']);
@@ -235,6 +235,11 @@ class AdminTest extends AbstractBackendController
         self::assertSame('Artikelnummer', $data['matches']['sku']);
         self::assertSame('Preis', $data['matches']['price']);
         self::assertSame('name_default', $data['matches']['store:default:name'] ?? null);
+        // Picture columns are offered and matched although core's 2.4.9 sample file does not list them.
+        self::assertContains('base_image', array_column($data['fields'], 'code'));
+        self::assertContains('thumbnail_image_label', array_column($data['fields'], 'code'));
+        self::assertSame('Bild', $data['matches']['base_image'] ?? null);
+        self::assertSame('additional_images', $data['matches']['additional_images'] ?? null);
         self::assertContains('default', array_column($data['stores'], 'code'));
     }
 

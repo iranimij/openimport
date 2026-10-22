@@ -24,7 +24,7 @@ use Magento\Framework\Filesystem;
  */
 class Download extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Iranimij_OpenImport::runs';
+    public const ADMIN_RESOURCE = 'Iranimij_OpenImport::run_files';
 
     /**
      * @param Context $context

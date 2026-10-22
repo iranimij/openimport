@@ -50,7 +50,7 @@ class ModuleConfigTest extends TestCase
             }
         };
         $walk($tree, []);
-        foreach (['profiles', 'profiles_edit', 'run', 'run_destructive', 'runs'] as $child) {
+        foreach (['profiles', 'profiles_edit', 'run', 'run_destructive', 'runs', 'run_files'] as $child) {
             self::assertSame(
                 ['Magento_Backend::admin', 'Magento_Backend::system', 'Magento_Backend::convert', 'Iranimij_OpenImport::openimport'],
                 $ids['Iranimij_OpenImport::' . $child] ?? null,

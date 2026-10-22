@@ -120,7 +120,9 @@ $run = $view->run();
                 $againParams = ['id' => (int) $run->getProfileId(), 'mode' => $run->getMode()];
                 $againInit = $run->isDryRun() ? [] : ['Iranimij_OpenImport/js/run/confirm-submit' => [
                     'title' => (string) __('Run "%1" again?', $run->getProfileName()),
-                    'message' => (string) __('The run reads the source again and changes the shop.'),
+                    'message' => $run->getDirection() === 'export'
+                        ? (string) __('The run exports again and delivers a new file to the destination.')
+                        : (string) __('The run reads the source again and changes the shop.'),
                     'button' => (string) __('Run again'),
                 ]];
                 ?>
@@ -130,10 +132,10 @@ $run = $view->run();
                     <button type="submit" class="action-secondary"><span><?= $escaper->escapeHtml($run->isDryRun() ? __('Dry run again') : __('Run again')) ?></span></button>
                 </form>
             <?php endif; ?>
-            <?php if ($run->getSourceFile() !== null): ?>
+            <?php if ($run->getSourceFile() !== null && $view->canDownloadFiles()): ?>
                 <a class="action-secondary" href="<?= $escaper->escapeUrl($view->url('openimport/run/download')) ?>"><?= $escaper->escapeHtml(__('Download the file')) ?></a>
             <?php endif; ?>
-            <?php if ($run->getOutputFile() !== null): ?>
+            <?php if ($run->getOutputFile() !== null && $view->canDownloadFiles()): ?>
                 <a class="<?= $escaper->escapeHtmlAttr($runForReal ? 'action-secondary' : 'action-primary') ?>"
                    href="<?= $escaper->escapeUrl($view->url('openimport/run/download', ['file' => 'output'])) ?>"><?= $escaper->escapeHtml(__('Download the export')) ?></a>
             <?php endif; ?>

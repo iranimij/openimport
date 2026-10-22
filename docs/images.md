@@ -2,7 +2,8 @@
 
 Product imports take pictures in the same columns as Magento's own import: `base_image`, `small_image`,
 `thumbnail_image`, `swatch_image`, `additional_images` (several, separated by commas), `hide_from_product_page` and any
-custom image attribute. A cell can hold a **web address** or a **file name**.
+custom image attribute. A cell can hold a **web address** or a **file name**. These columns are in the field list of
+step 4 and Auto-match finds them (also from *Bild*, *Foto*, *Picture*, *Bilder*, *Images*).
 
 ## Pictures from web addresses
 
@@ -46,7 +47,9 @@ picture again.
 
 A cell without `://` is a file name. Magento reads it from the import images folder, `var/import/images` (the
 *Images Upload Directory* under *Stores › Configuration › Advanced › System*), the same folder Magento's own import
-uses. Sub folders work: `supplier/red-shoe.jpg` is `var/import/images/supplier/red-shoe.jpg`.
+uses. Sub folders work: `supplier/red-shoe.jpg` is `var/import/images/supplier/red-shoe.jpg`, and a leading `/`
+stays inside the folder (`/m/b/shoe.jpg`, as Magento's exports write gallery paths). Other addresses (`file://`,
+`ftp://`), drives (`C:\`), network paths and `../` are refused with a row error.
 
 > **Changed in 1.3.** Before 1.3 OpenImport left the folder to Magento's default for imports started by code,
 > `pub/media/import`. Move pictures you placed there to `var/import/images`.

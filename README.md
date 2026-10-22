@@ -54,7 +54,7 @@ orders to CSV, XLSX, ODS, JSON or XML, downloaded, dropped in a folder, pushed t
 | **Mapping** | Columns to fields, fixed values, required fields, store-view columns (`name_de`, `price_ch`), auto-match with English and German synonyms. |
 | **Transforms** | 21 transforms and a safe expression language (`{price} * 1.19`, `if(...)`, `round(...)`), no `eval`, parsed once per run; every transform can be conditional (*Only when*). Own transforms through `di.xml`. |
 | **Dry run** | Every new profile starts with one. Field-level before/after preview, counts of new, changed, unchanged and deleted records, error report with your file's line numbers. |
-| **Safety** | Runs that would delete or replace more than a threshold wait for a typed confirmation. Formula-injection guard on every CSV the module writes. |
+| **Safety** | Runs that would delete or replace more than a threshold wait for a typed confirmation. Formula-injection guard on every file the module writes, taken off again on import so exports round-trip. Downloading run files is its own permission. |
 | **Delta** | Only rows that changed since the last run are sent to Magento (per line, per store view). |
 | **Schedules** | Cron expressions and presets, each due minute runs exactly once, catch-up after a missed window, one run per profile at a time; job chains (then run profile B, after success or always); triggers (run when a product, stock, customer or order changes). |
 | **Exports** | Core entities and orders (one row per order or per line, only new or changed orders), renamed and transformed columns, to CSV, XLSX, JSON, XML and nine destinations (download, folder, SFTP, FTP, S3, Google Drive or a Google Sheet, Dropbox, OneDrive, a REST API, e-mail). |
@@ -126,7 +126,7 @@ instead of a project: mapping, transforms, dry runs, schedules, remote files, hi
 The module fetches files from remote servers and writes into your catalog, so it is careful: SSRF guard with DNS
 re-checks on every redirect, sandboxed server folders, no XML entities, zip-bomb and zip-slip limits for archives, `.xlsx` and `.ods`, XSLT without file, network or PHP access, encrypted
 credentials that never leave the database (not in JSON exports, not in forms), CSRF-protected admin actions behind
-six ACL resources, and a formula guard for spreadsheets. See [docs/security.md](docs/security.md) and
+seven ACL resources, and a formula guard for spreadsheets. See [docs/security.md](docs/security.md) and
 [SECURITY.md](SECURITY.md) for how to report a problem.
 
 ## Contributing

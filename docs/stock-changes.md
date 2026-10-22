@@ -14,6 +14,9 @@ It works for **Products**, **Stock & prices** (column `qty`, Magento's default s
   gives 17). Magento receives one row per SKU (per SKU and source) with the result, after the file's last row.
 - A product that does not exist yet starts at 0.
 - A value that is not a change (`many`) is a row error naming the column.
+- Decimals only for products sold in decimals: `+1.5` for a product whose *Qty Uses Decimals* is off is a row error
+  (since 1.5.2; also for plain quantities, "are the new stock"). A new product can switch it on in the same row with
+  the column `is_qty_decimal` = 1.
 - Live runs hold the lock of Magento's entity: products, Stock & prices and Stock per source runs never change the
   same quantities at the same time.
 - The dry run shows the quantity Magento would receive (*qty: 10 → 17*).

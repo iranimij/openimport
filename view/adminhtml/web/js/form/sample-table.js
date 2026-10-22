@@ -20,6 +20,7 @@ define([
             rows: [],
             detected: {},
             sheets: [],
+            warnings: [],
             error: '',
             loading: false,
             visible: true,
@@ -43,6 +44,7 @@ define([
                 rows: true,
                 detected: true,
                 sheets: true,
+                warnings: true,
                 error: true,
                 loading: true,
                 visible: true
@@ -73,7 +75,8 @@ define([
             if (!sample) {
                 return;
             }
-            this.error = sample.error || '';
+            this.error = sample.error || (sample.empty ? $t('The file is empty: it has no rows and no column names.') : '');
+            this.warnings = sample.warnings || [];
             this.columns = sample.columns || [];
             this.rows = sample.rows || [];
             this.detected = sample.detected || {};
@@ -123,6 +126,10 @@ define([
             _.each(this.detected || {}, function (value, key) {
                 parts.push(key.replace('_', ' ') + ': ' + value);
             });
+            if ((this.sheets || []).length > 1) {
+                parts.push($t('sheets in the file: %1 (choose one under "Sheet (Excel, OpenDocument)" in step 3)')
+                    .replace('%1', this.sheets.join(', ')));
+            }
 
             return parts.join(' · ');
         },

@@ -28,6 +28,45 @@ All notable changes to this project are documented here. The format follows
 - The old order-export option *Export each order when it is placed* is shown only for profiles that use it, with a
   note that step 6 replaces it.
 
+## [1.5.2] - 2026-10-22
+
+Fixes from the fourth hands-on review (Notion "17 · Browser review 4").
+
+### Fixed
+- Profiles and Runs grids: the keyword search finds profiles (and runs) by name. It listed every record: the
+  search filter never reached Magento's grid data provider.
+- Product pictures: `base_image`, `small_image`, `thumbnail_image`, `swatch_image`, `additional_images`, their
+  labels and `hide_from_product_page` are in the field list of step 4, and Auto-match finds them (also from *Bild*,
+  *Foto*, *Picture*). Magento 2.4.9's own sample file, which the list was built from, has no picture columns.
+- Dry run: when rows with errors are left out, the headline says so ("Magento accepts the other rows; 3 row(s) have
+  errors and will be left out") instead of "Magento accepts the rows". Run summaries count rows with errors, not
+  error messages.
+- Exported files import back unchanged: the apostrophe the formula guard puts in front of `=`, `+`, `-`, `@` is
+  taken off on import (phone numbers such as `+49 69 …` kept getting an apostrophe).
+- CSV files with CR line breaks (old Excel for Mac, some ERPs) are read line by line; they were one header row.
+- A CSV row with filled cells beyond the last column is a row error (and a warning in the first rows of step 3):
+  the extra cells used to disappear silently, although they mean shifted values.
+- A CSV line longer than 8 MB stops the file with a plain message instead of exhausting PHP's memory.
+- An empty file says "The file is empty" in step 3 and in the run, not "The profile has no mapping yet".
+- Quantities with decimals are refused for products sold in whole pieces (*Qty Uses Decimals* off), for changes
+  (`+1.5`) and plain quantities.
+- Orders import: unknown country codes in billing and shipping addresses are reported.
+- Picture cells with `file://`, `ftp://`, drives, network paths or `../` are refused with a row error instead of
+  Magento's "Wrong URL/path used for attribute image"; Magento's "Value for 'name' attribute contains incorrect
+  value" names the column in plain words.
+- "Products missing from the file" changes nothing when the file has no rows (a broken feed).
+- Import profiles from JSON: a broken file says it is not valid JSON.
+- REST source: without a saved connection the field says where to add one, Test connection asks for one, and the
+  path shows a REST example.
+- "Run again" on an export says it exports again instead of "changes the shop"; the cron status says "just now".
+
+### Changed
+- Profiles imported from a JSON file never switch automatic runs on: new profiles start off, updated ones keep
+  their state.
+- New permission *Download run files* (the imported file and the export of a run, which can hold customer data).
+  Roles that could view runs get it on upgrade.
+- Step 3 lists the sheets of an Excel or OpenDocument file with several sheets.
+
 ## [1.5.1] - 2026-10-22
 
 Fixes from the third hands-on browser review of 1.5.0 (Notion "16 · Browser review 3").

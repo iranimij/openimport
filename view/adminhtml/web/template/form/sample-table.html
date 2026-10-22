@@ -10,6 +10,9 @@
     </div>
     <div class="admin__field-control">
         <div class="message message-warning" role="alert" if="error" text="error"></div>
+        <!-- ko foreach: warnings -->
+        <div class="message message-warning" role="alert" text="$data"></div>
+        <!-- /ko -->
         <p class="admin__field-note" if="!error && !columns.length && !loading"
            translate="'Upload a file in step 2 to see its first rows here.'"></p>
         <p class="admin__field-note" if="loading" role="status" translate="'Reading the file …'"></p>

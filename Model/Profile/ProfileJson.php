@@ -117,6 +117,12 @@ class ProfileJson
     public function prepare(string $json): array
     {
         $data = json_decode($json, true);
+        if ($data === null && trim($json) !== 'null') {
+            throw new \InvalidArgumentException(sprintf(
+                'The file is not valid JSON (%s). Use a file from "Download as JSON" or openimport:profiles:export.',
+                trim($json) === '' ? 'it is empty' : json_last_error_msg()
+            ));
+        }
         if (!is_array($data) || !isset($data['profiles']) || !is_array($data['profiles'])) {
             throw new \InvalidArgumentException('The file is not an OpenImport profile export (no "profiles" list).');
         }
@@ -162,6 +168,7 @@ class ProfileJson
             } catch (NoSuchEntityException $exception) {
                 $existing = null;
             }
+            $wasActive = $existing !== null && $existing->isActive();
             $profile = $this->apply($existing ?? $this->factory->create(), $row);
             $next = is_scalar($row['then_profile'] ?? null) ? trim((string) $row['then_profile']) : '';
             if ($next !== '') {
@@ -175,6 +182,9 @@ class ProfileJson
                     $this->chains[count($prepared)] = $next;
                 }
             }
+            // Automatic runs are never switched on by a file: new profiles start off (run a dry run first), updated
+            // ones keep their state.
+            $profile->setIsActive($wasActive);
             foreach ($this->validator->validate($profile) as $problem) {
                 $problems[] = $label . ': ' . $problem;
             }

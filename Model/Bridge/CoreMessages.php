@@ -30,6 +30,20 @@ class CoreMessages
             'product_websites',
             'There is no website with this code; use website codes such as "base", separated by commas.',
         ],
+        // "Value for 'name' attribute contains incorrect value"
+        'invalidAttributeType' => [
+            '',
+            'Magento does not accept this value for %1: it is empty where a value is required, too long, of the wrong type, or not one of the attribute\'s options.',
+        ],
+        // "Wrong URL/path used for attribute image"
+        'invalidMediaUrlPath' => [
+            '',
+            'The picture in %1 is neither a web address (http/https) nor a file name in var/import/images (no "../", no paths from the root).',
+        ],
+        'mediaPathNotAvailable' => [
+            '',
+            'The picture in %1 is not in var/import/images (the import images folder).',
+        ],
     ];
 
     /**
@@ -43,7 +57,14 @@ class CoreMessages
         foreach ($errors as $error) {
             $plain = self::PLAIN[$error->code] ?? null;
             if ($plain !== null) {
-                $error = new RowError($error->row, $error->code, (string) __($plain[1]), $error->column ?? $plain[0], $error->critical);
+                $column = $error->column ?? ($plain[0] !== '' ? $plain[0] : $this->quotedName($error->message));
+                $error = new RowError(
+                    $error->row,
+                    $error->code,
+                    (string) __($plain[1], (string) $column),
+                    $column === '' ? null : $column,
+                    $error->critical
+                );
             }
             $key = $error->row . '|' . $error->code . '|' . $error->column . '|' . $error->message;
             if (isset($seen[$key])) {
@@ -54,5 +75,18 @@ class CoreMessages
         }
 
         return $explained;
+    }
+
+    /**
+     * The attribute core names in its message ("Value for 'name' attribute …", "… used for attribute image").
+     */
+    private function quotedName(string $message): string
+    {
+        if (preg_match("/'([a-z0-9_]+)'/", $message, $match) === 1
+            || preg_match('/attribute ([a-z0-9_]+)\s*$/', $message, $match) === 1) {
+            return $match[1];
+        }
+
+        return '';
     }
 }

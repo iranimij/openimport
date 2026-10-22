@@ -280,7 +280,7 @@ define([
                 self.stores = response.stores || [];
                 self.matches = response.matches || {};
                 if (self.matchWhenLoaded && !self.isExport() && !self.rows().length && !_.isEmpty(self.matches)) {
-                    self.autoMatch();
+                    self.autoMatch(true);
                 }
                 self.matchWhenLoaded = false;
             }).always(function () {
@@ -368,8 +368,10 @@ define([
 
         /**
          * Adds rows for the auto-match proposal (fields that are not mapped yet).
+         *
+         * @param {Boolean} automatic run by itself once the file was read (not by the button)
          */
-        autoMatch: function () {
+        autoMatch: function (automatic) {
             var mapped = _.map(this.value() || [], function (row) {
                     return row.target;
                 }),
@@ -389,9 +391,19 @@ define([
                 }
             }, this);
             this.sync();
-            this.notice = added
-                ? $t('%1 field(s) matched. Check them, then add transforms where needed.').replace('%1', added)
-                : $t('No further matches. Map the remaining fields by hand.');
+            if (!added && this.matchedAutomatically) {
+                // The button after an automatic match: the notice of that match still says what was done.
+                return;
+            }
+            this.matchedAutomatically = automatic === true && added > 0;
+            if (this.matchedAutomatically) {
+                this.notice = $t('%1 field(s) matched automatically. Check them, then add transforms where needed.')
+                    .replace('%1', added);
+            } else {
+                this.notice = added
+                    ? $t('%1 field(s) matched. Check them, then add transforms where needed.').replace('%1', added)
+                    : $t('No further matches. Map the remaining fields by hand.');
+            }
             if (commas.length) {
                 this.notice += ' ' + $t('Decimal commas found in %1: "Decimal comma → dot" was added.')
                     .replace('%1', commas.join(', '));

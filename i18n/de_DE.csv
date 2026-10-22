@@ -798,3 +798,5 @@
 "Search terms by text and store view: redirect URL, shown among the popular terms, popularity.","Suchbegriffe nach Text und Store View: Weiterleitungs-URL, Anzeige unter den beliebten Begriffen, Beliebtheit."
 "Search synonym groups: words separated by commas, for all store views, a website (website:base) or a store view (store:de).","Suchsynonym-Gruppen: Wörter durch Kommas getrennt, für alle Store Views, eine Website (website:base) oder einen Store View (store:de)."
 "Products in categories with their position, by category path and SKU; Delete removes the product from the category.","Produkte in Kategorien mit ihrer Position, nach Kategoriepfad und SKU; Löschen entfernt das Produkt aus der Kategorie."
+"Import from: %1","Import aus: %1"
+"Export to: %1","Export nach: %1"

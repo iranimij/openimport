@@ -25,7 +25,10 @@ define(['jquery'], function ($) {
 
                     return;
                 }
-                $(element).find('[data-role="progress"]').text(response.progress);
+                // A queued run has no rows yet: its counter stays empty rather than showing "0".
+                if (response.status === 'running') {
+                    $(element).find('[data-role="progress"]').text(response.progress);
+                }
             });
         }
 

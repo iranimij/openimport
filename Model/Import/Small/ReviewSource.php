@@ -132,9 +132,11 @@ class ReviewSource implements SmallSourceInterface
     }
 
     /**
-     * The shop's ratings with their options: option ids by value (1 to 5).
+     * The shop's ratings with their options (option ids by value, 1 to 5), whether they are active and the store
+     * views they are shown in (Stores › Rating › Visibility).
      *
-     * @return array<string, array{id: int, code: string, options: array<int, int>}> lower-cased code => rating
+     * @return array<string, array{id: int, code: string, active: bool, stores: int[], options: array<int, int>}>
+     *         lower-cased code => rating
      */
     public function ratings(): array
     {
@@ -143,7 +145,10 @@ class ReviewSource implements SmallSourceInterface
             $connection = $this->records->resource()->getConnection();
             $rows = $connection->fetchAll(
                 $connection->select()
-                    ->from(['rt' => $this->records->resource()->getTableName('rating')], ['rating_id', 'rating_code'])
+                    ->from(
+                        ['rt' => $this->records->resource()->getTableName('rating')],
+                        ['rating_id', 'rating_code', 'is_active']
+                    )
                     ->join(
                         ['o' => $this->records->resource()->getTableName('rating_option')],
                         'o.rating_id = rt.rating_id',
@@ -154,8 +159,21 @@ class ReviewSource implements SmallSourceInterface
             foreach ($rows as $row) {
                 $code = mb_strtolower((string) $row['rating_code']);
                 $this->ratings[$code] ??= ['id' => (int) $row['rating_id'], 'code' => (string) $row['rating_code'],
-                    'options' => []];
+                    'active' => (int) $row['is_active'] === 1, 'stores' => [], 'options' => []];
                 $this->ratings[$code]['options'][(int) $row['value']] = (int) $row['option_id'];
+            }
+            $visible = $connection->fetchAll(
+                $connection->select()->from(
+                    $this->records->resource()->getTableName('rating_store'),
+                    ['rating_id', 'store_id']
+                )
+            );
+            foreach ($this->ratings as $code => $rating) {
+                foreach ($visible as $row) {
+                    if ((int) $row['rating_id'] === $rating['id']) {
+                        $this->ratings[$code]['stores'][] = (int) $row['store_id'];
+                    }
+                }
             }
         }
 
@@ -171,8 +189,12 @@ class ReviewSource implements SmallSourceInterface
     public function storeCodes(array $storeIds): string
     {
         $views = array_values(array_filter($storeIds, static fn (int $id): bool => $id !== 0));
+        $every = array_values(array_filter(
+            array_values($this->records->storeCodes()),
+            static fn (int $id): bool => $id !== 0
+        ));
 
-        return $views === []
+        return $views === [] || array_diff($every, $views) === []
             ? 'all'
             : implode(',', array_map(fn (int $storeId): string => $this->records->storeCode($storeId), $views));
     }

@@ -102,7 +102,7 @@ define([
             listens: {
                 entity: 'loadFields',
                 direction: 'loadFields',
-                columns: 'loadFields'
+                columns: 'columnsChanged'
             },
             tracks: {
                 entity: true,
@@ -239,6 +239,14 @@ define([
         },
 
         /**
+         * A file was read: with nothing mapped yet, its columns are matched as soon as the proposal is there.
+         */
+        columnsChanged: function () {
+            this.matchWhenLoaded = !!(this.columns && this.columns.length);
+            this.loadFields();
+        },
+
+        /**
          * Loads the entity's fields and an auto-match proposal for the file's columns.
          */
         fetchFields: function () {
@@ -271,6 +279,10 @@ define([
                 self.fields = response.fields || [];
                 self.stores = response.stores || [];
                 self.matches = response.matches || {};
+                if (self.matchWhenLoaded && !self.isExport() && !self.rows().length && !_.isEmpty(self.matches)) {
+                    self.autoMatch();
+                }
+                self.matchWhenLoaded = false;
             }).always(function () {
                 if (ticket === self.fieldsTicket) {
                     self.loadingFields = false;

@@ -110,6 +110,16 @@ class ImportRunner
     private array $previewKinds = [];
 
     /**
+     * @var array<string, true> lower-cased identifiers the importer refused in a dry run
+     */
+    private array $previewFailed = [];
+
+    /**
+     * Whether the dry run's preview sample still has to be saved (with the run's outcome).
+     */
+    private bool $previewPending = false;
+
+    /**
      * @var PreviewRecord[]
      */
     private array $previewSample = [];
@@ -312,6 +322,8 @@ class ImportRunner
         );
         $this->previewSample = [];
         $this->previewKinds = [];
+        $this->previewFailed = [];
+        $this->previewPending = false;
         $this->sampleCounts = [];
         $this->existingAffected = 0;
         $this->affectedIdentifiers = [];
@@ -717,7 +729,8 @@ class ImportRunner
         // Totals count records (default rows); store-view rows only appear in the sample.
         foreach ($records as $entry) {
             [$record, $isMain] = $entry;
-            if ($isMain) {
+            // A record spread over several lines (an order with its items) counts once.
+            if ($isMain && !isset($this->previewKinds[$entry[2]])) {
                 $this->previewTotals[$record->changeType] = ($this->previewTotals[$record->changeType] ?? 0) + 1;
                 $this->previewKinds[$entry[2]] = $record->changeType;
             }
@@ -743,9 +756,8 @@ class ImportRunner
         $ownErrors = $this->counts['errors'];
         $allowed = $profile->getAllowedErrors();
         $skipErrors = $profile->getOnError() === ProfileInterface::ON_ERROR_SKIP;
-        if ($dryRun) {
-            $this->previewStore->add($this->runId, $this->previewSample);
-        }
+        // The sample is saved with the outcome, once the records the importer refused are known.
+        $this->previewPending = $dryRun;
         if ($ownErrors > $allowed && (!$skipErrors || $spool->count() === 0)) {
             $this->storeErrors(true);
             return $this->outcome(
@@ -809,7 +821,7 @@ class ImportRunner
         foreach ($result->errors as $error) {
             $position = $error->row;
             $identifier = $position === null ? '' : $spool->identifier($position);
-            if ($identifier !== '') {
+            if ($identifier !== '' && !$error->imported) {
                 $failedIdentifiers[$identifier] = true;
             }
             $this->error(new ErrorRecord(
@@ -830,6 +842,7 @@ class ImportRunner
                     $this->previewTotals[$kind]--;
                     unset($this->previewKinds[mb_strtolower((string) $identifier)]);
                 }
+                $this->previewFailed[mb_strtolower((string) $identifier)] = true;
             }
             // A delete that takes children with it: the totals count every record that goes.
             if ($behavior === ProfileInterface::BEHAVIOR_DELETE && $reader instanceof CascadingRecordsInterface
@@ -850,13 +863,20 @@ class ImportRunner
                 : RunInterface::STATUS_FAILED;
             return $this->outcome(
                 $status,
-                $this->dryRunMessage($result->valid, $safety, $reader !== null) . $this->firstProblem($result->valid)
+                $this->dryRunMessage(
+                    $result->valid,
+                    $safety,
+                    $reader !== null,
+                    $this->importers->isOwn($entity->importEntity())
+                ) . $this->firstProblem($result->valid)
             );
         }
         if (!$result->imported) {
             return $this->outcome(
                 RunInterface::STATUS_FAILED,
-                ($result->valid ? 'Magento did not import the rows.' : 'Magento refused the rows. Nothing was imported.')
+                $this->importers->isOwn($entity->importEntity())
+                    ? ($result->valid ? 'The rows were not imported.' : 'The rows have errors. Nothing was imported.')
+                    : ($result->valid ? 'Magento did not import the rows.' : 'Magento refused the rows. Nothing was imported.')
                 . $this->firstProblem($result->valid),
                 $result->historyId
             );
@@ -1042,7 +1062,14 @@ class ImportRunner
         );
     }
 
-    private function dryRunMessage(bool $valid, ?string $safety, bool $previewed): string
+    /**
+     * @param bool $valid
+     * @param string|null $safety
+     * @param bool $previewed
+     * @param bool $own OpenImport's own importer checked the rows (not Magento's import)
+     * @return string
+     */
+    private function dryRunMessage(bool $valid, ?string $safety, bool $previewed, bool $own = false): string
     {
         $parts = [];
         if ($previewed) {
@@ -1056,7 +1083,9 @@ class ImportRunner
         } else {
             $parts[] = sprintf('Dry run: %d row(s) checked by Magento.', $this->counts['read']);
         }
-        $parts[] = $valid ? 'Magento accepts the rows.' : 'Magento refuses the rows; see the errors.';
+        $parts[] = $own
+            ? ($valid ? 'The rows are valid.' : 'The rows have errors; see below.')
+            : ($valid ? 'Magento accepts the rows.' : 'Magento refuses the rows; see the errors.');
         if ($safety !== null) {
             $parts[] = self::CONFIRMATION_NOTE . ': ' . $safety;
         }
@@ -1095,6 +1124,13 @@ class ImportRunner
 
     private function outcome(string $status, string $message, ?int $historyId = null): RunOutcome
     {
+        if ($this->previewPending) {
+            $this->previewPending = false;
+            $this->previewStore->add($this->runId, array_values(array_filter(
+                $this->previewSample,
+                fn (PreviewRecord $record): bool => !$this->previewRefused($record->identifier)
+            )));
+        }
         $this->progress();
         if ($this->skippedNames !== []) {
             $message .= "\n" . (string) __(
@@ -1118,6 +1154,21 @@ class ImportRunner
         }
 
         return new RunOutcome($status, $this->counts, $message, $historyId);
+    }
+
+    /**
+     * Whether a preview record (or one of its store-view lines, "SKU [de]") belongs to a record the importer refused:
+     * those are listed under the errors, not as changes.
+     */
+    private function previewRefused(string $identifier): bool
+    {
+        $key = mb_strtolower($identifier);
+        if (isset($this->previewFailed[$key])) {
+            return true;
+        }
+        $bracket = mb_strrpos($key, ' [');
+
+        return $bracket !== false && isset($this->previewFailed[mb_substr($key, 0, $bracket)]);
     }
 
     private function error(ErrorRecord $error): void

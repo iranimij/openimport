@@ -20,6 +20,8 @@ use Iranimij\OpenImport\Model\Import\Order\OrderFile;
 use Iranimij\OpenImport\Model\Import\Order\OrderImporter;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
+use Iranimij\OpenImport\Model\Storage\PreviewRecord;
+use Iranimij\OpenImport\Model\Storage\PreviewStore;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\ResourceConnection;
@@ -283,6 +285,45 @@ class OrderImportTest extends TestCase
         self::assertStringContainsString('Unknown order status "shipped".', $messages);
         self::assertStringContainsString('The order has no items', $messages);
         self::assertNull(Bootstrap::getObjectManager()->create(Order::class)->loadByIncrementId('OI-9004')->getId());
+    }
+
+    #[DataFixture('Magento/Catalog/_files/product_simple.php')]
+    public function testOrderWithoutShippingColumnsAndCountsPerOrder(): void
+    {
+        $tag = strtoupper(bin2hex(random_bytes(2)));
+        $header = 'increment_id;status;customer_email;order_currency_code;subtotal;shipping_amount;grand_total;'
+            . 'billing_firstname;billing_lastname;billing_street;billing_city;billing_postcode;billing_country_id;'
+            . "item_sku;item_name;item_qty_ordered;item_price\n";
+        // Two orders, the first with two lines; the third order is refused (bad e-mail).
+        $file = $this->file($header
+            . "OI-{$tag}-1;pending;anna@example.com;USD;30;0;30;Anna;Berg;Ringstraße 7;Wien;1010;AT;simple;Simple;1;10\n"
+            . "OI-{$tag}-1;;;;;;;;;;;;;simple;Simple again;2;10\n"
+            . "OI-{$tag}-2;pending;ben@example.com;USD;10;0;10;Ben;Kurz;Am Markt 2;Graz;8010;AT;simple;Simple;1;10\n"
+            . "OI-{$tag}-3;pending;nobody;USD;10;0;10;C;D;Weg 1;Linz;4020;AT;simple;Simple;1;10\n");
+        $profile = $this->importProfile([], ProfileInterface::BEHAVIOR_ADD_UPDATE, explode(';', trim($header)));
+        $profile = Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save(
+            $profile->setOnError(ProfileInterface::ON_ERROR_SKIP)->setAllowedErrors(5)
+        );
+
+        // The dry run counts orders, not lines, and leaves the refused order out of the preview.
+        $dry = $this->process($profile, $file, RunInterface::MODE_DRY_RUN);
+        self::assertSame(2, $dry->getCount('created'), $this->report($dry));
+        self::assertStringContainsString('Dry run: 2 new', (string) $dry->getMessage());
+        $preview = Bootstrap::getObjectManager()->get(PreviewStore::class)->fetch((int) $dry->getRunId());
+        self::assertSame([], array_filter(
+            $preview,
+            static fn (PreviewRecord $record): bool => str_contains($record->identifier, "OI-{$tag}-3")
+        ), 'the refused order is listed under the errors only');
+
+        $live = $this->process($profile, $file);
+        self::assertSame(2, $live->getCount('created'), $this->report($live));
+        $order = Bootstrap::getObjectManager()->create(Order::class)->loadByIncrementId("OI-{$tag}-1");
+        self::assertCount(2, $order->getAllItems());
+        // Without shipping columns the billing address ships: Magento's order view needs one.
+        $shipping = $order->getShippingAddress();
+        self::assertNotNull($shipping);
+        self::assertSame(['Anna', 'Wien', 'AT'], [$shipping->getFirstname(), $shipping->getCity(), $shipping->getCountryId()]);
+        self::assertSame('Ringstraße 7', implode(', ', (array) $shipping->getStreet()));
     }
 
     public function testOnlyAddBehaviours(): void

@@ -131,6 +131,9 @@ class EntityRegistry
             'datum' => 'created_at', 'date' => 'created_at', 'kunde' => 'customer_email', 'customer' => 'customer_email',
             'sterne' => 'ratings', 'stars' => 'ratings', 'rating' => 'ratings', 'suchbegriff' => 'query_text',
             'term' => 'query_text', 'query' => 'query_text', 'search term' => 'query_text', 'weiterleitung' => 'redirect',
+            'beliebtheit' => 'popularity', 'häufigkeit' => 'popularity', 'haeufigkeit' => 'popularity',
+            'uses' => 'popularity', 'searches' => 'popularity', 'suchanfragen' => 'popularity',
+            'redirect url' => 'redirect', 'ergebnisse' => 'num_results', 'results' => 'num_results',
             'synonyme' => 'synonyms', 'words' => 'synonyms', 'kategorie' => 'category_path', 'category' => 'category_path',
             'position' => 'position', 'sort' => 'position', 'reihenfolge' => 'position',
         ];

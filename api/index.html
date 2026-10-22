@@ -217,7 +217,7 @@ SFTP or FTP); exports work with every destination.</p>
 (start) and <em>View runs and error reports</em> (status). Typical use: a PIM or ERP drops a file on the SFTP server and then
 calls the endpoint, so the import starts at once instead of at the next schedule.</p>
 <h2 id="export-right-after-an-order-is-placed">Export right after an order is placed<a class="headerlink" href="#export-right-after-an-order-is-placed" title="Permanent link">&para;</a></h2>
-<p>Order export profiles have the setting <strong>Also run after every order</strong>. When an order is placed (storefront, admin or
+<p>Order export profiles from before 1.6 have the setting <strong>Also run after every order</strong> (since 1.6 the form shows it only while it is on; new profiles use step 6 › <em>Also run when</em> › <em>An order is placed</em>). When an order is placed (storefront, admin or
 API), the profile is queued; cron runs it within a minute. Ten orders in that minute make one run, not ten. Combine
 it with <em>Which orders: Only orders not exported before by this profile</em> so every file holds just the new orders.</p>
 <p>Since 1.6 any profile can do this, and react to more events (a product or customer saved, stock changes, an order

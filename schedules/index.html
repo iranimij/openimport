@@ -310,7 +310,10 @@ instead of) its schedule. Cron runs it within a minute.</p>
 <li>A failing trigger never breaks the save that raised it; the error goes to <code>var/log/openimport.log</code>.</li>
 </ul>
 <p>Order exports from 1.1 with <strong>Also run after every order</strong> keep working: the switch acts like the trigger <em>An order
-is placed</em>.</p>
+is placed</em>, also when it was saved as <code>true</code> or <code>1</code> by a JSON file or the API. The form shows the old switch only
+while it is on; switch it off and choose <em>An order is placed</em> instead.</p>
+<p>The step 6 header sums it up: <em>Manual only · after: product saved · switched on · then: Stock update</em>. The mass
+actions of the profile grid switch automatic runs (schedule and triggers) on and off.</p>
 <h2 id="job-chains">Job chains<a class="headerlink" href="#job-chains" title="Permanent link">&para;</a></h2>
 <p>Since 1.6. Step 6 of a profile, <strong>Then run</strong>: the profile that runs after this one, as a live run of its own with
 this run as its parent (the run grid shows <em>Job chain</em> as the start). A nightly chain is one schedule: the first
@@ -323,7 +326,10 @@ profile has the schedule, every next one has none.</p>
   as always, which also holds the rest of the chain until an admin confirms it.</li>
 <li>Saving refuses a chain that comes back to a profile (<em>The chain would loop: A → B → A</em>), a profile that runs
   itself, a next profile that reads uploaded files (nothing would be there to read), and more than 20 links.</li>
-<li>The run page says what happened next: <em>Then: "Stock update" queued as run 512</em>, or why nothing started.</li>
+<li>The run page says what happened next: <em>Then: "Stock update" queued as run 512</em> (a link to that run), or why
+  nothing started; the next run's page links back to the run that started it.</li>
+<li>Deleting a profile that another profile runs next asks with the names of those profiles; their chain stops there.</li>
+<li>The <em>Then run</em> list leaves out imports that read uploaded files.</li>
 <li>Profiles exported as JSON carry the chain by profile name; an import links the profiles of the file to each
   other once they are saved.</li>
 </ul>

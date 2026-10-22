@@ -181,7 +181,8 @@ class ReviewSource implements SmallSourceInterface
     }
 
     /**
-     * Magento stores every review under store 0 as well; the file names the store views, or "all" alone.
+     * Magento stores every review under store 0 as well; the file names the store views, "all" for every one, or
+     * nothing for a review shown in no store view.
      *
      * @param int[] $storeIds
      * @return string
@@ -189,12 +190,16 @@ class ReviewSource implements SmallSourceInterface
     public function storeCodes(array $storeIds): string
     {
         $views = array_values(array_filter($storeIds, static fn (int $id): bool => $id !== 0));
+        if ($views === []) {
+            // Store 0 alone shows the review nowhere (saved so before 1.5.1): no store view, so "all" repairs it.
+            return '';
+        }
         $every = array_values(array_filter(
             array_values($this->records->storeCodes()),
             static fn (int $id): bool => $id !== 0
         ));
 
-        return $views === [] || array_diff($every, $views) === []
+        return array_diff($every, $views) === []
             ? 'all'
             : implode(',', array_map(fn (int $storeId): string => $this->records->storeCode($storeId), $views));
     }

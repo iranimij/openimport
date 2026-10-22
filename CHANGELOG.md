@@ -12,7 +12,8 @@ Fixes from the third hands-on browser review of 1.5.0 (Notion "16 · Browser rev
 ### Fixed
 - Reviews: a new review without `store_codes`, and `all`, is saved for every store view. It used to be saved for
   store 0 only, which Magento shows nowhere: the review and its stars stayed invisible in the shop and in the
-  admin form. The export writes `all` for a review shown in every store view.
+  admin form. The export writes `all` for a review shown in every store view and leaves `store_codes` empty for
+  one shown in none, so importing `all` for such a review repairs it.
 - Reviews: a rating that is switched off or not shown in the review's store views (Stores › Rating › Rating
   Visibility) is still imported, with a note on the row that its stars will not appear.
 - Orders: an order without shipping columns gets the billing address as its shipping address, as documented.

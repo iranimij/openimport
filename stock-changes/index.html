@@ -205,6 +205,9 @@ corner. Step 5, <strong>Quantities in the file</strong>:</p>
   gives 17). Magento receives one row per SKU (per SKU and source) with the result, after the file's last row.</li>
 <li>A product that does not exist yet starts at 0.</li>
 <li>A value that is not a change (<code>many</code>) is a row error naming the column.</li>
+<li>Decimals only for products sold in decimals: <code>+1.5</code> for a product whose <em>Qty Uses Decimals</em> is off is a row error
+  (since 1.5.2; also for plain quantities, "are the new stock"). A new product can switch it on in the same row with
+  the column <code>is_qty_decimal</code> = 1.</li>
 <li>Live runs hold the lock of Magento's entity: products, Stock &amp; prices and Stock per source runs never change the
   same quantities at the same time.</li>
 <li>The dry run shows the quantity Magento would receive (<em>qty: 10 → 17</em>).</li>

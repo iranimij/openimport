@@ -229,7 +229,7 @@ nowhere. A live run delivers it and keeps a copy in the run folder for "Keep run
 <ul>
 <li>Cells that would run as a formula in a spreadsheet (<code>=</code>, <code>+</code>, <code>-</code>, <code>@</code>, tab, CR first) are prefixed with <code>'</code>
   in CSV and Excel files (Stores › Configuration › iranimij › OpenImport › Safety › <em>Protect exports against
-  spreadsheet formulas</em>). Negative numbers are left alone.</li>
+  spreadsheet formulas</em>). Negative numbers are left alone. Importing such a file takes the apostrophe off again.</li>
 <li>Excel files are written without any library: plain numbers become numeric cells, everything else stays text
   (SKUs with leading zeros survive). Excel's limit of 1,048,575 rows is enforced with a plain message.</li>
 <li>Destinations use the same encrypted secrets and the same SSRF, path and folder rules as sources

@@ -262,7 +262,8 @@ with the current key. Run it while the old key is still in <code>app/etc/env.php
 mapping and value map, never passwords, keys, tokens or upload tokens. Keep the file in version control or move it
 to another store: <code>bin/magento openimport:profiles:export &gt; profiles.json</code>.</p>
 <h2 id="openimportprofilesimport-file-dry-run"><code>openimport:profiles:import &lt;file&gt; [--dry-run]</code><a class="headerlink" href="#openimportprofilesimport-file-dry-run" title="Permanent link">&para;</a></h2>
-<p>Creates the profiles of such a file; a profile with the same name is updated (its stored secrets are kept).
+<p>Creates the profiles of such a file; a profile with the same name is updated (its stored secrets are kept). A file
+never switches automatic runs on: new profiles start switched off, updated ones keep their state.
 Everything is checked first and listed as "create …" / "update …"; one problem and nothing is saved. <code>--dry-run</code>
 checks and lists without saving. Enter passwords and keys in the admin afterwards.</p>
 <h2 id="openimportdoctor"><code>openimport:doctor</code><a class="headerlink" href="#openimportdoctor" title="Permanent link">&para;</a></h2>

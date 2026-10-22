@@ -244,6 +244,8 @@ would do (<em>would disable 2 …</em>) and changes nothing.</p>
 <ul>
 <li><strong>Rows with errors stop it.</strong> When OpenImport could not prepare a row, that row may name a product, so nothing is
   disabled, set out of stock or deleted. The run message says so.</li>
+<li><strong>A file without rows stops it.</strong> A header-only file is a broken feed, not "nothing is sold any more": nothing is
+  changed and the run message says so.</li>
 <li><strong>Safety limit.</strong> When the missing products are more than the profile's safety limit (share of the products in the
   scope), the run waits for a typed confirmation: <em>Type DISABLE to confirm</em> (or <code>OUT OF STOCK</code>, <code>DELETE</code>). The dry
   run shows the same note. On the command line use <code>--confirm</code>.</li>

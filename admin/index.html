@@ -204,8 +204,9 @@
 Above it, a status line says how the last 24 hours went (failed runs link to the runs), what is waiting, and whether
 the cron runs. A click on a row opens the profile. Row actions: <em>Edit</em>, <em>Dry run</em>, <em>Run now</em> (the dialog names the
 file it imports and how the last dry run went), <em>Duplicate</em> (the copy starts with its schedule off) and <em>Delete</em>
-(runs and error reports are kept). Mass actions: switch schedules on or off, delete. <strong>Import profiles from JSON</strong>
-takes a file from <em>Download as JSON</em> or <code>openimport:profile:export</code>.</p>
+(runs and error reports are kept). Mass actions: switch schedules on or off, delete. The search box finds profiles
+by name (the runs grid: by profile name). <strong>Import profiles from JSON</strong> takes a file from <em>Download as JSON</em> or
+<code>openimport:profile:export</code>; new profiles from a file start switched off.</p>
 <p>The form has a step navigation at the top; each step header says what the step holds, and its <strong>?</strong> opens the
 matching page of this documentation. Fields show only where they matter (an export has no import rules, a CSV no
 sheet name, the cron field only with <em>Custom</em>), required fields are marked, and a save that fails opens the step with
@@ -277,7 +278,11 @@ run is queued or running.</p>
 </tr>
 <tr>
 <td>View runs and error reports</td>
-<td>the run list, run pages and downloads</td>
+<td>the run list, run pages and error reports</td>
+</tr>
+<tr>
+<td>Download run files</td>
+<td>the imported file and the export of a run (they can hold customer and order data); since 1.5.2, given on upgrade to every role that could view runs</td>
 </tr>
 <tr>
 <td>Manage connections</td>

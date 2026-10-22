@@ -208,7 +208,8 @@ page lists what the module does about that, what the settings control, and what 
 <h2 id="admin-actions">Admin actions<a class="headerlink" href="#admin-actions" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Every controller is behind an ACL resource: <em>View profiles</em>, <em>Create and edit profiles</em>, <em>Run profiles</em>, <em>Confirm
-  runs above the safety limit</em>, <em>View runs and error reports</em>, <em>Manage connections</em>, plus the configuration section. Roles that may view but
+  runs above the safety limit</em>, <em>View runs and error reports</em>, <em>Download run files</em>, <em>Manage connections</em>, plus the
+  configuration section. Roles that may view but
   not edit get a read-only form.</li>
 <li>Everything that changes state is a POST with Magento's form key; everything that reads is a GET. File answers go
   through Magento's <code>FileFactory</code>, never a raw path.</li>

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Ui\Component\Listing\Column;
 
+use Iranimij\OpenImport\Model\Chain\ChainLinks;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\DB\Sql\Expression;
@@ -33,6 +34,7 @@ class ProfileActions extends Column
      * @param ResourceConnection $resource
      * @param Json $json
      * @param TimezoneInterface $timezone
+     * @param ChainLinks $chains
      * @param array<string, mixed> $components
      * @param array<string, mixed> $data
      */
@@ -45,6 +47,7 @@ class ProfileActions extends Column
         private readonly ResourceConnection $resource,
         private readonly Json $json,
         private readonly TimezoneInterface $timezone,
+        private readonly ChainLinks $chains,
         array $components = [],
         array $data = []
     ) {
@@ -105,7 +108,8 @@ class ProfileActions extends Column
                     'post' => true,
                     'confirm' => [
                         'title' => __('Delete "%1"?', $name),
-                        'message' => __('The profile will be deleted. Its runs and error reports are kept.'),
+                        'message' => __('The profile will be deleted. Its runs and error reports are kept.')
+                            . $this->chainNote($id),
                         'button' => __('Delete profile'),
                     ],
                 ];
@@ -114,6 +118,22 @@ class ProfileActions extends Column
         }
 
         return $dataSource;
+    }
+
+    /**
+     * " The chain of A, B stops here." when other profiles run this one next.
+     *
+     * @param int $id
+     * @return string
+     */
+    private function chainNote(int $id): string
+    {
+        $names = $this->chains->predecessors($id);
+
+        return $names === [] ? '' : ' ' . $this->escaper->escapeHtml((string) __(
+            '"%1" run(s) this profile next; their chain will stop there.',
+            implode('", "', $names)
+        ));
     }
 
     /**

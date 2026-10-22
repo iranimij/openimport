@@ -163,11 +163,17 @@
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">entity</item>
+                    <!-- Replaced by step 6 › "Also run when" › "An order is placed" (1.6); shown only while it is on. -->
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.order.on_place" xsi:type="array">
+                            <item name="match" xsi:type="string">^(1|true)$</item>
+                        </item>
+                    </item>
                 </item>
             </argument>
             <settings>
                 <label translate="true">Also run after every order</label>
-                <notice translate="true">Queues this export when an order is placed; cron runs it within a minute. Combine with "Only orders not exported before".</notice>
+                <notice translate="true">Replaced by step 6 › "Also run when" › "An order is placed", which also works with schedules and other events. This switch still works while it is on; once it is off, it is gone.</notice>
                 <dataScope>export_options.order.on_place</dataScope>
             </settings>
             <formElements>

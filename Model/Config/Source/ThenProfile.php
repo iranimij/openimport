@@ -15,7 +15,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 /**
  * The profiles a profile can run afterwards (job chain): every profile by name; the form hides the profile
- * itself. Profiles that read uploaded files are listed but refused at save with a plain message.
+ * itself. Imports that read uploaded files are left out: nothing would be there to read when they run next.
  */
 class ThenProfile implements OptionSourceInterface
 {
@@ -41,6 +41,9 @@ class ThenProfile implements OptionSourceInterface
             ->addSortOrder($this->sortOrders->setField('name')->setDirection('ASC')->create())
             ->create();
         foreach ($this->profiles->getList($criteria)->getItems() as $profile) {
+            if ($profile->getDirection() !== 'export' && $profile->getSourceType() === 'upload') {
+                continue;
+            }
             $options[] = [
                 'value' => (string) $profile->getProfileId(),
                 'label' => sprintf(

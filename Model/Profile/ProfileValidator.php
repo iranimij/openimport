@@ -106,8 +106,8 @@ class ProfileValidator
                     . 'SFTP or FTP as the source, or set the schedule to "Manual only".';
             }
             if (!$import && ($profile->getExportOptions()['destination'] ?? 'download') === 'download') {
-                $problems[] = 'A scheduled export needs a destination: choose a server folder, SFTP, FTP or e-mail, '
-                    . 'or set the schedule to "Manual only".';
+                $problems[] = 'A scheduled export needs a destination other than "Download from the run page" (a server '
+                    . 'folder, SFTP, FTP, cloud storage, a REST API or e-mail), or set the schedule to "Manual only".';
             }
         }
         $problems = array_merge($problems, $this->triggers($profile, $import));
@@ -317,8 +317,9 @@ class ProfileValidator
                 . 'under "Also run when".';
         }
         if (!$import && ($profile->getExportOptions()['destination'] ?? 'download') === 'download') {
-            $problems[] = 'An export that runs after shop events needs a destination: choose a server folder, SFTP, '
-                . 'FTP or e-mail, or remove the events under "Also run when".';
+            $problems[] = 'An export that runs after shop events needs a destination other than "Download from the run '
+                . 'page" (a server folder, SFTP, FTP, cloud storage, a REST API or e-mail), or remove the events under '
+                . '"Also run when".';
         }
 
         return $problems;

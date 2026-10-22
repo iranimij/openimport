@@ -17,6 +17,16 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 - The step 6 switch *Schedule is on* is now *Automatic runs are on*: it governs the schedule and the triggers.
+- Review 4 (Notion "17 · Browser review 4"): the grid action is now *Switch automatic runs on/off* and also
+  switches on profiles that only run after events; the step 6 summary shows the schedule, the events, whether
+  automatic runs are on and the next profile; the destination messages name the destinations that count.
+
+### Fixed
+- Triggers: *Export each order when it is placed* saved as `true` (profile JSON, API) queued nothing.
+- Job chains: deleting a profile that others run next says which chains stop there; *Then run* no longer offers
+  imports that read an uploaded file. The run page links "queued as run N" lines and the parent run.
+- The old order-export option *Export each order when it is placed* is shown only for profiles that use it, with a
+  note that step 6 replaces it.
 
 ## [1.5.1] - 2026-10-22
 

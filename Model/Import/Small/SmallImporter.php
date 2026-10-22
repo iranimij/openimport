@@ -39,7 +39,8 @@ abstract class SmallImporter implements ImporterInterface
 
     /**
      * Checks a row. Returns ['error' => [column, message]] on a problem, else what write()/remove() need, with
-     * 'key' (lower-cased, to spot duplicates in the file) and 'exists' (bool).
+     * 'key' (lower-cased, to spot duplicates in the file) and 'exists' (bool); an optional 'warning' => [column,
+     * message] is reported with the row, which is imported all the same.
      *
      * @param array<string, string> $row trimmed values by column
      * @param string $behavior
@@ -92,6 +93,11 @@ abstract class SmallImporter implements ImporterInterface
                 [$column, $message] = $prepared['error'];
                 $errors[] = new RowError($position, $column, $message, $column, true);
             } else {
+                if (isset($prepared['warning'])) {
+                    // Reported, not refused: the row is imported.
+                    [$column, $message] = $prepared['warning'];
+                    $errors[] = new RowError($position, $column, $message, $column, false, true);
+                }
                 $ready[$position] = $prepared;
                 $seen[$prepared['key']] = true;
                 if ($request->behavior === Import::BEHAVIOR_DELETE) {
@@ -104,9 +110,10 @@ abstract class SmallImporter implements ImporterInterface
             }
             $position++;
         }
-        $invalid = count(array_filter($errors, static fn (RowError $error): bool => $error->row !== null));
-        $valid = $errors === [] || ($request->skipErrors && $invalid <= $request->allowedErrors
-            && !array_filter($errors, static fn (RowError $error): bool => $error->row === null));
+        $critical = array_filter($errors, static fn (RowError $error): bool => $error->critical);
+        $invalid = count(array_filter($critical, static fn (RowError $error): bool => $error->row !== null));
+        $valid = $critical === [] || ($request->skipErrors && $invalid <= $request->allowedErrors
+            && !array_filter($critical, static fn (RowError $error): bool => $error->row === null));
         if ($request->dryRun || !$valid) {
             return $this->result($valid, false, $position, $invalid, $created, $updated, $deleted, $errors, $started);
         }

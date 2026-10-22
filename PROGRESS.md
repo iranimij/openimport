@@ -111,8 +111,10 @@ Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).
 
 **1.5 · Sales and marketing entities** (plan page 15 §3) **released as 1.5.0 on 2026-10-21**: #65 shipments,
 #67 orders, #68 URL rewrites, #69 price rules and coupons, #70 reviews/newsletter/search/positions; E2E dev-env
-#17. Next: **1.6 · Automation and operations** (plan page 15 §3): 1 job chains, 2 triggers, 3 webhook/Slack,
-4 reindex after a run, 5 parallel workers, 6 undo, 7 close. Slice 1 job chains (`feat/1.6-chains`) built. Each slice: README,
+#17. **1.5.1 on 2026-10-22**: the 12 findings of browser review 3 (Notion page 16) fixed on branch `release/1.5`
+(made from v1.5.0, so the release carries no 1.6 work), released from there and merged back into main.
+Next: **1.6 · Automation and operations** (plan page 15 §3): 1 job chains, 2 triggers, 3 webhook/Slack,
+4 reindex after a run, 5 parallel workers, 6 undo, 7 close. Slice 1 job chains merged (#72). Each slice: README,
 CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs

@@ -109,7 +109,8 @@ class ReviewImporter extends SmallImporter
             $stores = [];
             foreach (array_filter(array_map('trim', explode(',', $get('store_codes')))) as $code) {
                 if (strtolower($code) === 'all') {
-                    $stores = [0];
+                    // Every store view; Magento adds store 0 itself. Store 0 alone would show the review nowhere.
+                    $stores = $this->allStoreViews();
                     break;
                 }
                 $id = $this->records->storeId($code);
@@ -124,7 +125,7 @@ class ReviewImporter extends SmallImporter
         }
         $customerId = null;
         if ($get('customer_email') !== '') {
-            $storeId = $stores !== null && $stores !== [0] ? $stores[0] : ($this->records->storeId('') ?? 0);
+            $storeId = $stores !== null && $stores !== [] ? $stores[0] : ($this->records->storeId('') ?? 0);
             $customerId = $this->records->customerId($get('customer_email'), $this->records->websiteOf($storeId));
             if ($customerId === null) {
                 return ['error' => ['customer_email',
@@ -132,6 +133,7 @@ class ReviewImporter extends SmallImporter
             }
         }
         $ratings = null;
+        $warning = null;
         if ($get('ratings') !== '') {
             $ratings = [];
             $known = $this->source->ratings();
@@ -157,6 +159,11 @@ class ReviewImporter extends SmallImporter
                     )]];
                 }
                 $ratings[(int) $known[$code]['id']] = (int) $known[$code]['options'][$value];
+                $warning ??= $this->hiddenRating(
+                    $known[$code],
+                    $stores ?? ($existing !== null ? $this->source->storesOf((int) $existing['review_id'])
+                        : $this->allStoreViews())
+                );
             }
         }
 
@@ -174,7 +181,7 @@ class ReviewImporter extends SmallImporter
                 ? gmdate('Y-m-d H:i:s', (int) strtotime($get('created_at'))) : null,
             'customer_id' => $customerId,
             'ratings' => $ratings,
-        ];
+        ] + ($warning === null ? [] : ['warning' => ['ratings', $warning]]);
     }
 
     /**
@@ -190,7 +197,7 @@ class ReviewImporter extends SmallImporter
             $review->setEntityId((int) $review->getEntityIdByCode(Review::ENTITY_PRODUCT_CODE))
                 ->setEntityPkValue($prepared['product_id'])
                 ->setStatusId(Review::STATUS_APPROVED)
-                ->setData('stores', [0]);
+                ->setData('stores', $this->allStoreViews());
         }
         foreach (['nickname', 'title', 'detail'] as $column) {
             if ($prepared[$column] !== '') {
@@ -226,6 +233,47 @@ class ReviewImporter extends SmallImporter
             }
         }
         $review->aggregate();
+    }
+
+    /**
+     * Why a rating's stars will not show for this review, or null when they will.
+     *
+     * @param array{code: string, active: bool, stores: int[]} $rating
+     * @param int[] $reviewStores
+     * @return string|null
+     */
+    private function hiddenRating(array $rating, array $reviewStores): ?string
+    {
+        if (!$rating['active']) {
+            return sprintf(
+                'rating %s is switched off (Stores › Rating › Is Active), so its stars are not shown',
+                $rating['code']
+            );
+        }
+        $views = array_values(array_filter($reviewStores, static fn (int $id): bool => $id !== 0));
+        if ($views !== [] && array_intersect($views, $rating['stores']) === []) {
+            return sprintf(
+                'rating %s is not shown in store view %s (Stores › Rating › Rating Visibility), so its stars '
+                . 'are not shown; the vote is imported',
+                $rating['code'],
+                implode(', ', array_map(fn (int $id): string => $this->records->storeCode($id), $views))
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * Every store view of the shop (a new review without store_codes, or "all", is shown everywhere).
+     *
+     * @return int[]
+     */
+    private function allStoreViews(): array
+    {
+        return array_values(array_filter(
+            array_values($this->records->storeCodes()),
+            static fn (int $id): bool => $id !== 0
+        ));
     }
 
     /**

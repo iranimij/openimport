@@ -807,3 +807,6 @@
 "Job chain","Job-Kette"
 "export","Export"
 "import","Import"
+"Import from: %1","Import aus: %1"
+"Export to: %1","Export nach: %1"
+"%1 field(s) matched automatically. Check them, then add transforms where needed.","%1 Feld(er) automatisch zugeordnet. Prüfen Sie sie und fügen Sie bei Bedarf Umwandlungen hinzu."

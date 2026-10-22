@@ -12,7 +12,50 @@ define([
 ], function (_, Select, conditional) {
     'use strict';
 
+    /**
+     * First real value of a list of options (option groups carry their options in "value").
+     *
+     * @param {Array} options
+     * @returns {*}
+     */
+    function firstValue(options) {
+        var found;
+
+        _.some(options || [], function (option) {
+            found = _.isArray(option.value) ? firstValue(option.value) : option.value;
+
+            return !_.isUndefined(found);
+        });
+
+        return found;
+    }
+
     return conditional(Select).extend({
+        /**
+         * Magento's select passes the options observable itself to its findFirst(), which breaks (and silently drops
+         * the whole field) for a select without a caption and without a value. Read the observable's list instead.
+         *
+         * @returns {Object} Chainable
+         */
+        clear: function () {
+            this.value(this.caption() ? '' : firstValue(this.options()));
+
+            return this;
+        },
+
+        /** @inheritdoc */
+        normalizeData: function (value) {
+            var option;
+
+            if (value !== '' && !_.isUndefined(value) && value !== null) {
+                option = this.getOption(value);
+
+                return option && option.value;
+            }
+
+            return this.caption() ? '' : firstValue(this.options());
+        },
+
         /** @inheritdoc */
         initialize: function () {
             var options;

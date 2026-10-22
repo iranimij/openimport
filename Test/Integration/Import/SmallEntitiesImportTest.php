@@ -26,9 +26,11 @@ use Iranimij\OpenImport\Model\Import\Small\SynonymSource;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Filesystem;
 use Magento\Newsletter\Model\Subscriber;
 use Magento\Review\Model\Review;
+use Magento\Review\Model\ResourceModel\Review\Collection as ReviewCollection;
 use Magento\TestFramework\Fixture\AppArea;
 use Magento\TestFramework\Fixture\AppIsolation;
 use Magento\TestFramework\Fixture\DataFixture;
@@ -88,6 +90,28 @@ class SmallEntitiesImportTest extends TestCase
         );
 
         return Bootstrap::getObjectManager()->get(RunProcessor::class)->process((int) $run->getRunId());
+    }
+
+    /**
+     * Makes ratings active and shown (true) or not shown (false) in store view 1.
+     *
+     * @param array<string, bool> $ratings rating code => shown
+     */
+    private function ratingVisibility(array $ratings): void
+    {
+        $resource = Bootstrap::getObjectManager()->get(ResourceConnection::class);
+        $connection = $resource->getConnection();
+        foreach ($ratings as $code => $shown) {
+            $id = (int) $connection->fetchOne(
+                $connection->select()->from($resource->getTableName('rating'), ['rating_id'])->where('rating_code = ?', $code)
+            );
+            self::assertGreaterThan(0, $id, 'rating ' . $code);
+            $connection->update($resource->getTableName('rating'), ['is_active' => 1], ['rating_id = ?' => $id]);
+            $connection->delete($resource->getTableName('rating_store'), ['rating_id = ?' => $id, 'store_id = ?' => 1]);
+            if ($shown) {
+                $connection->insert($resource->getTableName('rating_store'), ['rating_id' => $id, 'store_id' => 1]);
+            }
+        }
     }
 
     private function report(RunInterface $run): string
@@ -167,6 +191,8 @@ class SmallEntitiesImportTest extends TestCase
     public function testReviewsWithRatings(): void
     {
         $tag = 'OI' . bin2hex(random_bytes(2));
+        // Quality and Value are shown in store view 1, Price is not: its stars would never appear.
+        $this->ratingVisibility(['Quality' => true, 'Value' => true, 'Price' => false]);
         $header = "product_sku;nickname;title;detail;status;store_codes;created_at;customer_email;ratings\n";
         $rows = $this->roundTrip(
             EntityRegistry::REVIEW,
@@ -182,7 +208,8 @@ class SmallEntitiesImportTest extends TestCase
         );
         self::assertCount(2, $rows);
         $anna = $rows["Anna {$tag}"];
-        foreach (['status' => 'approved', 'store_codes' => 'default', 'created_at' => '2025-02-03 10:00:00',
+        // The test shop has one store view, so "default" is every store view and comes back as "all".
+        foreach (['status' => 'approved', 'store_codes' => 'all', 'created_at' => '2025-02-03 10:00:00',
             'customer_email' => 'customer@example.com', 'ratings' => 'Quality:4,Value:5'] as $column => $expected) {
             self::assertSame($expected, $anna[$column], $column . ' of the exported review: ' . json_encode($anna));
         }
@@ -190,6 +217,11 @@ class SmallEntitiesImportTest extends TestCase
         $review = Bootstrap::getObjectManager()->get(ReviewSource::class)->byKey(1, "Anna {$tag}", 'Great shirt');
         self::assertNotNull($review);
         self::assertSame(Review::STATUS_APPROVED, (int) $review['status_id']);
+        // Both reviews are shown in the store view ("all" used to save store 0 alone, which shows a review nowhere).
+        $shown = Bootstrap::getObjectManager()->create(ReviewCollection::class)
+            ->addStoreFilter(1)
+            ->addFieldToFilter('detail.nickname', ['in' => ["Anna {$tag}", "Ben {$tag}"]]);
+        self::assertCount(2, $shown, 'the imported reviews are visible in store view 1');
 
         // Update by product, nickname and title: the status changes, the ratings are replaced.
         $update = $this->process(
@@ -213,6 +245,15 @@ class SmallEntitiesImportTest extends TestCase
         self::assertStringContainsString('there is no rating "Nope"', $messages);
         self::assertStringContainsString('rating Quality has no value 9', $messages);
         self::assertStringContainsString('needs a nickname, a title and a text', $messages);
+
+        // A rating that the review's store views do not show is imported, with a note on the row.
+        $hidden = $this->process(
+            $this->profile(EntityRegistry::REVIEW, explode(';', trim($header))),
+            $this->file($header . "simple;Carl {$tag};Fine;Fits well.;approved;;;;Price:3\n"),
+            RunInterface::MODE_DRY_RUN
+        );
+        self::assertSame(1, $hidden->getCount('created'), $this->report($hidden));
+        self::assertStringContainsString('rating Price is not shown in store view default', $this->report($hidden));
 
         $this->delete(EntityRegistry::REVIEW, "product_sku;nickname;title\nsimple;Anna {$tag};Great shirt\nsimple;Ben {$tag};Meh\n", 2);
         self::assertNull(Bootstrap::getObjectManager()->get(ReviewSource::class)->find("simple|Anna {$tag}|Great shirt"));

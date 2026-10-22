@@ -220,6 +220,8 @@ calls the endpoint, so the import starts at once instead of at the next schedule
 <p>Order export profiles have the setting <strong>Also run after every order</strong>. When an order is placed (storefront, admin or
 API), the profile is queued; cron runs it within a minute. Ten orders in that minute make one run, not ten. Combine
 it with <em>Which orders: Only orders not exported before by this profile</em> so every file holds just the new orders.</p>
+<p>Since 1.6 any profile can do this, and react to more events (a product or customer saved, stock changes, an order
+changing status): see <a href="../schedules/#triggers">Schedules › Triggers</a>.</p>
               
             </div>
           </div><footer>

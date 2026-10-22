@@ -144,6 +144,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#exactly-once">Exactly once</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#triggers">Triggers</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#job-chains">Job chains</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#housekeeping">Housekeeping</a>
@@ -239,8 +241,9 @@ Magento's default jobs (indexers, e-mails), and they never hold up an import.</p
 at 02:00, weekdays at 06:00) or a 5-field cron expression, and the form shows the next three run times: minute, hour, day of month, month, day of week. Lists (<code>1,15</code>), ranges (<code>8-18</code>), steps (<code>*/15</code>) and
 names (<code>mon-fri</code>, <code>jan</code>) work. Times are read in the store's time zone (Stores › Configuration › General ›
 Locale Options › Timezone), so <code>0 2 * * *</code> means 02:00 local time, also across daylight-saving changes.</p>
-<p>A schedule only fires while the profile's <strong>Schedule is on</strong> switch is on. New and duplicated profiles start with it
-off: run a dry run first, then switch it on.</p>
+<p>A schedule only fires while the profile's <strong>Automatic runs are on</strong> switch is on (called <em>Schedule is on</em> before 1.6;
+it also governs <a href="#triggers">triggers</a>). New and duplicated profiles start with it off: run a dry run first, then
+switch it on.</p>
 <p>A schedule needs a source that changes by itself: a profile that reads an <strong>uploaded file</strong> cannot be switched on
 (it would import the same file again and again; use a server folder, web address, SFTP or FTP), and a scheduled
 export needs a destination other than <em>Download</em> (a server folder, SFTP, FTP or e-mail).</p>
@@ -257,6 +260,57 @@ remove more than the threshold stops with "needs confirmation" and waits for som
 </ul>
 <p>Two runs of one profile never run at the same time, and two live imports of the same entity never run at the same
 time (products and Stock &amp; prices share the product entity).</p>
+<h2 id="triggers">Triggers<a class="headerlink" href="#triggers" title="Permanent link">&para;</a></h2>
+<p>Since 1.6. Step 6 of a profile, <strong>Also run when</strong>: shop events that queue a live run of the profile, besides (or
+instead of) its schedule. Cron runs it within a minute.</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Raised by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A product is saved</td>
+<td>a product saved in the admin, by the REST API, by <em>Update attributes</em> on several products, or by Magento's own import</td>
+</tr>
+<tr>
+<td>Stock changes</td>
+<td>a stock item saved (admin, API, an order taking stock)</td>
+</tr>
+<tr>
+<td>A customer registers</td>
+<td>a new account made in the storefront</td>
+</tr>
+<tr>
+<td>A customer is saved</td>
+<td>a customer saved in the admin, the storefront account or the API</td>
+</tr>
+<tr>
+<td>An order is placed</td>
+<td>storefront, admin or API checkout</td>
+</tr>
+<tr>
+<td>An order changes status</td>
+<td>an order saved with another status than it had; pick the statuses under <em>Only for these order statuses</em> (empty: any status)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Triggers fire only while <strong>Automatic runs are on</strong> is on, like the schedule.</li>
+<li>One run, not a flood: when a run of the profile is already waiting in the queue, a new event adds nothing, and
+  the same process queues a profile at most once every 30 seconds. Saving 500 products queues one export.</li>
+<li>What OpenImport writes itself starts nothing: a product import does not trigger the product export it may feed,
+  so a profile can never trigger itself in a loop. Use a <a href="#job-chains">job chain</a> to run one profile after another.</li>
+<li>The rules of a schedule apply: a triggered import cannot read uploaded files, and a triggered export needs a
+  destination other than <em>Download</em>.</li>
+<li>The run grid shows <em>Event</em> as the start and the event under <em>Requested by</em> (for example <em>product saved</em>).</li>
+<li>The profile grid's <em>Schedule</em> column lists the events after the schedule: <em>Every hour · after: product saved</em>.</li>
+<li>A failing trigger never breaks the save that raised it; the error goes to <code>var/log/openimport.log</code>.</li>
+</ul>
+<p>Order exports from 1.1 with <strong>Also run after every order</strong> keep working: the switch acts like the trigger <em>An order
+is placed</em>.</p>
 <h2 id="job-chains">Job chains<a class="headerlink" href="#job-chains" title="Permanent link">&para;</a></h2>
 <p>Since 1.6. Step 6 of a profile, <strong>Then run</strong>: the profile that runs after this one, as a live run of its own with
 this run as its parent (the run grid shows <em>Job chain</em> as the start). A nightly chain is one schedule: the first

@@ -75,4 +75,32 @@ class QuantityReader
 
         return $quantities;
     }
+
+    /**
+     * @param string[] $skus
+     * @return array<string, bool> lower-cased SKU => whether its quantity may have decimals ("Qty Uses Decimals");
+     *     products without a stock item are missing
+     */
+    public function decimals(array $skus): array
+    {
+        $connection = $this->resource->getConnection();
+        $decimals = [];
+        foreach (array_chunk(array_values(array_unique($skus)), self::CHUNK) as $chunk) {
+            $rows = $connection->fetchPairs(
+                $connection->select()
+                    ->from(['e' => $this->resource->getTableName('catalog_product_entity')], ['sku'])
+                    ->join(
+                        ['s' => $this->resource->getTableName('cataloginventory_stock_item')],
+                        's.product_id = e.entity_id AND s.stock_id = 1',
+                        ['is_qty_decimal']
+                    )
+                    ->where('e.sku IN (?)', $chunk)
+            );
+            foreach ($rows as $sku => $decimal) {
+                $decimals[mb_strtolower((string) $sku)] = (int) $decimal === 1;
+            }
+        }
+
+        return $decimals;
+    }
 }

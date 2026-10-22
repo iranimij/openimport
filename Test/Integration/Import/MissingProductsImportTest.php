@@ -274,4 +274,17 @@ class MissingProductsImportTest extends TestCase
         self::assertNotNull($this->state($prefix . '-OTHER'));
         self::assertSame(1, $run->getCount('deleted'), $this->describe($run) . ' / ' . $this->describe($broken));
     }
+
+    public function testAFileWithoutRowsChangesNothing(): void
+    {
+        $prefix = 'OI-MIE-' . bin2hex(random_bytes(3));
+        $this->shop($prefix);
+        $file = sys_get_temp_dir() . '/openimport-missing-' . bin2hex(random_bytes(5)) . '.csv';
+        file_put_contents($file, "sku,name,supplier\n");
+        $this->files[] = $file;
+
+        $run = $this->runImport($this->productProfile($this->options('disable')), $file);
+        self::assertStringContainsString('nothing changed because the file has no rows', $this->describe($run));
+        self::assertSame(1, $this->state($prefix . '-5')['status'] ?? null, 'nothing is disabled by an empty feed');
+    }
 }

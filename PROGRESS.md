@@ -113,6 +113,14 @@ Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).
 #67 orders, #68 URL rewrites, #69 price rules and coupons, #70 reviews/newsletter/search/positions; E2E dev-env
 #17. **1.5.1 on 2026-10-22**: the 12 findings of browser review 3 (Notion page 16) fixed on branch `release/1.5`
 (made from v1.5.0, so the release carries no 1.6 work), released from there and merged back into main.
+**1.5.2**: the findings of browser review 4 (Notion page 17) in released code, on branch `fix/1.5.2` from
+`release/1.5`: grid keyword search (filter pool now reaches Magento's Reporting), picture columns in the field list,
+dry-run headline with left-out rows, formula-guard round trip, CR line breaks, extra cells, 8 MB line limit, empty
+files, decimal quantities, order country codes, picture paths, plain core messages, empty feeds and missing
+products, JSON import never switches profiles on, broken JSON message, REST hints, export wording, permission
+*Download run files* (data patch GrantRunFiles), sheet list. The 1.6-only findings (mass action for trigger-only
+profiles, on_place normalisation, step 6 summary, chain links and delete warning, Then-run list, legacy order
+switch) follow on main after the merge back.
 Next: **1.6 · Automation and operations** (plan page 15 §3): 1 job chains, 2 triggers, 3 webhook/Slack,
 4 reindex after a run, 5 parallel workers, 6 undo, 7 close. Slice 1 job chains merged (#72). Each slice: README,
 CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.

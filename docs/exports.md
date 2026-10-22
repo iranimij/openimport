@@ -32,7 +32,7 @@ nowhere. A live run delivers it and keeps a copy in the run folder for "Keep run
 
 - Cells that would run as a formula in a spreadsheet (`=`, `+`, `-`, `@`, tab, CR first) are prefixed with `'`
   in CSV and Excel files (Stores › Configuration › iranimij › OpenImport › Safety › *Protect exports against
-  spreadsheet formulas*). Negative numbers are left alone.
+  spreadsheet formulas*). Negative numbers are left alone. Importing such a file takes the apostrophe off again.
 - Excel files are written without any library: plain numbers become numeric cells, everything else stays text
   (SKUs with leading zeros survive). Excel's limit of 1,048,575 rows is enforced with a plain message.
 - Destinations use the same encrypted secrets and the same SSRF, path and folder rules as sources

@@ -24,6 +24,11 @@ class OrderRecords
     private ?array $statuses = null;
 
     /**
+     * @var array<string, true>|null
+     */
+    private ?array $countries = null;
+
+    /**
      * @var array<string, int>|null code => id
      */
     private ?array $groups = null;
@@ -198,5 +203,21 @@ class OrderRecords
             'name' => (string) $store->getName(),
             'currency' => (string) $store->getBaseCurrencyCode(),
         ];
+    }
+
+    /**
+     * @return array<string, true> the country codes Magento knows (directory_country), upper case
+     */
+    public function countries(): array
+    {
+        if ($this->countries === null) {
+            $connection = $this->resource->getConnection();
+            $codes = $connection->fetchCol(
+                $connection->select()->from($this->resource->getTableName('directory_country'), ['country_id'])
+            );
+            $this->countries = array_fill_keys(array_map(static fn ($code): string => strtoupper((string) $code), $codes), true);
+        }
+
+        return $this->countries;
     }
 }

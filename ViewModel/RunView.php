@@ -288,6 +288,17 @@ class RunView implements ArgumentInterface
      *
      * @return bool
      */
+    /**
+     * Whether the admin may download the run's files (they can hold customer and order data).
+     */
+    public function canDownloadFiles(): bool
+    {
+        return $this->authorization->isAllowed('Iranimij_OpenImport::run_files');
+    }
+
+    /**
+     * @return bool
+     */
     public function canRunAgain(): bool
     {
         $run = $this->run();

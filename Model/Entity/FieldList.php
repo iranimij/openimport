@@ -45,6 +45,15 @@ class FieldList
     ];
 
     /**
+     * Import columns core's sample files leave out (2.4.9's product sample has no picture columns).
+     */
+    private const EXTRA_COLUMNS = [
+        'catalog_product' => ['base_image', 'base_image_label', 'small_image', 'small_image_label', 'thumbnail_image',
+            'thumbnail_image_label', 'swatch_image', 'swatch_image_label', 'additional_images',
+            'additional_image_labels', 'hide_from_product_page', 'url_key'],
+    ];
+
+    /**
      * EAV entity whose attributes are offered too.
      */
     private const EAV = ['catalog_product' => 'catalog_product', 'customer' => 'customer',
@@ -70,6 +79,11 @@ class FieldList
     {
         $info = $this->entities->get($entity);
         $codes = $info !== null && $info->columns !== [] ? $info->columns : $this->sampleColumns($entity);
+        foreach (self::EXTRA_COLUMNS[$entity] ?? [] as $code) {
+            if (!in_array($code, $codes, true)) {
+                $codes[] = $code;
+            }
+        }
         $labels = [];
         if ($info === null || $info->columns === []) {
             foreach ($this->attributes($entity) as $code => $label) {

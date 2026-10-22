@@ -305,10 +305,17 @@
             </argument>
         </arguments>
     </virtualType>
+    <!-- Magento's grid data provider filters through its Reporting object, which carries the filter pool. -->
+    <virtualType name="Iranimij\OpenImport\Ui\DataProvider\GridReporting"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\Reporting">
+        <arguments>
+            <argument name="filterPool" xsi:type="object">Iranimij\OpenImport\Ui\DataProvider\GridFilterPool</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="Iranimij\OpenImport\Ui\DataProvider\GridDataProvider"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
         <arguments>
-            <argument name="filterPool" xsi:type="object">Iranimij\OpenImport\Ui\DataProvider\GridFilterPool</argument>
+            <argument name="reporting" xsi:type="object">Iranimij\OpenImport\Ui\DataProvider\GridReporting</argument>
         </arguments>
     </virtualType>
 

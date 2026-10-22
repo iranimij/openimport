@@ -69,6 +69,11 @@ class ImportJson extends Action implements HttpGetActionInterface, HttpPostActio
                 $created,
                 $updated
             ));
+            if ($created > 0) {
+                $this->messageManager->addNoticeMessage((string) __(
+                    'New profiles are switched off: switch them on after a dry run you are happy with.'
+                ));
+            }
 
             return $redirect->setPath('*/*/');
         } catch (\InvalidArgumentException | LocalizedException $exception) {

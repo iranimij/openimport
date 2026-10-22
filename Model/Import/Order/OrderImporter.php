@@ -262,9 +262,13 @@ class OrderImporter implements ImporterInterface
         }
 
         $model->setBillingAddress($this->address($order['billing'], 'billing', $data['customer_email']));
-        if ($this->filled($order['shipping'])) {
-            $model->setShippingAddress($this->address($order['shipping'], 'shipping', $data['customer_email']));
-        }
+        // Imported orders are never virtual, and Magento's order view needs a shipping address: without shipping
+        // columns the billing address is used.
+        $model->setShippingAddress($this->address(
+            $this->filled($order['shipping']) ? $order['shipping'] : $order['billing'],
+            'shipping',
+            $data['customer_email']
+        ));
         /** @var Payment $payment */
         $payment = $this->paymentFactory->create();
         $payment->setMethod($data['payment_method'] !== '' ? $data['payment_method'] : 'checkmo');

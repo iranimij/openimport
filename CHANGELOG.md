@@ -11,6 +11,36 @@ All notable changes to this project are documented here. The format follows
   that read uploaded files are refused at save; profile JSON carries the chain by name. See
   [Schedules › Job chains](https://iranimij.github.io/openimport/schedules/#job-chains).
 
+## [1.5.1] - 2026-10-22
+
+Fixes from the third hands-on browser review of 1.5.0 (Notion "16 · Browser review 3").
+
+### Fixed
+- Reviews: a new review without `store_codes`, and `all`, is saved for every store view. It used to be saved for
+  store 0 only, which Magento shows nowhere: the review and its stars stayed invisible in the shop and in the
+  admin form. The export writes `all` for a review shown in every store view and leaves `store_codes` empty for
+  one shown in none, so importing `all` for such a review repairs it.
+- Reviews: a rating that is switched off or not shown in the review's store views (Stores › Rating › Rating
+  Visibility) is still imported, with a note on the row that its stars will not appear.
+- Orders: an order without shipping columns gets the billing address as its shipping address, as documented.
+  Without it Magento's admin order view failed with "An error has happened during application run".
+- Profile form: the "Order numbers" option (keep the file's numbers or generate new ones) was missing for order
+  imports. A select without a default value no longer disappears from the form, and every field of a step has its
+  own position (fields sharing one could swap places).
+- Dry run: a record spread over several lines (an order with its items) counts once, and records the importer
+  refuses (an invalid e-mail, an unknown product) are listed under the errors only, no longer also as "New".
+- Profiles grid: the "Source / destination" filter also finds exports by destination ("Export to: E-mail"…).
+- Run page: a queued run no longer shows a bare "0" after the waiting notice.
+- Run messages for OpenImport's own importers say "The rows are valid" / "The rows have errors" instead of
+  naming Magento's import, which did not check them.
+- SFTP: a failed connection names the server once and says why in plain words ("the server name is unknown")
+  instead of PHP's network messages.
+
+### Changed
+- Profile form: after the first file is read, its columns are matched automatically when nothing is mapped yet.
+- Auto-match knows `Beliebtheit`, `Häufigkeit`, `uses` and `searches` (popularity) and `Ergebnisse` / `results`
+  for search terms.
+
 ## [1.5.0] - 2026-10-21
 
 Sales and marketing entities: orders, shipments, URL rewrites, price rules and coupons, reviews, newsletter,

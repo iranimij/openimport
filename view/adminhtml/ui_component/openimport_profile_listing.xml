@@ -150,7 +150,7 @@
         <column name="source_type" class="Iranimij\OpenImport\Ui\Component\Listing\Column\SourceOrDestination"
                 component="Magento_Ui/js/grid/columns/column" sortOrder="50">
             <settings>
-                <options class="Iranimij\OpenImport\Model\Config\Source\SourceType"/>
+                <options class="Iranimij\OpenImport\Model\Config\Source\SourceOrDestinationFilter"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
                 <label translate="true">Source / destination</label>

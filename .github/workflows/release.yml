@@ -1,7 +1,8 @@
 name: Release
 
-# Tags main and publishes a GitHub release with the changelog section of the version. Run by hand:
-# Actions › Release › Run workflow › version (e.g. 1.0.0). Packagist picks the tag up through its GitHub hook.
+# Tags the branch it is run on (main, or a release branch such as release/1.5 for a patch release) and publishes a
+# GitHub release with the changelog section of the version. Run by hand: Actions › Release › Run workflow › branch
+# and version (e.g. 1.0.0). Packagist picks the tag up through its GitHub hook.
 on:
   workflow_dispatch:
     inputs:
@@ -22,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Release notes from the changelog

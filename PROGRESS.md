@@ -96,7 +96,7 @@ parallelism only across runs and for exports).
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
 | 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | **released 1.4.0** (#53, #54, #58–#60, #62, #63; release PR); E2E dev-env #13–#16 |
 | 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | **released 1.5.0** (#65, #67–#70, release PR); E2E dev-env #17 |
-| 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | in progress: 1 PR open |
+| 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | in progress: 1 done, 2 PR open |
 
 Rule for every slice: one PR, pushed at once; this file updated after each slice (done, exact next step, open
 questions, failing/skipped tests, CI link); unit ≥ 85 % on new namespaces, integration on all seven pairs, oracle or
@@ -431,6 +431,23 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - Tests: integration `Execution/ChainTest` (chain of three with parents and options, dry run starts nothing, JSON
   round trip, failure stops unless always, loop/self/upload/missing refused). Docs schedules.md, README,
   comparison, CHANGELOG.
+
+### 1.6 slice 2 · triggers (what was built)
+
+- Profile column `triggers` (JSON: `events`, `order_statuses`; schema + whitelist, interface, model, stub, form
+  mapper, duplicate, profile JSON). `Trigger\TriggerEvents` (six events, labels and short names), `TriggerQueue::fire()`
+  (switched-on profiles that list the event, plus legacy order exports with `on_place`; status filter; skips a
+  profile with a waiting run and one queued by this process in the last 30 s; never throws), `TriggerGuard` (entered
+  by `RunProcessor` around every run, so OpenImport's own writes trigger nothing). Observers: one `TriggerRuns`
+  class as four di virtual types (product saved incl. mass attribute update and Magento import, stock item saved,
+  customer registered, customer saved), `QueueOrderExports` (order placed), `OrderStatusChanged` (origData status).
+  Validator refuses unknown events, upload sources and download destinations for active profiles. Form step 6
+  *Also run when* + *Only for these order statuses*; switch renamed *Automatic runs are on*; profile grid
+  *Schedule* column shows "after: …"; run grid label *Event*.
+- Tests: integration `Execution/TriggerTest` (three product saves → one run, switched-off and other-event profiles
+  untouched, stock, order status with and without a status filter, unchanged status, order placed, customer saved
+  and registered, guard, unknown event); unit validator and JSON. Docs schedules.md *Triggers*, api.md, README,
+  CHANGELOG.
 
 ## Open questions
 

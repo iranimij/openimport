@@ -17,6 +17,7 @@ use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Export\ExportRunner;
 use Iranimij\OpenImport\Model\Notification\RunMailer;
+use Iranimij\OpenImport\Model\Trigger\TriggerGuard;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Pipeline\RunOutcome;
@@ -49,6 +50,7 @@ class RunProcessor
      * @param Unpacker $unpacker
      * @param XsltStep $xslt
      * @param ChainStarter $chains
+     * @param TriggerGuard $triggerGuard
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -65,7 +67,8 @@ class RunProcessor
         private readonly FileBatch $fileBatch,
         private readonly Unpacker $unpacker,
         private readonly XsltStep $xslt,
-        private readonly ChainStarter $chains
+        private readonly ChainStarter $chains,
+        private readonly TriggerGuard $triggerGuard
     ) {
     }
 
@@ -114,7 +117,13 @@ class RunProcessor
                 }
                 $held[] = $name;
             }
-            $outcome = $this->runProfile($profile, $run, $held);
+            // What the run writes (products, stock, customers) starts no triggered runs.
+            $this->triggerGuard->enter();
+            try {
+                $outcome = $this->runProfile($profile, $run, $held);
+            } finally {
+                $this->triggerGuard->leave();
+            }
         } catch (RunCancelledException $exception) {
             // The counts so far, as the run wrote them while reading.
             $counts = $this->runRepository->getById($runId)->getCounts();

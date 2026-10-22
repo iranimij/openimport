@@ -39,6 +39,10 @@ interface ProfileInterface
     public const THEN_PROFILE_ID = 'then_profile_id';
     public const THEN_WHEN = 'then_when';
 
+    public const TRIGGERS = 'triggers';
+    public const TRIGGER_EVENTS = 'events';
+    public const TRIGGER_ORDER_STATUSES = 'order_statuses';
+
     public const THEN_SUCCESS = 'success';
     public const THEN_ALWAYS = 'always';
     public const CREATED_BY = 'created_by';
@@ -318,6 +322,20 @@ interface ProfileInterface
      * @return $this
      */
     public function setThenWhen(string $when): self;
+
+    /**
+     * Shop events after which the profile runs (while it is switched on): ['events' => TriggerEvents constants,
+     * 'order_statuses' => statuses for "an order changes status", none = every status].
+     *
+     * @return array{events: string[], order_statuses: string[]}
+     */
+    public function getTriggers(): array;
+
+    /**
+     * @param array<string, mixed> $triggers
+     * @return $this
+     */
+    public function setTriggers(array $triggers): self;
 
     /**
      * Mapping rows in order: target, source, static, transforms, required, value_map_case_sensitive,

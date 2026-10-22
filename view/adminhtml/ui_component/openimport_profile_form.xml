@@ -3021,21 +3021,74 @@
                 <notice translate="true">minute hour day month weekday, for example 30 5 * * 1-6</notice>
             </settings>
         </field>
-        <field name="is_active" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="30">
+        <field name="trigger_events" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="23">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">any</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Also run when</label>
+                <dataScope>triggers.events</dataScope>
+                <notice translate="true">Starts a live run within a minute after the event, while automatic runs are on. Many events in a minute make one run; what OpenImport's own runs write starts nothing (use "Then run" for that). Hold Ctrl or ⌘ to choose several.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Trigger\TriggerEvents"/>
+                        <size>6</size>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="trigger_order_statuses" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="26">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">any</item>
                     <item name="showWhen" xsi:type="array">
-                        <item name="schedule_preset" xsi:type="array">
-                            <item name="filled" xsi:type="string">1</item>
+                        <item name="triggers.events" xsi:type="array">
+                            <item name="match" xsi:type="string">order_status_changed</item>
                         </item>
                     </item>
                 </item>
             </argument>
             <settings>
-                <label translate="true">Schedule is on</label>
+                <label translate="true">To the statuses</label>
+                <dataScope>triggers.order_statuses</dataScope>
+                <notice translate="true">"An order changes status" runs only for these new statuses. None chosen = every change.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\OrderStatus"/>
+                        <size>6</size>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="is_active" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <!-- One of: a schedule, a trigger. -->
+                    <item name="showWhen" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="schedule_preset" xsi:type="array">
+                                <item name="filled" xsi:type="string">1</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="triggers.events" xsi:type="array">
+                                <item name="filled" xsi:type="string">1</item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Automatic runs are on</label>
                 <dataScope>is_active</dataScope>
-                <notice translate="true">New profiles start off: switch the schedule on after a dry run you are happy with.</notice>
+                <notice translate="true">The schedule and the triggers start runs only while this is on. New profiles start off: switch it on after a dry run you are happy with.</notice>
             </settings>
             <formElements>
                 <checkbox>

@@ -414,6 +414,25 @@ class ProfileStub implements ProfileInterface
         return $this->set(self::THEN_WHEN, $when);
     }
 
+    public function getTriggers(): array
+    {
+        $triggers = $this->json->decode($this->get(self::TRIGGERS));
+        $list = static fn (mixed $values): array => array_values(array_unique(array_filter(
+            array_map(static fn (mixed $value): string => is_scalar($value) ? trim((string) $value) : '', (array) $values),
+            static fn (string $value): bool => $value !== ''
+        )));
+
+        return [
+            self::TRIGGER_EVENTS => $list($triggers[self::TRIGGER_EVENTS] ?? []),
+            self::TRIGGER_ORDER_STATUSES => $list($triggers[self::TRIGGER_ORDER_STATUSES] ?? []),
+        ];
+    }
+
+    public function setTriggers(array $triggers): ProfileInterface
+    {
+        return $this->set(self::TRIGGERS, $this->json->encode($triggers));
+    }
+
     /**
      * @inheritDoc
      */

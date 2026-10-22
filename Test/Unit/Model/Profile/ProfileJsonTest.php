@@ -193,4 +193,18 @@ class ProfileJsonTest extends TestCase
             ['name' => 'Lonely', 'entity' => 'catalog_product', 'then_profile' => 'Nobody'],
         ]]));
     }
+
+    public function testTriggersTravelWithTheProfile(): void
+    {
+        $json = $this->json();
+        $events = ['events' => ['product_saved', 'order_status_changed'], 'order_statuses' => ['complete']];
+        $array = $json->toArray(new ProfileStub(['name' => 'Feed', 'entity' => 'catalog_product', 'triggers' => $events]));
+        self::assertSame($events, $array['triggers']);
+        self::assertSame(['events' => [], 'order_statuses' => []], $json->toArray(new ProfileStub(['name' => 'Plain', 'entity' => 'customer']))['triggers']);
+
+        $prepared = $json->prepare(json_encode(['openimport' => 1, 'profiles' => [
+            ['name' => 'Feed copy', 'entity' => 'catalog_product', 'triggers' => $events],
+        ]]));
+        self::assertSame($events, $prepared[0][0]->getTriggers());
+    }
 }

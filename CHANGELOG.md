@@ -10,6 +10,13 @@ All notable changes to this project are documented here. The format follows
   as a live run with the parent run recorded and *Job chain* as the start; loops, self-links and next profiles
   that read uploaded files are refused at save; profile JSON carries the chain by name. See
   [Schedules › Job chains](https://iranimij.github.io/openimport/schedules/#job-chains).
+- Triggers: *Also run when* in step 6 queues a live run when a product is saved, stock changes, a customer registers
+  or is saved, an order is placed or an order changes status (optionally only to chosen statuses). A waiting run is
+  not queued twice, and what OpenImport's own runs write triggers nothing. The profile grid lists the events. See
+  [Schedules › Triggers](https://iranimij.github.io/openimport/schedules/#triggers).
+
+### Changed
+- The step 6 switch *Schedule is on* is now *Automatic runs are on*: it governs the schedule and the triggers.
 
 ## [1.5.1] - 2026-10-22
 

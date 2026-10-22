@@ -363,6 +363,37 @@ class ProfileValidatorTest extends TestCase
         self::assertNotEmpty(array_filter($export, static fn (string $p): bool => str_contains($p, 'scheduled export needs a destination')));
     }
 
+    public function testTriggersNeedKnownEventsAChangingSourceAndADestination(): void
+    {
+        $manual = ['schedule' => null] + $this->valid();
+        $events = ['events' => ['product_saved', 'order_status_changed'], 'order_statuses' => ['processing']];
+        self::assertSame([], $this->validator()->validate(new ProfileStub(['triggers' => $events, 'is_active' => true] + $manual)));
+
+        $unknown = $this->validator()->validate(new ProfileStub(['triggers' => ['events' => ['product_deleted']]] + $manual));
+        self::assertCount(1, $unknown);
+        self::assertStringStartsWith('"product_deleted" is not an event a profile can run after (product_saved, ', $unknown[0]);
+
+        $upload = $this->validator()->validate(new ProfileStub(
+            ['source_type' => 'upload', 'is_active' => true, 'triggers' => $events] + $manual
+        ));
+        self::assertNotEmpty(array_filter($upload, static fn (string $p): bool => str_contains($p, 'uploaded file cannot run after shop events')));
+        $off = $this->validator()->validate(new ProfileStub(
+            ['source_type' => 'upload', 'is_active' => false, 'triggers' => $events] + $manual
+        ));
+        self::assertSame([], $off, 'switched off: the events are kept for later');
+
+        $export = $this->validator()->validate(new ProfileStub([
+            'direction' => 'export',
+            'entity' => 'catalog_product',
+            'is_active' => true,
+            'triggers' => $events,
+            'export_options' => ['destination' => 'download'],
+            'mapping' => [],
+            'row_filters' => [],
+        ] + $manual));
+        self::assertNotEmpty(array_filter($export, static fn (string $p): bool => str_contains($p, 'runs after shop events needs a destination')));
+    }
+
     public function testArchiveCompressionAndXsltSettings(): void
     {
         $xsl = '<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">'

@@ -32,7 +32,7 @@ class ProfileJson
     private const FIELDS = ['name', 'direction', 'entity', 'is_active', 'source_type', 'source_config', 'format',
         'format_options', 'behavior', 'on_error', 'allowed_errors', 'delta', 'safety_threshold', 'schedule',
         'after_success', 'notify', 'notify_emails', 'row_filters', 'export_options', 'import_options', 'mapping',
-        'value_maps', 'then_profile', 'then_when'];
+        'value_maps', 'then_profile', 'then_when', 'triggers'];
 
     /**
      * @var array<int, string> prepared profile index => the name of the profile to run next (resolved on save)
@@ -101,6 +101,7 @@ class ProfileJson
             'import_options' => $profile->getImportOptions(),
             'then_profile' => $this->thenProfileName($profile),
             'then_when' => $profile->getThenWhen(),
+            'triggers' => $profile->getTriggers(),
             'mapping' => $profile->getMapping(),
             'value_maps' => $profile->getValueMaps(),
         ];
@@ -304,6 +305,7 @@ class ProfileJson
             ->setNotifyEmails($text('notify_emails', ''))
             ->setThenProfileId(null)
             ->setThenWhen($text('then_when', ProfileInterface::THEN_SUCCESS))
+            ->setTriggers($list('triggers'))
             ->setRowFilters($list('row_filters'))
             ->setExportOptions($export)
             ->setImportOptions($list('import_options'))

@@ -8,14 +8,18 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Ui\Component\Listing\Column;
 
+use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
+use Iranimij\OpenImport\Model\JsonField;
 use Iranimij\OpenImport\Model\Schedule\DailyTime;
+use Iranimij\OpenImport\Model\Trigger\TriggerEvents;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
 /**
- * The schedule in words: presets by name, other cron expressions as written, "Manual" without one.
+ * The schedule in words: presets by name, other cron expressions as written, "Manual" without one; the shop events
+ * the profile runs after.
  */
 class Schedule extends Column
 {
@@ -23,6 +27,7 @@ class Schedule extends Column
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
      * @param DailyTime $dailyTime
+     * @param JsonField $json
      * @param array<string, mixed> $components
      * @param array<string, mixed> $data
      */
@@ -30,6 +35,7 @@ class Schedule extends Column
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         private readonly DailyTime $dailyTime,
+        private readonly JsonField $json,
         array $components = [],
         array $data = []
     ) {
@@ -55,12 +61,36 @@ class Schedule extends Column
                 $daily !== null => (string) __('Every day at %1', $daily),
                 default => $schedule,
             };
-            if ($schedule !== '' && empty($item['is_active'])) {
+            $events = $this->events($item['triggers'] ?? null);
+            if ($events !== []) {
+                $words = implode(', ', array_map(
+                    static fn (string $short): string => (string) __($short),
+                    array_map(static fn (string $event): string => TriggerEvents::SHORT[$event], $events)
+                ));
+                $text = $schedule === ''
+                    ? (string) __('After: %1', $words)
+                    : (string) __('%1 · after: %2', $text, $words);
+            }
+            if (($schedule !== '' || $events !== []) && empty($item['is_active'])) {
                 $text = (string) __('%1 (off)', $text);
             }
             $item['schedule'] = $text;
         }
 
         return $dataSource;
+    }
+
+    /**
+     * @param mixed $stored the profile's triggers column (JSON)
+     * @return string[] known events, in the form's order
+     */
+    private function events(mixed $stored): array
+    {
+        $events = (array) ($this->json->decode($stored)[ProfileInterface::TRIGGER_EVENTS] ?? []);
+
+        return array_values(array_filter(
+            array_keys(TriggerEvents::SHORT),
+            static fn (string $event): bool => in_array($event, $events, true)
+        ));
     }
 }

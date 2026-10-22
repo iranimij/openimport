@@ -119,6 +119,7 @@ class ProfileFormMapper
             'notify_emails' => $profile->getNotifyEmails(),
             'then_profile_id' => (string) ($profile->getThenProfileId() ?? ''),
             'then_when' => $profile->getThenWhen(),
+            'triggers' => $profile->getTriggers(),
             'filter_mode' => (string) ($filters['mode'] ?? 'include'),
             'filter_match' => (string) ($filters['match'] ?? 'all'),
             'mapping' => $mapping,
@@ -152,7 +153,8 @@ class ProfileFormMapper
             ->setNotify($text('notify', 'failure'))
             ->setNotifyEmails($text('notify_emails'))
             ->setThenProfileId(ctype_digit($text('then_profile_id')) ? (int) $text('then_profile_id') : null)
-            ->setThenWhen($text('then_when', ProfileInterface::THEN_SUCCESS));
+            ->setThenWhen($text('then_when', ProfileInterface::THEN_SUCCESS))
+            ->setTriggers(is_array($data['triggers'] ?? null) ? $data['triggers'] : []);
 
         $preset = $text('schedule_preset');
         $profile->setSchedule(match ($preset) {

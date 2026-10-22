@@ -144,6 +144,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#exactly-once">Exactly once</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#job-chains">Job chains</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#housekeeping">Housekeeping</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#e-mails">E-mails</a>
@@ -255,6 +257,22 @@ remove more than the threshold stops with "needs confirmation" and waits for som
 </ul>
 <p>Two runs of one profile never run at the same time, and two live imports of the same entity never run at the same
 time (products and Stock &amp; prices share the product entity).</p>
+<h2 id="job-chains">Job chains<a class="headerlink" href="#job-chains" title="Permanent link">&para;</a></h2>
+<p>Since 1.6. Step 6 of a profile, <strong>Then run</strong>: the profile that runs after this one, as a live run of its own with
+this run as its parent (the run grid shows <em>Job chain</em> as the start). A nightly chain is one schedule: the first
+profile has the schedule, every next one has none.</p>
+<ul>
+<li><strong>When</strong>: <em>Only after a successful run</em> (success or partial — the next step gets the data it expects) or
+  <em>Always, even after a failed run</em> (cleanup or a report that must run regardless). A cancelled run starts
+  nothing; a dry run never does.</li>
+<li>The next profile runs with its own settings. A live run under the safety limit stops at <em>needs confirmation</em>
+  as always, which also holds the rest of the chain until an admin confirms it.</li>
+<li>Saving refuses a chain that comes back to a profile (<em>The chain would loop: A → B → A</em>), a profile that runs
+  itself, a next profile that reads uploaded files (nothing would be there to read), and more than 20 links.</li>
+<li>The run page says what happened next: <em>Then: "Stock update" queued as run 512</em>, or why nothing started.</li>
+<li>Profiles exported as JSON carry the chain by profile name; an import links the profiles of the file to each
+  other once they are saved.</li>
+</ul>
 <h2 id="housekeeping">Housekeeping<a class="headerlink" href="#housekeeping" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Run files (the uploaded or fetched source, prepared rows, output) are removed after "Keep run files for" days

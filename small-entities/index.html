@@ -234,7 +234,7 @@ import the file into another, export again, same rows. Replace is refused for al
 <tr>
 <td><code>store_codes</code></td>
 <td>no</td>
-<td>Store views the review is shown in, comma-separated, or <code>all</code>; new reviews: all.</td>
+<td>Store views the review is shown in, comma-separated, or <code>all</code> (every store view); new reviews: all. The export leaves it empty for a review shown in no store view (reviews imported with 1.5.0): import <code>all</code> for those to show them.</td>
 </tr>
 <tr>
 <td><code>created_at</code></td>
@@ -249,7 +249,7 @@ import the file into another, export again, same rows. Replace is refused for al
 <tr>
 <td><code>ratings</code></td>
 <td>no</td>
-<td><code>Quality:4, Value:5</code> — the shop's ratings (Stores › Rating) by name with a value from 1 to 5. Replaces the review's votes.</td>
+<td><code>Quality:4, Value:5</code> — the shop's ratings (Stores › Rating) by name with a value from 1 to 5. Replaces the review's votes. A rating that is switched off or not shown in the review's store views (Rating Visibility) is imported with a note on the row: its stars only appear once the rating is shown there.</td>
 </tr>
 </tbody>
 </table>

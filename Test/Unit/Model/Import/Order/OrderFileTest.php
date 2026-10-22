@@ -169,4 +169,21 @@ class OrderFileTest extends TestCase
     {
         return implode("\n", array_map(static fn (RowError $error): string => $error->message, $errors));
     }
+
+    public function testUnknownCountriesAreReported(): void
+    {
+        $file = new OrderFile();
+        $errors = [];
+        $orders = $file->group([$this->row('a', '1', '10', ['billing_country_id' => 'XX', 'shipping_country_id' => 'de',
+            'shipping_firstname' => 'Jane', 'shipping_lastname' => 'Doe', 'shipping_street' => 'Main 1',
+            'shipping_city' => 'Town'])], $errors);
+        $order = $orders['ORD-1'];
+
+        self::assertFalse($file->check($order, self::STATUSES, self::GROUPS, $errors, ['US' => true, 'DE' => true]));
+        self::assertSame(
+            ['"XX" is not a country code Magento knows; use two letters such as DE, AT or US.'],
+            array_map(static fn (RowError $error): string => $error->message, $errors)
+        );
+        self::assertSame('billing_country_id', $errors[0]->column);
+    }
 }

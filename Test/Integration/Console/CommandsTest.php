@@ -157,7 +157,9 @@ class CommandsTest extends TestCase
 
         $file = sys_get_temp_dir() . '/openimport-profiles-' . bin2hex(random_bytes(3)) . '.json';
         $data['profiles'][0]['allowed_errors'] = 7;
-        $data['profiles'][] = ['name' => $name . ' copy', 'entity' => 'catalog_product', 'mapping' => [['target' => 'sku', 'source' => 'SKU']]];
+        $data['profiles'][] = ['name' => $name . ' copy', 'entity' => 'catalog_product', 'is_active' => true,
+            'source_type' => 'folder', 'source_config' => ['path' => 'incoming'], 'schedule' => '0 2 * * *',
+            'mapping' => [['target' => 'sku', 'source' => 'SKU']]];
         file_put_contents($file, json_encode($data));
         $this->file = $file;
 
@@ -174,6 +176,8 @@ class CommandsTest extends TestCase
         self::assertSame(7, $updated->getAllowedErrors());
         self::assertSame(['password' => 'enc'], $updated->getSourceConfig()['secrets'], 'stored secrets are kept');
         self::assertSame('catalog_product', $repository->getByName($name . ' copy')->getEntity());
+        self::assertFalse($repository->getByName($name . ' copy')->isActive(), 'a file never switches a new profile on');
+        self::assertStringContainsString('switched off', $import->getDisplay());
 
         $data['profiles'][1]['entity'] = 'no_such_entity';
         $data['profiles'][1]['behavior'] = 'merge';

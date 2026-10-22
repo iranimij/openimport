@@ -85,7 +85,7 @@ class EntityRegistry
             'beschreibung' => 'description', 'kurzbeschreibung' => 'short_description', 'gewicht' => 'weight',
             'sonderpreis' => 'special_price', 'hersteller' => 'manufacturer', 'farbe' => 'color',
             'ean' => 'ean', 'gtin' => 'ean', 'kategorie' => 'categories', 'kategorien' => 'categories',
-            'bild' => 'base_image', 'image' => 'base_image', 'url key' => 'url_key',
+            'bild' => 'base_image', 'image' => 'base_image', 'foto' => 'base_image', 'picture' => 'base_image', 'bilder' => 'additional_images', 'images' => 'additional_images', 'url key' => 'url_key',
         ];
         $customerSynonyms = [
             'e mail' => 'email', 'mail' => 'email', 'vorname' => 'firstname', 'nachname' => 'lastname',

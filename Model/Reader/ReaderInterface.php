@@ -18,6 +18,11 @@ namespace Iranimij\OpenImport\Model\Reader;
 interface ReaderInterface
 {
     /**
+     * Key a row carries when the line has filled cells beyond the header (the extra values, joined by " | ").
+     */
+    public const EXTRA_CELLS = '__openimport_extra_cells';
+
+    /**
      * Column names in file order. For JSON and XML: the keys found in the first records (later records may add
      * more; they still come through in rows()).
      *

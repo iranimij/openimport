@@ -49,7 +49,8 @@ to another store: `bin/magento openimport:profiles:export > profiles.json`.
 
 ## `openimport:profiles:import <file> [--dry-run]`
 
-Creates the profiles of such a file; a profile with the same name is updated (its stored secrets are kept).
+Creates the profiles of such a file; a profile with the same name is updated (its stored secrets are kept). A file
+never switches automatic runs on: new profiles start switched off, updated ones keep their state.
 Everything is checked first and listed as "create …" / "update …"; one problem and nothing is saved. `--dry-run`
 checks and lists without saving. Enter passwords and keys in the admin afterwards.
 

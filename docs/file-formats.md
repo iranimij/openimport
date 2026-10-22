@@ -16,9 +16,18 @@ says "row 18" and row 18 is what the merchant sees in Excel or a text editor.
 | First row is the header | yes | Without a header, columns are named `column_1`, `column_2`, … |
 
 - Quoted cells may hold delimiters and line breaks.
+- Line breaks: LF, CRLF and CR alone (old Excel for Mac "CSV (Macintosh)", some ERP exports) are all read.
 - Empty lines are skipped; row numbers still count them.
 - Empty header cells become `column_<n>`; duplicate headers become `name (2)`, `name (3)`.
-- Short rows are filled with empty cells; extra cells without a header are dropped.
+- Short rows are filled with empty cells. A row with **filled** cells beyond the last column is an error ("more
+  cells than the first row has columns"): usually a value with the delimiter and no quotes, which shifts every cell
+  after it. Empty trailing cells (`a,b,,`) are fine. The first rows in step 3 show the same warning.
+- A line longer than 8 MB stops the file with a plain message (it is not a CSV file, or its line breaks are
+  missing) before anything is read into memory.
+- An apostrophe that OpenImport's formula guard put in front of `=`, `+`, `-`, `@` (see [Exports](exports.md#safety))
+  is taken off again, so an exported file imports back unchanged (`'+49 69 1234` → `+49 69 1234`). This holds for
+  every format.
+- An empty file stops the run with "The file is empty".
 - The file is streamed: memory does not grow with the file size.
 
 ## Excel (.xlsx)

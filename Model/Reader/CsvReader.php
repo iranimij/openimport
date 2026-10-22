@@ -15,11 +15,22 @@ namespace Iranimij\OpenImport\Model\Reader;
  * - Encoding: UTF-8 (with or without byte order mark), UTF-16 with byte order mark (Excel "Unicode text"), or a
  *   single-byte legacy encoding (Windows-1252 when the file is not valid UTF-8); everything is returned as UTF-8.
  * - Quoted cells may contain delimiters and line breaks. Empty lines are skipped but still counted.
+ * - Line breaks: LF, CRLF, and CR alone (old Mac and some ERP exports) are all read as line breaks.
+ * - A line longer than MAX_LINE_BYTES stops the file with a plain error before anything is read into memory.
  */
 class CsvReader implements ReaderInterface
 {
     private const DELIMITERS = [',', ';', "\t", '|'];
     private const SAMPLE_BYTES = 262144;
+
+    /**
+     * Longest line read (8 MB): longer lines are not CSV (a binary file, a file without line breaks).
+     */
+    public const MAX_LINE_BYTES = 8388608;
+
+    private ?bool $crOnly = null;
+
+    private bool $lengthsChecked = false;
 
     /**
      * @var string[]|null
@@ -102,6 +113,7 @@ class CsvReader implements ReaderInterface
      */
     private function records(): \Generator
     {
+        $this->checkLineLengths();
         $file = new \SplFileObject($this->streamPath(), 'r');
         $file->setFlags(\SplFileObject::READ_CSV);
         $file->setCsvControl($this->delimiter(), $this->options->enclosure, '');
@@ -155,11 +167,63 @@ class CsvReader implements ReaderInterface
      */
     private function streamPath(): string
     {
-        return match ($this->encoding()) {
-            'UTF-16LE' => 'php://filter/read=convert.iconv.UTF-16LE.UTF-8/resource=' . $this->file,
-            'UTF-16BE' => 'php://filter/read=convert.iconv.UTF-16BE.UTF-8/resource=' . $this->file,
-            default => $this->file,
+        $filters = match ($this->encoding()) {
+            'UTF-16LE' => ['convert.iconv.UTF-16LE.UTF-8'],
+            'UTF-16BE' => ['convert.iconv.UTF-16BE.UTF-8'],
+            default => [],
         };
+        if ($this->crOnly()) {
+            CrLineEndingsFilter::register();
+            $filters[] = CrLineEndingsFilter::NAME;
+        }
+
+        return $filters === [] ? $this->file : 'php://filter/read=' . implode('|', $filters) . '/resource=' . $this->file;
+    }
+
+    /**
+     * Whether the file breaks lines with CR alone: the sample has CRs but no LF.
+     */
+    private function crOnly(): bool
+    {
+        if ($this->crOnly === null) {
+            $sample = $this->sample();
+            if (str_starts_with($sample, "\xFF\xFE") || str_starts_with($sample, "\xFE\xFF")) {
+                $sample = str_replace("\0", '', $sample);
+            }
+            $this->crOnly = str_contains($sample, "\r") && !str_contains($sample, "\n");
+        }
+
+        return $this->crOnly;
+    }
+
+    /**
+     * Refuses a file with a line longer than MAX_LINE_BYTES before the CSV parser reads such a line into memory.
+     *
+     * @throws ReaderException
+     */
+    private function checkLineLengths(): void
+    {
+        if ($this->lengthsChecked) {
+            return;
+        }
+        $file = new \SplFileObject($this->streamPath(), 'r');
+        $file->setMaxLineLen(self::MAX_LINE_BYTES);
+        $number = 1;
+        while (!$file->eof()) {
+            $chunk = (string) $file->fgets();
+            if (strlen($chunk) >= self::MAX_LINE_BYTES && !str_ends_with($chunk, "\n") && !$file->eof()) {
+                throw new ReaderException(sprintf(
+                    'Line %d of the file is longer than %d MB. The file is probably not a CSV file, or its '
+                    . 'line breaks are missing.',
+                    $number,
+                    intdiv(self::MAX_LINE_BYTES, 1048576)
+                ));
+            }
+            if (str_ends_with($chunk, "\n")) {
+                $number++;
+            }
+        }
+        $this->lengthsChecked = true;
     }
 
     private function sample(): string

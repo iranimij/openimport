@@ -149,6 +149,13 @@ class ProfileJsonTest extends TestCase
         }
         self::assertSame([], $this->saved);
 
+        try {
+            $json->prepare('{"openimport": 1, "profiles": [ {"name": "broken" ');
+            self::fail('broken JSON must stop the import');
+        } catch (\InvalidArgumentException $exception) {
+            self::assertStringContainsString('The file is not valid JSON (Syntax error)', $exception->getMessage());
+        }
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('not an OpenImport profile export');
         $json->prepare('[1, 2]');

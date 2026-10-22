@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Test\Unit\Model\Reader;
 
 use Iranimij\OpenImport\Model\Reader\ColumnNames;
+use Iranimij\OpenImport\Model\Reader\ReaderInterface;
 use PHPUnit\Framework\TestCase;
 
 class ColumnNamesTest extends TestCase
@@ -32,9 +33,13 @@ class ColumnNamesTest extends TestCase
         self::assertSame([], (new ColumnNames())->generated(0));
     }
 
-    public function testCombineFillsMissingCellsAndDropsExtraOnes(): void
+    public function testCombineFillsMissingCellsAndMarksFilledExtraOnes(): void
     {
         self::assertSame(['a' => '1', 'b' => ''], (new ColumnNames())->combine(['a', 'b'], ['1']));
-        self::assertSame(['a' => '1', 'b' => ''], (new ColumnNames())->combine(['a', 'b'], [1, null, 'extra']));
+        self::assertSame(['a' => '1', 'b' => ''], (new ColumnNames())->combine(['a', 'b'], [1, null, '', ' ']));
+        self::assertSame(
+            ['a' => '1', 'b' => '', ReaderInterface::EXTRA_CELLS => 'extra | more'],
+            (new ColumnNames())->combine(['a', 'b'], [1, null, 'extra', '', 'more'])
+        );
     }
 }

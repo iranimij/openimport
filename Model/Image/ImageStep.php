@@ -78,7 +78,11 @@ class ImageStep extends AbstractRowStep
         foreach ($records as $record) {
             foreach ($record->rows as $index => $row) {
                 foreach ($row as $column => $value) {
-                    if (!str_contains($value, '://')) {
+                    $isList = in_array($column, ImageColumns::LISTS, true);
+                    if (trim($value) === '' || (!$isList && !in_array($column, $single, true))) {
+                        continue;
+                    }
+                    if (!str_contains($value, '://') && !$this->unsafeName($value, $isList)) {
                         continue;
                     }
                     if (in_array($column, $single, true)) {
@@ -133,11 +137,17 @@ class ImageStep extends AbstractRowStep
      */
     private function localize(StepRecord $record, string $column, string $value, \Closure $tick): string
     {
-        if (preg_match('#^https?://#i', $value) !== 1) {
+        $web = preg_match('#^https?://#i', $value) === 1;
+        if (!$web && !$this->unsafeName($value, false)) {
             return $value;
         }
-        $this->seen = true;
+        $this->seen = $this->seen || $web;
         try {
+            if (!$web) {
+                throw new PipelineException((string) __(
+                    'only web addresses (http, https) and file names inside var/import/images are read.'
+                ));
+            }
             $file = $this->fetcher->fetch($value);
             $this->tick($tick);
 
@@ -158,6 +168,31 @@ class ImageStep extends AbstractRowStep
 
             return '';
         }
+    }
+
+    /**
+     * A cell that is neither a web address nor a file name in the import images folder: another scheme (file://,
+     * ftp://), a drive or network path, or "../" out of the folder. A leading "/" is fine: Magento reads it inside
+     * the folder, and exports write gallery paths that way.
+     *
+     * @param string $value one picture, or a comma-separated list
+     * @param bool $list
+     * @return bool
+     */
+    private function unsafeName(string $value, bool $list): bool
+    {
+        foreach ($list ? explode(',', $value) : [$value] as $item) {
+            $item = trim($item);
+            if ($item === '' || preg_match('#^https?://#i', $item) === 1) {
+                continue;
+            }
+            if (str_contains($item, '://') || str_starts_with($item, '\\')
+                || preg_match('#^[a-z]:#i', $item) === 1 || preg_match('#(^|[/\\\\])\.\.([/\\\\]|$)#', $item) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

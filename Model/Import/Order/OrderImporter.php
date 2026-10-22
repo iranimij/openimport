@@ -135,7 +135,7 @@ class OrderImporter implements ImporterInterface
                 continue;
             }
             $order['store'] = $store;
-            if ($this->file->check($order, $statuses, $groups, $errors)) {
+            if ($this->file->check($order, $statuses, $groups, $errors, $this->records->countries())) {
                 $ready[$key] = $order;
             }
         }

@@ -139,4 +139,27 @@ class ImageStepTest extends TestCase
         });
         self::assertSame('', $step->summary());
     }
+
+    public function testOtherSchemesAndPathsOutOfTheFolderFail(): void
+    {
+        $step = new ImageStep(new FakeImageFetcher(), new FakeImageColumns());
+        $step->begin($this->profile(), 'add_update', false);
+        $records = [];
+        foreach (['file:///etc/passwd', '../../../app/etc/env.php', 'C:\\pics\\a.jpg', '/m/b/mb01.jpg', 'supplier/a.jpg'] as $i => $value) {
+            $records[] = new StepRecord($i + 2, 'P-' . $i, [['sku' => 'P-' . $i, 'base_image' => $value]]);
+        }
+        $records[] = new StepRecord(9, 'L', [['sku' => 'L', 'additional_images' => 'a.jpg,../b.jpg']]);
+        $step->apply($records, static function (): void {
+        });
+
+        self::assertSame([true, true, true, false, false, true], array_map(
+            static fn (StepRecord $record): bool => $record->isFailed(),
+            $records
+        ), 'a leading "/" stays inside the images folder, as in Magento\'s own exports');
+        self::assertSame(
+            'Picture file:///etc/passwd: only web addresses (http, https) and file names inside var/import/images are read.',
+            $records[0]->error()
+        );
+        self::assertSame('/m/b/mb01.jpg', $records[3]->rows[0]['base_image']);
+    }
 }

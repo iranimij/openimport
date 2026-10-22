@@ -23,6 +23,9 @@ use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
  * same quantity at once. Rows with a change are taken over and sent once per SKU (or SKU and source) after the last
  * row, with the sum of their changes, because Magento's import keeps only one quantity per SKU. "Skip unchanged rows"
  * is refused: the same +5 in the next file is a new delivery.
+ *
+ * In both modes (changes or plain quantities) a quantity with decimals is refused for a product whose stock does not
+ * use decimals: Magento would store 13.5 pieces of a product sold in whole pieces.
  */
 class StockChangeStep extends AbstractRowStep
 {
@@ -34,6 +37,8 @@ class StockChangeStep extends AbstractRowStep
     private string $column = 'qty';
 
     private bool $sources = false;
+
+    private bool $adding = false;
 
     private int $changed = 0;
 
@@ -58,12 +63,11 @@ class StockChangeStep extends AbstractRowStep
      */
     public function begin(ProfileInterface $profile, string $behavior, bool $dryRun): bool
     {
-        if (!in_array($profile->getEntity(), self::ENTITIES, true)
-            || ($profile->getImportOptions()[self::OPTION_MODE] ?? '') !== self::MODE_ADD
-            || $behavior === ProfileInterface::BEHAVIOR_DELETE) {
+        if (!in_array($profile->getEntity(), self::ENTITIES, true) || $behavior === ProfileInterface::BEHAVIOR_DELETE) {
             return false;
         }
-        if ($profile->isDelta()) {
+        $this->adding = ($profile->getImportOptions()[self::OPTION_MODE] ?? '') === self::MODE_ADD;
+        if ($this->adding && $profile->isDelta()) {
             throw new PipelineException(
                 '"Skip unchanged rows" cannot be used with quantities as changes: the same +5 in the next file is'
                 . ' a new delivery. Switch one of them off.'
@@ -82,7 +86,7 @@ class StockChangeStep extends AbstractRowStep
      */
     public function columns(array $columns): array
     {
-        if (!in_array($this->column, $columns, true)) {
+        if ($this->adding && !in_array($this->column, $columns, true)) {
             throw new PipelineException(sprintf(
                 'Map the quantity (%s) in step 4: with quantities as changes it holds the change.',
                 $this->column
@@ -98,17 +102,44 @@ class StockChangeStep extends AbstractRowStep
     public function apply(array $records, \Closure $tick): void
     {
         $changes = [];
+        $fractions = [];
         foreach ($records as $index => $record) {
             $value = trim((string) ($record->rows[0][$this->column] ?? ''));
             if ($value === '') {
                 continue;
             }
-            $delta = $this->change->parse($value);
-            if ($delta === null) {
-                $record->fail(sprintf('"%s" is not a change of quantity (+5, -3 or 4).', $value), $this->column);
+            $number = $this->adding ? $this->change->parse($value) : (is_numeric($value) ? (float) $value : null);
+            if ($number === null) {
+                if ($this->adding) {
+                    $record->fail(sprintf('"%s" is not a change of quantity (+5, -3 or 4).', $value), $this->column);
+                }
                 continue;
             }
-            $changes[$index] = $delta;
+            if (fmod($number, 1.0) !== 0.0 && (string) ($record->rows[0]['is_qty_decimal'] ?? '') !== '1') {
+                $fractions[$index] = $value;
+            }
+            if ($this->adding) {
+                $changes[$index] = $number;
+            }
+        }
+        if ($fractions !== []) {
+            $decimals = $this->reader->decimals(array_map(
+                static fn (StepRecord $r): string => (string) ($r->rows[0]['sku'] ?? $r->identifier),
+                array_intersect_key($records, $fractions)
+            ));
+            foreach ($fractions as $index => $value) {
+                $record = $records[$index];
+                $sku = (string) ($record->rows[0]['sku'] ?? $record->identifier);
+                if (!($decimals[mb_strtolower($sku)] ?? false)) {
+                    $record->fail(sprintf(
+                        '%s is sold in whole pieces: "%s" has decimals. Use whole numbers, or switch on "Qty Uses '
+                        . 'Decimals" for the product (column is_qty_decimal).',
+                        $sku,
+                        $value
+                    ), $this->column);
+                    unset($changes[$index]);
+                }
+            }
         }
         if ($changes === []) {
             return;

@@ -30,6 +30,7 @@ use Iranimij\OpenImport\Model\Pipeline\Step\RowStepPool;
 use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
+use Iranimij\OpenImport\Model\Reader\ReaderInterface;
 use Iranimij\OpenImport\Model\ResourceModel\Run as RunResource;
 use Iranimij\OpenImport\Model\Source\MappedSource;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
@@ -77,6 +78,13 @@ class ImportRunner
      * @var array<string, int>
      */
     private array $counts = [];
+
+    /**
+     * Rows (or records without a row) with at least one error: a row with three problems counts once.
+     *
+     * @var array<string, true>
+     */
+    private array $errorRows = [];
 
     private int $errorsStored = 0;
 
@@ -238,6 +246,9 @@ class ImportRunner
             );
             // CSV and XLSX have a fixed header; JSON and XML records may add fields after the sample.
             $strictColumns = in_array($format, ['csv', 'xlsx', 'ods'], true) ? $reader->columns() : null;
+            if ($strictColumns === []) {
+                throw new PipelineException('The file is empty: it has no rows and no column names.');
+            }
         } catch (ReaderException $exception) {
             throw new PipelineException($exception->getMessage(), 0, $exception);
         }
@@ -311,6 +322,7 @@ class ImportRunner
     {
         $this->runId = $runId;
         $this->counts = array_fill_keys(RunInterface::COUNTS, 0);
+        $this->errorRows = [];
         $this->errorsStored = 0;
         $this->errorCap = max(1, $this->config->getMaxErrorsPerRun());
         $this->pendingErrors = [];
@@ -346,6 +358,22 @@ class ImportRunner
      */
     private function prepare(RowFilter $filter, CompiledMapping $mapping, int $line, array $row): ?MappedRow
     {
+        if (isset($row[ReaderInterface::EXTRA_CELLS])) {
+            $extra = $row[ReaderInterface::EXTRA_CELLS];
+            unset($row[ReaderInterface::EXTRA_CELLS]);
+            $this->error(new ErrorRecord(
+                $line,
+                sprintf(
+                    'The row has more cells than the first row has columns (%s). A value probably contains the '
+                    . 'delimiter without quotes, so the cells are shifted; the row was left out.',
+                    $extra
+                ),
+                $mapping->map($row)->identifier,
+                '',
+                $row
+            ));
+            return null;
+        }
         try {
             if (!$filter->keep($row)) {
                 $this->counts['filtered']++;
@@ -909,7 +937,7 @@ class ImportRunner
                 $this->counts['deleted'],
                 $this->counts['unchanged'],
                 $this->counts['filtered'],
-                $this->counts['errors']
+                count($this->errorRows)
             ),
             $result->historyId
         );
@@ -937,6 +965,14 @@ class ImportRunner
     {
         $plans = [];
         foreach ($this->postImportSteps() as $step) {
+            if ($this->counts['read'] === 0) {
+                // A file without rows is a broken feed, not "nothing is sold any more".
+                $this->postLines[] = (string) __(
+                    '%1: nothing changed because the file has no rows.',
+                    $step->label()
+                );
+                continue;
+            }
             if ($this->counts['errors'] > 0) {
                 $this->postLines[] = (string) __(
                     '%1: nothing changed because %2 row(s) had errors.',
@@ -1083,9 +1119,20 @@ class ImportRunner
         } else {
             $parts[] = sprintf('Dry run: %d row(s) checked by Magento.', $this->counts['read']);
         }
-        $parts[] = $own
-            ? ($valid ? 'The rows are valid.' : 'The rows have errors; see below.')
-            : ($valid ? 'Magento accepts the rows.' : 'Magento refuses the rows; see the errors.');
+        $refused = count($this->errorRows);
+        if ($valid && $refused > 0) {
+            // Rows with errors are left out (Skip, or within "Errors allowed"); the rest goes in.
+            $parts[] = sprintf(
+                $own
+                    ? 'The other rows are valid; %d row(s) have errors and will be left out (see below).'
+                    : 'Magento accepts the other rows; %d row(s) have errors and will be left out (see below).',
+                $refused
+            );
+        } else {
+            $parts[] = $own
+                ? ($valid ? 'The rows are valid.' : 'The rows have errors; see below.')
+                : ($valid ? 'Magento accepts the rows.' : 'Magento refuses the rows; see the errors.');
+        }
         if ($safety !== null) {
             $parts[] = self::CONFIRMATION_NOTE . ': ' . $safety;
         }
@@ -1118,7 +1165,7 @@ class ImportRunner
             $this->counts['unchanged'],
             $this->counts['filtered'],
             $this->counts['skipped'],
-            $this->counts['errors']
+            count($this->errorRows)
         );
     }
 
@@ -1174,6 +1221,7 @@ class ImportRunner
     private function error(ErrorRecord $error): void
     {
         $this->counts['errors']++;
+        $this->errorRows[$error->sourceRow > 0 ? 'r' . $error->sourceRow : 'i' . mb_strtolower($error->identifier)] = true;
         $this->firstError ??= $error;
         if ($this->errorsStored + count($this->pendingErrors) < $this->errorCap) {
             $this->pendingErrors[] = $error;

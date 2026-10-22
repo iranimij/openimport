@@ -9,6 +9,7 @@
  * folder after switching the source type (and comes back when switching back).
  * noticeByType {type: text}: help text for the chosen type (the field's own notice otherwise).
  * labelByType {type: text}: label for the chosen type (the field's own label otherwise).
+ * placeholderByType {type: text}: placeholder for the chosen type (the field's own placeholder otherwise).
  */
 define([
     'Magento_Ui/js/form/element/abstract',
@@ -24,9 +25,11 @@ define([
             typeGroups: null,
             noticeByType: null,
             labelByType: null,
+            placeholderByType: null,
             tracks: {
                 storedNote: true,
-                label: true
+                label: true,
+                placeholder: true
             }
         },
 
@@ -40,6 +43,7 @@ define([
             }
             this.defaultNotice = this.notice ? this.notice() : '';
             this.defaultLabel = this.label;
+            this.defaultPlaceholder = this.placeholder;
             this.lastGroup = this.group(this.sourceType);
             this.groupValues = {};
             this.refresh();
@@ -65,6 +69,9 @@ define([
             }
             if (this.labelByType && this.defaultLabel !== undefined) {
                 this.label = this.labelByType[this.sourceType] || this.defaultLabel;
+            }
+            if (this.placeholderByType && this.defaultPlaceholder !== undefined) {
+                this.placeholder = this.placeholderByType[this.sourceType] || this.defaultPlaceholder;
             }
             if (!this.typeGroups || this.lastGroup === undefined) {
                 return;

@@ -179,7 +179,7 @@ class WritersTest extends TestCase
         self::assertSame('9.99', $rows[1]['price']);
         self::assertSame('00123', $rows[1]['sku']);
         self::assertSame('', $rows[1]['qty']);
-        self::assertSame("'=SUM(A1)", $rows[0]['formula']);
+        self::assertSame('=SUM(A1)', $rows[0]['formula'], 'the reader takes the guard\'s apostrophe off again');
         self::assertFalse(file_exists($path . '.content.xml'), 'temporary content removed');
         self::assertSame('ods', (new ReaderFactory())->detect($path, 'download.bin'), 'detected by the mimetype entry');
     }

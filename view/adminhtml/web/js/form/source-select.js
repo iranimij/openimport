@@ -60,8 +60,9 @@ define([
         /** @inheritdoc */
         initObservable: function () {
             this._super();
-            this.baseNotice = this.notice || '';
-            if (!_.isEmpty(this.noticeByValue)) {
+            // Magento may already have made "notice" observable: keep its text, not the observable.
+            this.baseNotice = (_.isFunction(this.notice) ? this.notice() : this.notice) || '';
+            if (!_.isEmpty(this.noticeByValue) && !_.isFunction(this.notice)) {
                 this.observe('notice');
             }
 

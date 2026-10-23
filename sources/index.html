@@ -66,6 +66,8 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Sources</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#big-files">Big files</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#which-file">Which file</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#after-a-successful-run">After a successful run</a>
@@ -263,6 +265,18 @@ instead of entering it in the profile (since 1.4); see <a href="../connections/"
 can go through an <a href="../file-formats/#xslt-since-14">XSLT stylesheet</a> before they are read.</p>
 <p><strong>Test connection</strong> checks the settings as they are in the form (saved or not) and says what the next run would read,
 without importing anything.</p>
+<h2 id="big-files">Big files<a class="headerlink" href="#big-files" title="Permanent link">&para;</a></h2>
+<p>An upload goes through the web server and PHP first, and both limit its size: PHP's <code>upload_max_filesize</code> and
+<code>post_max_size</code> (the form shows the smaller one under the drop zone) and the web server's own limit (nginx
+<code>client_max_body_size</code>, 1 MB by default; Apache <code>LimitRequestBody</code>), which PHP cannot see. A file over the web
+server's limit is refused before OpenImport sees it: the form says "The file is larger than the web server
+accepts".</p>
+<p>For big files:</p>
+<ul>
+<li>zip or gzip the file before uploading: OpenImport unpacks it (a 20,000-row product CSV of 2.5 MB is a 200 KB ZIP);</li>
+<li>or let OpenImport fetch it: a server folder, a web address (URL), SFTP/FTP or cloud storage have no upload limit;</li>
+<li>or raise the limits on your server.</li>
+</ul>
 <h2 id="which-file">Which file<a class="headerlink" href="#which-file" title="Permanent link">&para;</a></h2>
 <p>For folders and servers, the pattern picks the candidates (<code>*</code> any text, <code>?</code> one character, case does not matter,
 several patterns separated by commas: <code>stock-*.csv, Stock-*.xlsx</code>), and <em>Which file</em> picks one of them: the newest

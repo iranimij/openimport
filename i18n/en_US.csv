@@ -1486,3 +1486,6 @@
 "This run would disable %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","This run would disable %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm."
 "This run would set %d of %d records out of stock (%s, %d%%, limit %d%%). Type %s to confirm.","This run would set %d of %d records out of stock (%s, %d%%, limit %d%%). Type %s to confirm."
 "This run would delete %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","This run would delete %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm."
+"This run would %s %d of %d records (%d%%, limit %d%%). Type %s to confirm.","This run would %s %d of %d records (%d%%, limit %d%%). Type %s to confirm."
+"This run would %s %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","This run would %s %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm."
+"This run would %s up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.","This run would %s up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it."

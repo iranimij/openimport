@@ -1486,3 +1486,6 @@
 "This run would disable %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","Dieser Lauf würde %1 von %2 Datensätzen deaktivieren (%3, %4 %, Grenze %5 %). Geben Sie %6 ein, um zu bestätigen."
 "This run would set %d of %d records out of stock (%s, %d%%, limit %d%%). Type %s to confirm.","Dieser Lauf würde %1 von %2 Datensätzen auf „nicht vorrätig“ setzen (%3, %4 %, Grenze %5 %). Geben Sie %6 ein, um zu bestätigen."
 "This run would delete %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","Dieser Lauf würde %1 von %2 Datensätzen löschen (%3, %4 %, Grenze %5 %). Geben Sie %6 ein, um zu bestätigen."
+"This run would %s %d of %d records (%d%%, limit %d%%). Type %s to confirm.","Dieser Lauf würde %2 von %3 Datensätzen betreffen (%1, %4 %, Grenze %5 %). Geben Sie %6 ein, um zu bestätigen."
+"This run would %s %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","Dieser Lauf würde %2 von %3 Datensätzen betreffen (%4: %1, %5 %, Grenze %6 %). Geben Sie %7 ein, um zu bestätigen."
+"This run would %s up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.","Dieser Lauf würde bis zu %2 Datensatz/Datensätze betreffen (%1), und OpenImport kann sie nicht im Voraus zählen. Bestätigen Sie, um ihn auszuführen."

@@ -6,8 +6,12 @@ page lists what the module does about that, what the settings control, and what 
 ## Admin actions
 
 - Every controller is behind an ACL resource: *View profiles*, *Create and edit profiles*, *Run profiles*, *Confirm
-  runs above the safety limit*, *View runs and error reports*, *Manage connections*, plus the configuration section. Roles that may view but
-  not edit get a read-only form.
+  runs above the safety limit*, *View runs and error reports*, *Download run files*, *Manage connections*, plus the
+  configuration section. Roles that may view but
+  not edit get a read-only form. File contents (first rows, the mapping preview, an export's first rows, the source
+  cells of error reports) need *Download run files*.
+- Grids send no secrets: the profiles grid strips the encrypted passwords, keys and tokens from the settings it sends
+  to the browser (since 1.5.4).
 - Everything that changes state is a POST with Magento's form key; everything that reads is a GET. File answers go
   through Magento's `FileFactory`, never a raw path.
 - Uploads: 256 MB at most, only `.csv .tsv .txt .xlsx .json .xml`, stored under a random token in `var/openimport/tmp`
@@ -41,6 +45,13 @@ form shows "stored" and lets you replace a secret, not read it) or the error rep
 
 - **XML:** streamed with `XMLReader`; documents with a `DOCTYPE` are refused, so there is no entity expansion and no
   external entity. The parser never resolves URLs.
+- **Archives (ZIP, gzip, tar):** the file inside is written under a fixed name (entry names never become paths: no
+  zip-slip), its size is counted while unpacking (1 GB limit, zip bombs), links are skipped, nested archives and
+  password-protected entries are refused. See [Archives](archives.md).
+- **XSLT:** stylesheets run with every read and write permission of libxslt switched off (no `document()`, no
+  `xsl:include`/`xsl:import`, no files, no network), no PHP functions, no DOCTYPE in the stylesheet or the file, a
+  size limit for the file (a DOM holds it whole). See [XSLT](file-formats.md#xslt-since-14).
+- **ODS:** as XLSX (no DOCTYPE, no network, 512 MB unpacked limit), streamed with XMLReader.
 - **XLSX:** read from the zip with size checks; a workbook whose parts would unpack to more than 512 MB is refused
   (zip bombs). Only the parts the reader needs are opened.
 - **CSV written by the module** (error reports, exports): cells starting with `= + - @` or a tab are prefixed with an

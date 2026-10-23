@@ -20,10 +20,22 @@ class FakeQuantityReader extends QuantityReader
     /**
      * @param array<string, float> $products lower-cased SKU => quantity
      * @param array<string, float> $sources "lower-cased SKU|source" => quantity
+     * @param array<string, bool> $decimals lower-cased SKU => quantity uses decimals
      */
     // phpcs:ignore Magento2.CodeAnalysis.EmptyBlock
-    public function __construct(private readonly array $products = [], private readonly array $sources = [])
+    public function __construct(
+        private readonly array $products = [],
+        private readonly array $sources = [],
+        private readonly array $decimals = []
+    ) {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function decimals(array $skus): array
     {
+        return array_intersect_key($this->decimals, array_flip(array_map('mb_strtolower', $skus)));
     }
 
     /**

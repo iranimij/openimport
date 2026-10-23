@@ -13,6 +13,7 @@ use Iranimij\OpenImport\Model\ResourceModel\Run\CollectionFactory;
 use Iranimij\OpenImport\Ui\Component\Listing\Column\StatusChip;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\UrlInterface;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * The last runs of a profile, for the "Recent runs" panel of the profile form.
@@ -26,12 +27,14 @@ class RecentRuns
      * @param StatusChip $chip
      * @param UrlInterface $urlBuilder
      * @param TimezoneInterface $timezone
+     * @param StoredText $text
      */
     public function __construct(
         private readonly CollectionFactory $collectionFactory,
         private readonly StatusChip $chip,
         private readonly UrlInterface $urlBuilder,
-        private readonly TimezoneInterface $timezone
+        private readonly TimezoneInterface $timezone,
+        private readonly StoredText $text
     ) {
     }
 
@@ -63,7 +66,7 @@ class RecentRuns
                     \IntlDateFormatter::MEDIUM,
                     \IntlDateFormatter::SHORT
                 ),
-                'summary' => strtok($run->getMessage(), "\n") ?: '',
+                'summary' => $this->text->translate(strtok($run->getMessage(), "\n") ?: ''),
             ];
         }
 

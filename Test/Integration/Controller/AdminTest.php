@@ -227,7 +227,7 @@ class AdminTest extends AbstractBackendController
     {
         $this->post('backend/openimport/profile/fields', [
             'entity' => 'catalog_product',
-            'columns' => ['Artikelnummer', 'Bezeichnung', 'Preis', 'name_default'],
+            'columns' => ['Artikelnummer', 'Bezeichnung', 'Preis', 'name_default', 'Bild', 'additional_images'],
         ]);
         $data = $this->json();
         self::assertSame('sku', $data['fields'][0]['code']);
@@ -235,6 +235,11 @@ class AdminTest extends AbstractBackendController
         self::assertSame('Artikelnummer', $data['matches']['sku']);
         self::assertSame('Preis', $data['matches']['price']);
         self::assertSame('name_default', $data['matches']['store:default:name'] ?? null);
+        // Picture columns are offered and matched although core's 2.4.9 sample file does not list them.
+        self::assertContains('base_image', array_column($data['fields'], 'code'));
+        self::assertContains('thumbnail_image_label', array_column($data['fields'], 'code'));
+        self::assertSame('Bild', $data['matches']['base_image'] ?? null);
+        self::assertSame('additional_images', $data['matches']['additional_images'] ?? null);
         self::assertContains('default', array_column($data['stores'], 'code'));
     }
 
@@ -291,6 +296,17 @@ class AdminTest extends AbstractBackendController
         self::assertStringContainsString($prefix . '-2', $body);
         self::assertStringContainsString('Download error report', $body);
 
+        // Magento's own row errors carry no source row; an error of OpenImport's mapping does (as from a transform).
+        Bootstrap::getObjectManager()->get(\Iranimij\OpenImport\Model\Storage\ErrorLog::class)->add($runId, [
+            new \Iranimij\OpenImport\Model\Storage\ErrorRecord(
+                3,
+                'Mapping error',
+                $prefix . '-2',
+                'name',
+                ['sku' => $prefix . '-2', 'name' => 'Two ' . $prefix, 'price' => 'abc']
+            ),
+        ]);
+
         // The controller writes the report; the file answer (FileResponse) does not reach the test response, so
         // the file is read from the run folder. Downloads themselves are covered by the Playwright E2E tests.
         $this->fresh();
@@ -299,6 +315,14 @@ class AdminTest extends AbstractBackendController
             ->getDirectoryRead(DirectoryList::VAR_DIR)->getAbsolutePath('openimport/runs/' . $runId . '/errors.csv'));
         self::assertStringContainsString('Row,Record,Field,Error', $report);
         self::assertStringContainsString($prefix . '-2,price,', $report);
+        self::assertStringContainsString(',sku,', $report, 'the source row follows each error');
+
+        // Without "Download run files" the report has the errors only, not the file's cells.
+        $plain = (string) file_get_contents(Bootstrap::getObjectManager()->get(\Iranimij\OpenImport\Model\Admin\ErrorReport::class)
+            ->write(Bootstrap::getObjectManager()->get(RunRepositoryInterface::class)->getById($runId), false));
+        self::assertStringContainsString('Row,Record,Field,Error', $plain);
+        self::assertStringNotContainsString(',sku,', $plain);
+        self::assertStringNotContainsString('Two ' . $prefix, $plain);
     }
 
     /**
@@ -349,5 +373,32 @@ class AdminTest extends AbstractBackendController
 
         $this->post('backend/openimport/run/confirm', ['id' => $run->getRunId(), 'confirmation' => 'remove']);
         $this->assertSessionMessages(self::containsEqual('Type DELETE to confirm.'), MessageInterface::TYPE_ERROR);
+    }
+
+    public function testMassActionSwitchesOnProfilesThatRunAfterEvents(): void
+    {
+        $repository = $this->_objectManager->get(ProfileRepositoryInterface::class);
+        $tag = bin2hex(random_bytes(3));
+        $events = $repository->save($this->_objectManager->get(ProfileInterfaceFactory::class)->create()
+            ->setName('Mass events ' . $tag)->setDirection(ProfileInterface::DIRECTION_EXPORT)
+            ->setEntity('catalog_product')->setFormat('csv')
+            ->setExportOptions(['destination' => 'folder', 'path' => 'mass-' . $tag])
+            ->setTriggers([ProfileInterface::TRIGGER_EVENTS => ['product_saved']]));
+        $manual = $repository->save($this->_objectManager->get(ProfileInterfaceFactory::class)->create()
+            ->setName('Mass manual ' . $tag)->setDirection(ProfileInterface::DIRECTION_EXPORT)
+            ->setEntity('catalog_product')->setFormat('csv')
+            ->setExportOptions(['destination' => 'folder', 'path' => 'mass-' . $tag]));
+
+        $this->post('backend/openimport/profile/massSchedule', [
+            'on' => '1',
+            'namespace' => 'openimport_profile_listing',
+            'selected' => [(int) $events->getProfileId(), (int) $manual->getProfileId()],
+        ]);
+        $this->assertSessionMessages(
+            self::containsEqual('Automatic runs switched on for 1 profile(s).'),
+            MessageInterface::TYPE_SUCCESS
+        );
+        self::assertTrue($repository->getById((int) $events->getProfileId())->isActive());
+        self::assertFalse($repository->getById((int) $manual->getProfileId())->isActive());
     }
 }

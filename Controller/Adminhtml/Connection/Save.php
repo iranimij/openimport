@@ -18,6 +18,7 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Saves a connection; problems go back to the form with what was entered (never the secrets).
@@ -33,13 +34,15 @@ class Save extends Action implements HttpPostActionInterface
      * @param ConnectionFactory $connectionFactory
      * @param ConnectionFormMapper $mapper
      * @param DataPersistorInterface $dataPersistor
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly ConnectionRepositoryInterface $connections,
         private readonly ConnectionFactory $connectionFactory,
         private readonly ConnectionFormMapper $mapper,
-        private readonly DataPersistorInterface $dataPersistor
+        private readonly DataPersistorInterface $dataPersistor,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -60,7 +63,7 @@ class Save extends Action implements HttpPostActionInterface
             $connection = $this->connections->save($this->mapper->fromForm($data, $connection));
             $this->dataPersistor->clear(self::PERSIST_KEY);
         } catch (LocalizedException $exception) {
-            foreach (explode("\n", $exception->getMessage()) as $problem) {
+            foreach (explode("\n", $this->text->translate($exception->getMessage())) as $problem) {
                 $this->messageManager->addErrorMessage($problem);
             }
             $this->dataPersistor->set(self::PERSIST_KEY, $this->withoutSecrets($data));

@@ -117,6 +117,9 @@ class ProfileFormMapper
             'after_success' => $profile->getAfterSuccess(),
             'notify' => $profile->getNotify(),
             'notify_emails' => $profile->getNotifyEmails(),
+            'then_profile_id' => (string) ($profile->getThenProfileId() ?? ''),
+            'then_when' => $profile->getThenWhen(),
+            'triggers' => $profile->getTriggers(),
             'filter_mode' => (string) ($filters['mode'] ?? 'include'),
             'filter_match' => (string) ($filters['match'] ?? 'all'),
             'mapping' => $mapping,
@@ -148,7 +151,10 @@ class ProfileFormMapper
             ->setSafetyThreshold($text('safety_threshold') === '' ? null : (int) $text('safety_threshold'))
             ->setAfterSuccess($text('after_success', 'keep'))
             ->setNotify($text('notify', 'failure'))
-            ->setNotifyEmails($text('notify_emails'));
+            ->setNotifyEmails($text('notify_emails'))
+            ->setThenProfileId(ctype_digit($text('then_profile_id')) ? (int) $text('then_profile_id') : null)
+            ->setThenWhen($text('then_when', ProfileInterface::THEN_SUCCESS))
+            ->setTriggers(is_array($data['triggers'] ?? null) ? $data['triggers'] : []);
 
         $preset = $text('schedule_preset');
         $profile->setSchedule(match ($preset) {
@@ -239,6 +245,9 @@ class ProfileFormMapper
             'missing_scope' => 'all',
             'qty_mode' => 'set',
             'url_redirects' => '0',
+            'order_number' => 'keep',
+            'order_documents' => '0',
+            'order_stock' => '0',
         ];
         $options['configurable_attributes'] = array_values(array_filter(
             array_map('trim', explode(',', (string) ($options['configurable_attributes'] ?? ''))),

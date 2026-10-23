@@ -27,6 +27,7 @@ use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
 use Psr\Log\LoggerInterface;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * "Test connection" in the profile form: checks the source settings as posted (unsaved changes included; stored
@@ -45,6 +46,7 @@ class TestSource extends Action implements HttpPostActionInterface
      * @param LoggerInterface $logger
      * @param Filesystem $filesystem
      * @param FileSample $fileSample
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
@@ -54,7 +56,8 @@ class TestSource extends Action implements HttpPostActionInterface
         private readonly SourceResolver $sources,
         private readonly LoggerInterface $logger,
         private readonly Filesystem $filesystem,
-        private readonly FileSample $fileSample
+        private readonly FileSample $fileSample,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -83,14 +86,17 @@ class TestSource extends Action implements HttpPostActionInterface
             $message = $source->test($profile);
             $sample = $this->sample($profile, $source);
         } catch (PipelineException $exception) {
-            return $json->setData(['ok' => false, 'message' => $exception->getMessage()]);
+            return $json->setData(['ok' => false, 'message' => $this->text->translate($exception->getMessage())]);
         } catch (\Throwable $exception) {
             $this->logger->error('OpenImport test connection: ' . $exception->getMessage(), ['exception' => $exception]);
 
-            return $json->setData(['ok' => false, 'message' => (string) __('The test failed unexpectedly: %1', $exception->getMessage())]);
+            return $json->setData(['ok' => false, 'message' => (string) __(
+                'The test failed unexpectedly: %1',
+                $this->text->translate($exception->getMessage())
+            )]);
         }
 
-        return $json->setData(['ok' => true, 'message' => $message, 'sample' => $sample]);
+        return $json->setData(['ok' => true, 'message' => $this->text->translate($message), 'sample' => $sample]);
     }
 
     /**
@@ -118,7 +124,7 @@ class TestSource extends Action implements HttpPostActionInterface
                 $profile->getFormatOptions()
             );
         } catch (ReaderException $exception) {
-            return ['error' => $exception->getMessage()];
+            return ['error' => $this->text->translate($exception->getMessage())];
         } finally {
             $var->delete($relative);
         }

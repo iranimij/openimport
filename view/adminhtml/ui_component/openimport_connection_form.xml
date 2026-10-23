@@ -429,6 +429,492 @@
                 <notice translate="true">Stored encrypted, never shown again.</notice>
             </settings>
         </field>
+        <field name="auth_google" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="60">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Log in as</label>
+                <dataScope>settings.auth_google</dataScope>
+                <notice translate="true">A service account suits servers (share the folders with its e-mail address); a Google account sees what that person sees.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">service_account</item>
+                                <item name="label" xsi:type="string" translate="true">Service account (JSON key)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">oauth</item>
+                                <item name="label" xsi:type="string" translate="true">Google account (sign in)</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="service_account_json" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="61">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_google" xsi:type="array">
+                            <item name="not" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                    </item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/secret-text</item>
+                    <item name="placeholder" xsi:type="string">{"type": "service_account", ...}</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Service account key</label>
+                <dataScope>settings.service_account_json</dataScope>
+                <notice translate="true">The JSON key file of the service account (Google Cloud console › IAM › Service accounts › Keys). Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="service_account_email" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="62">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="service_account_note" xsi:type="array">
+                            <item name="filled" xsi:type="string">1</item>
+                        </item>
+                        <item name="settings.auth_google" xsi:type="array">
+                            <item name="not" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/text</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Share folders with</label>
+                <dataScope>service_account_note</dataScope>
+            </settings>
+        </field>
+        <field name="client_id" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="63">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                        <item name="1" xsi:type="string">dropbox</item>
+                        <item name="2" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="noticeByType" xsi:type="array">
+                        <item name="google_drive" xsi:type="string" translate="true">Of an OAuth client of the type "Web application" in your Google Cloud project, with the Google Drive API switched on.</item>
+                        <item name="dropbox" xsi:type="string" translate="true">The app key of your Dropbox app (dropbox.com/developers/apps), with the permissions files.content.read and files.content.write.</item>
+                        <item name="onedrive" xsi:type="string" translate="true">The application (client) ID of your app registration in Microsoft Entra ID (entra.microsoft.com), a "Web" platform with the redirect URI below.</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="settings.auth_google" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="type" xsi:type="array">
+                                <item name="0" xsi:type="string">dropbox</item>
+                                <item name="1" xsi:type="string">onedrive</item>
+                            </item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Client ID</label>
+                <dataScope>settings.client_id</dataScope>
+            </settings>
+        </field>
+        <field name="client_secret" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="64">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                        <item name="1" xsi:type="string">dropbox</item>
+                        <item name="2" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="settings.auth_google" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="type" xsi:type="array">
+                                <item name="0" xsi:type="string">dropbox</item>
+                                <item name="1" xsi:type="string">onedrive</item>
+                            </item>
+                        </item>
+                    </item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Client secret</label>
+                <dataScope>settings.client_secret</dataScope>
+                <notice translate="true">Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="tenant" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="65">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Directory (tenant)</label>
+                <dataScope>settings.tenant</dataScope>
+                <placeholder>common</placeholder>
+                <notice translate="true">Your organisation's directory (tenant) ID or domain; empty = common (any account the app allows).</notice>
+            </settings>
+        </field>
+        <field name="site" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="66">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">SharePoint site</label>
+                <dataScope>settings.site</dataScope>
+                <placeholder>contoso.sharepoint.com/sites/Shop</placeholder>
+                <notice translate="true">Empty = the signed-in user's OneDrive; a site address = its document library.</notice>
+            </settings>
+        </field>
+        <field name="redirect_uri" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="67">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                        <item name="1" xsi:type="string">dropbox</item>
+                        <item name="2" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="settings.auth_google" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="type" xsi:type="array">
+                                <item name="0" xsi:type="string">dropbox</item>
+                                <item name="1" xsi:type="string">onedrive</item>
+                            </item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/text</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Redirect URI</label>
+                <dataScope>redirect_uri</dataScope>
+                <notice translate="true">Add this address as redirect URI of your OAuth client or app.</notice>
+            </settings>
+        </field>
+        <field name="oauth_signin" component="Iranimij_OpenImport/js/form/oauth-signin" formElement="input" sortOrder="68">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">Iranimij_OpenImport/form/oauth-signin</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                        <item name="1" xsi:type="string">dropbox</item>
+                        <item name="2" xsi:type="string">onedrive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="settings.auth_google" xsi:type="array">
+                                <item name="0" xsi:type="string">oauth</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="type" xsi:type="array">
+                                <item name="0" xsi:type="string">dropbox</item>
+                                <item name="1" xsi:type="string">onedrive</item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Account</label>
+                <dataScope>oauth_signin</dataScope>
+            </settings>
+        </field>
+        <field name="base_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Base address</label>
+                <dataScope>settings.base_url</dataScope>
+                <placeholder>https://api.example.com/v1</placeholder>
+                <notice translate="true">Profiles add their own path to it, e.g. /products.</notice>
+            </settings>
+        </field>
+        <field name="auth_rest" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="71">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Login</label>
+                <dataScope>settings.auth_rest</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">none</item>
+                                <item name="label" xsi:type="string" translate="true">None</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">header</item>
+                                <item name="label" xsi:type="string" translate="true">Token in a header</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">basic</item>
+                                <item name="label" xsi:type="string" translate="true">User name and password (Basic)</item>
+                            </option>
+                            <option name="3" xsi:type="array">
+                                <item name="value" xsi:type="string">oauth2</item>
+                                <item name="label" xsi:type="string" translate="true">OAuth 2 client credentials</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="header_name" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="72">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_rest" xsi:type="array">
+                            <item name="0" xsi:type="string">header</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Header</label>
+                <dataScope>settings.header_name</dataScope>
+                <placeholder>Authorization</placeholder>
+            </settings>
+        </field>
+        <field name="header_token" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="73">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_rest" xsi:type="array">
+                            <item name="0" xsi:type="string">header</item>
+                        </item>
+                    </item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Header value</label>
+                <dataScope>settings.token</dataScope>
+                <notice translate="true">The whole value, e.g. "Bearer abc123" or the API key. Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="rest_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="74">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_rest" xsi:type="array">
+                            <item name="0" xsi:type="string">basic</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">User name</label>
+                <dataScope>settings.username</dataScope>
+            </settings>
+        </field>
+        <field name="rest_password" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="75">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_rest" xsi:type="array">
+                            <item name="0" xsi:type="string">basic</item>
+                        </item>
+                    </item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Password</label>
+                <dataScope>settings.password</dataScope>
+                <notice translate="true">Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="token_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="76">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_rest" xsi:type="array">
+                            <item name="0" xsi:type="string">oauth2</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Token address</label>
+                <dataScope>settings.token_url</dataScope>
+                <placeholder>https://auth.example.com/oauth/token</placeholder>
+            </settings>
+        </field>
+        <field name="rest_client_id" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="77">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_rest" xsi:type="array">
+                            <item name="0" xsi:type="string">oauth2</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Client ID</label>
+                <dataScope>settings.client_id</dataScope>
+            </settings>
+        </field>
+        <field name="rest_client_secret" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="78">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_rest" xsi:type="array">
+                            <item name="0" xsi:type="string">oauth2</item>
+                        </item>
+                    </item>
+                    <item name="secret" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Client secret</label>
+                <dataScope>settings.client_secret</dataScope>
+                <notice translate="true">Stored encrypted, never shown again.</notice>
+            </settings>
+        </field>
+        <field name="scope" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="79">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="typeField" xsi:type="string">type</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="settings.auth_rest" xsi:type="array">
+                            <item name="0" xsi:type="string">oauth2</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Scope</label>
+                <dataScope>settings.scope</dataScope>
+                <notice translate="true">Optional, as the API asks for it.</notice>
+            </settings>
+        </field>
         <field name="timeout" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

@@ -39,7 +39,11 @@ class SftpClient implements RemoteClientInterface
             }
             $loggedIn = $sftp->login($settings->username, $credential);
         } catch (\Throwable $exception) {
-            throw new PipelineException(sprintf('Cannot connect to %s: %s', $this->label, $exception->getMessage()));
+            throw new PipelineException(sprintf(
+                'Cannot connect to %s: %s',
+                $this->label,
+                $this->reason($exception->getMessage())
+            ));
         }
         if (!$loggedIn) {
             throw new PipelineException(sprintf(
@@ -49,6 +53,35 @@ class SftpClient implements RemoteClientInterface
             ));
         }
         $this->sftp = $sftp;
+    }
+
+    /**
+     * The network library's message in plain words ("Cannot connect to host:22. Error 0. php_network_getaddresses:
+     * getaddrinfo … failed" says that the host name is unknown).
+     *
+     * @param string $message
+     * @return string
+     */
+    private function reason(string $message): string
+    {
+        $known = [
+            'getaddrinfo' => 'the server name is unknown (check the spelling of the server)',
+            'not known' => 'the server name is unknown (check the spelling of the server)',
+            'servname' => 'the server name is unknown (check the spelling of the server)',
+            'refused' => 'the server refused the connection (check the port and that SFTP runs there)',
+            'timed out' => 'the server did not answer in time (check the server, the port and firewalls)',
+            'no route' => 'the server cannot be reached from this shop (network or firewall)',
+            'unreachable' => 'the server cannot be reached from this shop (network or firewall)',
+        ];
+        foreach ($known as $needle => $reason) {
+            if (stripos($message, $needle) !== false) {
+                return $reason;
+            }
+        }
+        // Without the library's own "Cannot connect to host:22. Error 0." prefix, which repeats the label.
+        $plain = trim((string) preg_replace('/^Cannot connect to \S+\s*(Error \d+\.\s*)?/i', '', $message));
+
+        return $plain !== '' ? $plain : $message;
     }
 
     /**

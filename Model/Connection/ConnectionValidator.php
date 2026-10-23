@@ -50,6 +50,27 @@ class ConnectionValidator
         if ($connection->getType() === 's3') {
             return array_merge($problems, $this->s3($text, isset($settings['secrets']['secret_key'])));
         }
+        if ($connection->getType() === 'rest') {
+            return array_merge($problems, $this->rest($text, array_keys((array) ($settings['secrets'] ?? []))));
+        }
+        if (in_array($connection->getType(), ['dropbox', 'onedrive'], true)) {
+            $stored = array_keys((array) ($settings['secrets'] ?? []));
+            if ($text('client_id') === '') {
+                $problems[] = $connection->getType() === 'dropbox'
+                    ? 'Enter the app key of your Dropbox app (dropbox.com/developers/apps).'
+                    : 'Enter the application (client) ID of your app registration (entra.microsoft.com).';
+            }
+            if (!in_array('client_secret', $stored, true)) {
+                $problems[] = $connection->getType() === 'dropbox'
+                    ? 'Enter the app secret of your Dropbox app.'
+                    : 'Enter a client secret of your app registration.';
+            }
+
+            return $problems;
+        }
+        if ($connection->getType() === 'google_drive') {
+            return array_merge($problems, $this->google($text, array_keys((array) ($settings['secrets'] ?? []))));
+        }
         if ($text('host') === '') {
             $problems[] = 'Enter the server (host name).';
         }
@@ -94,6 +115,73 @@ class ConnectionValidator
         }
         if (!$secretStored) {
             $problems[] = 'Enter the secret key.';
+        }
+
+        return $problems;
+    }
+
+    /**
+     * @param callable $text setting => trimmed text
+     * @param string[] $stored names of the stored secrets
+     * @return string[]
+     */
+    private function google(callable $text, array $stored): array
+    {
+        if (($text('auth_google') ?: 'service_account') === 'oauth') {
+            $problems = [];
+            if ($text('client_id') === '') {
+                $problems[] = 'Enter the client ID of your OAuth client (Google Cloud console › APIs & Services › '
+                    . 'Credentials).';
+            }
+            if (!in_array('client_secret', $stored, true)) {
+                $problems[] = 'Enter the client secret of your OAuth client.';
+            }
+
+            return $problems;
+        }
+        if (!in_array('service_account_json', $stored, true) || $text('account') === '') {
+            return [
+                'Paste the JSON key of a Google service account (Google Cloud console › IAM › Service accounts '
+                . '› Keys).',
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * @param callable $text setting => trimmed text
+     * @param string[] $stored names of the stored secrets
+     * @return string[]
+     */
+    private function rest(callable $text, array $stored): array
+    {
+        $problems = [];
+        if (preg_match('#^https?://[^/\s]+#i', $text('base_url')) !== 1) {
+            $problems[] = 'Enter the base address of the API, e.g. https://api.example.com/v1.';
+        }
+        switch ($text('auth_rest') ?: 'none') {
+            case 'none':
+                break;
+            case 'header':
+                if (!in_array('token', $stored, true)) {
+                    $problems[] = 'Enter the value of the login header (e.g. "Bearer <token>").';
+                }
+                break;
+            case 'basic':
+                if ($text('username') === '' || !in_array('password', $stored, true)) {
+                    $problems[] = 'Enter user name and password of the API.';
+                }
+                break;
+            case 'oauth2':
+                if (preg_match('#^https?://#i', $text('token_url')) !== 1 || $text('client_id') === ''
+                    || !in_array('client_secret', $stored, true)
+                ) {
+                    $problems[] = 'Enter token address, client ID and client secret of the OAuth 2 client.';
+                }
+                break;
+            default:
+                $problems[] = 'Choose how to log in to the API.';
         }
 
         return $problems;

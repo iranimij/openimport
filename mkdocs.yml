@@ -21,9 +21,15 @@ nav:
   - URL keys and redirects: url-keys.md
   - Presets (Shopify, WooCommerce, Magento 1): presets.md
   - Exports: exports.md
+  - Archives (ZIP, gzip, tar): archives.md
   - Categories: categories.md
   - Attributes: attributes.md
   - CMS pages and blocks: cms.md
+  - Shipments and tracking: shipments.md
+  - Order import: orders-import.md
+  - URL rewrites: url-rewrites.md
+  - Price rules and coupons: price-rules.md
+  - Reviews, newsletter, search, positions: small-entities.md
   - Schedules and cron: schedules.md
   - Command line: cli.md
   - REST API and triggers: api.md

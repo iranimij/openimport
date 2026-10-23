@@ -9,7 +9,9 @@ on a schedule.
 ## Steps
 
 1. **What**: direction Export and the entity.
-2. **Where**: the destination (download from the run page, server folder, SFTP, FTP, Amazon S3 or S3-compatible, e-mail)
+2. **Where**: the destination (download from the run page, server folder, SFTP, FTP, Amazon S3 or
+   S3-compatible, Google Drive, Dropbox, OneDrive / SharePoint, a REST API,
+   e-mail)
    and the file name.
    Placeholders in the file name: `{entity}`, `{profile}`, `{date}` (2026-10-14), `{time}` (143000),
    `{datetime}`, `{run}`, `{ext}`. Default `{entity}-{datetime}.{ext}`.
@@ -30,7 +32,7 @@ nowhere. A live run delivers it and keeps a copy in the run folder for "Keep run
 
 - Cells that would run as a formula in a spreadsheet (`=`, `+`, `-`, `@`, tab, CR first) are prefixed with `'`
   in CSV and Excel files (Stores › Configuration › iranimij › OpenImport › Safety › *Protect exports against
-  spreadsheet formulas*). Negative numbers are left alone.
+  spreadsheet formulas*). Negative numbers are left alone. Importing such a file takes the apostrophe off again.
 - Excel files are written without any library: plain numbers become numeric cells, everything else stays text
   (SKUs with leading zeros survive). Excel's limit of 1,048,575 rows is enforced with a plain message.
 - Destinations use the same encrypted secrets and the same SSRF, path and folder rules as sources
@@ -57,15 +59,26 @@ postcode, region, country_id, telephone, email, vat_id), and per line `item_id`,
 `item_product_type`, `item_parent_sku`, `item_qty_ordered`, `item_qty_invoiced`, `item_qty_shipped`,
 `item_qty_refunded`, `item_qty_canceled`, `item_price`, `item_price_incl_tax`, `item_row_total`,
 `item_row_total_incl_tax`, `item_discount_amount`, `item_tax_amount`, `item_tax_percent`, `item_weight`,
-`item_product_options`. Amounts are in the order's currency without trailing zeros.
+`item_product_options`. Amounts are in the order's currency without trailing zeros. The same layout is what the
+[order import](orders-import.md) reads.
 
 ## Destinations
+
+**XSLT after writing (XML)** reshapes an XML export into any layout before it is delivered, see
+[XSLT](file-formats.md#xslt-since-14); **Compress** (step 3) packs the file as `.zip`, `.gz` or `.tar.gz` before it
+goes to any destination; see [Archives](archives.md).
 
 - **Download**: the file stays in the run folder, with a button on the run page.
 - **Server folder**: under `var/openimport/<path>` or an allowed absolute folder (created when missing). A file of
   the same name is kept and the new one gets the date and time, or overwritten (profile setting).
 - **SFTP / FTP**: uploaded into the remote folder; same login settings and secrets as sources, or a
   [saved connection](connections.md).
+- **Google Drive / Sheets**: uploaded into the Drive folder of a
+  [saved Google connection](connections.md#google-drive-and-google-sheets); optionally as a Google Sheet.
+- **Dropbox**, **OneDrive / SharePoint**: uploaded into the folder of a [saved connection](connections.md); a file of
+  the same name is replaced.
+- **REST API**: the file (POST or PUT) or, for JSON exports, the records in batches; see
+  [REST APIs](connections.md#rest-apis).
 - **Amazon S3 / S3-compatible**: uploaded into the folder (key prefix) of the bucket of a
   [saved S3 connection](connections.md#amazon-s3-and-s3-compatible-storage).
 - **E-mail**: attached (up to 10 MB) to an e-mail sent through the store's mail settings, template

@@ -56,6 +56,7 @@ interface RunInterface
     public const TRIGGER_CLI = 'cli';
     public const TRIGGER_API = 'api';
     public const TRIGGER_EVENT = 'event';
+    public const TRIGGER_CHAIN = 'chain';
 
     /**
      * @return int|null

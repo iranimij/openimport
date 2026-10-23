@@ -17,7 +17,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Features
 
-| Feature | OpenImport 1.3 | Open Source | Commerce | Firebear | Amasty Premium | Xtento |
+| Feature | OpenImport 1.5 | Open Source | Commerce | Firebear | Amasty Premium | Xtento |
 |---|---|---|---|---|---|---|
 | Saved profiles | ✓ | ✗ | ○ scheduled jobs | ✓ | ✓ (Premium) | ✓ |
 | Schedules (cron) | ✓ presets and cron expressions, each due minute exactly once | ✗ | ✓ | ✓ | ○ (Pro and up) | ✓ |
@@ -26,10 +26,14 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | **Dry run with a field-level preview of changes** | **✓ every new profile starts with one** | ○ "Check data" validates only | ○ | ✗ (on the roadmap) | ○ file validation | ○ test mode |
 | **Typed confirmation above a delete/replace threshold** | **✓** | ✗ | ✗ | ✗ | ✗ | ✗ |
 | Delta: only changed rows go to Magento | ✓ per row and store view | ✗ | ✗ | ✓ "import cache" | ✗ | ✗ |
-| CSV / XLSX / JSON / XML | ✓ all four, streamed (flat memory) | CSV | CSV | ✓ plus ODS, XSLT, ZIP | ○ (Pro and up) | ✓ |
+| CSV / XLSX / ODS / JSON / XML | ✓ all five, streamed (flat memory) | CSV | CSV | ✓ | ○ (Pro and up) | ✓ |
+| ZIP, gzip, tar archives in and out; XSLT for XML | ✓ zip-slip and zip-bomb safe, XSLT without file or network access | ✗ | ✗ | ✓ | ○ ZIP | ✓ XSLT |
 | Upload, server folder, URL, SFTP, FTP | ✓ sandboxed folders, SSRF guard, key login | ✗ | ○ FTP for schedules | ✓ | ✓ (Pro and up) | ✓ |
-| Google Sheets | ✓ published links | ✗ | ✗ | ✓ | ○ | ✗ |
-| Google Drive, Dropbox, OneDrive | ✗ (1.4) | ✗ | ✗ | ✓ | ○ | ✗ |
+| Google Sheets | ✓ published links, and private Sheets with a login | ✗ | ✗ | ✓ | ○ | ✗ |
+| Saved connections shared by profiles | ✓ encrypted, Test connection, OAuth with the shop's own app | ✗ | ✗ | ○ | ○ | ○ |
+| Amazon S3 and S3-compatible storage | ✓ own SigV4 client, R2/Wasabi/MinIO | ✗ | ✗ | ✓ | ○ | ✗ |
+| Google Drive, Dropbox, OneDrive / SharePoint | ✓ service account or sign-in, mock-tested in CI | ✗ | ✗ | ✓ | ○ | ✗ |
+| REST API as source and destination | ✓ paging (page, offset, cursor, next, Link), three logins, retries | ✗ | ✗ | ✓ | ○ | ○ |
 | Pictures from web addresses, downloaded once and cached | ✓ SSRF guard, ETag/Last-Modified | ○ downloads every run | ○ downloads every run | ○ downloads, no cache found | ○ downloads, no cache found | ✗ |
 | Configurable products from simple rows (parent column) | ✓ name, variants, own parent rows | ✗ | ✗ | ✓ | ✗ | ✗ |
 | Products missing from the file: disable, out of stock, delete | ✓ per scope (all, website, supplier), under the safety limit | ✗ | ✗ | ✓ | ✗ | ✗ |
@@ -41,12 +45,15 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | Products, advanced pricing, customers, addresses, MSI stock | ✓ through Magento's own importer | ✓ | ✓ | ✓ | ✓ | ○ stock and price |
 | Fast stock & price update of existing products | ✓ | ✗ | ✗ | ○ | ○ | ✓ |
 | Order export (per order or per line, only new or changed) | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ |
-| Order import, tracking import | ✗ (1.5) | ✗ | ✗ | ✓ | ✓ with invoice/ship actions | ✓ |
+| Shipment and tracking import | ✓ via Magento's shipment service, duplicates skipped | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Order import | ✓ historic orders as they are, round-trip with the export, invoices/shipments/credit memos optional | ✗ | ✗ | ✓ | ✓ with invoice/ship actions | ✓ |
 | Categories (paths, store views) | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
 | Product attributes and attribute sets (options, store labels) | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | CMS pages and blocks | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
-| URL rewrites, cart and catalog price rules | ✗ (1.5) | ✗ | ✗ | ✓ | ✓ | ✗ |
-| Export destinations | ✓ download, folder, SFTP, FTP, e-mail | ✗ | ○ | ✓ | ✓ | ✓ |
+| URL rewrites (custom, product, category, CMS page; 301/302; conflicts with generated URLs reported) | ✓ import and export | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Cart price rules with coupons and labels, catalog price rules; conditions as simple columns or Magento's tree as JSON | ✓ import and export | ✗ | ✗ | ✓ | ✓ | ✗ |
+| Product reviews with ratings, newsletter subscribers, search terms and synonyms, product positions in categories | ✓ import and export, round trips | ✗ | ✗ | ✓ | ○ reviews, newsletter | ✗ |
+| Export destinations | ✓ download, folder, SFTP, FTP, S3, Google Drive/Sheet, Dropbox, OneDrive, REST, e-mail | ✗ | ○ | ✓ | ✓ | ✓ |
 | Run history, error report with your file's line numbers | ✓ original rows in the report | ○ history | ○ last outcome | ✓ | ✓ | ✓ |
 | E-mail on failure or always | ✓ | ✗ | ○ | ✓ | ✓ | ✓ |
 | CLI | ✓ run, status, list, queue, profiles export/import, doctor, secrets | ✗ (REST only) | ✗ | ✓ | ✗ | ○ |
@@ -55,6 +62,7 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 | Spreadsheet formula-injection guard | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | Encrypted credentials, never shown again | ✓ | — | — | ○ | ○ | ○ |
 | Event-triggered export (order placed → file) | ✓ debounced, one run per minute | ✗ | ✗ | ✓ | ✓ | ✓ |
+| Job chains (run B after A) | ✓ after success or always, parent run, loops refused at save | ✗ | ✗ | ✓ | ✗ | ✗ |
 | Trigger profiles by REST, read run status | ✓ | ○ raw CSV/JSON import API | ○ | ○ | ○ | ✗ |
 | B2B entities | ✗ | ✗ | ○ | ✓ (add-on) | ✗ | ✗ |
 
@@ -71,9 +79,8 @@ clean-room project). Prices change; check the vendor. If something here is wrong
 
 ## Where the paid tools still have more
 
-Order and tracking import, price rules and URL rewrites, cloud drives (Google Drive, Dropbox, OneDrive, S3) and REST
-API sources, ODS, archives, job chains and more triggers, B2B. Connectors are planned for 1.4, sales entities for 1.5,
-automation for 1.6; B2B is declined (Adobe Commerce only). See the [roadmap](https://github.com/iranimij/openimport/milestones).
+More triggers, webhook and Slack notifications, reindex after a run, undo, B2B. Automation is
+planned for 1.6 (job chains shipped); B2B is declined (Adobe Commerce only). See the [roadmap](https://github.com/iranimij/openimport/milestones).
 
 ## Free alternatives for developers
 

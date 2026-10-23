@@ -35,6 +35,7 @@ class UrlSource implements SourceInterface
         'application/xml' => 'xml',
         'text/xml' => 'xml',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+        'application/vnd.oasis.opendocument.spreadsheet' => 'ods',
     ];
 
     /**
@@ -81,7 +82,9 @@ class UrlSource implements SourceInterface
             }
         }
 
-        return sprintf('Downloaded %s (%s%s).', $name, $this->downloader->size($bytes), $type === '' ? '' : ', ' . $type);
+        return $type === ''
+            ? sprintf('Downloaded %s (%s).', $name, $this->downloader->size($bytes))
+            : sprintf('Downloaded %s (%s, %s).', $name, $this->downloader->size($bytes), $type);
     }
 
     /**

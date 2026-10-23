@@ -27,7 +27,8 @@ class ConnectionConfig
      * Settings that belong to the connection, not to the profile.
      */
     public const LOGIN_KEYS = ['host', 'port', 'username', 'auth_sftp', 'ssl', 'passive', 'timeout', 'endpoint',
-        'region', 'bucket', 'access_key', 'path_style', Secrets::KEY];
+        'region', 'bucket', 'access_key', 'path_style', 'auth_google', 'client_id', 'account', 'tenant', 'site',
+        'base_url', 'auth_rest', 'header_name', 'token_url', 'scope', Secrets::KEY];
 
     /**
      * @param ConnectionRepositoryInterface $connections

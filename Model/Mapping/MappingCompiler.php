@@ -93,8 +93,9 @@ class MappingCompiler
         $missing = array_diff($entity->identifier, $defaultColumns);
         if ($missing !== []) {
             $problems[] = sprintf(
-                'Map the identifier column%s %s (a source column or a fixed value).',
-                count($missing) === 1 ? '' : 's',
+                count($missing) === 1
+                    ? 'Map the identifier column %s (a source column or a fixed value).'
+                    : 'Map the identifier columns %s (a source column or a fixed value).',
                 implode(', ', $missing)
             );
         }

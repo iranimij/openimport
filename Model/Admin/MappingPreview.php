@@ -14,6 +14,7 @@ use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Pipeline\ProfileCompiler;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
+use Iranimij\OpenImport\Model\Reader\ReaderInterface;
 
 /**
  * The live preview of the mapping step: the first rows of the file as Magento will receive them, or why not.
@@ -43,7 +44,7 @@ class MappingPreview
         try {
             $format = $profile->getFormat() === 'auto' ? $this->readers->detect($file, $name) : $profile->getFormat();
             $reader = $this->readers->create($file, $format, $this->readers->options($profile->getFormatOptions()));
-            $columns = in_array($format, ['csv', 'xlsx'], true) ? $reader->columns() : null;
+            $columns = in_array($format, ['csv', 'xlsx', 'ods'], true) ? $reader->columns() : null;
             [$mapping] = $this->compiler->mapping($profile, $columns);
             $filter = $this->compiler->filter($profile, $columns);
         } catch (ReaderException | PipelineException $exception) {
@@ -51,6 +52,13 @@ class MappingPreview
         }
         $rows = [];
         foreach ($reader->rows() as $line => $row) {
+            if (isset($row[ReaderInterface::EXTRA_CELLS])) {
+                $rows[] = ['row' => $line, 'errors' => [(string) __(
+                    'The row has more cells than the first row has columns (%1).',
+                    $row[ReaderInterface::EXTRA_CELLS]
+                )], 'values' => []];
+                continue;
+            }
             try {
                 if (!$filter->keep($row)) {
                     continue;

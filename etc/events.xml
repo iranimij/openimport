@@ -7,7 +7,30 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Triggers (step 6 › "Also run when"): each queues the switched-on profiles that run after the event. -->
     <event name="sales_order_place_after">
         <observer name="openimport_queue_order_exports" instance="Iranimij\OpenImport\Observer\QueueOrderExports"/>
+    </event>
+    <event name="sales_order_save_after">
+        <observer name="openimport_order_status_changed" instance="Iranimij\OpenImport\Observer\OrderStatusChanged"/>
+    </event>
+    <!-- A product saved in the admin or by API, "Update attributes" on several products, Magento's own import. -->
+    <event name="catalog_product_save_after">
+        <observer name="openimport_trigger_product_saved" instance="Iranimij\OpenImport\Observer\ProductSavedTrigger"/>
+    </event>
+    <event name="catalog_product_attribute_update_before">
+        <observer name="openimport_trigger_product_saved" instance="Iranimij\OpenImport\Observer\ProductSavedTrigger"/>
+    </event>
+    <event name="catalog_product_import_bunch_save_after">
+        <observer name="openimport_trigger_product_saved" instance="Iranimij\OpenImport\Observer\ProductSavedTrigger"/>
+    </event>
+    <event name="cataloginventory_stock_item_save_after">
+        <observer name="openimport_trigger_stock_changed" instance="Iranimij\OpenImport\Observer\StockChangedTrigger"/>
+    </event>
+    <event name="customer_register_success">
+        <observer name="openimport_trigger_customer_registered" instance="Iranimij\OpenImport\Observer\CustomerRegisteredTrigger"/>
+    </event>
+    <event name="customer_save_after_data_object">
+        <observer name="openimport_trigger_customer_saved" instance="Iranimij\OpenImport\Observer\CustomerSavedTrigger"/>
     </event>
 </config>

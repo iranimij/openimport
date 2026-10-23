@@ -10,6 +10,7 @@ namespace Iranimij\OpenImport\Test\Unit\Model\Reader;
 
 use Iranimij\OpenImport\Model\Reader\CsvReader;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
+use Iranimij\OpenImport\Model\Reader\ReaderInterface;
 use Iranimij\OpenImport\Model\Reader\ReaderOptions;
 use PHPUnit\Framework\TestCase;
 
@@ -132,9 +133,52 @@ class CsvReaderTest extends TestCase
         $reader = new CsvReader($this->tempFile("a,b,c\n1\n1,2,3,4\n"));
 
         self::assertSame(
-            [2 => ['a' => '1', 'b' => '', 'c' => ''], 3 => ['a' => '1', 'b' => '2', 'c' => '3']],
+            [
+                2 => ['a' => '1', 'b' => '', 'c' => ''],
+                3 => ['a' => '1', 'b' => '2', 'c' => '3', ReaderInterface::EXTRA_CELLS => '4'],
+            ],
             iterator_to_array($reader->rows())
         );
+    }
+
+    public function testEmptyCellsBeyondTheHeaderAreNotExtra(): void
+    {
+        $reader = new CsvReader($this->tempFile("a,b\n1,2,,\n"));
+
+        self::assertSame([2 => ['a' => '1', 'b' => '2']], iterator_to_array($reader->rows()));
+    }
+
+    public function testCarriageReturnLineBreaks(): void
+    {
+        $reader = new CsvReader($this->tempFile("sku,name\rA,\"One\"\rB,Two\r"));
+
+        self::assertSame(['sku', 'name'], $reader->columns());
+        self::assertSame(
+            [2 => ['sku' => 'A', 'name' => 'One'], 3 => ['sku' => 'B', 'name' => 'Two']],
+            iterator_to_array($reader->rows())
+        );
+    }
+
+    public function testFormulaGuardApostropheIsRemoved(): void
+    {
+        $reader = new CsvReader($this->tempFile("sku,phone,name\nA,'+49 69 1234,'=SUM(1)\nB,'plain,It's\n"));
+
+        self::assertSame(
+            [
+                2 => ['sku' => 'A', 'phone' => '+49 69 1234', 'name' => '=SUM(1)'],
+                3 => ['sku' => 'B', 'phone' => "'plain", 'name' => "It's"],
+            ],
+            iterator_to_array($reader->rows())
+        );
+    }
+
+    public function testOverlongLineIsRefused(): void
+    {
+        $reader = new CsvReader($this->tempFile("sku,name\nA," . str_repeat('x', CsvReader::MAX_LINE_BYTES + 10) . "\n"));
+
+        $this->expectException(ReaderException::class);
+        $this->expectExceptionMessage('Line 2 of the file is longer than 8 MB');
+        iterator_to_array($reader->rows());
     }
 
     public function testDuplicateAndEmptyHeaders(): void

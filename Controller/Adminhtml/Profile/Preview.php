@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Controller\Adminhtml\Profile;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
+use Iranimij\OpenImport\Model\Admin\FileAccess;
 use Iranimij\OpenImport\Model\Admin\MappingPreview;
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
 use Iranimij\OpenImport\Model\Admin\UploadStore;
@@ -18,6 +19,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * The first rows as Magento will receive them, for the form as it is now (not saved).
@@ -32,13 +34,17 @@ class Preview extends Action implements HttpPostActionInterface
      * @param ProfileFormMapper $mapper
      * @param UploadStore $uploads
      * @param MappingPreview $preview
+     * @param FileAccess $fileAccess
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly ProfileInterfaceFactory $profileFactory,
         private readonly ProfileFormMapper $mapper,
         private readonly UploadStore $uploads,
-        private readonly MappingPreview $preview
+        private readonly MappingPreview $preview,
+        private readonly FileAccess $fileAccess,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -57,8 +63,20 @@ class Preview extends Action implements HttpPostActionInterface
         if ($path === null) {
             return $json->setData(['problems' => [(string) __('Upload a file to see the preview.')]]);
         }
+        if (!$this->fileAccess->canSee((string) ($source['file'] ?? ''))) {
+            return $json->setData(['problems' => [(string) __(
+                'The preview is not shown: your role may not see file contents ("Download run files").'
+            )]]);
+        }
         $profile = $this->mapper->fromForm($data, $this->profileFactory->create());
 
-        return $json->setData($this->preview->preview($profile, $path, (string) ($source['file_name'] ?? '')));
+        $result = $this->preview->preview($profile, $path, (string) ($source['file_name'] ?? ''));
+        // The engine's messages are English: shown in the admin's language.
+        $result['problems'] = array_map([$this->text, 'translate'], $result['problems']);
+        foreach ($result['rows'] as $index => $row) {
+            $result['rows'][$index]['errors'] = array_map([$this->text, 'translate'], (array) ($row['errors'] ?? []));
+        }
+
+        return $json->setData($result);
     }
 }

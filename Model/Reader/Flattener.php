@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Model\Reader;
 
+use Iranimij\OpenImport\Model\Value\FormulaGuard;
+
 use Iranimij\OpenImport\Model\Value\NumberText;
 
 /**
@@ -82,7 +84,7 @@ class Flattener
             $value === null => '',
             is_bool($value) => $value ? '1' : '0',
             is_float($value) => $this->numbers->fromFloat($value),
-            default => (string) $value,
+            default => FormulaGuard::unprotect((string) $value),
         };
     }
 }

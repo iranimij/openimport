@@ -22,6 +22,9 @@
             "row_filters": true,
             "export_options": true,
             "import_options": true,
+            "then_profile_id": true,
+            "then_when": true,
+            "triggers": true,
             "created_by": true,
             "created_at": true,
             "updated_at": true

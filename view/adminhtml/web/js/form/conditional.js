@@ -148,8 +148,18 @@ define([
                 var imports, listens, found;
 
                 this._super();
-                imports = _.extend({}, this.imports);
-                listens = _.extend({}, this.listens);
+                // Magento's class extension merges defaults shallowly: a component with its own imports or listens
+                // (oauth-signin) would otherwise lose the type, direction and auth links below.
+                imports = _.extend({
+                    sourceType: this.provider + ':data.' + this.typeField,
+                    direction: this.provider + ':data.direction',
+                    auth: this.provider + ':data.' + this.authScope + '.' + this.authField
+                }, this.imports);
+                listens = _.extend({
+                    sourceType: 'refresh',
+                    direction: 'refresh',
+                    auth: 'refresh'
+                }, this.listens);
                 found = paths(this.requiredWhen, paths(this.showWhen, []));
                 // Options from a source class arrive as a list, options written in the form XML as an object.
                 _.each(_.isObject(this.options) ? _.values(this.options) : [], function (option) {

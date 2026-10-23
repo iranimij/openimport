@@ -17,11 +17,12 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
- * Profiles grid mass actions: switch the schedules of the chosen profiles on or off (param "on"), or delete them
- * (param "delete"). Every profile is saved through the repository, so a schedule that cannot run (an uploaded file,
- * an export without destination) stays off and is named.
+ * Profiles grid mass actions: switch the automatic runs (schedule and triggers) of the chosen profiles on or off
+ * (param "on"), or delete them (param "delete"). Every profile is saved through the repository, so automatic runs
+ * that cannot work (an uploaded file, an export without destination) stay off and are named.
  */
 class MassSchedule extends Action implements HttpPostActionInterface
 {
@@ -32,12 +33,14 @@ class MassSchedule extends Action implements HttpPostActionInterface
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
      * @param ProfileRepositoryInterface $profiles
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly Filter $filter,
         private readonly CollectionFactory $collectionFactory,
-        private readonly ProfileRepositoryInterface $profiles
+        private readonly ProfileRepositoryInterface $profiles,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -57,25 +60,30 @@ class MassSchedule extends Action implements HttpPostActionInterface
                 try {
                     if ($delete) {
                         $this->profiles->delete($profile);
-                    } elseif ($on && $profile->getSchedule() === null) {
-                        $skipped[] = sprintf('%s: %s', $profile->getName(), __('it has no schedule ("Manual only").'));
+                    } elseif ($on && $profile->getSchedule() === null
+                        && ($profile->getTriggers()[ProfileInterface::TRIGGER_EVENTS] ?? []) === []) {
+                        $skipped[] = sprintf(
+                            '%s: %s',
+                            $profile->getName(),
+                            __('it has no schedule and runs after no event (step 6).')
+                        );
                         continue;
                     } else {
                         $this->profiles->save($profile->setIsActive($on));
                     }
                     $done++;
                 } catch (LocalizedException $exception) {
-                    $skipped[] = sprintf('%s: %s', $profile->getName(), strtok($exception->getMessage(), "\n"));
+                    $skipped[] = sprintf('%s: %s', $profile->getName(), strtok($this->text->translate($exception->getMessage()), "\n"));
                 }
             }
         } catch (LocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
         }
         if ($done > 0) {
             $this->messageManager->addSuccessMessage((string) match (true) {
                 $delete => __('%1 profile(s) deleted. Their runs are kept.', $done),
-                $on => __('%1 schedule(s) switched on.', $done),
-                default => __('%1 schedule(s) switched off.', $done),
+                $on => __('Automatic runs switched on for %1 profile(s).', $done),
+                default => __('Automatic runs switched off for %1 profile(s).', $done),
             });
         }
         foreach ($skipped as $problem) {

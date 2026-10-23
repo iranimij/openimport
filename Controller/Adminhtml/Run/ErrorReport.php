@@ -19,9 +19,11 @@ use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
- * Download: the run's errors with the original rows (CSV).
+ * Download: the run's errors with the original rows (CSV); without the rows' cells for users who may not download
+ * run files.
  */
 class ErrorReport extends Action implements HttpGetActionInterface
 {
@@ -33,13 +35,15 @@ class ErrorReport extends Action implements HttpGetActionInterface
      * @param Report $report
      * @param RunFiles $runFiles
      * @param FileFactory $fileFactory
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly RunRepositoryInterface $runs,
         private readonly Report $report,
         private readonly RunFiles $runFiles,
-        private readonly FileFactory $fileFactory
+        private readonly FileFactory $fileFactory,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -51,7 +55,8 @@ class ErrorReport extends Action implements HttpGetActionInterface
     {
         try {
             $run = $this->runs->getById((int) $this->getRequest()->getParam('id'));
-            $path = $this->report->write($run);
+            // The source cells are file contents: only with "Download run files".
+            $path = $this->report->write($run, $this->_authorization->isAllowed(Download::ADMIN_RESOURCE));
 
             return $this->fileFactory->create(
                 sprintf('openimport-run-%d-errors.csv', (int) $run->getRunId()),
@@ -60,7 +65,7 @@ class ErrorReport extends Action implements HttpGetActionInterface
                 'text/csv'
             );
         } catch (LocalizedException | \RuntimeException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
             return $this->resultRedirectFactory->create()->setPath('*/*/');
         }
     }

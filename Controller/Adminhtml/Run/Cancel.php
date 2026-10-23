@@ -45,6 +45,11 @@ class Cancel extends Action implements HttpPostActionInterface
         $runId = (int) $this->getRequest()->getParam('id');
         if ($this->runResource->cancelQueued($runId)) {
             $this->messageManager->addSuccessMessage((string) __('The run was cancelled.'));
+        } elseif ($this->runResource->fetchStatus($runId) === RunInterface::STATUS_RUNNING
+            && $this->runFiles->isWriting($runId)) {
+            $this->messageManager->addErrorMessage((string) __(
+                'The run is writing to Magento now, which cannot be stopped half-way; it finishes this step.'
+            ));
         } elseif ($this->runResource->fetchStatus($runId) === RunInterface::STATUS_RUNNING) {
             $this->runFiles->requestCancel($runId);
             $this->messageManager->addSuccessMessage((string) __(

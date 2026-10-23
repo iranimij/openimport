@@ -61,6 +61,12 @@ colon must be written `\:`, also inside strings.
 from simple rows, products missing from the file, quantities as changes, URL keys and 301s, conditional transforms,
 several files per run, presets. Comparison table updated.
 
+**1.4.0 (2026-10-21):** connectors, plan page 15 slices 1–7 (#53, #54, #58, #59, #60, #62, #63): saved connections,
+S3, Google Drive/Sheets, Dropbox, OneDrive/SharePoint, REST API, archives, ODS and XSLT. Lessons: the GitHub runners'
+libxml2 2.12+ refuses core 2.4.7's `esconfig.xsd` (CI patches it); PHPUnit's TeamCity log names failed tests when a
+fixture crashes before the summary; the OAuth round trip is E2E-testable with a stand-in consent page that redirects
+straight back.
+
 Open for Iman: delete the temporary branch `ci/m5-all` (shows as a dev version on Packagist; cloud sessions cannot
 delete branches), repository settings (squash only, delete branch on merge,
 `main` protected with `ci-ok`), a look at the admin on the Mac. Next product work: Notion "12 · Roadmap 1.x".
@@ -88,9 +94,9 @@ parallelism only across runs and for exports).
 | Release | Slices | Status |
 |---|---|---|
 | 1.3 Catalog helpers | 1 images from URLs · 2 configurables from simple rows · 3 products missing from the file · 4 add to stock · 5 URL keys and 301s · 6 conditional transforms · 7 several files per run · 8 Shopify/WooCommerce/Magento 1 presets | **released 1.3.0** (#44–#51, release PR #52); E2E dev-env #9–#12 |
-| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | 1 done (#53, E2E dev-env #13); 2 in review (#54, E2E dev-env #14) |
-| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | not started |
-| 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | not started |
+| 1.4 Connectors | 1 connections · 2 S3 · 3 Google Drive/Sheets · 4 Dropbox, OneDrive · 5 REST API source/destination · 6 archives · 7 ODS, XSLT | **released 1.4.0** (#53, #54, #58–#60, #62, #63; release PR); E2E dev-env #13–#16 |
+| 1.5 Sales and marketing entities | 1 shipments and tracking · 2 order import · 3 URL rewrites · 4 price rules and coupons · 5 reviews, newsletter, search terms, category positions | **released 1.5.0** (#65, #67–#70, release PR); E2E dev-env #17 |
+| 1.6 Automation and operations | 1 job chains · 2 triggers · 3 webhook/Slack · 4 reindex · 5 parallel workers · 6 undo · 7 close | paused after slice 2: 1 done (#72), 2 done (#76) |
 
 Rule for every slice: one PR, pushed at once; this file updated after each slice (done, exact next step, open
 questions, failing/skipped tests, CI link); unit ≥ 85 % on new namespaces, integration on all seven pairs, oracle or
@@ -99,14 +105,57 @@ code.
 
 ## Exact next step
 
-1.3 released (v1.3.0, #44–#52; E2E dev-env #9–#12). Still open from 1.3: the local browser check on the Mac
-(double-click `claude-upgrade.command` first).
+**Status 2026-10-23:** review 5 is closed for high and medium. 1.5.4 is released (#82) and merged into main with L1
+(#83); M3 is merged (#84). Open: the review 5 lows L2–L20 (Notion page 18). 1.6 stays paused after slice 2 until
+Iman says go (TODO list in Notion page 15 §3.1).
 
-Now: **1.4 slice 2 · S3**, PR #54 (`feat/1.4-s3`), E2E dev-env #14 (`e2e/1.4-s3`, ref `feat/1.4-s3`). Merge both
-when green, set the dev-env ref back to `main`. Then slice 3 (Google Drive and Sheets with login): connection kinds
-for a Google service account (JSON key, JWT bearer grant) and OAuth (user account, PKCE, refresh tokens stored as
-secrets), a Drive client on `RemoteClientInterface` (list a folder by id or path, download, upload, move), private
-Sheets read as CSV through the Drive export endpoint; tests against a mock Google API (recorded answers) in CI.
+**1.5.4** (browser review 5, Notion page 18, 2026-10-23; Iman: "fix all high and medium ones"), on `fix/1.5.4` from
+`release/1.5`: H1 a cancelled or failing products export delivered a partial file (ExportRunner remembers errors
+raised inside Magento's export, which swallows them), H2 the profiles grid sent encrypted secrets, H3 (found while
+testing e-mails in Mailhog) the "E-mail" destination crashed on 2.4.8+ (Symfony mail), M1 file contents need
+*Download run files* (FileAccess; own uploads stay visible), M2 upload size messages and limit, M4 cancel in the
+write phase (writing marker), M5 Replace keeps URL keys (ReplaceUrlKeyStep) and behaviour notes. Then: merge back
+into main with L1 (`$t('After: %1')`), browser re-test, M3 (run messages translated when shown) as its own slice.
+
+**M3 · run messages in the admin's language** (branch `feature/run-messages-i18n`, on main after 1.5.4): runs keep
+storing English; `Model/I18n/StoredText` cuts a stored line into sentences and matches each against the phrases of
+`i18n/en_US.csv` (sprintf formats such as `%d row(s) read.` are phrases too; the German line uses %1, %2 … in the
+order of the values; the most specific phrase wins). Used on the run page (summary, errors), recent runs, mapping
+preview and every controller that shows an engine message. About 600 German lines added (drafted per file by
+three helper agents, terms aligned with de_DE.csv: Store View, Werte-Zuordnung, Shops ›). Composed messages
+(plural "s", verbs, "deleted"/"moved") were split into whole sentences. CI: `.github/ci/check-run-messages.py`
+lists sentence-like texts in Model/ without an en/de line (exceptions in `not-messages.txt`). Not translated:
+e-mails, CLI, Magento's own row messages.
+
+1.4 released (v1.4.0; module #53–#63; E2E dev-env #13–#16). Still open from 1.3: the local browser check on the Mac
+(double-click `claude-upgrade.command` first), now also for the 1.4 pages (connections grid and form, Google/Dropbox/
+Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).
+
+**1.5 · Sales and marketing entities** (plan page 15 §3) **released as 1.5.0 on 2026-10-21**: #65 shipments,
+#67 orders, #68 URL rewrites, #69 price rules and coupons, #70 reviews/newsletter/search/positions; E2E dev-env
+#17. **1.5.1 on 2026-10-22**: the 12 findings of browser review 3 (Notion page 16) fixed on branch `release/1.5`
+(made from v1.5.0, so the release carries no 1.6 work), released from there and merged back into main.
+**1.5.2**: the findings of browser review 4 (Notion page 17) in released code, on branch `fix/1.5.2` from
+`release/1.5`: grid keyword search (filter pool now reaches Magento's Reporting), picture columns in the field list,
+dry-run headline with left-out rows, formula-guard round trip, CR line breaks, extra cells, 8 MB line limit, empty
+files, decimal quantities, order country codes, picture paths, plain core messages, empty feeds and missing
+products, JSON import never switches profiles on, broken JSON message, REST hints, export wording, permission
+*Download run files* (data patch GrantRunFiles), sheet list. The 1.6-only findings (mass action for trigger-only
+profiles, on_place normalisation, step 6 summary, chain links and delete warning, Then-run list, legacy order
+switch) follow on main after the merge back.
+Next: **1.6 · Automation and operations** (plan page 15 §3): 1 job chains, 2 triggers, 3 webhook/Slack,
+4 reindex after a run, 5 parallel workers, 6 undo, 7 close. Slice 1 job chains merged (#72). Each slice: README,
+CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21: every feature slice updates README.md.
+
+**Browser review 4** (Notion page 17, 2026-10-22): every finding fixed and re-tested in Chrome. Released code:
+**1.5.2** (#77) and **1.5.3** (#80, a core-message fix the re-test found), both from `release/1.5` and merged back
+into main (#79, #78). 1.6-only fixes (mass action with triggers, `on_place` true, step 6 summary, chain notes, run
+links) in #78. 1.6 stays paused after slice 2 until Iman says go; next is slice 3 webhook/Slack (15 · Plan §3.1).
+
+**Browser review 5** (Notion page 18, 2026-10-23): roles, German admin, cancel, behaviours at 20,000 rows, exports.
+2 high (H1 a cancelled products export ends SUCCESS with a partial file: Magento's `Export\Product` swallows the
+cancel exception; H2 the profiles grid sends encrypted secrets to the browser), 5 medium, 13 low. Nothing fixed
+yet: waiting for Iman. Proposed: 1.5.4 from `release/1.5` for everything except L1 (main).
 
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
@@ -251,6 +300,194 @@ Local store: after a schema change, double-click `claude-upgrade.command` in the
 - CI: `.github/ci/s3-server.sh` starts RustFS (MinIO images can no longer be pulled) and exports OPENIMPORT_TEST_S3;
   `Test/Integration/Connection/S3Test.php` runs against it. Lesson: Magento's integration framework sets the
   properties of a finished test to null, so typed test properties must be nullable.
+
+### 1.4 slice 3 · Google Drive and Sheets (what was built)
+
+- `Model/Http/ApiClient` (+`ApiResponse`): API requests through the URL guard, body from a file, answer to a file,
+  own header lines (no `Expect: 100-continue`).
+- `Model/Google/GoogleAuth`: service account (RS256 JWT, jwt-bearer grant), refresh token grant, code exchange with
+  PKCE, consent URL; tokens cached in memory. `GoogleEndpoints` (di; tests point it to a mock).
+- `Model/Google/DriveClient` (`RemoteClientInterface`): folders by link, id or path from My Drive (created for
+  "processed"), Sheets listed as `<name>.xlsx` and exported as XLSX, other Google types left out, resumable uploads
+  (an existing file keeps its id; *Save as a Google Sheet* converts), moves by parents, deletes to the bin.
+- `Model/Google/OAuthFlow` + `Connection/OauthStart`, `Connection/OauthCallback` (public action without secret key,
+  still ACL): state `<id>.<random>` hashed in the connection, verifier encrypted, 15 minutes; the refresh token is a
+  secret; the account e-mail comes from `about`.
+- Connection form: *Log in as* service account (key; account shown to share folders with) or Google account (client
+  ID/secret, redirect URI, Sign in button). Profile: source/destination `google_drive`.
+- Tests: unit (PKCE RFC 7636 vector, consent URL, key check, settings, validator, form mapper); integration with
+  the mock Google server (`GoogleDriveTest`, `GoogleOAuthAdminTest`).
+
+### 1.4 slice 4 · Dropbox, OneDrive and SharePoint (what was built)
+
+- OAuth generalised: `Model/OAuth/OAuthFlow` (moved from Model/Google) takes providers by connection type
+  (`OAuthProviderInterface`: signsIn, consentUrl, exchange, account); `GoogleOAuthProvider`, `DropboxOAuthProvider`,
+  `MicrosoftOAuthProvider`; `OAuthTokens` (form posts, refresh with in-memory cache, PKCE challenge).
+- `DropboxClient`: list_folder (+continue), download/upload (Dropbox-API-Arg, overwrite), move_v2 after
+  create_folder_v2, delete_v2. `OneDriveClient`: Graph path addressing (`root:/a/b:`), the user's OneDrive or a
+  SharePoint site's library (`/sites/{host}:/{path}`), download through Graph's redirect, upload sessions in 10 MB
+  parts, moves by parent id (folder made when missing), deletes to the recycle bin. Scopes ask for
+  Sites.ReadWrite.All only when a site is set.
+- Connection form: client ID/secret, redirect URI and the sign-in button now serve Google (account login), Dropbox
+  and Microsoft (`oauth-signin.js`); OneDrive adds tenant and site.
+- Tests: unit (settings, validator); integration with `Test/Integration/_files/cloud-server.php` (Dropbox + Graph
+  stand-in): sign-in through OAuthFlow, files, parts, redirect download, SharePoint site, a profile, a refused code.
+
+### 1.4 slice 5 · REST API source and destination (what was built)
+
+- Connection type `rest`: base URL plus a login (none, header token, basic, OAuth2 client credentials with a cached
+  token). `RestClient`: absolute links must stay on the base's host, retries on 429/502/503/504 (Retry-After, at most
+  30 s, 3 times), no redirects (ApiClient and the URL guard as everywhere).
+- `RestSource`: records at a path in the answer, paging by page number, offset, cursor, next-URL field or Link
+  header, a page limit (stops the run with a message, nothing imported); the records go to `rest-api.json` and run
+  through the JSON reader. `RestDestination`: the export file in one request, or JSON batches of N records.
+- Tests: unit (paging helpers); integration against `Test/Integration/_files/rest-server.php` (every paging kind,
+  every login, retries with recorded waits, the page limit, file and batch exports).
+
+### 1.4 slice 6 · archives (what was built)
+
+- `Model/Archive/Unpacker`: ZIP (ZipArchive), gzip (zlib stream), tar and tar.gz (own ustar reader with GNU long
+  names and pax paths); the entry by pattern or the first readable file; fixed target file name (no zip-slip),
+  size counted while writing (1 GB), 10,000 entries, links skipped, nested and password-protected archives refused.
+  `Packer` writes ZIP, gzip and tar.gz (own ustar header); `PackedWriter` gives destinations the archive's
+  extension and content type. `Storage/TempFolder` for short-lived folders under `var/openimport/tmp`.
+- Wired into `RunProcessor` (the run names the inner file, the message says "Read x from y."), `FileSample` (form
+  previews and Test connection unpack too, `inner` in the sample), `ExportRunner` (export option `compress`),
+  uploads accept `.zip .gz .tgz .tar`, validator checks, form fields in step 3 (`format_options.archive`,
+  `archive_entry`, `export_options.compress`).
+- Tests: unit with real archives (zip-slip, bomb, entries limit, password, damaged, gzip, tar long names, links,
+  truncated tar, round trips through the Packer); integration `Execution/ArchivesTest` (ZIP and gzip from a folder
+  through a live run, pattern, "read as it is", broken ZIP, packed export). Docs `docs/archives.md`.
+
+### 1.4 slice 7 · ODS and XSLT (what was built)
+
+- `Reader/OdsReader` (content.xml streamed with XMLReader: tables by name or position, repeated columns and rows
+  expanded with empty runs dropped, typed values, paragraphs, annotations skipped, no DOCTYPE, 512 MB limit,
+  mimetype checked) and `Writer/OdsWriter` (mimetype stored first, manifest, styles, bold frozen header, numbers
+  as floats, text:s/text:tab). Format `ods` everywhere (factory, sniffing by the mimetype entry, profile formats,
+  uploads, URL content type, sheet field, form sample sheets, strict columns).
+- `Xslt/XsltStep`: XSLTProcessor with all security prefs on (no read/write file, no network), no PHP functions,
+  no DOCTYPE, include/import refused, 64 MB file limit, `check()` at save; `transform()` before the reader
+  (`RunProcessor::prepare`, `FileSample`) and `transformInPlace()` after the XML writer (`ExportRunner`). Form:
+  `format_options.xslt`, `export_options.xslt` (textareas).
+- Tests: unit (ODS reader with Calc-style content, ODS writer round trip, XSLT with eight hostile stylesheets),
+  integration `Execution/OdsXsltTest` (ODS export → edit → ODS import, XSLT in and out through live runs, hostile
+  stylesheet refused at save). Docs: file-formats (ODS, XSLT), security, sources, exports; README; CHANGELOG.
+
+### 1.5 slice 1 · shipments and tracking (what was built)
+
+- Entity `openimport_shipment` (import only, Add/Update or Only add): `Import/Shipment/ShipmentImporter` collects
+  the rows per order (items by SKU with quantities or everything open, tracking numbers, notify, comment), checks
+  every row (order, can ship, open item, quantity left, carrier from `Magento\Shipping\Model\Config`), skips and
+  reports orders that already carry a tracking number or have nothing left, and ships through
+  `ShipOrderInterface`. `ShipmentRecords` caches orders per run; `ShipmentRecordReader` treats every row as new.
+  Registry: `EntityRegistry::SHIPMENT`, `ADD_ONLY` (validator), synonyms, entity source names and hints, field list,
+  di importer and reader, `magento/module-shipping` required (core module, for the carrier list).
+- Tests: integration `Import/ShipmentImportTest` against the Sales order fixture (partial shipment with tracking,
+  file imported twice, the rest without SKU with two tracking rows, bad rows refused before anything ships,
+  behaviours refused at save); unit validator rule. Docs `docs/shipments.md`, README, comparison, CHANGELOG.
+
+### 1.5 slice 2 · order import (what was built)
+
+- Entity `openimport_order` in the import direction (Add/Update or Only add, `ADD_ONLY`): `Import/Order/OrderFile`
+  groups the rows of a file by `increment_id` (the layout of the order export: order columns on the first row,
+  one item per row, `item_parent_sku` for children), checks every column and the totals (subtotal = Σ row totals,
+  grand total = subtotal + shipping + tax − discount, missing ones filled). `OrderImporter` skips existing numbers
+  (non-critical, run partial), looks up the store, builds `Magento\Sales\Model\Order` like the Sales fixtures
+  (state/status, currency with rate 1, customer by e-mail on the website or guest, group, addresses, payment
+  recorded, items with parents first), saves through `OrderRepository` in one transaction per order, adds the
+  history comment, optionally invoices/ships/refunds through `InvoiceOrderInterface`, `ShipOrderInterface`,
+  `RefundOrderInterface` and sets the file's state and totals again, optionally reduces stock via
+  `StockRegistry`. Numbers: keep the file's or `SalesSequence` next value. `OrderRecords` does the lookups with
+  plain selects. `ImportRequest::$options` carries the profile's import options (`ImportRunner`); profile form
+  fields `order_number`, `order_documents`, `order_stock` (shown for the order entity). Requires
+  `magento/module-sales-sequence` and `magento/module-catalog-inventory`.
+- Tests: integration `Import/OrderImportTest` (round-trip oracle: export the `order_list` fixture per line →
+  import with generated numbers → export → same rows; an order with documents, tracking and stock; the same file
+  twice; dry-run checks; behaviours refused), unit `OrderFileTest` (grouping, totals, checks, columns, money).
+  Docs `docs/orders-import.md`, exports cross-link, README, comparison, CHANGELOG.
+
+### 1.5 slice 3 · URL rewrites (what was built)
+
+- Entity `openimport_url_rewrite` (import Add/Update + Delete, export): `Import/UrlRewrite/UrlRewriteImporter`
+  prepares every row (path checks, store view, redirect type incl. words, entity from the filled column
+  product_sku/category_path/cms_page checked against entity_type, target from the file or the entity's generated
+  URL (`systemPath`) for redirects / canonical path otherwise, self-target, duplicates in the file, conflicts with
+  Magento's generated URLs of other entities), counts created/updated/deleted in the dry run, writes through the
+  URL rewrite model + resource (`UrlRewriteRecords::save/delete`). `UrlRewriteRecordReader` (identifier
+  "request_path|store_code"), `UrlRewriteEntitySource` (every rewrite, ids resolved to SKU/path/identifier).
+  Registry identifier `['request_path']` (the store view is a plain column), NO_REPLACE, synonyms; requires `magento/module-url-rewrite`.
+- Tests: unit `UrlRewriteImporterTest` with an in-memory `FakeRecords` and `ArraySource` (every kind, counts,
+  conflicts and bad rows, delete, replace); integration `Import/UrlRewriteImportTest` (product_simple fixture:
+  create, the storefront router answers 301/302/forward, update, export round trip, conflicts, delete, generated
+  URL kept, replace refused). Docs `docs/url-rewrites.md`, README, comparison, CHANGELOG.
+
+### 1.5 slice 4 · price rules and coupons (what was built)
+
+- Entities `openimport_cart_rule` and `openimport_catalog_rule` (import Add/Update + Delete, export), one
+  `Import/PriceRule/PriceRuleImporter` with a `kind` (di virtual types): rows matched by `rule_id` or name
+  (several rules of one name reported), values from the columns (empty columns of an existing rule keep their
+  values; new rules get defaults: active, all websites and groups), websites/groups by code or `all`, dates,
+  action per kind, numbers, cart extras (coupon type/code/codes, limits, free shipping, labels per store view).
+  `ConditionTree` parses Magento's condition arrays from JSON (short types expanded, every type must be an
+  `AbstractCondition` subclass), builds trees from the simple columns (subtotal, SKUs, categories; Product\Found
+  for cart conditions, bare Product for cart actions and catalog rules) and compacts saved trees for the export.
+  `PriceRuleRecords`: lookups, rule models + resources, coupon codes/owners, `addCoupon` (generated type).
+  Writes: `addData` + fresh condition/action combine loaded from the tree, resource save; extra coupon codes added
+  unless the rule has them, codes of another rule refused. `PriceRuleEntitySource` (codes, labels, JSON),
+  `PriceRuleRecordReader`. Requires `magento/module-sales-rule`, `module-catalog-rule`, `module-rule`.
+- Tests: unit `ConditionTreeTest`; integration `Import/PriceRuleImportTest` (three cart rules from simple columns
+  and JSON, coupon list, labels; the coupon applies in a quote; update by name keeps the rest; export round trip
+  imports as updates without doubling coupons; bad rows; delete removes coupons; a catalog rule for one SKU,
+  reindex, rule price 9 for guests; round trip; delete; replace refused). Docs `docs/price-rules.md`, README,
+  comparison, CHANGELOG.
+
+### 1.5 slice 5 · reviews, newsletter, search terms, synonyms, category positions (what was built)
+
+- `Import/Small/SmallImporter` (abstract: check every row → dry-run counts → write/remove row by row; Replace
+  refused; duplicates in the file by a key) with five importers: `ReviewImporter` (review + rating models,
+  votes replaced, summary aggregated; identifier product_sku|nickname|title or review_id), `NewsletterImporter`
+  (subscriber model, status set directly, customer linked, no e-mails), `SearchTermImporter` (search query
+  model per store view, redirect cleared by an empty mapped cell), `SynonymImporter` (synonym group repository,
+  merge by shared words and scope all/website:/store:), `CategoryPositionImporter` (category link repository
+  save/deleteByIds). `SmallSourceInterface` (export + `find` + `count`) with one source per entity (plain
+  selects, codes instead of ids) and one generic `SmallRecordReader` (di virtual types with the identifier
+  columns). `SmallRecords` shared lookups. Registry, codes, names/hints, field list, di; requires
+  `magento/module-review`, `module-newsletter`, `module-search`.
+- Tests: integration `Import/SmallEntitiesImportTest` — each entity imported, exported with a filter, the
+  export re-imported as unchanged, updates, bad rows, delete. Docs `docs/small-entities.md`, README,
+  comparison, CHANGELOG.
+
+### 1.6 slice 1 · job chains (what was built)
+
+- Profile columns `then_profile_id`, `then_when` (schema + whitelist, interface, model, form mapper, duplicate,
+  profile JSON by name with deferred linking of profiles of the same file). `Chain\ChainLinks` reads the links
+  with plain selects (the validator runs inside the repository); `ProfileValidator::chain()` refuses self, missing
+  next, upload sources and loops (path followed up to 20 links, the repeating profile named). `Chain\ChainStarter`
+  runs after `RunProcessor::finish()`: queues the next profile live with trigger `chain`, parent run id and the
+  chain's profile ids in the run options (loop guard at run time too); not after dry runs, cancelled runs or (unless
+  "always") failed runs; the reason goes into the run message. Form: *Then run* / *When* in step 6; run grid
+  label *Job chain*.
+- Tests: integration `Execution/ChainTest` (chain of three with parents and options, dry run starts nothing, JSON
+  round trip, failure stops unless always, loop/self/upload/missing refused). Docs schedules.md, README,
+  comparison, CHANGELOG.
+
+### 1.6 slice 2 · triggers (what was built)
+
+- Profile column `triggers` (JSON: `events`, `order_statuses`; schema + whitelist, interface, model, stub, form
+  mapper, duplicate, profile JSON). `Trigger\TriggerEvents` (six events, labels and short names), `TriggerQueue::fire()`
+  (switched-on profiles that list the event, plus legacy order exports with `on_place`; status filter; skips a
+  profile with a waiting run and one queued by this process in the last 30 s; never throws), `TriggerGuard` (entered
+  by `RunProcessor` around every run, so OpenImport's own writes trigger nothing). Observers: one `TriggerRuns`
+  class as four di virtual types (product saved incl. mass attribute update and Magento import, stock item saved,
+  customer registered, customer saved), `QueueOrderExports` (order placed), `OrderStatusChanged` (origData status).
+  Validator refuses unknown events, upload sources and download destinations for active profiles. Form step 6
+  *Also run when* + *Only for these order statuses*; switch renamed *Automatic runs are on*; profile grid
+  *Schedule* column shows "after: …"; run grid label *Event*.
+- Tests: integration `Execution/TriggerTest` (three product saves → one run, switched-off and other-event profiles
+  untouched, stock, order status with and without a status filter, unchanged status, order placed, customer saved
+  and registered, guard, unknown event); unit validator and JSON. Docs schedules.md *Triggers*, api.md, README,
+  CHANGELOG.
 
 ## Open questions
 

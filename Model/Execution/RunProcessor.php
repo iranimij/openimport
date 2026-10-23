@@ -11,15 +11,20 @@ namespace Iranimij\OpenImport\Model\Execution;
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
 use Iranimij\OpenImport\Api\Data\RunInterface;
 use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
+use Iranimij\OpenImport\Model\Chain\ChainStarter;
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
+use Iranimij\OpenImport\Model\Archive\Unpacker;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
 use Iranimij\OpenImport\Model\Export\ExportRunner;
 use Iranimij\OpenImport\Model\Notification\RunMailer;
+use Iranimij\OpenImport\Model\Trigger\TriggerGuard;
 use Iranimij\OpenImport\Model\Pipeline\ImportRunner;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
 use Iranimij\OpenImport\Model\Pipeline\RunOutcome;
 use Iranimij\OpenImport\Model\ResourceModel\Run as RunResource;
+use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Storage\LockManager;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Psr\Log\LoggerInterface;
 
@@ -42,6 +47,10 @@ class RunProcessor
      * @param ExportRunner $exportRunner
      * @param EntityRegistry $entities
      * @param FileBatch $fileBatch
+     * @param Unpacker $unpacker
+     * @param XsltStep $xslt
+     * @param ChainStarter $chains
+     * @param TriggerGuard $triggerGuard
      */
     public function __construct(
         private readonly RunRepositoryInterface $runRepository,
@@ -55,7 +64,11 @@ class RunProcessor
         private readonly RunMailer $mailer,
         private readonly ExportRunner $exportRunner,
         private readonly EntityRegistry $entities,
-        private readonly FileBatch $fileBatch
+        private readonly FileBatch $fileBatch,
+        private readonly Unpacker $unpacker,
+        private readonly XsltStep $xslt,
+        private readonly ChainStarter $chains,
+        private readonly TriggerGuard $triggerGuard
     ) {
     }
 
@@ -104,7 +117,13 @@ class RunProcessor
                 }
                 $held[] = $name;
             }
-            $outcome = $this->runProfile($profile, $run, $held);
+            // What the run writes (products, stock, customers) starts no triggered runs.
+            $this->triggerGuard->enter();
+            try {
+                $outcome = $this->runProfile($profile, $run, $held);
+            } finally {
+                $this->triggerGuard->leave();
+            }
         } catch (RunCancelledException $exception) {
             // The counts so far, as the run wrote them while reading.
             $counts = $this->runRepository->getById($runId)->getCounts();
@@ -126,9 +145,24 @@ class RunProcessor
             }
         }
 
+        if ($outcome->status !== RunInterface::STATUS_CANCELLED && $this->runFiles->cancelRequested($runId)) {
+            // The cancel came while Magento was writing: the run finished that step instead.
+            $outcome = new RunOutcome(
+                $outcome->status,
+                $outcome->counts,
+                $outcome->message . "\n" . 'Cancel was requested while the run was writing to Magento, which cannot be'
+                . ' stopped half-way; the run finished.',
+                $outcome->historyId
+            );
+        }
         $finished = $this->finish($runId, $outcome);
         if ($profile !== null) {
             $this->fileBatch->stopAfterFailure($profile, $finished);
+            $then = $this->chains->after($profile, $finished);
+            if ($then !== '') {
+                $finished->setMessage(rtrim((string) $finished->getMessage()) . "\n" . $then);
+                $finished = $this->runRepository->save($finished);
+            }
             $this->mailer->send($profile, $finished);
         }
 
@@ -176,9 +210,12 @@ class RunProcessor
     {
         $runId = (int) $run->getRunId();
         $folder = $this->runFiles->folder($runId);
-        $heartbeat = function (bool $canStop = false) use ($locks, $runId): void {
+        $heartbeat = function (bool $canStop = false, bool $writing = false) use ($locks, $runId): void {
             foreach ($locks as $name) {
                 $this->locks->heartbeat($name, $runId);
+            }
+            if ($writing) {
+                $this->runFiles->markWriting($runId);
             }
             if ($canStop && $this->runFiles->cancelRequested($runId)) {
                 throw new RunCancelledException('Cancelled while running, before anything was written or sent.');
@@ -195,15 +232,19 @@ class RunProcessor
         }
         $batchNote = $this->fileBatch->start($profile, $run);
         $fetched = $this->sources->fetch($profile, $run, $folder);
-        $staged = $this->runFiles->stageSource($runId, $fetched->path, $fetched->name);
+        [$readPath, $readName, $archiveNote] = $this->prepare($profile, $fetched, $folder);
+        $staged = $this->runFiles->stageSource($runId, $readPath, $readName);
         $run->setSourceFile($this->runFiles->relative($staged));
-        if (empty($run->getOptions()['original_name']) && $fetched->name !== '') {
+        if ($archiveNote !== null) {
+            // The run page shows the file that was read, not the archive it came in.
+            $run->setOptions(['original_name' => $readName] + $run->getOptions());
+        } elseif (empty($run->getOptions()['original_name']) && $fetched->name !== '') {
             // The run page and the download show the file by its own name (uploads set it when queued).
             $run->setOptions($run->getOptions() + ['original_name' => $fetched->name]);
         }
         $this->runRepository->save($run);
         try {
-            $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $fetched->name, $heartbeat);
+            $outcome = $this->importRunner->run($profile, $run, $staged, $folder, $readName, $heartbeat);
         } catch (PipelineException $exception) {
             // The run fails, but the note says which file it was and which runs got the others.
             if ($batchNote === null) {
@@ -215,16 +256,50 @@ class RunProcessor
             && in_array($outcome->status, [RunInterface::STATUS_SUCCESS, RunInterface::STATUS_PARTIAL], true)) {
             $outcome = $this->afterSuccess($profile, $fetched, $outcome);
         }
-        if ($batchNote !== null) {
-            $outcome = new RunOutcome(
-                $outcome->status,
-                $outcome->counts,
-                rtrim($outcome->message) . "\n" . $batchNote,
-                $outcome->historyId
-            );
+        foreach ([$archiveNote, $batchNote] as $note) {
+            if ($note !== null) {
+                $outcome = new RunOutcome(
+                    $outcome->status,
+                    $outcome->counts,
+                    rtrim($outcome->message) . "\n" . $note,
+                    $outcome->historyId
+                );
+            }
         }
 
         return $outcome;
+    }
+
+    /**
+     * The file to read: the fetched file, the file taken out of it when it is an archive, and that one transformed
+     * when the profile has an XSLT stylesheet.
+     *
+     * @param ProfileInterface $profile
+     * @param FetchedFile $fetched
+     * @param string $folder the run folder
+     * @return array{0: string, 1: string, 2: string|null} path, name, note for the run message
+     * @throws PipelineException
+     */
+    private function prepare(ProfileInterface $profile, FetchedFile $fetched, string $folder): array
+    {
+        $options = $profile->getFormatOptions();
+        $path = $fetched->path;
+        $name = $fetched->name;
+        $note = null;
+        try {
+            if ($this->unpacker->kindFor($path, $name, $options) !== '') {
+                $unpacked = $this->unpacker->unpack($path, $name, $folder, $options);
+                [$path, $name, $note] = [$unpacked->path, $unpacked->name, $unpacked->note()];
+            }
+            if ($this->xslt->applies($profile->getFormat(), $name, $options)) {
+                $this->xslt->transform($path, (string) $options[XsltStep::OPTION], $folder . '/transformed.xml');
+                $path = $folder . '/transformed.xml';
+            }
+        } catch (ReaderException $exception) {
+            throw new PipelineException($exception->getMessage(), 0, $exception);
+        }
+
+        return [$path, $name, $note];
     }
 
     /**
@@ -244,9 +319,12 @@ class RunProcessor
             return new RunOutcome(
                 $outcome->status,
                 $outcome->counts,
-                rtrim($outcome->message) . ' The file was imported, but it could not be '
-                . ($profile->getAfterSuccess() === 'delete' ? 'deleted' : 'moved') . ' afterwards: '
-                . $exception->getMessage(),
+                rtrim($outcome->message) . ' ' . sprintf(
+                    $profile->getAfterSuccess() === 'delete'
+                        ? 'The file was imported, but it could not be deleted afterwards: %s'
+                        : 'The file was imported, but it could not be moved afterwards: %s',
+                    $exception->getMessage()
+                ),
                 $outcome->historyId
             );
         }

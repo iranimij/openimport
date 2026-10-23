@@ -375,6 +375,80 @@ class Profile extends AbstractModel implements ProfileInterface
     /**
      * @inheritDoc
      */
+    public function getThenProfileId(): ?int
+    {
+        $id = $this->getData(self::THEN_PROFILE_ID);
+
+        return $id === null || $id === '' || (int) $id === 0 ? null : (int) $id;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setThenProfileId(?int $profileId): ProfileInterface
+    {
+        return $this->setData(self::THEN_PROFILE_ID, $profileId === null || $profileId === 0 ? null : $profileId);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getThenWhen(): string
+    {
+        $when = (string) $this->getData(self::THEN_WHEN);
+
+        return $when === self::THEN_ALWAYS ? self::THEN_ALWAYS : self::THEN_SUCCESS;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setThenWhen(string $when): ProfileInterface
+    {
+        return $this->setData(self::THEN_WHEN, $when === self::THEN_ALWAYS ? self::THEN_ALWAYS : self::THEN_SUCCESS);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTriggers(): array
+    {
+        return $this->cleanTriggers($this->json()->decode($this->getData(self::TRIGGERS)));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTriggers(array $triggers): ProfileInterface
+    {
+        $clean = $this->cleanTriggers($triggers);
+
+        return $this->setData(
+            self::TRIGGERS,
+            $clean[self::TRIGGER_EVENTS] === [] ? null : $this->json()->encode($clean)
+        );
+    }
+
+    /**
+     * @param array<mixed> $triggers
+     * @return array{events: string[], order_statuses: string[]}
+     */
+    private function cleanTriggers(array $triggers): array
+    {
+        $list = static fn (mixed $values): array => array_values(array_unique(array_filter(
+            array_map(static fn (mixed $value): string => is_scalar($value) ? trim((string) $value) : '', (array) $values),
+            static fn (string $value): bool => $value !== ''
+        )));
+
+        return [
+            self::TRIGGER_EVENTS => $list($triggers[self::TRIGGER_EVENTS] ?? []),
+            self::TRIGGER_ORDER_STATUSES => $list($triggers[self::TRIGGER_ORDER_STATUSES] ?? []),
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getMapping(): array
     {
         $mapping = $this->getData(self::MAPPING);

@@ -63,7 +63,7 @@
                         <param name="on">1</param>
                     </url>
                     <type>schedule_on</type>
-                    <label translate="true">Switch schedules on</label>
+                    <label translate="true">Switch automatic runs on</label>
                 </settings>
             </action>
             <action name="schedule_off">
@@ -72,7 +72,7 @@
                         <param name="on">0</param>
                     </url>
                     <type>schedule_off</type>
-                    <label translate="true">Switch schedules off</label>
+                    <label translate="true">Switch automatic runs off</label>
                 </settings>
             </action>
             <action name="delete">
@@ -150,7 +150,7 @@
         <column name="source_type" class="Iranimij\OpenImport\Ui\Component\Listing\Column\SourceOrDestination"
                 component="Magento_Ui/js/grid/columns/column" sortOrder="50">
             <settings>
-                <options class="Iranimij\OpenImport\Model\Config\Source\SourceType"/>
+                <options class="Iranimij\OpenImport\Model\Config\Source\SourceOrDestinationFilter"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
                 <label translate="true">Source / destination</label>

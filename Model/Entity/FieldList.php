@@ -31,6 +31,26 @@ class FieldList
         'openimport_attribute' => ['attribute_code', 'label', 'frontend_input'],
         'openimport_cms_page' => ['identifier', 'title'],
         'openimport_cms_block' => ['identifier', 'title'],
+        'openimport_shipment' => ['increment_id'],
+        'openimport_url_rewrite' => ['request_path'],
+        'openimport_cart_rule' => ['name', 'action', 'discount_amount'],
+        'openimport_catalog_rule' => ['name', 'action', 'discount_amount'],
+        'openimport_review' => ['product_sku', 'nickname', 'title', 'detail'],
+        'openimport_newsletter' => ['email'],
+        'openimport_search_term' => ['query_text'],
+        'openimport_search_synonym' => ['synonyms'],
+        'openimport_category_position' => ['category_path', 'product_sku'],
+        'openimport_order' => ['increment_id', 'customer_email', 'status', 'billing_firstname', 'billing_lastname',
+            'billing_street', 'billing_city', 'billing_country_id', 'item_sku', 'item_qty_ordered', 'item_price'],
+    ];
+
+    /**
+     * Import columns core's sample files leave out (2.4.9's product sample has no picture columns).
+     */
+    private const EXTRA_COLUMNS = [
+        'catalog_product' => ['base_image', 'base_image_label', 'small_image', 'small_image_label', 'thumbnail_image',
+            'thumbnail_image_label', 'swatch_image', 'swatch_image_label', 'additional_images',
+            'additional_image_labels', 'hide_from_product_page', 'url_key'],
     ];
 
     /**
@@ -59,6 +79,11 @@ class FieldList
     {
         $info = $this->entities->get($entity);
         $codes = $info !== null && $info->columns !== [] ? $info->columns : $this->sampleColumns($entity);
+        foreach (self::EXTRA_COLUMNS[$entity] ?? [] as $code) {
+            if (!in_array($code, $codes, true)) {
+                $codes[] = $code;
+            }
+        }
         $labels = [];
         if ($info === null || $info->columns === []) {
             foreach ($this->attributes($entity) as $code => $label) {

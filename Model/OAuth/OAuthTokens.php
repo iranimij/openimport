@@ -105,12 +105,9 @@ class OAuthTokens
         if (!$answer->ok()) {
             $error = (string) ($data['error'] ?? 'HTTP ' . $answer->status);
             $description = (string) ($data['error_description'] ?? '');
-            throw new PipelineException(sprintf(
-                '%s refused the login: %s%s',
-                $service,
-                $error,
-                $description !== '' ? ' (' . $description . ')' : ''
-            ));
+            throw new PipelineException($description !== ''
+                ? sprintf('%s refused the login: %s (%s)', $service, $error, $description)
+                : sprintf('%s refused the login: %s', $service, $error));
         }
 
         return $data;

@@ -16,6 +16,11 @@ All notable changes to this project are documented here. The format follows
   [Schedules › Triggers](https://iranimij.github.io/openimport/schedules/#triggers).
 
 ### Changed
+- Run messages in the admin's language (review 5, M3): a run's summary, its errors, the mapping preview's problems
+  and the messages of saving, testing and starting are shown in the language of the admin who reads them. Runs still
+  store English (they happen in cron); each sentence is matched against OpenImport's phrases when it is shown, so
+  older runs are translated too. About 600 messages have a German line now, and a CI check keeps every new message
+  translated. E-mails and `bin/magento` stay English. See [Admin › Runs](https://iranimij.github.io/openimport/admin/#runs).
 - The step 6 switch *Schedule is on* is now *Automatic runs are on*: it governs the schedule and the triggers.
 - Review 4 (Notion "17 · Browser review 4"): the grid action is now *Switch automatic runs on/off* and also
   switches on profiles that only run after events; the step 6 summary shows the schedule, the events, whether

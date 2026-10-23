@@ -113,6 +113,16 @@ testing e-mails in Mailhog) the "E-mail" destination crashed on 2.4.8+ (Symfony 
 write phase (writing marker), M5 Replace keeps URL keys (ReplaceUrlKeyStep) and behaviour notes. Then: merge back
 into main with L1 (`$t('After: %1')`), browser re-test, M3 (run messages translated when shown) as its own slice.
 
+**M3 · run messages in the admin's language** (branch `feature/run-messages-i18n`, on main after 1.5.4): runs keep
+storing English; `Model/I18n/StoredText` cuts a stored line into sentences and matches each against the phrases of
+`i18n/en_US.csv` (sprintf formats such as `%d row(s) read.` are phrases too; the German line uses %1, %2 … in the
+order of the values; the most specific phrase wins). Used on the run page (summary, errors), recent runs, mapping
+preview and every controller that shows an engine message. About 600 German lines added (drafted per file by
+three helper agents, terms aligned with de_DE.csv: Store View, Werte-Zuordnung, Shops ›). Composed messages
+(plural "s", verbs, "deleted"/"moved") were split into whole sentences. CI: `.github/ci/check-run-messages.py`
+lists sentence-like texts in Model/ without an en/de line (exceptions in `not-messages.txt`). Not translated:
+e-mails, CLI, Magento's own row messages.
+
 1.4 released (v1.4.0; module #53–#63; E2E dev-env #13–#16). Still open from 1.3: the local browser check on the Mac
 (double-click `claude-upgrade.command` first), now also for the 1.4 pages (connections grid and form, Google/Dropbox/
 Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).

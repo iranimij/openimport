@@ -20,6 +20,7 @@ use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Receives a file for an upload profile and answers with its token and a sample of its rows.
@@ -35,13 +36,15 @@ class Upload extends Action implements HttpPostActionInterface
      * @param FileSample $sample
      * @param FileAccess $fileAccess
      * @param UploadLimit $uploadLimit
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly UploadStore $uploads,
         private readonly FileSample $sample,
         private readonly FileAccess $fileAccess,
-        private readonly UploadLimit $uploadLimit
+        private readonly UploadLimit $uploadLimit,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -74,7 +77,7 @@ class Upload extends Action implements HttpPostActionInterface
                 []
             );
         } catch (LocalizedException | ReaderException $exception) {
-            return $json->setData(['error' => $exception->getMessage()]);
+            return $json->setData(['error' => $this->text->translate($exception->getMessage())]);
         }
 
         return $json->setData(['file' => $stored] + $sample);

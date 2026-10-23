@@ -303,6 +303,39 @@ class ImportPipelineTest extends TestCase
         self::assertStringContainsString('Nothing was imported', $stop->getMessage());
     }
 
+    /**
+     * A run stores English; a German admin reads the summary and the errors in German (Notion review 5, M3).
+     */
+    public function testRunMessagesAreShownInTheAdminsLanguage(): void
+    {
+        $prefix = 'OI-DE-' . bin2hex(random_bytes(3));
+        $rows = $this->supplierRows($prefix, 3, ['2' => ['Preis' => 'teuer'], '3' => ['Aktiv' => 'vielleicht']]);
+        $profile = $this->profile('add_update', ['on_error' => 'skip', 'allowed_errors' => 10]);
+        $mapping = $profile->getMapping();
+        $mapping[6]['value_map_strict'] = true;
+        $profile = Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save($profile->setMapping($mapping));
+        $run = $this->runFile($profile, $this->csv($rows), RunInterface::MODE_DRY_RUN);
+        $errors = Bootstrap::getObjectManager()->get(ErrorLog::class)->fetch((int) $run->getRunId());
+        self::assertStringStartsWith('Dry run: ', $run->getMessage());
+
+        $translate = Bootstrap::getObjectManager()->get(\Magento\Framework\TranslateInterface::class);
+        $locale = (string) $translate->getLocale();
+        try {
+            $translate->setLocale('de_DE')->loadData('adminhtml', true);
+            $text = Bootstrap::getObjectManager()->create(\Iranimij\OpenImport\Model\I18n\StoredText::class);
+            $german = $text->translate($run->getMessage());
+            self::assertStringStartsWith('Probelauf: ', $german, $german);
+            self::assertStringContainsString('Zeile(n) haben Fehler und werden ausgelassen', $german, $german);
+            self::assertSame('decimal_comma: „teuer“ ist keine Zahl.', $text->translate($errors[0]->message));
+            self::assertSame('Der Wert „vielleicht“ steht nicht in der Werte-Zuordnung.', $text->translate($errors[1]->message));
+        } finally {
+            $translate->setLocale($locale)->loadData('adminhtml', true);
+        }
+        // English admins read what was stored.
+        $english = Bootstrap::getObjectManager()->create(\Iranimij\OpenImport\Model\I18n\StoredText::class);
+        self::assertSame($run->getMessage(), $english->translate($run->getMessage()));
+    }
+
     public function testCoreErrorsAreMappedBackToSourceRows(): void
     {
         $prefix = 'OI-CE-' . bin2hex(random_bytes(3));

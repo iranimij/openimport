@@ -28,7 +28,9 @@ $run = $view->run();
             <strong class="title"><?= $escaper->escapeHtml(__('Status')) ?></strong>
         </div>
         <?php
-        $lines = $run->getMessage() === '' ? [] : explode("\n", $run->getMessage());
+        // Stored in English when the run happened; shown in the admin's language.
+        $message = $view->text($run->getMessage());
+        $lines = $message === '' ? [] : explode("\n", $message);
         $headline = (string) array_shift($lines);
         ?>
         <div class="openimport-run-head">
@@ -270,7 +272,7 @@ $run = $view->run();
                             <td><?= $escaper->escapeHtml($error->sourceRow > 0 ? (string) $error->sourceRow : '–') ?></td>
                             <td><?= $escaper->escapeHtml($error->identifier) ?></td>
                             <td><?= $escaper->escapeHtml($error->field) ?></td>
-                            <td class="openimport-wrap"><?= $escaper->escapeHtml($error->message) ?></td>
+                            <td class="openimport-wrap"><?= $escaper->escapeHtml($view->text($error->message)) ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

@@ -128,7 +128,7 @@ class ParserTest extends TestCase
             'unknown function' => ['EVAL(1)', 'Unknown function EVAL'],
             'too few arguments' => ['IF(1)', 'IF at position 1 takes 2 to 3 arguments, not 1'],
             'too many arguments' => ['LEN(1, 2)', 'LEN at position 1 takes 1 argument, not 2'],
-            'at least' => ['CONCAT()', 'takes at least 1 arguments, not 0'],
+            'at least' => ['CONCAT()', 'takes at least 1 argument, not 0'],
             'exact count' => ['REPLACE(1)', 'takes 3 arguments, not 1'],
             'missing parenthesis' => ['(1 + 2', 'Missing ")"'],
             'ends early' => ['1 +', 'ends too early'],

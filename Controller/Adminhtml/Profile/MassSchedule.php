@@ -17,6 +17,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Profiles grid mass actions: switch the automatic runs (schedule and triggers) of the chosen profiles on or off
@@ -32,12 +33,14 @@ class MassSchedule extends Action implements HttpPostActionInterface
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
      * @param ProfileRepositoryInterface $profiles
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly Filter $filter,
         private readonly CollectionFactory $collectionFactory,
-        private readonly ProfileRepositoryInterface $profiles
+        private readonly ProfileRepositoryInterface $profiles,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -70,11 +73,11 @@ class MassSchedule extends Action implements HttpPostActionInterface
                     }
                     $done++;
                 } catch (LocalizedException $exception) {
-                    $skipped[] = sprintf('%s: %s', $profile->getName(), strtok($exception->getMessage(), "\n"));
+                    $skipped[] = sprintf('%s: %s', $profile->getName(), strtok($this->text->translate($exception->getMessage()), "\n"));
                 }
             }
         } catch (LocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
         }
         if ($done > 0) {
             $this->messageManager->addSuccessMessage((string) match (true) {

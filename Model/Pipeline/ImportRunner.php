@@ -818,7 +818,7 @@ class ImportRunner
             $this->storeErrors(true);
             $ok = $this->executePlans($plans, $dryRun);
             $message = $dryRun
-                ? 'Dry run: nothing to import from the file.' . ($safety === null ? '' : ' ' . self::CONFIRMATION_NOTE . ': ' . $safety)
+                ? 'Dry run: nothing to import from the file.' . ($safety === null ? '' : ' ' . $this->confirmationNote($safety))
                 : $this->nothingToDo();
 
             return $this->outcome(
@@ -1009,8 +1009,12 @@ class ImportRunner
                 continue;
             }
             $messages[] = sprintf(
-                'This run would %s %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.',
-                $plan->verb,
+                match ($plan->verb) {
+                    'disable' => 'This run would disable %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.',
+                    'set out of stock'
+                        => 'This run would set %d of %d records out of stock (%s, %d%%, limit %d%%). Type %s to confirm.',
+                    default => 'This run would delete %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.',
+                },
                 $plan->count(),
                 $plan->total,
                 $step->label(),
@@ -1021,6 +1025,17 @@ class ImportRunner
         }
 
         return $messages === [] ? null : implode(' ', $messages);
+    }
+
+    /**
+     * The dry-run line that says a live run needs the typed confirmation (ConfirmationWord looks for its start).
+     *
+     * @param string $safety
+     * @return string
+     */
+    private function confirmationNote(string $safety): string
+    {
+        return sprintf('A live run will ask for confirmation: %s', $safety);
     }
 
     private function joinSafety(?string $first, ?string $second): ?string
@@ -1076,8 +1091,9 @@ class ImportRunner
         $verb = $behavior === ProfileInterface::BEHAVIOR_DELETE ? 'delete' : 'replace';
         if ($reader === null) {
             return sprintf(
-                'This run would %s up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.',
-                $verb,
+                $verb === 'delete'
+                    ? 'This run would delete up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.'
+                    : 'This run would replace up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.',
                 count($spool->allIdentifiers())
             );
         }
@@ -1091,8 +1107,9 @@ class ImportRunner
         }
 
         return sprintf(
-            'This run would %s %d of %d records (%d%%, limit %d%%). Type %s to confirm.',
-            $verb,
+            $verb === 'delete'
+                ? 'This run would delete %d of %d records (%d%%, limit %d%%). Type %s to confirm.'
+                : 'This run would replace %d of %d records (%d%%, limit %d%%). Type %s to confirm.',
             $this->existingAffected,
             $total,
             (int) round($this->existingAffected * 100 / $total),
@@ -1137,7 +1154,7 @@ class ImportRunner
                 : ($valid ? 'Magento accepts the rows.' : 'Magento refuses the rows; see the errors.');
         }
         if ($safety !== null) {
-            $parts[] = self::CONFIRMATION_NOTE . ': ' . $safety;
+            $parts[] = $this->confirmationNote($safety);
         }
 
         return implode(' ', $parts);

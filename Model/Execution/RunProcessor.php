@@ -319,9 +319,12 @@ class RunProcessor
             return new RunOutcome(
                 $outcome->status,
                 $outcome->counts,
-                rtrim($outcome->message) . ' The file was imported, but it could not be '
-                . ($profile->getAfterSuccess() === 'delete' ? 'deleted' : 'moved') . ' afterwards: '
-                . $exception->getMessage(),
+                rtrim($outcome->message) . ' ' . sprintf(
+                    $profile->getAfterSuccess() === 'delete'
+                        ? 'The file was imported, but it could not be deleted afterwards: %s'
+                        : 'The file was imported, but it could not be moved afterwards: %s',
+                    $exception->getMessage()
+                ),
                 $outcome->historyId
             );
         }

@@ -17,6 +17,7 @@ use Magento\Framework\Controller\Result\Raw;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Downloads a profile as JSON (the format of openimport:profile:export), without passwords, keys or tokens.
@@ -29,11 +30,13 @@ class DownloadJson extends Action implements HttpGetActionInterface
      * @param Context $context
      * @param ProfileRepositoryInterface $profiles
      * @param ProfileJson $json
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly ProfileRepositoryInterface $profiles,
-        private readonly ProfileJson $json
+        private readonly ProfileJson $json,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -56,7 +59,7 @@ class DownloadJson extends Action implements HttpGetActionInterface
 
             return $result;
         } catch (LocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
             return $this->resultRedirectFactory->create()->setPath('*/*/');
         }
     }

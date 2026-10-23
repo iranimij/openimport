@@ -14,6 +14,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Deletes a profile; its runs stay with the profile name.
@@ -25,10 +26,12 @@ class Delete extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param ProfileRepositoryInterface $profiles
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
-        private readonly ProfileRepositoryInterface $profiles
+        private readonly ProfileRepositoryInterface $profiles,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -43,7 +46,7 @@ class Delete extends Action implements HttpPostActionInterface
             $this->profiles->delete($profile);
             $this->messageManager->addSuccessMessage((string) __('The profile "%1" was deleted. Its runs are kept.', $profile->getName()));
         } catch (LocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
         }
 
         return $this->resultRedirectFactory->create()->setPath('*/*/');

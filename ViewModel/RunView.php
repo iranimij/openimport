@@ -27,6 +27,7 @@ use Magento\Framework\Escaper;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Everything the run page shows.
@@ -56,6 +57,7 @@ class RunView implements ArgumentInterface
      * @param RunFiles $runFiles
      * @param ReaderFactory $readers
      * @param ConfirmationWord $confirmationWord
+     * @param StoredText $text
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -70,8 +72,20 @@ class RunView implements ArgumentInterface
         private readonly Escaper $escaper,
         private readonly RunFiles $runFiles,
         private readonly ReaderFactory $readers,
-        private readonly ConfirmationWord $confirmationWord
+        private readonly ConfirmationWord $confirmationWord,
+        private readonly StoredText $text
     ) {
+    }
+
+    /**
+     * A message the run stored in English (its summary, an error), in the admin's language.
+     *
+     * @param string $message
+     * @return string
+     */
+    public function text(string $message): string
+    {
+        return $this->text->translate($message);
     }
 
     /**

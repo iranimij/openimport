@@ -139,6 +139,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: python3 .github/ci/check-translations.py .
+      - run: python3 .github/ci/check-run-messages.py .
 
   ci-ok:
     name: ci-ok

@@ -3,7 +3,8 @@
  * See LICENSE for license details (MIT).
  *
  * A select shown only where it matters (see conditional.js). Options with their own "showWhen" are offered only
- * while their conditions hold; a value that is no longer offered moves to the first option that is.
+ * while their conditions hold; a value that is no longer offered moves to the first option that is. With
+ * "noticeByValue" the note under the field explains the chosen option (followed by the field's own note).
  */
 define([
     'underscore',
@@ -57,11 +58,40 @@ define([
         },
 
         /** @inheritdoc */
+        initObservable: function () {
+            this._super();
+            this.baseNotice = this.notice || '';
+            if (!_.isEmpty(this.noticeByValue)) {
+                this.observe('notice');
+            }
+
+            return this;
+        },
+
+        /**
+         * The note for the chosen option, then the field's own note.
+         *
+         * @param {*} value
+         */
+        explainValue: function (value) {
+            var text = (this.noticeByValue || {})[value] || '';
+
+            if (_.isEmpty(this.noticeByValue)) {
+                return;
+            }
+            this.notice(_.compact([text, this.baseNotice]).join(' '));
+        },
+
+        /** @inheritdoc */
         initialize: function () {
             var options;
 
             this.allOptions = null;
             this._super();
+            if (!_.isEmpty(this.noticeByValue)) {
+                this.value.subscribe(this.explainValue, this);
+                this.explainValue(this.value());
+            }
             options = _.isArray(this.initialOptions) ? this.initialOptions : this.options();
             this.allOptions = _.some(options, function (option) {
                 return !!option.showWhen;

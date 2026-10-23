@@ -20,6 +20,7 @@ define([
             fileName: '',
             uploading: false,
             message: '',
+            limitText: '',
             detected: '',
             dragging: false,
             sample: null,
@@ -124,7 +125,9 @@ define([
                 data: data,
                 processData: false,
                 contentType: false,
-                dataType: 'json'
+                dataType: 'json',
+                // The message below says what went wrong; Magento's global "technical problem" banner would stay.
+                global: false
             }).done(function (response) {
                 if (response.error) {
                     self.message = response.error;
@@ -138,14 +141,27 @@ define([
                     self.detected = $t('Detected: %1').replace('%1', response.format.toUpperCase());
                 }
                 self.sample = response;
-            }).fail(function () {
-                self.message = $t('The file could not be uploaded. Try again.');
+            }).fail(function (xhr) {
+                self.message = self.failure(xhr && xhr.status);
             }).always(function () {
                 self.uploading = false;
                 if (input) {
                     input.value = '';
                 }
             });
+        },
+
+        /**
+         * @param {Number} status the HTTP status of the failed upload
+         * @returns {String}
+         */
+        failure: function (status) {
+            if (status === 413) {
+                return $t('The file is larger than the web server accepts. Zip it (OpenImport reads ZIP and gzip), or use a server folder, web address, SFTP or cloud storage for big files.');
+            }
+
+            return $t('The file could not be uploaded (the server answered %1). If the file is big, zip it or use a server folder, web address, SFTP or cloud storage.')
+                .replace('%1', status ? String(status) : $t('nothing'));
         }
     });
 });

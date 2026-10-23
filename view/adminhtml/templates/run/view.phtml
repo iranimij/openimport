@@ -19,6 +19,7 @@ $run = $view->run();
          'Iranimij_OpenImport/js/run/status' => [
              'url' => $view->url('openimport/run/status'),
              'status' => $run->getStatus(),
+             'writing' => $view->isWriting(),
          ],
      ])) ?>'
      <?php endif; ?>>
@@ -56,10 +57,14 @@ $run = $view->run();
         </p>
         <?php if ($view->isActive()): ?>
             <div class="message message-notice" role="status">
-                <?= $escaper->escapeHtml($run->getStatus() === 'queued'
-                    ? __('Waiting for OpenImport\'s cron (runs every minute). This page updates by itself.')
-                    : __('Running. Rows done so far:')) ?>
-                <span data-role="progress"><?= $escaper->escapeHtml($run->getStatus() === 'running' ? (string) $run->getProgressRows() : '') ?></span>
+                <?php if ($view->isWriting()): ?>
+                    <?= $escaper->escapeHtml(__('Writing to Magento: this step cannot be stopped. This page updates by itself.')) ?>
+                <?php else: ?>
+                    <?= $escaper->escapeHtml($run->getStatus() === 'queued'
+                        ? __('Waiting for OpenImport\'s cron (runs every minute). This page updates by itself.')
+                        : __('Running. Rows done so far:')) ?>
+                    <span data-role="progress"><?= $escaper->escapeHtml($run->getStatus() === 'running' ? (string) $run->getProgressRows() : '') ?></span>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
         <?php if (array_filter($lines, static fn (string $line): bool => trim($line) !== '') !== []): ?>
@@ -106,7 +111,19 @@ $run = $view->run();
                 <a class="action-secondary" href="<?= $escaper->escapeUrl($view->profileUrl()) ?>"><?= $escaper->escapeHtml(__('Edit profile')) ?></a>
             <?php endif; ?>
             <?php if ($view->canCancel()): ?>
-                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/cancel')) ?>">
+                <?php
+                // A running live run: ask first (a queued run or a dry run just stops).
+                $cancelInit = $run->getStatus() === 'running' && !$run->isDryRun()
+                    ? ['Iranimij_OpenImport/js/run/confirm-submit' => [
+                        'title' => (string) __('Stop this run?'),
+                        'message' => (string) __('It stops within seconds while it still reads the file, and nothing is changed. Once it writes to Magento it cannot stop half-way.'),
+                        'button' => (string) __('Stop the run'),
+                        'dismiss' => (string) __('Keep running'),
+                    ]]
+                    : [];
+                ?>
+                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/cancel')) ?>"
+                      <?php if ($cancelInit !== []): ?>data-mage-init='<?= $escaper->escapeHtmlAttr((string) json_encode($cancelInit)) ?>'<?php endif; ?>>
                     <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
                     <button type="submit" class="action-secondary"><span><?= $escaper->escapeHtml(__('Cancel')) ?></span></button>
                 </form>

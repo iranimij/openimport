@@ -105,6 +105,14 @@ code.
 
 ## Exact next step
 
+**1.5.4** (browser review 5, Notion page 18, 2026-10-23; Iman: "fix all high and medium ones"), on `fix/1.5.4` from
+`release/1.5`: H1 a cancelled or failing products export delivered a partial file (ExportRunner remembers errors
+raised inside Magento's export, which swallows them), H2 the profiles grid sent encrypted secrets, H3 (found while
+testing e-mails in Mailhog) the "E-mail" destination crashed on 2.4.8+ (Symfony mail), M1 file contents need
+*Download run files* (FileAccess; own uploads stay visible), M2 upload size messages and limit, M4 cancel in the
+write phase (writing marker), M5 Replace keeps URL keys (ReplaceUrlKeyStep) and behaviour notes. Then: merge back
+into main with L1 (`$t('After: %1')`), browser re-test, M3 (run messages translated when shown) as its own slice.
+
 1.4 released (v1.4.0; module #53–#63; E2E dev-env #13–#16). Still open from 1.3: the local browser check on the Mac
 (double-click `claude-upgrade.command` first), now also for the 1.4 pages (connections grid and form, Google/Dropbox/
 Microsoft sign-in buttons, REST fields, archive and XSLT fields in step 3).

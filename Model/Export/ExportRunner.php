@@ -43,6 +43,13 @@ class ExportRunner
     private ?\Closure $heartbeat = null;
 
     /**
+     * The first error raised inside the row callbacks. Magento's product export catches every exception in its page
+     * loop and returns the rows so far, so a cancel or a writer error must be remembered and raised again after
+     * the source returns; otherwise a partial file would count as a finished export.
+     */
+    private ?\Throwable $aborted = null;
+
+    /**
      * @param EntitySourcePool $sources
      * @param ExportMapping $mapping
      * @param ProfileCompiler $compiler
@@ -82,6 +89,7 @@ class ExportRunner
         $this->runId = (int) $run->getRunId();
         $this->counts = array_fill_keys(RunInterface::COUNTS, 0);
         $this->heartbeat = $heartbeat;
+        $this->aborted = null;
         $mapping = $this->mapping->compile($profile);
         $filter = $this->compiler->filter($profile, null);
         try {
@@ -97,30 +105,40 @@ class ExportRunner
             $source->read(
                 $profile,
                 function (array $columns) use ($writer, $mapping, $path, $options, &$opened): void {
-                    $writer->open($path, $mapping->columns($columns), $options);
-                    $opened = true;
+                    $this->guarded(function () use ($writer, $mapping, $path, $options, $columns, &$opened): void {
+                        $writer->open($path, $mapping->columns($columns), $options);
+                        $opened = true;
+                    });
                 },
                 function (array $row) use ($writer, $mapping, $filter, &$opened, $path, $options): bool {
-                    if (!$opened) {
-                        $writer->open($path, $mapping->columns(array_keys($row)), $options);
-                        $opened = true;
-                    }
-                    $this->counts['read']++;
-                    $kept = $filter->keep($row);
-                    if (!$kept) {
-                        $this->counts['filtered']++;
-                    } else {
-                        $writer->write($mapping->map($row));
-                        $this->counts['exported']++;
-                    }
-                    if ($this->counts['read'] % self::PROGRESS_EVERY === 0) {
-                        // The file is not delivered yet: the run may stop here when it is cancelled.
-                        $this->progress(true);
-                    }
+                    return $this->guarded(function () use ($writer, $mapping, $filter, $row, &$opened, $path, $options): bool {
+                        if (!$opened) {
+                            $writer->open($path, $mapping->columns(array_keys($row)), $options);
+                            $opened = true;
+                        }
+                        $this->counts['read']++;
+                        $kept = $filter->keep($row);
+                        if (!$kept) {
+                            $this->counts['filtered']++;
+                        } else {
+                            $writer->write($mapping->map($row));
+                            $this->counts['exported']++;
+                        }
+                        if ($this->counts['read'] % self::PROGRESS_EVERY === 0) {
+                            // The file is not delivered yet: the run may stop here when it is cancelled.
+                            $this->progress(true);
+                        }
 
-                    return $kept;
+                        return $kept;
+                    });
                 }
             );
+            if ($this->aborted !== null) {
+                throw $this->aborted;
+            }
+        } catch (PipelineException $exception) {
+            // A cancel (RunCancelledException) or a pipeline error stays what it is.
+            throw $exception;
         } catch (\RuntimeException $exception) {
             // Writers throw WriterException (a RuntimeException) from inside the callbacks.
             throw new PipelineException($exception->getMessage(), 0, $exception);
@@ -164,6 +182,7 @@ class ExportRunner
         if ($run->isDryRun()) {
             return [new RunOutcome(RunInterface::STATUS_SUCCESS, $this->counts, 'Dry run: ' . $summary . ' The file was not delivered.'), $path];
         }
+        $this->progress(false, true);
         $delivered = $this->destinations->get($profile)->deliver($profile, $run, $path, $writer);
         $source->finish($profile, $this->runId);
 
@@ -171,14 +190,36 @@ class ExportRunner
     }
 
     /**
+     * Runs one callback of the source. After the first error every later call fails at once with the same error,
+     * so a source that swallows exceptions (Magento's product export) writes no further rows.
+     *
+     * @param \Closure $callback
+     * @return mixed
+     * @throws \Throwable
+     */
+    private function guarded(\Closure $callback): mixed
+    {
+        if ($this->aborted !== null) {
+            throw $this->aborted;
+        }
+        try {
+            return $callback();
+        } catch (\Throwable $exception) {
+            $this->aborted = $exception;
+            throw $exception;
+        }
+    }
+
+    /**
      * @param bool $canStop nothing is delivered yet, so a cancel may stop the run here
+     * @param bool $writing the live run delivers its file now (it cannot stop from here on)
      * @return void
      */
-    private function progress(bool $canStop = false): void
+    private function progress(bool $canStop = false, bool $writing = false): void
     {
         $this->runResource->updateProgress($this->runId, $this->counts['read'], $this->counts);
         if ($this->heartbeat !== null) {
-            ($this->heartbeat)($canStop);
+            ($this->heartbeat)($canStop, $writing);
         }
     }
 }

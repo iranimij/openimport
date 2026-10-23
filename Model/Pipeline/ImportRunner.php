@@ -841,6 +841,9 @@ class ImportRunner
             historyLabel: sprintf('openimport-run-%d.csv', $this->runId),
             options: $profile->getImportOptions()
         );
+        if (!$dryRun) {
+            $this->progress(false, true);
+        }
         $result = $this->importers->get($entity->importEntity())->run(
             $request,
             new MappedSource($spool->columns(), static fn (): \Generator => $spool->rows())
@@ -1243,15 +1246,16 @@ class ImportRunner
 
     /**
      * @param bool $canStop the run has written nothing yet, so a cancel may stop it here
+     * @param bool $writing the live run starts writing to Magento now (it cannot stop from here on)
      * @return void
      */
-    private function progress(bool $canStop = false): void
+    private function progress(bool $canStop = false, bool $writing = false): void
     {
         if ($this->runId > 0) {
             $this->runResource->updateProgress($this->runId, $this->counts['read'], $this->counts);
         }
         if ($this->heartbeat !== null) {
-            ($this->heartbeat)($canStop);
+            ($this->heartbeat)($canStop, $writing);
         }
     }
 }

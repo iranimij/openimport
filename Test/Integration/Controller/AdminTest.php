@@ -304,6 +304,14 @@ class AdminTest extends AbstractBackendController
             ->getDirectoryRead(DirectoryList::VAR_DIR)->getAbsolutePath('openimport/runs/' . $runId . '/errors.csv'));
         self::assertStringContainsString('Row,Record,Field,Error', $report);
         self::assertStringContainsString($prefix . '-2,price,', $report);
+        self::assertStringContainsString(',sku,', $report, 'the source row follows each error');
+
+        // Without "Download run files" the report has the errors only, not the file's cells.
+        $plain = (string) file_get_contents(Bootstrap::getObjectManager()->get(\Iranimij\OpenImport\Model\Admin\ErrorReport::class)
+            ->write(Bootstrap::getObjectManager()->get(RunRepositoryInterface::class)->getById($runId), false));
+        self::assertStringContainsString('Row,Record,Field,Error', $plain);
+        self::assertStringNotContainsString(',sku,', $plain);
+        self::assertStringNotContainsString('Two ' . $prefix, $plain);
     }
 
     /**

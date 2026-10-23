@@ -16,6 +16,8 @@ import sys
 
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), '..', '..'))
 SENTENCE = re.compile(r'[A-Za-z]{2,}[,.;:]? +(?:\S+ +)?[a-z]{2,}')
+# Short formats such as "Picture %s: %s" or "row %d" (a word, then a value).
+SHORT = re.compile(r'^[A-Za-z][A-Za-z ]*[a-z]{2,},? %[sd](?:[:.)]| \(|$)')
 PLACEHOLDER = re.compile(r"%(?:%|[1-9]|[-+ 0',]*\d*(?:\.\d+)?[sdfFgGu])")
 VALUE = '\x00'
 
@@ -89,11 +91,9 @@ def expressions(text):
 def phrases(path):
     found = set()
     for value in expressions(open(path, encoding='utf-8').read()):
-        if not SENTENCE.search(value.replace(VALUE, ' ')):
-            continue
         for line in value.split('\n'):
             line = re.sub(VALUE + '+', '%s', line).strip()
-            if line in ('', '%s') or not SENTENCE.search(line):
+            if line in ('', '%s') or not (SENTENCE.search(line) or SHORT.search(line)):
                 continue
             found.add(line)
     return found

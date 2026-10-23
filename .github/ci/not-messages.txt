@@ -35,6 +35,8 @@ url key
 vk preis
 
 # Database and API queries, HTTP headers
+Bearer %s
+Basic %s
 o.rating_id = rt.rating_id
 FIELD(change_type, 'changed', 'new', 'deleted', 'unchanged'), source_row ASC, preview_id ASC
 text/csv, application/json, application/xml, text/xml, */*

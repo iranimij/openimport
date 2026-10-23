@@ -1482,3 +1482,7 @@
 "profile %d","profile %d"
 "batch %s","batch %s"
 "Step %d: %s","Step %d: %s"
+"A live run will ask for confirmation: %s","A live run will ask for confirmation: %s"
+"This run would disable %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","This run would disable %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm."
+"This run would set %d of %d records out of stock (%s, %d%%, limit %d%%). Type %s to confirm.","This run would set %d of %d records out of stock (%s, %d%%, limit %d%%). Type %s to confirm."
+"This run would delete %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","This run would delete %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm."

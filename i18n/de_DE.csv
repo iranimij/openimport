@@ -1482,3 +1482,7 @@
 "profile %d","Profil %1"
 "batch %s","Paket %1"
 "Step %d: %s","Schritt %1: %2"
+"A live run will ask for confirmation: %s","Ein echter Lauf verlangt eine Bestätigung: %1"
+"This run would disable %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","Dieser Lauf würde %1 von %2 Datensätzen deaktivieren (%3, %4 %, Grenze %5 %). Geben Sie %6 ein, um zu bestätigen."
+"This run would set %d of %d records out of stock (%s, %d%%, limit %d%%). Type %s to confirm.","Dieser Lauf würde %1 von %2 Datensätzen auf „nicht vorrätig“ setzen (%3, %4 %, Grenze %5 %). Geben Sie %6 ein, um zu bestätigen."
+"This run would delete %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.","Dieser Lauf würde %1 von %2 Datensätzen löschen (%3, %4 %, Grenze %5 %). Geben Sie %6 ein, um zu bestätigen."

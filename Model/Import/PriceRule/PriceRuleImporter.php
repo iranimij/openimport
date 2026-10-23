@@ -520,7 +520,7 @@ class PriceRuleImporter implements ImporterInterface
                 continue;
             }
             if (!isset($known[strtolower($code)])) {
-                return sprintf('there is no %s "%s" (%ss: %s)', $what, $code, $what, implode(', ', array_keys($known)));
+                return sprintf('there is no %s "%s" (known: %s)', $what, $code, implode(', ', array_keys($known)));
             }
             $ids[] = $known[strtolower($code)];
         }

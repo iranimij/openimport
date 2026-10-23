@@ -19,6 +19,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * The first rows as Magento will receive them, for the form as it is now (not saved).
@@ -34,6 +35,7 @@ class Preview extends Action implements HttpPostActionInterface
      * @param UploadStore $uploads
      * @param MappingPreview $preview
      * @param FileAccess $fileAccess
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
@@ -41,7 +43,8 @@ class Preview extends Action implements HttpPostActionInterface
         private readonly ProfileFormMapper $mapper,
         private readonly UploadStore $uploads,
         private readonly MappingPreview $preview,
-        private readonly FileAccess $fileAccess
+        private readonly FileAccess $fileAccess,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -67,6 +70,13 @@ class Preview extends Action implements HttpPostActionInterface
         }
         $profile = $this->mapper->fromForm($data, $this->profileFactory->create());
 
-        return $json->setData($this->preview->preview($profile, $path, (string) ($source['file_name'] ?? '')));
+        $result = $this->preview->preview($profile, $path, (string) ($source['file_name'] ?? ''));
+        // The engine's messages are English: shown in the admin's language.
+        $result['problems'] = array_map([$this->text, 'translate'], $result['problems']);
+        foreach ($result['rows'] as $index => $row) {
+            $result['rows'][$index]['errors'] = array_map([$this->text, 'translate'], (array) ($row['errors'] ?? []));
+        }
+
+        return $json->setData($result);
     }
 }

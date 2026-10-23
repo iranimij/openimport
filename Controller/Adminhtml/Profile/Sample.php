@@ -17,6 +17,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * The first rows of an uploaded file with the format options chosen in the form (re-read when options change).
@@ -30,12 +31,14 @@ class Sample extends Action implements HttpPostActionInterface
      * @param UploadStore $uploads
      * @param FileSample $sample
      * @param FileAccess $fileAccess
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly UploadStore $uploads,
         private readonly FileSample $sample,
-        private readonly FileAccess $fileAccess
+        private readonly FileAccess $fileAccess,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -61,7 +64,7 @@ class Sample extends Action implements HttpPostActionInterface
                 is_array($options) ? $options : []
             );
         } catch (ReaderException $exception) {
-            return $json->setData(['error' => $exception->getMessage()]);
+            return $json->setData(['error' => $this->text->translate($exception->getMessage())]);
         }
 
         if (!$this->fileAccess->canSee($token)) {

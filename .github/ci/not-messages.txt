@@ -1,0 +1,88 @@
+# Texts in Model/ that look like sentences but are never shown in the admin, so they need no translation
+# (checked by .github/ci/check-run-messages.py). One text per line, exactly as the check prints it.
+
+# Column names auto-match recognises (Model/Entity/EntityRegistry.php)
+kunde e mail
+alte url
+art nr
+category path
+customer group
+first name
+im menü
+in menu
+last name
+meta titel
+meta title
+neue url
+new url
+old url
+order id
+order number
+product name
+redirect url
+request path
+rule name
+search term
+sonderpreis bis
+sonderpreis von
+sort order
+store view
+store views
+target path
+tracking id
+tracking no
+url key
+vk preis
+
+# Database and API queries, HTTP headers
+o.rating_id = rt.rating_id
+FIELD(change_type, 'changed', 'new', 'deleted', 'unchanged'), source_row ASC, preview_id ASC
+text/csv, application/json, application/xml, text/xml, */*
+application/json; charset=UTF-8
+image/jpeg, image/png, image/gif;q=0.9, */*;q=0.5
+source_file IS NOT NULL OR output_file IS NOT NULL
+(%s AND is_active = 1)
+'%s' in parents and name = '%s' and mimeType = '%s' and trashed = false
+'%s' in parents and trashed = false
+main_table.source_config LIKE ? OR main_table.export_options LIKE ?
+is_primary IS NULL OR is_primary = 0
+profile_id IS NULL OR profile_id NOT IN (?)
+
+# Lines for the Magento log (system.log), kept in English for support
+OpenImport run %d failed: %s
+OpenImport %s import: %s
+OpenImport attribute import: %s
+OpenImport category import: %s
+OpenImport CMS import: %s
+OpenImport order import: %s
+OpenImport order import: stock of %s not changed: %s
+OpenImport price rule import: %s
+OpenImport shipment import: %s
+OpenImport URL rewrite import: %s
+OpenImport: the e-mail about run %d could not be sent: %s
+OpenImport: schedule "%s" is not valid: %s
+OpenImport: could not queue runs after "%s": %s
+
+# Programming errors (a broken di.xml or a wrong call), not user messages
+%s is not a RemoteClientInterface.
+No client for "%s".
+The spool is closed.
+Row step "%s" must implement RowStepInterface.
+Unknown run count "%s".
+Cell values must be finite numbers.
+Cell values must be scalar, null or Stringable.
+Each row must be an array keyed by column name.
+The rows factory must return an array or a Traversable.
+The writer is not open.
+%s is not a writer.
+
+# Words OpenImport looks for in PHP's error texts (Model/Execution/Source/Remote/SftpClient.php)
+no route
+not known
+timed out
+
+# Values users type in a file column, compared as they are
+matching items
+whole cart
+not activated
+not approved

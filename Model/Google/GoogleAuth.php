@@ -217,11 +217,9 @@ class GoogleAuth
         if (!$answer->ok()) {
             $error = (string) ($data['error'] ?? 'HTTP ' . $answer->status);
             $description = (string) ($data['error_description'] ?? '');
-            throw new PipelineException(sprintf(
-                'Google refused the login: %s%s',
-                $error,
-                $description !== '' ? ' (' . $description . ')' : ''
-            ));
+            throw new PipelineException($description !== ''
+                ? sprintf('Google refused the login: %s (%s)', $error, $description)
+                : sprintf('Google refused the login: %s', $error));
         }
 
         return $data;

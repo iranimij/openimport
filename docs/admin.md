@@ -61,6 +61,11 @@ run is queued or running.
 
 The runs grid can be filtered by what and direction, and searched by profile name. A click on a row opens the run.
 
+Runs happen in the background, where no admin language is known, so a run stores its summary and errors in English.
+The admin shows them in the language of the admin who reads them (OpenImport ships English and German): each
+sentence is matched against OpenImport's phrases and its values are put into the translation. Messages Magento wrote
+itself stay as Magento wrote them. E-mails and `bin/magento openimport:run` show the English text.
+
 ## Permissions
 
 | Resource | Allows |

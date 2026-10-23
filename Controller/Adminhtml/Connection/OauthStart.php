@@ -16,6 +16,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * "Sign in with Google": off to Google's consent page.
@@ -28,11 +29,13 @@ class OauthStart extends Action implements HttpGetActionInterface
      * @param Context $context
      * @param ConnectionRepositoryInterface $connections
      * @param OAuthFlow $flow
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly ConnectionRepositoryInterface $connections,
-        private readonly OAuthFlow $flow
+        private readonly OAuthFlow $flow,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -47,7 +50,7 @@ class OauthStart extends Action implements HttpGetActionInterface
         try {
             return $redirect->setUrl($this->flow->start($this->connections->getById($connectionId)));
         } catch (PipelineException | NoSuchEntityException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
         }
 
         return $redirect->setPath('*/*/edit', ['id' => $connectionId]);

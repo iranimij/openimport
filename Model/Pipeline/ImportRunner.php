@@ -1076,8 +1076,9 @@ class ImportRunner
         $verb = $behavior === ProfileInterface::BEHAVIOR_DELETE ? 'delete' : 'replace';
         if ($reader === null) {
             return sprintf(
-                'This run would %s up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.',
-                $verb,
+                $verb === 'delete'
+                    ? 'This run would delete up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.'
+                    : 'This run would replace up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.',
                 count($spool->allIdentifiers())
             );
         }
@@ -1091,8 +1092,9 @@ class ImportRunner
         }
 
         return sprintf(
-            'This run would %s %d of %d records (%d%%, limit %d%%). Type %s to confirm.',
-            $verb,
+            $verb === 'delete'
+                ? 'This run would delete %d of %d records (%d%%, limit %d%%). Type %s to confirm.'
+                : 'This run would replace %d of %d records (%d%%, limit %d%%). Type %s to confirm.',
             $this->existingAffected,
             $total,
             (int) round($this->existingAffected * 100 / $total),

@@ -46,15 +46,13 @@ class Arguments
     {
         $count = $this->count();
         if ($count < $minimum || ($maximum >= 0 && $count > $maximum)) {
-            throw $this->error(sprintf(
-                'takes %s, %d given',
-                match (true) {
-                    $minimum === $maximum => $minimum . ' argument' . ($minimum === 1 ? '' : 's'),
-                    $maximum < 0 => 'at least ' . $minimum . ' argument' . ($minimum === 1 ? '' : 's'),
-                    default => $minimum . ' to ' . $maximum . ' arguments',
-                },
-                $count
-            ));
+            throw $this->error(match (true) {
+                $minimum === $maximum && $minimum === 1 => sprintf('takes 1 argument, %d given', $count),
+                $minimum === $maximum => sprintf('takes %d arguments, %d given', $minimum, $count),
+                $maximum < 0 && $minimum === 1 => sprintf('takes at least 1 argument, %d given', $count),
+                $maximum < 0 => sprintf('takes at least %d arguments, %d given', $minimum, $count),
+                default => sprintf('takes %d to %d arguments, %d given', $minimum, $maximum, $count),
+            });
         }
     }
 

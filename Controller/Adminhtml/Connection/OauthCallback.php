@@ -15,6 +15,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Google sends the admin back here after the consent page. The address has no secret key (Google needs a fixed
@@ -35,10 +36,12 @@ class OauthCallback extends Action implements HttpGetActionInterface
     /**
      * @param Context $context
      * @param OAuthFlow $flow
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
-        private readonly OAuthFlow $flow
+        private readonly OAuthFlow $flow,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -61,7 +64,7 @@ class OauthCallback extends Action implements HttpGetActionInterface
                 (string) $request->getParam('code')
             );
         } catch (PipelineException | LocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
 
             return $this->resultRedirectFactory->create()->setPath('*/*/');
         }

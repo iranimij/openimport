@@ -19,7 +19,8 @@ define(['jquery'], function ($) {
                 return;
             }
             $.getJSON(config.url).done(function (response) {
-                if (response.status !== config.status) {
+                // The run started writing to Magento: the page shows that (and no Cancel) after a reload.
+                if (response.status !== config.status || Boolean(response.writing) !== Boolean(config.writing)) {
                     stopped = true;
                     window.location.reload();
 

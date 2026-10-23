@@ -124,7 +124,7 @@ instead of a project: mapping, transforms, dry runs, schedules, remote files, hi
 
 The module fetches files from remote servers and writes into your catalog, so it is careful: SSRF guard with DNS
 re-checks on every redirect, sandboxed server folders, no XML entities, zip-bomb and zip-slip limits for archives, `.xlsx` and `.ods`, XSLT without file, network or PHP access, encrypted
-credentials that never leave the database (not in JSON exports, not in forms), CSRF-protected admin actions behind
+credentials that never leave the database (not in JSON exports, forms or grids), file contents only for roles allowed to download run files, CSRF-protected admin actions behind
 seven ACL resources, and a formula guard for spreadsheets. See [docs/security.md](docs/security.md) and
 [SECURITY.md](SECURITY.md) for how to report a problem.
 

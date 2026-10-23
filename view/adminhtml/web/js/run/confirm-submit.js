@@ -29,7 +29,7 @@ define([
                     }
                 },
                 buttons: [{
-                    text: $t('Cancel'),
+                    text: config.dismiss || $t('Cancel'),
                     class: 'action-secondary action-dismiss',
 
                     /** @param {Event} closeEvent */

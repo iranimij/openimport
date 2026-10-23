@@ -84,7 +84,9 @@ class RunView implements ArgumentInterface
     {
         $run = $this->run();
         $empty = ['columns' => [], 'rows' => []];
-        if ($run === null || $run->getDirection() !== 'export' || $run->getOutputFile() === null) {
+        // The rows are file contents: only for users allowed to download run files.
+        if ($run === null || $run->getDirection() !== 'export' || $run->getOutputFile() === null
+            || !$this->canDownloadFiles()) {
             return $empty;
         }
         try {
@@ -280,7 +282,21 @@ class RunView implements ArgumentInterface
     public function canCancel(): bool
     {
         return in_array($this->run()?->getStatus(), [RunInterface::STATUS_QUEUED, RunInterface::STATUS_RUNNING], true)
-            && $this->authorization->isAllowed('Iranimij_OpenImport::run');
+            && $this->authorization->isAllowed('Iranimij_OpenImport::run')
+            && !$this->isWriting();
+    }
+
+    /**
+     * A running live run that writes to Magento (or delivers its export) now: it cannot be cancelled any more.
+     *
+     * @return bool
+     */
+    public function isWriting(): bool
+    {
+        $run = $this->run();
+
+        return $run !== null && $run->getStatus() === RunInterface::STATUS_RUNNING
+            && $this->runFiles->isWriting((int) $run->getRunId());
     }
 
     /**

@@ -57,4 +57,13 @@ class CoreMessagesTest extends TestCase
         self::assertSame('small_image', $errors[1]->column);
         self::assertStringStartsWith('The picture in small_image is neither', $errors[1]->message);
     }
+
+    public function testDuplicatedUrlKeysAreExplained(): void
+    {
+        $core = "Url key: 'shirt' was already generated for an item with the SKU: 'A-1'. You need to specify the unique URL key manually";
+        $errors = (new CoreMessages())->explain([new RowError(3, $core, $core, null, false)]);
+
+        self::assertSame('url_key', $errors[0]->column);
+        self::assertStringStartsWith('Another product of the file or the shop already has this URL key.', $errors[0]->message);
+    }
 }

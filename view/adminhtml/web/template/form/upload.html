@@ -27,6 +27,9 @@
                 <!-- ko ifnot: fileName -->
                 <span translate="'CSV, Excel (.xlsx), OpenDocument (.ods), JSON or XML, also inside a ZIP, gzip or tar archive. The first rows appear in step 3.'"></span>
                 <!-- /ko -->
+                <!-- ko if: limitText -->
+                <br><span class="openimport-upload-limit" text="limitText"></span>
+                <!-- /ko -->
             </div>
         </div>
         <div class="message message-notice" role="status" if="uploading">

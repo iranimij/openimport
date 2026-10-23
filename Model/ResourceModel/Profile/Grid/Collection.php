@@ -9,14 +9,46 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\ResourceModel\Profile\Grid;
 
 use Iranimij\OpenImport\Model\Config\Source\SourceOrDestinationFilter;
+use Iranimij\OpenImport\Model\Security\Secrets;
 use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
 
 /**
  * Profiles grid: the keyword search looks in the profile name (the table has no full-text index); the
- * "Source / destination" filter knows import sources ("in:sftp") and export destinations ("out:email").
+ * "Source / destination" filter knows import sources ("in:sftp") and export destinations ("out:email"). The rows go to
+ * the browser as they are, so stored secrets (encrypted passwords, keys, tokens) are taken out after loading.
  */
 class Collection extends SearchResult
 {
+    /**
+     * Columns that hold settings, with the encrypted secrets inside.
+     */
+    private const SETTINGS = ['source_config', 'export_options'];
+
+    /**
+     * @inheritDoc
+     */
+    protected function _afterLoad()
+    {
+        parent::_afterLoad();
+        foreach ($this->getItems() as $item) {
+            foreach (self::SETTINGS as $column) {
+                $value = $item->getData($column);
+                if (!is_string($value) || !str_contains($value, Secrets::KEY)) {
+                    continue;
+                }
+                $settings = json_decode($value, true);
+                if (!is_array($settings)) {
+                    $item->setData($column, '{}');
+                    continue;
+                }
+                unset($settings[Secrets::KEY]);
+                $item->setData($column, (string) json_encode($settings, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * @param string $value
      * @return $this

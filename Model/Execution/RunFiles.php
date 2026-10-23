@@ -21,6 +21,11 @@ class RunFiles
     public const CANCEL_MARKER = 'cancel';
 
     /**
+     * Written when a live run starts writing to Magento (or delivering an export): from then on it cannot stop.
+     */
+    public const WRITING_MARKER = 'writing';
+
+    /**
      * @param Filesystem $filesystem
      */
     public function __construct(
@@ -109,5 +114,27 @@ class RunFiles
     {
         return $this->filesystem->getDirectoryRead(DirectoryList::VAR_DIR)
             ->isExist(self::BASE . '/' . $runId . '/' . self::CANCEL_MARKER);
+    }
+
+    /**
+     * The run writes to Magento (or delivers its export) now; a cancel cannot stop it any more.
+     *
+     * @param int $runId
+     * @return void
+     */
+    public function markWriting(int $runId): void
+    {
+        $this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)
+            ->writeFile(self::BASE . '/' . $runId . '/' . self::WRITING_MARKER, gmdate('c'));
+    }
+
+    /**
+     * @param int $runId
+     * @return bool whether the run has started writing to Magento
+     */
+    public function isWriting(int $runId): bool
+    {
+        return $this->filesystem->getDirectoryRead(DirectoryList::VAR_DIR)
+            ->isExist(self::BASE . '/' . $runId . '/' . self::WRITING_MARKER);
     }
 }

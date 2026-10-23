@@ -22,11 +22,40 @@ All notable changes to this project are documented here. The format follows
   automatic runs are on and the next profile; the destination messages name the destinations that count.
 
 ### Fixed
+- The step 6 summary says "Nach:" in the German admin again ("After:" was not translated).
 - Triggers: *Export each order when it is placed* saved as `true` (profile JSON, API) queued nothing.
 - Job chains: deleting a profile that others run next says which chains stop there; *Then run* no longer offers
   imports that read an uploaded file. The run page links "queued as run N" lines and the parent run.
 - The old order-export option *Export each order when it is placed* is shown only for profiles that use it, with a
   note that step 6 replaces it.
+
+## [1.5.4] - 2026-10-23
+
+Fixes from the fifth hands-on review (Notion "18 · Browser review 5").
+
+### Fixed
+- Exports: a run that is cancelled, or fails while Magento's export reads the records (a writer error, an expression
+  that divides by zero), now ends as cancelled or failed and delivers nothing. Magento's product export catches every
+  exception in its page loop and returns the rows so far, so such runs used to end as SUCCESS with a partial file.
+- Export destination "E-mail" on Magento 2.4.8 and 2.4.9: the file is attached again. The run failed with "Call to
+  undefined method Symfony\Component\Mime\Part\TextPart::getMimePart()" since Magento moved to Symfony mail.
+  The e-mail also said "exported 0 row(s)": destinations now get the run's counts.
+- The profiles grid no longer sends stored secrets (encrypted passwords, keys, tokens) to the browser.
+- "Replace existing records" for products keeps each product's URL key when the file has no `url_key` column;
+  Magento gave all existing products an empty key, so two or more collided ("Url key: '' was already generated").
+  Magento's duplicate URL key message is explained in plain words.
+- Upload: a file larger than the web server or PHP accepts says so ("The file is larger than the web server
+  accepts. Zip it …") instead of "A technical problem with the server … Try again"; the form shows PHP's upload limit
+  under the drop zone, and an old error banner no longer stays after the next upload. Docs: Sources › Big files.
+- Cancel: once a live run writes to Magento the run page says so and no longer offers Cancel; a cancel that came too
+  late is named in the run's message; stopping a running live run asks first.
+
+### Changed
+- *Download run files* now also covers file contents shown in the admin: the first rows in step 3, the mapping
+  preview, an export's first rows on the run page and the source cells in error reports. Files an admin uploads are
+  shown to that admin anyway.
+- The Behaviour field explains the chosen behaviour (what Replace deletes and keeps, what Only add / Only update
+  skip).
 
 ## [1.5.3] - 2026-10-22
 

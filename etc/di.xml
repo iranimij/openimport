@@ -168,11 +168,17 @@
             </argument>
         </arguments>
     </type>
+    <type name="Iranimij\OpenImport\Model\Admin\FileAccess">
+        <arguments>
+            <argument name="session" xsi:type="object">Magento\Backend\Model\Session\Storage</argument>
+        </arguments>
+    </type>
     <type name="Iranimij\OpenImport\Model\Pipeline\Step\RowStepPool">
         <arguments>
             <argument name="steps" xsi:type="array">
                 <item name="images" xsi:type="object">Iranimij\OpenImport\Model\Image\ImageStep</item>
                 <item name="url_keys" xsi:type="object">Iranimij\OpenImport\Model\UrlKey\UrlKeyStep</item>
+                <item name="replace_url_keys" xsi:type="object">Iranimij\OpenImport\Model\UrlKey\ReplaceUrlKeyStep</item>
                 <item name="configurable" xsi:type="object">Iranimij\OpenImport\Model\Configurable\ConfigurableStep</item>
                 <item name="stock" xsi:type="object">Iranimij\OpenImport\Model\Stock\StockChangeStep</item>
                 <item name="missing" xsi:type="object">Iranimij\OpenImport\Model\Missing\MissingProductsStep</item>

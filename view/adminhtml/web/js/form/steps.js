@@ -158,7 +158,7 @@ define([
                         filters ? $t('%1 filters').replace('%1', filters) : ''],
                 when: [
                     schedule || (events.length ? '' : $t('Manual only')),
-                    events.length ? $t(schedule ? 'after: %1' : 'After: %1').replace('%1', events.join(', ')) : '',
+                    events.length ? (schedule ? $t('after: %1') : $t('After: %1')).replace('%1', events.join(', ')) : '',
                     (schedule && this.value('schedule_preset')) || events.length
                         ? (String(this.value('is_active')) === '1' ? $t('switched on') : $t('switched off')) : '',
                     this.value('then_profile_id') ? $t('then: %1').replace('%1', this.chosen('then_profile_id')) : ''

@@ -128,4 +128,37 @@ class ProfileGridFilterTest extends TestCase
         self::assertContains('in:sftp', $values);
         self::assertContains('out:email', $values);
     }
+
+    public function testTheGridNeverSendsStoredSecrets(): void
+    {
+        $tag = 'Sec' . bin2hex(random_bytes(3));
+        $profile = Bootstrap::getObjectManager()->get(ProfileInterfaceFactory::class)->create()
+            ->setName($tag . ' sftp')
+            ->setDirection(ProfileInterface::DIRECTION_IMPORT)
+            ->setEntity('openimport_cms_block')
+            ->setFormat('csv')
+            ->setSourceType('sftp')
+            ->setSourceConfig(['host' => 'sftp.example.com', 'username' => 'shop', 'path' => '/in', 'secrets' => ['password' => 'encrypted-value']])
+            ->setExportOptions(['secrets' => ['token' => 'encrypted-token']])
+            ->setMapping([['target' => 'identifier', 'source' => 'identifier']]);
+        Bootstrap::getObjectManager()->get(ProfileRepositoryInterface::class)->save($profile);
+
+        $provider = Bootstrap::getObjectManager()->create('Iranimij\OpenImport\Ui\DataProvider\GridDataProvider', [
+            'name' => 'openimport_profile_listing_data_source',
+            'primaryFieldName' => 'profile_id',
+            'requestFieldName' => 'id',
+        ]);
+        $provider->addFilter(
+            Bootstrap::getObjectManager()->create(FilterBuilder::class)->setField('fulltext')
+                ->setConditionType('fulltext')->setValue($tag)->create()
+        );
+        $items = $provider->getData()['items'];
+
+        self::assertCount(1, $items);
+        $json = (string) json_encode($items);
+        self::assertStringNotContainsString('encrypted-value', $json);
+        self::assertStringNotContainsString('encrypted-token', $json);
+        self::assertStringNotContainsString('secrets', $json);
+        self::assertStringContainsString('sftp.example.com', (string) $items[0]['source_config']);
+    }
 }

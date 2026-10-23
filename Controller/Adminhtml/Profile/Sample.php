@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Controller\Adminhtml\Profile;
 
+use Iranimij\OpenImport\Model\Admin\FileAccess;
 use Iranimij\OpenImport\Model\Admin\FileSample;
 use Iranimij\OpenImport\Model\Admin\UploadStore;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
@@ -28,11 +29,13 @@ class Sample extends Action implements HttpPostActionInterface
      * @param Context $context
      * @param UploadStore $uploads
      * @param FileSample $sample
+     * @param FileAccess $fileAccess
      */
     public function __construct(
         Context $context,
         private readonly UploadStore $uploads,
-        private readonly FileSample $sample
+        private readonly FileSample $sample,
+        private readonly FileAccess $fileAccess
     ) {
         parent::__construct($context);
     }
@@ -44,7 +47,8 @@ class Sample extends Action implements HttpPostActionInterface
     {
         /** @var Json $json */
         $json = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $path = $this->uploads->path((string) $this->getRequest()->getParam('file'));
+        $token = (string) $this->getRequest()->getParam('file');
+        $path = $this->uploads->path($token);
         if ($path === null) {
             return $json->setData(['error' => (string) __('Upload a file first.')]);
         }
@@ -58,6 +62,13 @@ class Sample extends Action implements HttpPostActionInterface
             );
         } catch (ReaderException $exception) {
             return $json->setData(['error' => $exception->getMessage()]);
+        }
+
+        if (!$this->fileAccess->canSee($token)) {
+            $data['rows'] = [];
+            $data['warnings'] = [(string) __(
+                'The file\'s rows are not shown: your role may not see file contents ("Download run files").'
+            )];
         }
 
         return $json->setData($data);

@@ -69,6 +69,6 @@ The runs grid can be filtered by what and direction, and searched by profile nam
 | Create and edit profiles | saving, duplicating and deleting profiles, uploading files |
 | Run profiles | dry runs, live runs, cancelling runs |
 | Confirm runs above the safety limit | the typed confirmation for Delete and Replace |
-| View runs and error reports | the run list, run pages and error reports |
-| Download run files | the imported file and the export of a run (they can hold customer and order data); since 1.5.2, given on upgrade to every role that could view runs |
+| View runs and error reports | the run list, run pages and error reports (without the files' cells) |
+| Download run files | the imported file and the export of a run, and everything that shows file contents: the first rows in step 3, the mapping preview, an export's first rows on the run page and the source cells in error reports (they can hold customer and order data; since 1.5.4). Files an admin uploads in the form are shown to that admin anyway. Since 1.5.2, given on upgrade to every role that could view runs |
 | Manage connections | the saved connections grid and form, Test connection ([Saved connections](connections.md)) |

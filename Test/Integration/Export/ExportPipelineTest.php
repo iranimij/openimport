@@ -165,4 +165,42 @@ class ExportPipelineTest extends TestCase
         self::assertContains('product_websites', $columns);
         self::assertSame([], Bootstrap::getObjectManager()->get(CoreEntitySource::class)->columns('no_such_entity'));
     }
+
+    /**
+     * Magento's product export catches every exception inside its page loop and returns the rows so far. An error
+     * in a row (here the second product's expression divides by zero) must fail the run, not deliver a partial file.
+     */
+    public function testAnErrorInsideMagentosExportFailsTheRun(): void
+    {
+        $run = $this->process($this->profile([
+            'mapping' => [
+                ['target' => 'sku', 'source' => 'sku'],
+                ['target' => 'ratio', 'source' => 'qty', 'transforms' => [['name' => 'expr', 'args' => ['{price} / ({qty} - 2)']]]],
+            ],
+        ]));
+
+        self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus(), (string) $run->getMessage());
+        self::assertStringContainsString('Division by zero', (string) $run->getMessage());
+        self::assertNull($run->getOutputFile(), 'nothing is delivered');
+        self::assertLessThan(3, $run->getCount('exported'), 'no rows after the error');
+    }
+
+    /**
+     * A cancel that comes after the last point where the run can stop (three records never reach a stop point;
+     * a big run would be in the delivery step) is not silently ignored: the finished run says so.
+     */
+    public function testALateCancelIsNamedOnTheFinishedRun(): void
+    {
+        $profile = $this->profile();
+        $objects = Bootstrap::getObjectManager();
+        $run = $objects->get(RunQueue::class)->queue($profile, RunInterface::MODE_LIVE, RunInterface::TRIGGER_CLI);
+        $runId = (int) $run->getRunId();
+        $objects->get(RunFiles::class)->requestCancel($runId);
+
+        $finished = $objects->get(RunProcessor::class)->process($runId);
+
+        self::assertSame(RunInterface::STATUS_SUCCESS, $finished->getStatus(), (string) $finished->getMessage());
+        self::assertStringContainsString('Cancel was requested while the run was writing', (string) $finished->getMessage());
+        self::assertTrue($objects->get(RunFiles::class)->isWriting($runId), 'the delivery step is marked');
+    }
 }

@@ -21,7 +21,8 @@ use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Download: the run's errors with the original rows (CSV).
+ * Download: the run's errors with the original rows (CSV); without the rows' cells for users who may not download
+ * run files.
  */
 class ErrorReport extends Action implements HttpGetActionInterface
 {
@@ -51,7 +52,8 @@ class ErrorReport extends Action implements HttpGetActionInterface
     {
         try {
             $run = $this->runs->getById((int) $this->getRequest()->getParam('id'));
-            $path = $this->report->write($run);
+            // The source cells are file contents: only with "Download run files".
+            $path = $this->report->write($run, $this->_authorization->isAllowed(Download::ADMIN_RESOURCE));
 
             return $this->fileFactory->create(
                 sprintf('openimport-run-%d-errors.csv', (int) $run->getRunId()),

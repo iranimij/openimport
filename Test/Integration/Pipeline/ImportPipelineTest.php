@@ -394,4 +394,26 @@ class ImportPipelineTest extends TestCase
         self::assertSame(RunInterface::STATUS_FAILED, $run->getStatus());
         self::assertStringContainsString('the file has no column "Artikelnummer"', $run->getMessage());
     }
+
+    /**
+     * Replace deletes each product and creates it again; Magento builds URL keys from names only for unknown SKUs,
+     * so existing products of a file without url_key used to collide ("Url key: '' was already generated").
+     */
+    public function testReplaceKeepsTheUrlKeysOfExistingProducts(): void
+    {
+        $prefix = 'OI-RPL-' . bin2hex(random_bytes(3));
+        $rows = $this->supplierRows($prefix, 2);
+        $created = $this->runFile($this->profile(), $this->csv($rows), RunInterface::MODE_LIVE);
+        self::assertSame(RunInterface::STATUS_SUCCESS, $created->getStatus(), (string) $created->getMessage());
+        $before = $this->current([$prefix . '-1', $prefix . '-2'], ['url_key']);
+
+        $replace = $this->profile('replace', ['safety_threshold' => 100]);
+        $dry = $this->runFile($replace, $this->csv($rows), RunInterface::MODE_DRY_RUN);
+        self::assertSame(RunInterface::STATUS_SUCCESS, $dry->getStatus(), (string) $dry->getMessage());
+        self::assertStringNotContainsString('Url key', (string) $dry->getMessage());
+
+        $live = $this->runFile($replace, $this->csv($rows), RunInterface::MODE_LIVE);
+        self::assertSame(RunInterface::STATUS_SUCCESS, $live->getStatus(), (string) $live->getMessage());
+        self::assertSame($before, $this->current([$prefix . '-1', $prefix . '-2'], ['url_key']));
+    }
 }

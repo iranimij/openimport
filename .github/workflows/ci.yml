@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: extdn/github-actions-m2/magento-coding-standard/8.3@97152617ecb8e17169983ee2f6accc9ef4a1f60a
+      - uses: extdn/github-actions-m2/magento-coding-standard/8.3@98c07d7738dc0a337c51fe608f9bbf48b83baee2
 
   phpstan:
     name: PHPStan level 6

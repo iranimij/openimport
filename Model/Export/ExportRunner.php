@@ -133,9 +133,8 @@ class ExportRunner
                     });
                 }
             );
-            if ($this->aborted !== null) {
-                throw $this->aborted;
-            }
+            // An error inside a callback is swallowed by Magento's export loop: it is raised here again.
+            $this->rethrowAborted();
         } catch (PipelineException $exception) {
             // A cancel (RunCancelledException) or a pipeline error stays what it is.
             throw $exception;
@@ -191,6 +190,18 @@ class ExportRunner
         $source->finish($profile, $this->runId);
 
         return [new RunOutcome(RunInterface::STATUS_SUCCESS, $this->counts, $summary . ' ' . $delivered), $path];
+    }
+
+    /**
+     * Raises the first error a source callback recorded, if any.
+     *
+     * @throws \Throwable
+     */
+    private function rethrowAborted(): void
+    {
+        if ($this->aborted !== null) {
+            throw $this->aborted;
+        }
     }
 
     /**

@@ -6,6 +6,178 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Job chains: *Then run* in step 6 of a profile runs another profile after this one (after success, or always),
+  as a live run with the parent run recorded and *Job chain* as the start; loops, self-links and next profiles
+  that read uploaded files are refused at save; profile JSON carries the chain by name. See
+  [Schedules › Job chains](https://iranimij.github.io/openimport/schedules/#job-chains).
+- Triggers: *Also run when* in step 6 queues a live run when a product is saved, stock changes, a customer registers
+  or is saved, an order is placed or an order changes status (optionally only to chosen statuses). A waiting run is
+  not queued twice, and what OpenImport's own runs write triggers nothing. The profile grid lists the events. See
+  [Schedules › Triggers](https://iranimij.github.io/openimport/schedules/#triggers).
+
+### Changed
+- Run messages in the admin's language (review 5, M3): a run's summary, its errors, the mapping preview's problems
+  and the messages of saving, testing and starting are shown in the language of the admin who reads them. Runs still
+  store English (they happen in cron); each sentence is matched against OpenImport's phrases when it is shown, so
+  older runs are translated too. About 600 messages have a German line now, and a CI check keeps every new message
+  translated. E-mails and `bin/magento` stay English. See [Admin › Runs](https://iranimij.github.io/openimport/admin/#runs).
+- The step 6 switch *Schedule is on* is now *Automatic runs are on*: it governs the schedule and the triggers.
+- Review 4 (Notion "17 · Browser review 4"): the grid action is now *Switch automatic runs on/off* and also
+  switches on profiles that only run after events; the step 6 summary shows the schedule, the events, whether
+  automatic runs are on and the next profile; the destination messages name the destinations that count.
+
+### Fixed
+- The step 6 summary says "Nach:" in the German admin again ("After:" was not translated).
+- Triggers: *Export each order when it is placed* saved as `true` (profile JSON, API) queued nothing.
+- Job chains: deleting a profile that others run next says which chains stop there; *Then run* no longer offers
+  imports that read an uploaded file. The run page links "queued as run N" lines and the parent run.
+- The old order-export option *Export each order when it is placed* is shown only for profiles that use it, with a
+  note that step 6 replaces it.
+
+## [1.5.4] - 2026-10-23
+
+Fixes from the fifth hands-on review (Notion "18 · Browser review 5").
+
+### Fixed
+- Exports: a run that is cancelled, or fails while Magento's export reads the records (a writer error, an expression
+  that divides by zero), now ends as cancelled or failed and delivers nothing. Magento's product export catches every
+  exception in its page loop and returns the rows so far, so such runs used to end as SUCCESS with a partial file.
+- Export destination "E-mail" on Magento 2.4.8 and 2.4.9: the file is attached again. The run failed with "Call to
+  undefined method Symfony\Component\Mime\Part\TextPart::getMimePart()" since Magento moved to Symfony mail.
+  The e-mail also said "exported 0 row(s)": destinations now get the run's counts.
+- The profiles grid no longer sends stored secrets (encrypted passwords, keys, tokens) to the browser.
+- "Replace existing records" for products keeps each product's URL key when the file has no `url_key` column;
+  Magento gave all existing products an empty key, so two or more collided ("Url key: '' was already generated").
+  Magento's duplicate URL key message is explained in plain words.
+- Upload: a file larger than the web server or PHP accepts says so ("The file is larger than the web server
+  accepts. Zip it …") instead of "A technical problem with the server … Try again"; the form shows PHP's upload limit
+  under the drop zone, and an old error banner no longer stays after the next upload. Docs: Sources › Big files.
+- Cancel: once a live run writes to Magento the run page says so and no longer offers Cancel; a cancel that came too
+  late is named in the run's message; stopping a running live run asks first.
+
+### Changed
+- *Download run files* now also covers file contents shown in the admin: the first rows in step 3, the mapping
+  preview, an export's first rows on the run page and the source cells in error reports. Files an admin uploads are
+  shown to that admin anyway.
+- The Behaviour field explains the chosen behaviour (what Replace deletes and keeps, what Only add / Only update
+  skip).
+
+## [1.5.3] - 2026-10-22
+
+### Fixed
+- Magento's "Value for 'name' attribute contains incorrect value" and "Wrong URL/path used for attribute …" are
+  explained in plain words for the column. 1.5.2 did this only when Magento sent its short error code; the product
+  import sends the formatted message instead.
+
+## [1.5.2] - 2026-10-22
+
+Fixes from the fourth hands-on review (Notion "17 · Browser review 4").
+
+### Fixed
+- Profiles and Runs grids: the keyword search finds profiles (and runs) by name. It listed every record: the
+  search filter never reached Magento's grid data provider.
+- Product pictures: `base_image`, `small_image`, `thumbnail_image`, `swatch_image`, `additional_images`, their
+  labels and `hide_from_product_page` are in the field list of step 4, and Auto-match finds them (also from *Bild*,
+  *Foto*, *Picture*). Magento 2.4.9's own sample file, which the list was built from, has no picture columns.
+- Dry run: when rows with errors are left out, the headline says so ("Magento accepts the other rows; 3 row(s) have
+  errors and will be left out") instead of "Magento accepts the rows". Run summaries count rows with errors, not
+  error messages.
+- Exported files import back unchanged: the apostrophe the formula guard puts in front of `=`, `+`, `-`, `@` is
+  taken off on import (phone numbers such as `+49 69 …` kept getting an apostrophe).
+- CSV files with CR line breaks (old Excel for Mac, some ERPs) are read line by line; they were one header row.
+- A CSV row with filled cells beyond the last column is a row error (and a warning in the first rows of step 3):
+  the extra cells used to disappear silently, although they mean shifted values.
+- A CSV line longer than 8 MB stops the file with a plain message instead of exhausting PHP's memory.
+- An empty file says "The file is empty" in step 3 and in the run, not "The profile has no mapping yet".
+- Quantities with decimals are refused for products sold in whole pieces (*Qty Uses Decimals* off), for changes
+  (`+1.5`) and plain quantities.
+- Orders import: unknown country codes in billing and shipping addresses are reported.
+- Picture cells with `file://`, `ftp://`, drives, network paths or `../` are refused with a row error instead of
+  Magento's "Wrong URL/path used for attribute image"; Magento's "Value for 'name' attribute contains incorrect
+  value" names the column in plain words.
+- "Products missing from the file" changes nothing when the file has no rows (a broken feed).
+- Import profiles from JSON: a broken file says it is not valid JSON.
+- REST source: without a saved connection the field says where to add one, Test connection asks for one, and the
+  path shows a REST example.
+- "Run again" on an export says it exports again instead of "changes the shop"; the cron status says "just now".
+
+### Changed
+- Profiles imported from a JSON file never switch automatic runs on: new profiles start off, updated ones keep
+  their state.
+- New permission *Download run files* (the imported file and the export of a run, which can hold customer data).
+  Roles that could view runs get it on upgrade.
+- Step 3 lists the sheets of an Excel or OpenDocument file with several sheets.
+
+## [1.5.1] - 2026-10-22
+
+Fixes from the third hands-on browser review of 1.5.0 (Notion "16 · Browser review 3").
+
+### Fixed
+- Reviews: a new review without `store_codes`, and `all`, is saved for every store view. It used to be saved for
+  store 0 only, which Magento shows nowhere: the review and its stars stayed invisible in the shop and in the
+  admin form. The export writes `all` for a review shown in every store view and leaves `store_codes` empty for
+  one shown in none, so importing `all` for such a review repairs it.
+- Reviews: a rating that is switched off or not shown in the review's store views (Stores › Rating › Rating
+  Visibility) is still imported, with a note on the row that its stars will not appear.
+- Orders: an order without shipping columns gets the billing address as its shipping address, as documented.
+  Without it Magento's admin order view failed with "An error has happened during application run".
+- Profile form: the "Order numbers" option (keep the file's numbers or generate new ones) was missing for order
+  imports. A select without a default value no longer disappears from the form, and every field of a step has its
+  own position (fields sharing one could swap places).
+- Dry run: a record spread over several lines (an order with its items) counts once, and records the importer
+  refuses (an invalid e-mail, an unknown product) are listed under the errors only, no longer also as "New".
+- Profiles grid: the "Source / destination" filter also finds exports by destination ("Export to: E-mail"…).
+- Run page: a queued run no longer shows a bare "0" after the waiting notice.
+- Run messages for OpenImport's own importers say "The rows are valid" / "The rows have errors" instead of
+  naming Magento's import, which did not check them.
+- SFTP: a failed connection names the server once and says why in plain words ("the server name is unknown")
+  instead of PHP's network messages.
+
+### Changed
+- Profile form: after the first file is read, its columns are matched automatically when nothing is mapped yet.
+- Auto-match knows `Beliebtheit`, `Häufigkeit`, `uses` and `searches` (popularity) and `Ergebnisse` / `results`
+  for search terms.
+
+## [1.5.0] - 2026-10-21
+
+Sales and marketing entities: orders, shipments, URL rewrites, price rules and coupons, reviews, newsletter,
+search terms and synonyms, category positions — import and export through Magento's own models and services
+(plan 1.3–1.6, release 1.5).
+
+### Added
+- Shipments and tracking numbers (`openimport_shipment`): a file ships orders by order number through Magento's
+  own shipment service (all open items or one SKU with a quantity, carrier, tracking number, customer e-mail,
+  comment); rows of one order make one shipment; orders already carrying the tracking number are skipped and
+  reported. See [Shipments](https://iranimij.github.io/openimport/shipments/).
+- Order import (`openimport_order`, import direction): historic orders land as they are, one row per item in the
+  layout of the order export (state and status, date, totals, addresses, items with parents and product options,
+  payment method recorded). Options: keep the file's order numbers or generate new ones, create invoices, shipments
+  (with tracking numbers) and credit memos from the item quantities through Magento's own services, reduce stock.
+  Orders are only added; existing numbers are skipped and reported; one transaction per order; the dry run checks
+  totals and every column. See [Order import](https://iranimij.github.io/openimport/orders-import/).
+- Import profiles carry import options (`ImportRequest::$options`) for the own importers.
+- URL rewrites (`openimport_url_rewrite`, import and export): custom rewrites and redirects (301, 302, plain) by
+  request path and store view, or the URL of a product (SKU), category (path) or CMS page (identifier); Add/Update,
+  Delete; Magento's generated URLs are never changed or deleted and a request path that is one is reported as a
+  conflict naming the owner. The export writes every rewrite with SKUs, category paths and page identifiers
+  instead of ids. See [URL rewrites](https://iranimij.github.io/openimport/url-rewrites/).
+- Cart price rules with coupons (`openimport_cart_rule`) and catalog price rules (`openimport_catalog_rule`),
+  import and export, matched by name (or `rule_id`): discount, websites and customer groups by code, dates,
+  priority, coupon code or a list of codes, usage limits, free shipping, store labels; conditions from simple
+  columns (subtotal, SKUs, categories, the items the discount applies to) or Magento's condition tree as JSON
+  with short type names; every type checked. Add/Update, Delete. See
+  [Price rules](https://iranimij.github.io/openimport/price-rules/).
+- Product reviews with ratings (`openimport_review`), newsletter subscribers (`openimport_newsletter`, no e-mail
+  sent), search terms (`openimport_search_term`), search synonyms (`openimport_search_synonym`, groups merged as
+  the admin does) and product positions in categories (`openimport_category_position`): import (Add/Update,
+  Delete) and export, each a round trip. See
+  [Reviews, newsletter, search, positions](https://iranimij.github.io/openimport/small-entities/).
+
+## [1.4.0] - 2026-10-21
+
+Connectors: every file source and destination of the paid import modules (plan 1.3–1.6, release 1.4).
+
+### Added
 - Saved connections (System › Data Transfer › OpenImport Connections): SFTP and FTP logins with Test connection, shared
   by profiles as source or export destination; secrets encrypted and never shown again; a connection in use cannot be
   deleted; profile files name the connection instead of carrying a login. New ACL resource *Manage connections*. See
@@ -13,7 +185,29 @@ All notable changes to this project are documented here. The format follows
 - Amazon S3 and S3-compatible storage (Cloudflare R2, Wasabi, MinIO, Garage, ...) as import source and export
   destination, through a saved S3 connection: own Signature Version 4 client (no SDK), folders as key prefixes, all
   matching files, move after success; every request through the URL guard. Tested against AWS's published signature
-  examples and a MinIO server in CI.
+  examples and an S3-compatible server in CI.
+- Google Drive and Google Sheets with a login, as import source and export destination: a service account (JSON key,
+  signed JWT) or a Google account (*Sign in with Google*: your own OAuth client, state and PKCE, refresh token stored
+  encrypted). Folders by link, id or path, Sheets read as Excel files, exports replace a file of the same name or
+  become a Google Sheet, moves into `processed`, deletes go to the bin.
+- Dropbox and OneDrive / SharePoint as import source and export destination, through *Sign in with Dropbox* /
+  *Sign in with Microsoft* with the shop's own app (state, PKCE, refresh token stored encrypted). SharePoint document
+  libraries by site address; uploads in 10 MB parts on OneDrive.
+- REST APIs as import source and export destination: saved REST connection (header token, Basic, OAuth 2 client
+  credentials), paging by page numbers, offsets, cursors, next addresses or the Link header, records path, a page
+  limit that stops instead of importing a partial list, retries after 429/503 with Retry-After; exports send the
+  file or JSON batches.
+- Archives: a `.zip`, `.gz`, `.tar` or `.tar.gz` file from any source is unpacked and the file inside is read
+  (*File inside the archive*: a name or pattern, else the first CSV, Excel, ODS, JSON or XML file); exports can be
+  packed as ZIP, gzip or tar.gz (*Compress*). Zip-slip-safe (fixed file name), size counted while unpacking (1 GB),
+  nested and password-protected archives refused. See [Archives](https://iranimij.github.io/openimport/archives/).
+- OpenDocument spreadsheets (`.ods`, LibreOffice Calc) as import format (typed values, repeated cells and rows,
+  sheet by name or position, streamed) and export format (own writer, bold header row). Detected by the file's
+  `mimetype` entry when the name says nothing.
+- XSLT: *XSLT before reading (XML)* turns a supplier's XML into records before the reader sees it, *XSLT after
+  writing (XML)* reshapes an XML export before delivery. libxslt runs with no file, network or PHP access
+  (`document()`, `xsl:include`, `xsl:import` refused), no DOCTYPE, a 64 MB file limit; stylesheets are checked at
+  save. See [File formats](https://iranimij.github.io/openimport/file-formats/#xslt-since-14).
 
 ### Fixed
 - `openimport:secrets:reencrypt` now also encrypts the secrets of export destinations again, and goes on when one

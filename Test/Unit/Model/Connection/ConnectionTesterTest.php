@@ -14,6 +14,7 @@ use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteClientInterface;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteSettings;
 use Iranimij\OpenImport\Model\Execution\Source\Remote\RemoteSettingsBuilder;
 use Iranimij\OpenImport\Model\Pipeline\PipelineException;
+use Iranimij\OpenImport\Model\Rest\RestClient;
 use Iranimij\OpenImport\Model\Security\Secrets;
 use Iranimij\OpenImport\Test\Unit\Model\FakeObjectManager;
 use Iranimij\OpenImport\Test\Unit\Model\Security\FakeEncryptor;
@@ -63,7 +64,9 @@ class ConnectionTesterTest extends TestCase
         };
         $tester = new ConnectionTester(
             new RemoteClientFactory(new FakeObjectManager(['fake' => $client]), ['ftp' => 'fake']),
-            new RemoteSettingsBuilder(new Secrets(new FakeEncryptor()))
+            new RemoteSettingsBuilder(new Secrets(new FakeEncryptor())),
+            // Not used for these kinds of connection.
+            (new \ReflectionClass(RestClient::class))->newInstanceWithoutConstructor()
         );
 
         $connection = new ConnectionStub(1, 'Old FTP', 'ftp', ['host' => 'ftp.example.com', 'secrets' => ['password' => 'enc(pw)']]);

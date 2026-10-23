@@ -19,13 +19,17 @@ define(['jquery'], function ($) {
                 return;
             }
             $.getJSON(config.url).done(function (response) {
-                if (response.status !== config.status) {
+                // The run started writing to Magento: the page shows that (and no Cancel) after a reload.
+                if (response.status !== config.status || Boolean(response.writing) !== Boolean(config.writing)) {
                     stopped = true;
                     window.location.reload();
 
                     return;
                 }
-                $(element).find('[data-role="progress"]').text(response.progress);
+                // A queued run has no rows yet: its counter stays empty rather than showing "0".
+                if (response.status === 'running') {
+                    $(element).find('[data-role="progress"]').text(response.progress);
+                }
             });
         }
 

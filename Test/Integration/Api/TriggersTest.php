@@ -101,10 +101,17 @@ class TriggersTest extends TestCase
             'setEntity' => EntityRegistry::ORDER,
             'setExportOptions' => ['destination' => 'download', 'order' => ['only' => 'new', 'on_place' => '0']],
         ]);
+        // A JSON file or the API may store true instead of "1".
+        $boolean = $this->profile([
+            'setDirection' => ProfileInterface::DIRECTION_EXPORT,
+            'setEntity' => EntityRegistry::ORDER,
+            'setExportOptions' => ['destination' => 'download', 'order' => ['only' => 'new', 'on_place' => true]],
+        ]);
         $observer = Bootstrap::getObjectManager()->get(QueueOrderExports::class);
         $observer->execute(new Observer());
         $observer->execute(new Observer());
         self::assertSame(1, $this->queued((int) $wants->getProfileId()), 'two orders, one waiting run');
         self::assertSame(0, $this->queued((int) $ignores->getProfileId()));
+        self::assertSame(1, $this->queued((int) $boolean->getProfileId()));
     }
 }

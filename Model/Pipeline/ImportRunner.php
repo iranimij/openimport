@@ -30,6 +30,7 @@ use Iranimij\OpenImport\Model\Pipeline\Step\RowStepPool;
 use Iranimij\OpenImport\Model\Pipeline\Step\StepRecord;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
 use Iranimij\OpenImport\Model\Reader\ReaderFactory;
+use Iranimij\OpenImport\Model\Reader\ReaderInterface;
 use Iranimij\OpenImport\Model\ResourceModel\Run as RunResource;
 use Iranimij\OpenImport\Model\Source\MappedSource;
 use Iranimij\OpenImport\Model\Storage\ErrorLog;
@@ -78,6 +79,13 @@ class ImportRunner
      */
     private array $counts = [];
 
+    /**
+     * Rows (or records without a row) with at least one error: a row with three problems counts once.
+     *
+     * @var array<string, true>
+     */
+    private array $errorRows = [];
+
     private int $errorsStored = 0;
 
     private int $errorCap = 0;
@@ -108,6 +116,16 @@ class ImportRunner
      * @var array<string, string> lower-cased identifier => change type of its default record (dry runs)
      */
     private array $previewKinds = [];
+
+    /**
+     * @var array<string, true> lower-cased identifiers the importer refused in a dry run
+     */
+    private array $previewFailed = [];
+
+    /**
+     * Whether the dry run's preview sample still has to be saved (with the run's outcome).
+     */
+    private bool $previewPending = false;
 
     /**
      * @var PreviewRecord[]
@@ -227,7 +245,10 @@ class ImportRunner
                 $this->readerFactory->options($profile->getFormatOptions())
             );
             // CSV and XLSX have a fixed header; JSON and XML records may add fields after the sample.
-            $strictColumns = in_array($format, ['csv', 'xlsx'], true) ? $reader->columns() : null;
+            $strictColumns = in_array($format, ['csv', 'xlsx', 'ods'], true) ? $reader->columns() : null;
+            if ($strictColumns === []) {
+                throw new PipelineException('The file is empty: it has no rows and no column names.');
+            }
         } catch (ReaderException $exception) {
             throw new PipelineException($exception->getMessage(), 0, $exception);
         }
@@ -301,6 +322,7 @@ class ImportRunner
     {
         $this->runId = $runId;
         $this->counts = array_fill_keys(RunInterface::COUNTS, 0);
+        $this->errorRows = [];
         $this->errorsStored = 0;
         $this->errorCap = max(1, $this->config->getMaxErrorsPerRun());
         $this->pendingErrors = [];
@@ -312,6 +334,8 @@ class ImportRunner
         );
         $this->previewSample = [];
         $this->previewKinds = [];
+        $this->previewFailed = [];
+        $this->previewPending = false;
         $this->sampleCounts = [];
         $this->existingAffected = 0;
         $this->affectedIdentifiers = [];
@@ -334,6 +358,22 @@ class ImportRunner
      */
     private function prepare(RowFilter $filter, CompiledMapping $mapping, int $line, array $row): ?MappedRow
     {
+        if (isset($row[ReaderInterface::EXTRA_CELLS])) {
+            $extra = $row[ReaderInterface::EXTRA_CELLS];
+            unset($row[ReaderInterface::EXTRA_CELLS]);
+            $this->error(new ErrorRecord(
+                $line,
+                sprintf(
+                    'The row has more cells than the first row has columns (%s). A value probably contains the '
+                    . 'delimiter without quotes, so the cells are shifted; the row was left out.',
+                    $extra
+                ),
+                $mapping->map($row)->identifier,
+                '',
+                $row
+            ));
+            return null;
+        }
         try {
             if (!$filter->keep($row)) {
                 $this->counts['filtered']++;
@@ -717,7 +757,8 @@ class ImportRunner
         // Totals count records (default rows); store-view rows only appear in the sample.
         foreach ($records as $entry) {
             [$record, $isMain] = $entry;
-            if ($isMain) {
+            // A record spread over several lines (an order with its items) counts once.
+            if ($isMain && !isset($this->previewKinds[$entry[2]])) {
                 $this->previewTotals[$record->changeType] = ($this->previewTotals[$record->changeType] ?? 0) + 1;
                 $this->previewKinds[$entry[2]] = $record->changeType;
             }
@@ -743,9 +784,8 @@ class ImportRunner
         $ownErrors = $this->counts['errors'];
         $allowed = $profile->getAllowedErrors();
         $skipErrors = $profile->getOnError() === ProfileInterface::ON_ERROR_SKIP;
-        if ($dryRun) {
-            $this->previewStore->add($this->runId, $this->previewSample);
-        }
+        // The sample is saved with the outcome, once the records the importer refused are known.
+        $this->previewPending = $dryRun;
         if ($ownErrors > $allowed && (!$skipErrors || $spool->count() === 0)) {
             $this->storeErrors(true);
             return $this->outcome(
@@ -778,7 +818,7 @@ class ImportRunner
             $this->storeErrors(true);
             $ok = $this->executePlans($plans, $dryRun);
             $message = $dryRun
-                ? 'Dry run: nothing to import from the file.' . ($safety === null ? '' : ' ' . self::CONFIRMATION_NOTE . ': ' . $safety)
+                ? 'Dry run: nothing to import from the file.' . ($safety === null ? '' : ' ' . $this->confirmationNote($safety))
                 : $this->nothingToDo();
 
             return $this->outcome(
@@ -798,8 +838,12 @@ class ImportRunner
             $skipErrors,
             max(0, $allowed - $ownErrors),
             imagesDirectory: $entity->importEntity() === 'catalog_product' ? $this->imageFolder->absoluteBase() : '',
-            historyLabel: sprintf('openimport-run-%d.csv', $this->runId)
+            historyLabel: sprintf('openimport-run-%d.csv', $this->runId),
+            options: $profile->getImportOptions()
         );
+        if (!$dryRun) {
+            $this->progress(false, true);
+        }
         $result = $this->importers->get($entity->importEntity())->run(
             $request,
             new MappedSource($spool->columns(), static fn (): \Generator => $spool->rows())
@@ -808,7 +852,7 @@ class ImportRunner
         foreach ($result->errors as $error) {
             $position = $error->row;
             $identifier = $position === null ? '' : $spool->identifier($position);
-            if ($identifier !== '') {
+            if ($identifier !== '' && !$error->imported) {
                 $failedIdentifiers[$identifier] = true;
             }
             $this->error(new ErrorRecord(
@@ -829,6 +873,7 @@ class ImportRunner
                     $this->previewTotals[$kind]--;
                     unset($this->previewKinds[mb_strtolower((string) $identifier)]);
                 }
+                $this->previewFailed[mb_strtolower((string) $identifier)] = true;
             }
             // A delete that takes children with it: the totals count every record that goes.
             if ($behavior === ProfileInterface::BEHAVIOR_DELETE && $reader instanceof CascadingRecordsInterface
@@ -849,13 +894,20 @@ class ImportRunner
                 : RunInterface::STATUS_FAILED;
             return $this->outcome(
                 $status,
-                $this->dryRunMessage($result->valid, $safety, $reader !== null) . $this->firstProblem($result->valid)
+                $this->dryRunMessage(
+                    $result->valid,
+                    $safety,
+                    $reader !== null,
+                    $this->importers->isOwn($entity->importEntity())
+                ) . $this->firstProblem($result->valid)
             );
         }
         if (!$result->imported) {
             return $this->outcome(
                 RunInterface::STATUS_FAILED,
-                ($result->valid ? 'Magento did not import the rows.' : 'Magento refused the rows. Nothing was imported.')
+                ($this->importers->isOwn($entity->importEntity())
+                    ? ($result->valid ? 'The rows were not imported.' : 'The rows have errors. Nothing was imported.')
+                    : ($result->valid ? 'Magento did not import the rows.' : 'Magento refused the rows. Nothing was imported.'))
                 . $this->firstProblem($result->valid),
                 $result->historyId
             );
@@ -888,7 +940,7 @@ class ImportRunner
                 $this->counts['deleted'],
                 $this->counts['unchanged'],
                 $this->counts['filtered'],
-                $this->counts['errors']
+                count($this->errorRows)
             ),
             $result->historyId
         );
@@ -916,6 +968,14 @@ class ImportRunner
     {
         $plans = [];
         foreach ($this->postImportSteps() as $step) {
+            if ($this->counts['read'] === 0) {
+                // A file without rows is a broken feed, not "nothing is sold any more".
+                $this->postLines[] = (string) __(
+                    '%1: nothing changed because the file has no rows.',
+                    $step->label()
+                );
+                continue;
+            }
             if ($this->counts['errors'] > 0) {
                 $this->postLines[] = (string) __(
                     '%1: nothing changed because %2 row(s) had errors.',
@@ -949,8 +1009,12 @@ class ImportRunner
                 continue;
             }
             $messages[] = sprintf(
-                'This run would %s %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.',
-                $plan->verb,
+                match ($plan->verb) {
+                    'disable' => 'This run would disable %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.',
+                    'set out of stock'
+                        => 'This run would set %d of %d records out of stock (%s, %d%%, limit %d%%). Type %s to confirm.',
+                    default => 'This run would delete %d of %d records (%s, %d%%, limit %d%%). Type %s to confirm.',
+                },
                 $plan->count(),
                 $plan->total,
                 $step->label(),
@@ -961,6 +1025,17 @@ class ImportRunner
         }
 
         return $messages === [] ? null : implode(' ', $messages);
+    }
+
+    /**
+     * The dry-run line that says a live run needs the typed confirmation (ConfirmationWord looks for its start).
+     *
+     * @param string $safety
+     * @return string
+     */
+    private function confirmationNote(string $safety): string
+    {
+        return sprintf('A live run will ask for confirmation: %s', $safety);
     }
 
     private function joinSafety(?string $first, ?string $second): ?string
@@ -1016,8 +1091,9 @@ class ImportRunner
         $verb = $behavior === ProfileInterface::BEHAVIOR_DELETE ? 'delete' : 'replace';
         if ($reader === null) {
             return sprintf(
-                'This run would %s up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.',
-                $verb,
+                $verb === 'delete'
+                    ? 'This run would delete up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.'
+                    : 'This run would replace up to %d record(s) and OpenImport cannot count them in advance. Confirm to run it.',
                 count($spool->allIdentifiers())
             );
         }
@@ -1031,8 +1107,9 @@ class ImportRunner
         }
 
         return sprintf(
-            'This run would %s %d of %d records (%d%%, limit %d%%). Type %s to confirm.',
-            $verb,
+            $verb === 'delete'
+                ? 'This run would delete %d of %d records (%d%%, limit %d%%). Type %s to confirm.'
+                : 'This run would replace %d of %d records (%d%%, limit %d%%). Type %s to confirm.',
             $this->existingAffected,
             $total,
             (int) round($this->existingAffected * 100 / $total),
@@ -1041,7 +1118,14 @@ class ImportRunner
         );
     }
 
-    private function dryRunMessage(bool $valid, ?string $safety, bool $previewed): string
+    /**
+     * @param bool $valid
+     * @param string|null $safety
+     * @param bool $previewed
+     * @param bool $own OpenImport's own importer checked the rows (not Magento's import)
+     * @return string
+     */
+    private function dryRunMessage(bool $valid, ?string $safety, bool $previewed, bool $own = false): string
     {
         $parts = [];
         if ($previewed) {
@@ -1055,9 +1139,22 @@ class ImportRunner
         } else {
             $parts[] = sprintf('Dry run: %d row(s) checked by Magento.', $this->counts['read']);
         }
-        $parts[] = $valid ? 'Magento accepts the rows.' : 'Magento refuses the rows; see the errors.';
+        $refused = count($this->errorRows);
+        if ($valid && $refused > 0) {
+            // Rows with errors are left out (Skip, or within "Errors allowed"); the rest goes in.
+            $parts[] = sprintf(
+                $own
+                    ? 'The other rows are valid; %d row(s) have errors and will be left out (see below).'
+                    : 'Magento accepts the other rows; %d row(s) have errors and will be left out (see below).',
+                $refused
+            );
+        } else {
+            $parts[] = $own
+                ? ($valid ? 'The rows are valid.' : 'The rows have errors; see below.')
+                : ($valid ? 'Magento accepts the rows.' : 'Magento refuses the rows; see the errors.');
+        }
         if ($safety !== null) {
-            $parts[] = self::CONFIRMATION_NOTE . ': ' . $safety;
+            $parts[] = $this->confirmationNote($safety);
         }
 
         return implode(' ', $parts);
@@ -1088,12 +1185,19 @@ class ImportRunner
             $this->counts['unchanged'],
             $this->counts['filtered'],
             $this->counts['skipped'],
-            $this->counts['errors']
+            count($this->errorRows)
         );
     }
 
     private function outcome(string $status, string $message, ?int $historyId = null): RunOutcome
     {
+        if ($this->previewPending) {
+            $this->previewPending = false;
+            $this->previewStore->add($this->runId, array_values(array_filter(
+                $this->previewSample,
+                fn (PreviewRecord $record): bool => !$this->previewRefused($record->identifier)
+            )));
+        }
         $this->progress();
         if ($this->skippedNames !== []) {
             $message .= "\n" . (string) __(
@@ -1119,9 +1223,25 @@ class ImportRunner
         return new RunOutcome($status, $this->counts, $message, $historyId);
     }
 
+    /**
+     * Whether a preview record (or one of its store-view lines, "SKU [de]") belongs to a record the importer refused:
+     * those are listed under the errors, not as changes.
+     */
+    private function previewRefused(string $identifier): bool
+    {
+        $key = mb_strtolower($identifier);
+        if (isset($this->previewFailed[$key])) {
+            return true;
+        }
+        $bracket = mb_strrpos($key, ' [');
+
+        return $bracket !== false && isset($this->previewFailed[mb_substr($key, 0, $bracket)]);
+    }
+
     private function error(ErrorRecord $error): void
     {
         $this->counts['errors']++;
+        $this->errorRows[$error->sourceRow > 0 ? 'r' . $error->sourceRow : 'i' . mb_strtolower($error->identifier)] = true;
         $this->firstError ??= $error;
         if ($this->errorsStored + count($this->pendingErrors) < $this->errorCap) {
             $this->pendingErrors[] = $error;
@@ -1143,15 +1263,16 @@ class ImportRunner
 
     /**
      * @param bool $canStop the run has written nothing yet, so a cancel may stop it here
+     * @param bool $writing the live run starts writing to Magento now (it cannot stop from here on)
      * @return void
      */
-    private function progress(bool $canStop = false): void
+    private function progress(bool $canStop = false, bool $writing = false): void
     {
         if ($this->runId > 0) {
             $this->runResource->updateProgress($this->runId, $this->counts['read'], $this->counts);
         }
         if ($this->heartbeat !== null) {
-            ($this->heartbeat)($canStop);
+            ($this->heartbeat)($canStop, $writing);
         }
     }
 }

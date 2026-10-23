@@ -9,6 +9,11 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Model\Profile;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterface;
+use Iranimij\OpenImport\Model\Archive\Packer;
+use Iranimij\OpenImport\Model\Archive\Unpacker;
+use Iranimij\OpenImport\Model\Chain\ChainLinks;
+use Iranimij\OpenImport\Model\Trigger\TriggerEvents;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
 use Iranimij\OpenImport\Model\Configurable\ConfigurableStep;
 use Iranimij\OpenImport\Model\Connection\ConnectionConfig;
 use Iranimij\OpenImport\Model\Entity\EntityRegistry;
@@ -40,6 +45,8 @@ class ProfileValidator
      * @param DestinationPool $destinations
      * @param WriterFactory $writers
      * @param ConnectionConfig $connections
+     * @param XsltStep $xslt
+     * @param ChainLinks $chains
      */
     public function __construct(
         private readonly MappingCompiler $mappingCompiler,
@@ -48,7 +55,9 @@ class ProfileValidator
         private readonly EntityCodes $entityCodes,
         private readonly DestinationPool $destinations,
         private readonly WriterFactory $writers,
-        private readonly ConnectionConfig $connections
+        private readonly ConnectionConfig $connections,
+        private readonly XsltStep $xslt,
+        private readonly ChainLinks $chains
     ) {
     }
 
@@ -97,9 +106,24 @@ class ProfileValidator
                     . 'SFTP or FTP as the source, or set the schedule to "Manual only".';
             }
             if (!$import && ($profile->getExportOptions()['destination'] ?? 'download') === 'download') {
-                $problems[] = 'A scheduled export needs a destination: choose a server folder, SFTP, FTP or e-mail, '
-                    . 'or set the schedule to "Manual only".';
+                $problems[] = 'A scheduled export needs a destination other than "Download from the run page" (a server '
+                    . 'folder, SFTP, FTP, cloud storage, a REST API or e-mail), or set the schedule to "Manual only".';
             }
+        }
+        $problems = array_merge($problems, $this->triggers($profile, $import));
+        $problems = array_merge($problems, $this->chain($profile));
+        $archive = (string) ($profile->getFormatOptions()['archive'] ?? Unpacker::MODE_AUTO);
+        if ($import && !in_array($archive, [Unpacker::MODE_AUTO, Unpacker::MODE_NONE], true)) {
+            $problems[] = sprintf('The archive setting "%s" is not one of auto, none.', $archive);
+        }
+        $xsltOptions = $import ? $profile->getFormatOptions() : $profile->getExportOptions();
+        $stylesheet = trim((string) ($xsltOptions[XsltStep::OPTION] ?? ''));
+        if ($stylesheet !== '' && ($xsltProblem = $this->xslt->check($stylesheet)) !== '') {
+            $problems[] = $xsltProblem;
+        }
+        $compress = (string) ($profile->getExportOptions()['compress'] ?? Packer::NONE);
+        if (!$import && !in_array($compress, array_merge([Packer::NONE], Packer::KINDS), true)) {
+            $problems[] = sprintf('"%s" is not a compression OpenImport writes (zip, gz, tar.gz).', $compress);
         }
         foreach (array_filter(array_map('trim', explode(',', $profile->getNotifyEmails()))) as $email) {
             if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
@@ -119,6 +143,13 @@ class ProfileValidator
                 && $profile->getBehavior() === ProfileInterface::BEHAVIOR_REPLACE
             ) {
                 $problems[] = sprintf('%s cannot be imported with "Replace": use Add/Update.', $entity);
+            }
+            if (in_array($entity, EntityRegistry::ADD_ONLY, true) && !in_array(
+                $profile->getBehavior(),
+                [ProfileInterface::BEHAVIOR_ADD_UPDATE, ProfileInterface::BEHAVIOR_ONLY_ADD],
+                true
+            )) {
+                $problems[] = sprintf('%s can only be added: use Add/Update.', $entity);
             }
             $problems = array_merge(
                 $problems,
@@ -170,9 +201,13 @@ class ProfileValidator
                 }
                 break;
             case 's3':
+            case 'google_drive':
+            case 'dropbox':
+            case 'onedrive':
+            case 'rest':
                 $problem = $this->connections->selected($config) > 0
-                    ? $this->connections->problem($config, 's3')
-                    : 'Choose a saved S3 connection.';
+                    ? $this->connections->problem($config, $profile->getSourceType())
+                    : 'Choose a saved connection for this source.';
                 if ($problem !== null) {
                     $problems[] = $problem;
                 }
@@ -208,10 +243,13 @@ class ProfileValidator
             if ($destination === 'folder' && $out('path') === '') {
                 $problems[] = 'Enter the server folder to write to.';
             }
-            if ($destination === 's3') {
+            if ($destination === 'rest' && ($export['send'] ?? '') === 'batches' && $profile->getFormat() !== 'json') {
+                $problems[] = 'Batches of records need the JSON format; choose JSON or send the file.';
+            }
+            if (in_array($destination, ['s3', 'google_drive', 'dropbox', 'onedrive', 'rest'], true)) {
                 $problem = $this->connections->selected($export) > 0
-                    ? $this->connections->problem($export, 's3')
-                    : 'Choose a saved S3 connection for the destination.';
+                    ? $this->connections->problem($export, $destination)
+                    : 'Choose a saved connection for the destination.';
                 if ($problem !== null) {
                     $problems[] = $problem;
                 }
@@ -246,6 +284,89 @@ class ProfileValidator
         $pick = $text('pick');
         if ($pick !== '' && !in_array($pick, FileSelector::PICKS, true)) {
             $problems[] = sprintf('"%s" is not a way to choose the file.', $pick);
+        }
+
+        return $problems;
+    }
+
+    /**
+     * Shop events that start runs: known events only; like a schedule, a switched-on profile with triggers needs a
+     * source that changes by itself and, for an export, a destination.
+     *
+     * @param ProfileInterface $profile
+     * @param bool $import
+     * @return string[]
+     */
+    private function triggers(ProfileInterface $profile, bool $import): array
+    {
+        $events = $profile->getTriggers()[ProfileInterface::TRIGGER_EVENTS];
+        $problems = [];
+        foreach (array_diff($events, array_keys(TriggerEvents::LABELS)) as $unknown) {
+            $problems[] = sprintf(
+                '"%s" is not an event a profile can run after (%s).',
+                $unknown,
+                implode(', ', array_keys(TriggerEvents::LABELS))
+            );
+        }
+        if ($events === [] || !$profile->isActive()) {
+            return $problems;
+        }
+        if ($import && $profile->getSourceType() === 'upload') {
+            $problems[] = 'An uploaded file cannot run after shop events (it would import the same file again and '
+                . 'again): choose a server folder, web address, SFTP or FTP as the source, or remove the events '
+                . 'under "Also run when".';
+        }
+        if (!$import && ($profile->getExportOptions()['destination'] ?? 'download') === 'download') {
+            $problems[] = 'An export that runs after shop events needs a destination other than "Download from the run '
+                . 'page" (a server folder, SFTP, FTP, cloud storage, a REST API or e-mail), or remove the events under '
+                . '"Also run when".';
+        }
+
+        return $problems;
+    }
+
+    /**
+     * The "then run" link: the next profile exists, is not this one, can run unattended, and the chain does not
+     * come back to this profile.
+     *
+     * @param ProfileInterface $profile
+     * @return string[]
+     */
+    private function chain(ProfileInterface $profile): array
+    {
+        $nextId = $profile->getThenProfileId();
+        if ($nextId === null) {
+            return [];
+        }
+        $ownId = $profile->getProfileId() === null ? null : (int) $profile->getProfileId();
+        if ($nextId === $ownId) {
+            return ['A profile cannot run itself afterwards.'];
+        }
+        $next = $this->chains->profile($nextId);
+        if ($next === null) {
+            return [sprintf('There is no profile with id %d to run afterwards.', $nextId)];
+        }
+        $problems = [];
+        if ($next['direction'] === ProfileInterface::DIRECTION_IMPORT && $next['source_type'] === 'upload') {
+            $problems[] = sprintf(
+                '"%s" reads an uploaded file, so it cannot run afterwards: give it a server folder, web address, '
+                . 'SFTP, FTP or cloud source.',
+                $next['name']
+            );
+        }
+        if ($ownId !== null) {
+            [$ids, $again] = $this->chains->path($ownId, $nextId);
+            if ($again !== null) {
+                $ids[] = $again;
+                $names = array_map(fn (int $id): string => $this->chains->profile($id)['name'] ?? ('#' . $id), $ids);
+                $problems[] = sprintf(
+                    'The chain would loop: %s. A profile cannot run again in the same chain.',
+                    implode(' → ', $names)
+                );
+            }
+        }
+        if (!in_array($profile->getThenWhen(), [ProfileInterface::THEN_SUCCESS, ProfileInterface::THEN_ALWAYS], true)) {
+            $problems[] = 'When to run the next profile must be "success" or "always".';
         }
 
         return $problems;

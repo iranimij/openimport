@@ -22,7 +22,8 @@ class SecretsTest extends TestCase
         self::assertSame('pa55', $secrets->get($config, 'password'));
         self::assertSame('', $secrets->get($config, 'token'));
         self::assertSame(
-            ['password' => true, 'private_key' => false, 'passphrase' => false, 'token' => false, 'secret_key' => false],
+            ['password' => true, 'private_key' => false, 'passphrase' => false, 'token' => false, 'secret_key' => false,
+                'service_account_json' => false, 'client_secret' => false, 'refresh_token' => false],
             $secrets->stored($config)
         );
         self::assertSame(['host' => 'sftp.example.com'], $secrets->strip($config));

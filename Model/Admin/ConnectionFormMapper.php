@@ -41,7 +41,8 @@ class ConnectionFormMapper
             'connection_id' => $connection->getConnectionId(),
             'name' => $connection->getName(),
             'type' => $connection->getType() ?: 'sftp',
-            'settings' => $settings + ['auth_sftp' => 'password', 'passive' => '1', 'ssl' => '0', 'path_style' => '0'],
+            'settings' => $settings + ['auth_sftp' => 'password', 'passive' => '1', 'ssl' => '0', 'path_style' => '0',
+                'auth_google' => 'service_account', 'auth_rest' => 'none'],
         ];
     }
 
@@ -66,9 +67,28 @@ class ConnectionFormMapper
             }
         }
 
+        $stored = $connection->getSettings();
+        unset($settings['account']);
+        // The account a service account key belongs to is shown on the form (the key itself never is).
+        $key = json_decode((string) ($settings['service_account_json'] ?? ''), true);
+        if (is_array($key) && is_string($key['client_email'] ?? null)) {
+            $settings['account'] = $key['client_email'];
+        } elseif (($settings['service_account_json'] ?? '') !== '') {
+            $settings['account'] = '';
+        } elseif (isset($stored['account'])) {
+            // Not a form field: set by the key above or by "Sign in with Google".
+            $settings['account'] = (string) $stored['account'];
+        }
+        if ($text('type') === 'google_drive' && ($settings['auth_google'] ?? '') !== ($stored['auth_google'] ?? '')
+            && isset($stored['auth_google'])
+        ) {
+            // Another kind of login: the old account and its tokens no longer apply.
+            unset($settings['account'], $stored['secrets']['refresh_token']);
+        }
+
         return $connection
             ->setName($text('name'))
             ->setType($text('type'))
-            ->setSettings($this->secrets->merge($settings, $connection->getSettings()));
+            ->setSettings($this->secrets->merge($settings, $stored));
     }
 }

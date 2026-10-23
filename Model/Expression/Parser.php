@@ -343,14 +343,34 @@ class Parser
         [$minimum, $maximum] = self::FUNCTIONS[$name];
         $count = count($arguments);
         if ($count < $minimum || ($maximum >= 0 && $count > $maximum)) {
-            throw new ExpressionException(sprintf(
-                '%s at position %d takes %s, not %d.',
-                $name,
-                $token->position,
-                $minimum === $maximum ? $minimum . ' argument' . ($minimum === 1 ? '' : 's')
-                    : ($maximum < 0 ? 'at least ' . $minimum : $minimum . ' to ' . $maximum) . ' arguments',
-                $count
-            ));
+            throw new ExpressionException(match (true) {
+                $minimum === $maximum && $minimum === 1
+                    => sprintf('%s at position %d takes 1 argument, not %d.', $name, $token->position, $count),
+                $minimum === $maximum => sprintf(
+                    '%s at position %d takes %d arguments, not %d.',
+                    $name,
+                    $token->position,
+                    $minimum,
+                    $count
+                ),
+                $maximum < 0 && $minimum === 1
+                    => sprintf('%s at position %d takes at least 1 argument, not %d.', $name, $token->position, $count),
+                $maximum < 0 => sprintf(
+                    '%s at position %d takes at least %d arguments, not %d.',
+                    $name,
+                    $token->position,
+                    $minimum,
+                    $count
+                ),
+                default => sprintf(
+                    '%s at position %d takes %d to %d arguments, not %d.',
+                    $name,
+                    $token->position,
+                    $minimum,
+                    $maximum,
+                    $count
+                ),
+            });
         }
 
         return $this->function($name, $arguments);

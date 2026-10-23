@@ -18,25 +18,28 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Download: the file a run read (or produced). Only paths inside the run folder are served.
  */
 class Download extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Iranimij_OpenImport::runs';
+    public const ADMIN_RESOURCE = 'Iranimij_OpenImport::run_files';
 
     /**
      * @param Context $context
      * @param RunRepositoryInterface $runs
      * @param FileFactory $fileFactory
      * @param Filesystem $filesystem
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly RunRepositoryInterface $runs,
         private readonly FileFactory $fileFactory,
-        private readonly Filesystem $filesystem
+        private readonly Filesystem $filesystem,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -64,7 +67,7 @@ class Download extends Action implements HttpGetActionInterface
                 DirectoryList::VAR_DIR
             );
         } catch (LocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
             return $this->resultRedirectFactory->create()->setPath('*/*/');
         }
     }

@@ -27,6 +27,7 @@ use Magento\Framework\Escaper;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Everything the run page shows.
@@ -56,6 +57,7 @@ class RunView implements ArgumentInterface
      * @param RunFiles $runFiles
      * @param ReaderFactory $readers
      * @param ConfirmationWord $confirmationWord
+     * @param StoredText $text
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -70,8 +72,20 @@ class RunView implements ArgumentInterface
         private readonly Escaper $escaper,
         private readonly RunFiles $runFiles,
         private readonly ReaderFactory $readers,
-        private readonly ConfirmationWord $confirmationWord
+        private readonly ConfirmationWord $confirmationWord,
+        private readonly StoredText $text
     ) {
+    }
+
+    /**
+     * A message the run stored in English (its summary, an error), in the admin's language.
+     *
+     * @param string $message
+     * @return string
+     */
+    public function text(string $message): string
+    {
+        return $this->text->translate($message);
     }
 
     /**
@@ -84,7 +98,9 @@ class RunView implements ArgumentInterface
     {
         $run = $this->run();
         $empty = ['columns' => [], 'rows' => []];
-        if ($run === null || $run->getDirection() !== 'export' || $run->getOutputFile() === null) {
+        // The rows are file contents: only for users allowed to download run files.
+        if ($run === null || $run->getDirection() !== 'export' || $run->getOutputFile() === null
+            || !$this->canDownloadFiles()) {
             return $empty;
         }
         try {
@@ -280,12 +296,63 @@ class RunView implements ArgumentInterface
     public function canCancel(): bool
     {
         return in_array($this->run()?->getStatus(), [RunInterface::STATUS_QUEUED, RunInterface::STATUS_RUNNING], true)
-            && $this->authorization->isAllowed('Iranimij_OpenImport::run');
+            && $this->authorization->isAllowed('Iranimij_OpenImport::run')
+            && !$this->isWriting();
+    }
+
+    /**
+     * A running live run that writes to Magento (or delivers its export) now: it cannot be cancelled any more.
+     *
+     * @return bool
+     */
+    public function isWriting(): bool
+    {
+        $run = $this->run();
+
+        return $run !== null && $run->getStatus() === RunInterface::STATUS_RUNNING
+            && $this->runFiles->isWriting((int) $run->getRunId());
+    }
+
+    /**
+     * Turns "queued as run 48" in an escaped message line into a link to that run.
+     *
+     * @param string $escapedLine the line, already HTML-escaped
+     * @param Escaper $escaper
+     * @return string
+     */
+    public function linkRuns(string $escapedLine, Escaper $escaper): string
+    {
+        return (string) preg_replace_callback(
+            '/queued as run (\d+)/',
+            fn (array $match): string => 'queued as <a href="'
+                . $escaper->escapeUrl($this->runUrl((int) $match[1])) . '">run ' . $match[1] . '</a>',
+            $escapedLine
+        );
+    }
+
+    /**
+     * @param int $runId
+     * @return string
+     */
+    public function runUrl(int $runId): string
+    {
+        return $this->urlBuilder->getUrl('openimport/run/view', ['id' => $runId]);
     }
 
     /**
      * "Run again" for a finished run whose profile still exists: the same mode, a fresh read of the source.
      *
+     * @return bool
+     */
+    /**
+     * Whether the admin may download the run's files (they can hold customer and order data).
+     */
+    public function canDownloadFiles(): bool
+    {
+        return $this->authorization->isAllowed('Iranimij_OpenImport::run_files');
+    }
+
+    /**
      * @return bool
      */
     public function canRunAgain(): bool

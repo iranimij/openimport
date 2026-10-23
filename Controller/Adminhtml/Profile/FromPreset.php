@@ -13,6 +13,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Creates an inactive profile from a preset (Shopify, WooCommerce, Magento 1 files) and opens it.
@@ -24,10 +25,12 @@ class FromPreset extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param PresetRepository $presets
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
-        private readonly PresetRepository $presets
+        private readonly PresetRepository $presets,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -42,7 +45,7 @@ class FromPreset extends Action implements HttpPostActionInterface
         try {
             $profile = $this->presets->create($code);
         } catch (\InvalidArgumentException $exception) {
-            foreach (explode("\n", $exception->getMessage()) as $problem) {
+            foreach (explode("\n", $this->text->translate($exception->getMessage())) as $problem) {
                 $this->messageManager->addErrorMessage($problem);
             }
 

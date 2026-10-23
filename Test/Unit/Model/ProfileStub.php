@@ -49,6 +49,16 @@ class ProfileStub implements ProfileInterface
     }
 
     /**
+     * Test helper: what a repository save would give a new profile.
+     */
+    public function assignId(int $id): self
+    {
+        $this->set(self::PROFILE_ID, $id);
+
+        return $this;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getProfileId(): ?int
@@ -380,6 +390,47 @@ class ProfileStub implements ProfileInterface
     public function setImportOptions(array $options): ProfileInterface
     {
         return $this->set(self::IMPORT_OPTIONS, $this->json->encode($options));
+    }
+
+    public function getThenProfileId(): ?int
+    {
+        $id = $this->get(self::THEN_PROFILE_ID);
+
+        return $id === null || $id === '' || (int) $id === 0 ? null : (int) $id;
+    }
+
+    public function setThenProfileId(?int $profileId): ProfileInterface
+    {
+        return $this->set(self::THEN_PROFILE_ID, $profileId);
+    }
+
+    public function getThenWhen(): string
+    {
+        return (string) $this->get(self::THEN_WHEN) === self::THEN_ALWAYS ? self::THEN_ALWAYS : self::THEN_SUCCESS;
+    }
+
+    public function setThenWhen(string $when): ProfileInterface
+    {
+        return $this->set(self::THEN_WHEN, $when);
+    }
+
+    public function getTriggers(): array
+    {
+        $triggers = $this->json->decode($this->get(self::TRIGGERS));
+        $list = static fn (mixed $values): array => array_values(array_unique(array_filter(
+            array_map(static fn (mixed $value): string => is_scalar($value) ? trim((string) $value) : '', (array) $values),
+            static fn (string $value): bool => $value !== ''
+        )));
+
+        return [
+            self::TRIGGER_EVENTS => $list($triggers[self::TRIGGER_EVENTS] ?? []),
+            self::TRIGGER_ORDER_STATUSES => $list($triggers[self::TRIGGER_ORDER_STATUSES] ?? []),
+        ];
+    }
+
+    public function setTriggers(array $triggers): ProfileInterface
+    {
+        return $this->set(self::TRIGGERS, $this->json->encode($triggers));
     }
 
     /**

@@ -155,7 +155,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="order_on_place" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="40">
+        <field name="order_on_place" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -163,11 +163,17 @@
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">entity</item>
+                    <!-- Replaced by step 6 › "Also run when" › "An order is placed" (1.6); shown only while it is on. -->
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.order.on_place" xsi:type="array">
+                            <item name="match" xsi:type="string">^(1|true)$</item>
+                        </item>
+                    </item>
                 </item>
             </argument>
             <settings>
                 <label translate="true">Also run after every order</label>
-                <notice translate="true">Queues this export when an order is placed; cron runs it within a minute. Combine with "Only orders not exported before".</notice>
+                <notice translate="true">Replaced by step 6 › "Also run when" › "An order is placed", which also works with schedules and other events. This switch still works while it is on; once it is off, it is gone.</notice>
                 <dataScope>export_options.order.on_place</dataScope>
             </settings>
             <formElements>
@@ -182,7 +188,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="order_items" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="45">
+        <field name="order_items" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="60">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -234,7 +240,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="upload" component="Iranimij_OpenImport/js/form/upload" formElement="input" sortOrder="20">
+        <field name="upload" component="Iranimij_OpenImport/js/form/upload" formElement="input" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="uploadUrl" xsi:type="url" path="openimport/profile/upload"/>
@@ -251,7 +257,7 @@
                 <dataScope>source_config</dataScope>
             </settings>
         </field>
-        <field name="source_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
+        <field name="source_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="170">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -270,7 +276,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="source_auth" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="31">
+        <field name="source_auth" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="200">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -303,7 +309,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="source_username_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
+        <field name="source_username_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="240">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -324,7 +330,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="source_password_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="33">
+        <field name="source_password_url" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="280">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -344,7 +350,7 @@
                 <notice translate="true">Stored encrypted, never shown again.</notice>
             </settings>
         </field>
-        <field name="source_token" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="34">
+        <field name="source_token" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="320">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -364,7 +370,7 @@
                 <notice translate="true">Sent as "Authorization: Bearer …". Stored encrypted, never shown again.</notice>
             </settings>
         </field>
-        <field name="source_sheet_gid" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="35">
+        <field name="source_sheet_gid" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="350">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -384,13 +390,17 @@
                 <notice translate="true">Google Sheets only: the gid from the sheet link; empty = the first sheet.</notice>
             </settings>
         </field>
-        <field name="source_connection" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="29">
+        <field name="source_connection" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="150">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
                         <item name="2" xsi:type="string">s3</item>
+                        <item name="3" xsi:type="string">google_drive</item>
+                        <item name="4" xsi:type="string">dropbox</item>
+                        <item name="5" xsi:type="string">onedrive</item>
+                        <item name="6" xsi:type="string">rest</item>
                     </item>
                 </item>
             </argument>
@@ -407,7 +417,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="source_host" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
+        <field name="source_host" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="180">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -431,7 +441,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="source_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="31">
+        <field name="source_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="210">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -455,7 +465,7 @@
                 <notice translate="true">Empty = 22 for SFTP, 21 for FTP.</notice>
             </settings>
         </field>
-        <field name="source_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
+        <field name="source_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="250">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -478,7 +488,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="source_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="33">
+        <field name="source_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="290">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -512,7 +522,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="source_password" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="34">
+        <field name="source_password" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="330">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -549,7 +559,7 @@
                 <notice translate="true">Stored encrypted, never shown again.</notice>
             </settings>
         </field>
-        <field name="source_private_key" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="35">
+        <field name="source_private_key" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="360">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -575,7 +585,7 @@
                 <notice translate="true">OpenSSH or PEM private key for key login. Stored encrypted, never shown again.</notice>
             </settings>
         </field>
-        <field name="source_passphrase" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="36">
+        <field name="source_passphrase" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="370">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -599,7 +609,7 @@
                 <dataScope>source_config.passphrase</dataScope>
             </settings>
         </field>
-        <field name="source_ssl" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="37">
+        <field name="source_ssl" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="380">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -633,7 +643,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="source_passive" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="38">
+        <field name="source_passive" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="390">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -663,7 +673,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="source_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="40">
+        <field name="source_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="400">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -671,6 +681,10 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
+                        <item name="5" xsi:type="string">dropbox</item>
+                        <item name="6" xsi:type="string">onedrive</item>
+                        <item name="7" xsi:type="string">rest</item>
                     </item>
                     <item name="requiredWhen" xsi:type="array">
                         <item name="source_type" xsi:type="array">
@@ -682,12 +696,26 @@
                         <item name="sftp" xsi:type="string">remote</item>
                         <item name="ftp" xsi:type="string">remote</item>
                         <item name="s3" xsi:type="string">remote</item>
+                        <item name="google_drive" xsi:type="string">remote</item>
+                        <item name="dropbox" xsi:type="string">remote</item>
+                        <item name="onedrive" xsi:type="string">remote</item>
+                        <item name="rest" xsi:type="string">rest</item>
                     </item>
                     <item name="noticeByType" xsi:type="array">
                         <item name="folder" xsi:type="string" translate="true">A folder under var/openimport, or an absolute path inside a folder allowed under Stores › Configuration › iranimij › OpenImport › Safety.</item>
                         <item name="sftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
                         <item name="ftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
                         <item name="s3" xsi:type="string" translate="true">The folder in the bucket (key prefix), e.g. incoming; empty = the top of the bucket.</item>
+                        <item name="google_drive" xsi:type="string" translate="true">The link of the Drive folder, its id, or a path from My Drive such as Supplier/incoming. Google Sheets in it are read as Excel files (name.xlsx).</item>
+                        <item name="dropbox" xsi:type="string" translate="true">The folder from the top of the Dropbox (or of the app folder), e.g. Supplier/incoming; empty = the top.</item>
+                        <item name="onedrive" xsi:type="string" translate="true">The folder in the OneDrive or the SharePoint library, e.g. Supplier/incoming; empty = the top.</item>
+                        <item name="rest" xsi:type="string" translate="true">The path after the connection's base address, with its query, e.g. /products?status=active.</item>
+                    </item>
+                    <item name="labelByType" xsi:type="array">
+                        <item name="rest" xsi:type="string" translate="true">Path</item>
+                    </item>
+                    <item name="placeholderByType" xsi:type="array">
+                        <item name="rest" xsi:type="string">/products?status=active</item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
@@ -699,7 +727,238 @@
                 <placeholder>supplier/incoming</placeholder>
             </settings>
         </field>
-        <field name="source_pattern" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="41">
+        <field name="rest_records" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="450">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Records in the answer</label>
+                <dataScope>source_config.records</dataScope>
+                <placeholder>data.items</placeholder>
+                <notice translate="true">Where the list of records is in the JSON answer, as a dotted path; empty = the answer itself or its first list.</notice>
+            </settings>
+        </field>
+        <field name="rest_paging" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="460">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Pages</label>
+                <dataScope>source_config.paging</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">none</item>
+                                <item name="label" xsi:type="string" translate="true">One answer (no pages)</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">page</item>
+                                <item name="label" xsi:type="string" translate="true">Page numbers (?page=1, 2, …)</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">offset</item>
+                                <item name="label" xsi:type="string" translate="true">Offsets (?offset=0, 100, …)</item>
+                            </option>
+                            <option name="3" xsi:type="array">
+                                <item name="value" xsi:type="string">cursor</item>
+                                <item name="label" xsi:type="string" translate="true">A cursor in the answer</item>
+                            </option>
+                            <option name="4" xsi:type="array">
+                                <item name="value" xsi:type="string">next_url</item>
+                                <item name="label" xsi:type="string" translate="true">The next address in the answer</item>
+                            </option>
+                            <option name="5" xsi:type="array">
+                                <item name="value" xsi:type="string">link</item>
+                                <item name="label" xsi:type="string" translate="true">The Link header (rel="next")</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="rest_page_param" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="470">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Page parameter</label>
+                <dataScope>source_config.page_param</dataScope>
+                <placeholder>page</placeholder>
+            </settings>
+        </field>
+        <field name="rest_page_start" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="480">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">First page</label>
+                <dataScope>source_config.page_start</dataScope>
+                <notice translate="true">Empty = 1 for page numbers, 0 for offsets.</notice>
+            </settings>
+        </field>
+        <field name="rest_size_param" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="490">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Page size parameter</label>
+                <dataScope>source_config.size_param</dataScope>
+                <placeholder>per_page</placeholder>
+                <notice translate="true">Optional; with it, a shorter page is the last one.</notice>
+            </settings>
+        </field>
+        <field name="rest_page_size" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="500">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Page size</label>
+                <dataScope>source_config.page_size</dataScope>
+                <placeholder>100</placeholder>
+            </settings>
+        </field>
+        <field name="rest_cursor_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="510">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">cursor</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Cursor in the answer</label>
+                <dataScope>source_config.cursor_path</dataScope>
+                <placeholder>meta.next_cursor</placeholder>
+            </settings>
+        </field>
+        <field name="rest_cursor_param" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="520">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">cursor</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Cursor parameter</label>
+                <dataScope>source_config.cursor_param</dataScope>
+                <placeholder>cursor</placeholder>
+            </settings>
+        </field>
+        <field name="rest_next_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="530">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">next_url</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Next address in the answer</label>
+                <dataScope>source_config.next_path</dataScope>
+                <placeholder>links.next</placeholder>
+            </settings>
+        </field>
+        <field name="rest_max_pages" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="540">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="source_config.paging" xsi:type="array">
+                            <item name="0" xsi:type="string">page</item>
+                            <item name="1" xsi:type="string">offset</item>
+                            <item name="2" xsi:type="string">cursor</item>
+                            <item name="3" xsi:type="string">next_url</item>
+                            <item name="4" xsi:type="string">link</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Pages at most</label>
+                <dataScope>source_config.max_pages</dataScope>
+                <placeholder>100</placeholder>
+                <notice translate="true">A run with more pages stops with an error and imports nothing.</notice>
+            </settings>
+        </field>
+        <field name="source_pattern" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="410">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -707,6 +966,9 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
+                        <item name="5" xsi:type="string">dropbox</item>
+                        <item name="6" xsi:type="string">onedrive</item>
                     </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
@@ -718,7 +980,7 @@
                 <placeholder>stock-*.csv</placeholder>
             </settings>
         </field>
-        <field name="source_pick" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="42">
+        <field name="source_pick" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="420">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -726,6 +988,9 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
+                        <item name="5" xsi:type="string">dropbox</item>
+                        <item name="6" xsi:type="string">onedrive</item>
                     </item>
                 </item>
             </argument>
@@ -762,7 +1027,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="source_all_on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="43">
+        <field name="source_all_on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="430">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -770,6 +1035,9 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
+                        <item name="5" xsi:type="string">dropbox</item>
+                        <item name="6" xsi:type="string">onedrive</item>
                     </item>
                     <item name="showWhen" xsi:type="array">
                         <item name="source_config.pick" xsi:type="array">
@@ -800,7 +1068,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="source_move_to" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="44">
+        <field name="source_move_to" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="440">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -808,6 +1076,9 @@
                         <item name="1" xsi:type="string">sftp</item>
                         <item name="2" xsi:type="string">ftp</item>
                         <item name="3" xsi:type="string">s3</item>
+                        <item name="4" xsi:type="string">google_drive</item>
+                        <item name="5" xsi:type="string">dropbox</item>
+                        <item name="6" xsi:type="string">onedrive</item>
                     </item>
                     <item name="showWhen" xsi:type="array">
                         <item name="after_success" xsi:type="array">
@@ -824,7 +1095,7 @@
                 <placeholder>processed</placeholder>
             </settings>
         </field>
-        <field name="export_destination" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="12">
+        <field name="export_destination" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="20">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">export</item>
@@ -842,7 +1113,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="export_file_name" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="14">
+        <field name="export_file_name" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">export</item>
@@ -856,7 +1127,7 @@
                 <placeholder>{entity}-{date}.{ext}</placeholder>
             </settings>
         </field>
-        <field name="dest_path_folder" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="20">
+        <field name="dest_path_folder" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -882,7 +1153,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="dest_overwrite" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="21">
+        <field name="dest_overwrite" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="60">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -913,13 +1184,17 @@
                 </select>
             </formElements>
         </field>
-        <field name="dest_connection" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="21">
+        <field name="dest_connection" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="70">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
                         <item name="2" xsi:type="string">s3</item>
+                        <item name="3" xsi:type="string">google_drive</item>
+                        <item name="4" xsi:type="string">dropbox</item>
+                        <item name="5" xsi:type="string">onedrive</item>
+                        <item name="6" xsi:type="string">rest</item>
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
@@ -938,7 +1213,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="dest_host" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="22">
+        <field name="dest_host" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="80">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -964,7 +1239,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="dest_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="23">
+        <field name="dest_port" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="90">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -990,7 +1265,7 @@
                 <notice translate="true">Empty = 22 for SFTP, 21 for FTP.</notice>
             </settings>
         </field>
-        <field name="dest_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="24">
+        <field name="dest_username" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="100">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -1015,7 +1290,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="dest_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="25">
+        <field name="dest_auth_sftp" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="110">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -1051,7 +1326,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="dest_password" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="26">
+        <field name="dest_password" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="120">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1090,7 +1365,7 @@
                 <notice translate="true">Stored encrypted, never shown again.</notice>
             </settings>
         </field>
-        <field name="dest_private_key" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="27">
+        <field name="dest_private_key" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="130">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -1119,7 +1394,7 @@
                 <notice translate="true">OpenSSH or PEM private key for key login. Stored encrypted, never shown again.</notice>
             </settings>
         </field>
-        <field name="dest_passphrase" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="28">
+        <field name="dest_passphrase" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="140">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -1146,7 +1421,7 @@
                 <dataScope>export_options.passphrase</dataScope>
             </settings>
         </field>
-        <field name="dest_ssl" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="29">
+        <field name="dest_ssl" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="160">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -1182,7 +1457,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="dest_passive" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="30">
+        <field name="dest_passive" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="190">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="showWhen" xsi:type="array">
@@ -1214,16 +1489,45 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="dest_path_remote" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="31">
+        <field name="dest_path_remote" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="220">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
                         <item name="0" xsi:type="string">sftp</item>
                         <item name="1" xsi:type="string">ftp</item>
                         <item name="2" xsi:type="string">s3</item>
+                        <item name="3" xsi:type="string">google_drive</item>
+                        <item name="4" xsi:type="string">dropbox</item>
+                        <item name="5" xsi:type="string">onedrive</item>
+                        <item name="6" xsi:type="string">rest</item>
                     </item>
                     <item name="forDirection" xsi:type="string">export</item>
                     <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="typeGroups" xsi:type="array">
+                        <item name="sftp" xsi:type="string">remote</item>
+                        <item name="ftp" xsi:type="string">remote</item>
+                        <item name="s3" xsi:type="string">remote</item>
+                        <item name="google_drive" xsi:type="string">remote</item>
+                        <item name="dropbox" xsi:type="string">remote</item>
+                        <item name="onedrive" xsi:type="string">remote</item>
+                        <item name="rest" xsi:type="string">rest</item>
+                    </item>
+                    <item name="noticeByType" xsi:type="array">
+                        <item name="sftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
+                        <item name="ftp" xsi:type="string" translate="true">The folder on the server; empty = where the login lands.</item>
+                        <item name="s3" xsi:type="string" translate="true">The folder in the bucket (key prefix), e.g. exports; empty = the top of the bucket.</item>
+                        <item name="google_drive" xsi:type="string" translate="true">The link of the Drive folder, its id, or a path from My Drive such as Shop/exports.</item>
+                        <item name="dropbox" xsi:type="string" translate="true">The folder from the top of the Dropbox (or of the app folder), e.g. Shop/exports; empty = the top.</item>
+                        <item name="onedrive" xsi:type="string" translate="true">The folder in the OneDrive or the SharePoint library, e.g. Shop/exports; empty = the top.</item>
+                        <item name="rest" xsi:type="string" translate="true">The path after the connection's base address that receives the file or the records, e.g. /import.</item>
+                    </item>
+                    <item name="labelByType" xsi:type="array">
+                        <item name="rest" xsi:type="string" translate="true">Path</item>
+                        <item name="google_drive" xsi:type="string" translate="true">Folder</item>
+                        <item name="dropbox" xsi:type="string" translate="true">Folder</item>
+                        <item name="onedrive" xsi:type="string" translate="true">Folder</item>
+                        <item name="s3" xsi:type="string" translate="true">Folder</item>
+                    </item>
                     <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
                 </item>
             </argument>
@@ -1234,7 +1538,118 @@
                 <placeholder>/incoming</placeholder>
             </settings>
         </field>
-        <field name="dest_emails" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="32">
+        <field name="dest_as_sheet" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="230">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">google_drive</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Save as a Google Sheet</label>
+                <dataScope>export_options.as_sheet</dataScope>
+                <notice translate="true">The file becomes a Google Sheet; the next export replaces its content and keeps its link.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="dest_method" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="260">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Method</label>
+                <dataScope>export_options.method</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">POST</item>
+                                <item name="label" xsi:type="string" translate="true">POST</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">PUT</item>
+                                <item name="label" xsi:type="string" translate="true">PUT</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="dest_send" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="300">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Send</label>
+                <dataScope>export_options.send</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">file</item>
+                                <item name="label" xsi:type="string" translate="true">The file</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">batches</item>
+                                <item name="label" xsi:type="string" translate="true">JSON records in batches</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="dest_batch_size" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="340">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">rest</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">export_options.destination</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="export_options.send" xsi:type="array">
+                            <item name="0" xsi:type="string">batches</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/source-field</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Records per batch</label>
+                <dataScope>export_options.batch_size</dataScope>
+                <placeholder>100</placeholder>
+            </settings>
+        </field>
+        <field name="dest_emails" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="270">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1255,7 +1670,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="dest_subject" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="33">
+        <field name="dest_subject" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="310">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1272,7 +1687,7 @@
                 <notice translate="true">Empty = "OpenImport export: (profile name)".</notice>
             </settings>
         </field>
-        <field name="source_test" component="Iranimij_OpenImport/js/form/test-source" formElement="input" sortOrder="90">
+        <field name="source_test" component="Iranimij_OpenImport/js/form/test-source" formElement="input" sortOrder="550">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="testUrl" xsi:type="url" path="openimport/profile/testSource"/>
@@ -1358,7 +1773,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="has_header" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="40">
+        <field name="has_header" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="60">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">any</item>
@@ -1371,6 +1786,7 @@
                                 <item name="0" xsi:type="string">auto</item>
                                 <item name="1" xsi:type="string">csv</item>
                                 <item name="2" xsi:type="string">xlsx</item>
+                                <item name="3" xsi:type="string">ods</item>
                             </item>
                         </item>
                         <item name="1" xsi:type="array">
@@ -1400,7 +1816,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="sheet" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="50">
+        <field name="sheet" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="70">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1408,17 +1824,18 @@
                         <item name="format" xsi:type="array">
                             <item name="0" xsi:type="string">auto</item>
                             <item name="1" xsi:type="string">xlsx</item>
+                            <item name="2" xsi:type="string">ods</item>
                         </item>
                     </item>
                 </item>
             </argument>
             <settings>
-                <label translate="true">Sheet (Excel)</label>
+                <label translate="true">Sheet (Excel, OpenDocument)</label>
                 <dataScope>format_options.sheet</dataScope>
                 <notice translate="true">Name or position; empty = first sheet.</notice>
             </settings>
         </field>
-        <field name="record_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="60">
+        <field name="record_path" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="80">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1437,7 +1854,7 @@
                 <notice translate="true">JSON: data.items · XML: /catalog/product or //product. Empty = detect.</notice>
             </settings>
         </field>
-        <field name="out_bom" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="32">
+        <field name="out_bom" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1464,7 +1881,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="out_line_ending" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="33">
+        <field name="out_line_ending" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1496,7 +1913,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="out_root" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="61">
+        <field name="out_root" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="90">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1515,7 +1932,7 @@
                 <placeholder>export</placeholder>
             </settings>
         </field>
-        <field name="out_record" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="62">
+        <field name="out_record" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="100">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1533,7 +1950,7 @@
                 <placeholder>item</placeholder>
             </settings>
         </field>
-        <field name="out_pretty" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="63">
+        <field name="out_pretty" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="110">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1559,7 +1976,133 @@
                 </checkbox>
             </formElements>
         </field>
-        <container name="sample" component="Iranimij_OpenImport/js/form/sample-table" sortOrder="70">
+        <field name="xslt" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="120">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="format" xsi:type="array">
+                            <item name="0" xsi:type="string">auto</item>
+                            <item name="1" xsi:type="string">xml</item>
+                        </item>
+                    </item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/textarea</item>
+                    <item name="rows" xsi:type="number">8</item>
+                    <item name="placeholder" xsi:type="string">&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt; …</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">XSLT before reading (XML)</label>
+                <dataScope>format_options.xslt</dataScope>
+                <notice translate="true">An XSLT 1.0 stylesheet that turns the file into the XML OpenImport reads (one element per record). No document(), include or import; the file must fit in memory. Empty = none.</notice>
+            </settings>
+        </field>
+        <field name="out_xslt" component="Iranimij_OpenImport/js/form/source-field" formElement="textarea" sortOrder="130">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">xml</item>
+                    </item>
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="typeField" xsi:type="string">format</item>
+                    <item name="elementTmpl" xsi:type="string">Iranimij_OpenImport/form/textarea</item>
+                    <item name="rows" xsi:type="number">8</item>
+                    <item name="placeholder" xsi:type="string">&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt; …</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">XSLT after writing (XML)</label>
+                <dataScope>export_options.xslt</dataScope>
+                <notice translate="true">An XSLT 1.0 stylesheet applied to the written XML (root and record names as set above) before it is delivered: any layout a partner wants. Empty = none.</notice>
+            </settings>
+        </field>
+        <field name="archive" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="140">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="default" xsi:type="string">auto</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Archives (ZIP, gzip, tar)</label>
+                <dataScope>format_options.archive</dataScope>
+                <notice translate="true">A .zip, .gz, .tar or .tar.gz file is unpacked and the file inside is read. Archives inside archives are not unpacked.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">auto</item>
+                                <item name="label" xsi:type="string" translate="true">Unpack archives</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">none</item>
+                                <item name="label" xsi:type="string" translate="true">Read the file as it is</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="archive_entry" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="150">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="format_options.archive" xsi:type="array">
+                            <item name="not" xsi:type="array">
+                                <item name="0" xsi:type="string">none</item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">File inside the archive</label>
+                <dataScope>format_options.archive_entry</dataScope>
+                <notice translate="true">Name or pattern such as products-*.csv or data/*.xml. Empty = the first CSV, Excel, ODS, JSON or XML file by name.</notice>
+                <placeholder>*.csv</placeholder>
+            </settings>
+        </field>
+        <field name="out_compress" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="160">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">export</item>
+                    <item name="default" xsi:type="string">none</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Compress</label>
+                <dataScope>export_options.compress</dataScope>
+                <notice translate="true">The export file is packed before it is delivered; its name gets the archive's extension.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">none</item>
+                                <item name="label" xsi:type="string" translate="true">No</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">zip</item>
+                                <item name="label" xsi:type="string" translate="true">ZIP (.zip)</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">gz</item>
+                                <item name="label" xsi:type="string" translate="true">gzip (.gz)</item>
+                            </option>
+                            <option name="3" xsi:type="array">
+                                <item name="value" xsi:type="string">tar.gz</item>
+                                <item name="label" xsi:type="string" translate="true">tar.gz</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <container name="sample" component="Iranimij_OpenImport/js/form/sample-table" sortOrder="170">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="template" xsi:type="string">Iranimij_OpenImport/form/sample-table</item>
@@ -1596,7 +2139,7 @@
             <collapsible>true</collapsible>
             <opened>false</opened>
         </settings>
-        <field name="order_only" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="1">
+        <field name="order_only" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="10">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1631,7 +2174,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="order_statuses" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="2">
+        <field name="order_statuses" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="20">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1655,7 +2198,7 @@
                 </multiselect>
             </formElements>
         </field>
-        <field name="order_from" component="Iranimij_OpenImport/js/form/source-date" formElement="date" sortOrder="3">
+        <field name="order_from" component="Iranimij_OpenImport/js/form/source-date" formElement="date" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1677,7 +2220,7 @@
                 <notice translate="true">A day in the time zone of Stores › Configuration › General › Locale. Empty = no limit.</notice>
             </settings>
         </field>
-        <field name="order_to" component="Iranimij_OpenImport/js/form/source-date" formElement="date" sortOrder="4">
+        <field name="order_to" component="Iranimij_OpenImport/js/form/source-date" formElement="date" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forTypes" xsi:type="array">
@@ -1699,10 +2242,17 @@
                 <dataScope>export_options.order.to</dataScope>
             </settings>
         </field>
-        <field name="behavior" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="10">
+        <field name="behavior" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
+                    <item name="noticeByValue" xsi:type="array">
+                        <item name="add_update" xsi:type="string" translate="true">Creates the records that are new and updates the others; columns the file does not have stay as they are.</item>
+                        <item name="only_add" xsi:type="string" translate="true">Creates the records that are not in the shop yet; rows of existing records are skipped (the run lists them).</item>
+                        <item name="only_update" xsi:type="string" translate="true">Updates existing records only; rows of records that are not in the shop are skipped (the run lists them).</item>
+                        <item name="replace" xsi:type="string" translate="true">Deletes each record of the file and creates it again from the file alone: values the file does not have are lost, and products get new ids (links by id, such as reviews and wish lists, are lost). Products keep their URL key.</item>
+                        <item name="delete" xsi:type="string" translate="true">Deletes the records of the file.</item>
+                    </item>
                 </item>
             </argument>
             <settings>
@@ -1718,7 +2268,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="20">
+        <field name="on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="60">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1736,7 +2286,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="qty_mode" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="25">
+        <field name="qty_mode" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="70">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1770,7 +2320,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="url_key_pattern" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="26">
+        <field name="url_key_pattern" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="80">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1786,7 +2336,7 @@
                 <notice translate="true">For example {name}-{sku}: Magento fields in braces. Used for rows whose URL key is empty; empty = Magento makes the key from the name.</notice>
             </settings>
         </field>
-        <field name="url_redirects" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="27">
+        <field name="url_redirects" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="90">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1813,7 +2363,93 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="allowed_errors" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="30">
+        <field name="order_number" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="100">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Order numbers</label>
+                <dataScope>import_options.order_number</dataScope>
+                <notice translate="true">Keep: the file's numbers are the shop's order numbers (an order that exists is skipped). Generate: every order gets the next number of its store; the file's number only groups the rows.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="keep" xsi:type="array">
+                                <item name="value" xsi:type="string">keep</item>
+                                <item name="label" xsi:type="string" translate="true">Keep the file's numbers</item>
+                            </option>
+                            <option name="generate" xsi:type="array">
+                                <item name="value" xsi:type="string">generate</item>
+                                <item name="label" xsi:type="string" translate="true">Generate new numbers</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="order_documents" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="110">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Create invoices, shipments and credit memos</label>
+                <dataScope>import_options.order_documents</dataScope>
+                <notice translate="true">From the invoiced, shipped and refunded quantities of the items, through Magento's own services (offline, nothing is charged, no e-mails). The state and status of the file are kept.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="order_stock" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="120">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">import</item>
+                    <item name="forTypes" xsi:type="array">
+                        <item name="0" xsi:type="string">openimport_order</item>
+                    </item>
+                    <item name="typeField" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Reduce stock</label>
+                <dataScope>import_options.order_stock</dataScope>
+                <notice translate="true">Subtract the ordered quantities from the products' stock, as a new order would. Off: historic orders leave the stock alone.</notice>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="allowed_errors" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="130">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="addafter" xsi:type="string" translate="true">rows</item>
@@ -1832,7 +2468,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="images_on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="31">
+        <field name="images_on_error" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="140">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1864,7 +2500,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="configurable" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="32">
+        <field name="configurable" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="150">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1891,7 +2527,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="configurable_attributes" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="33">
+        <field name="configurable_attributes" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="160">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1925,7 +2561,7 @@
                 </multiselect>
             </formElements>
         </field>
-        <field name="configurable_child_visibility" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="34">
+        <field name="configurable_child_visibility" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="170">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -1961,7 +2597,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="missing_action" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="35">
+        <field name="missing_action" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="180">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -2001,7 +2637,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="missing_scope" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="36">
+        <field name="missing_scope" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="190">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -2043,7 +2679,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="missing_website" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="37">
+        <field name="missing_website" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="200">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -2070,7 +2706,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="missing_attribute" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="38">
+        <field name="missing_attribute" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="210">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -2096,7 +2732,7 @@
                 <notice translate="true">For example supplier or manufacturer.</notice>
             </settings>
         </field>
-        <field name="missing_value" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="39">
+        <field name="missing_value" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="220">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -2122,7 +2758,7 @@
                 <notice translate="true">The option label for dropdowns, e.g. the supplier's name.</notice>
             </settings>
         </field>
-        <field name="delta" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="40">
+        <field name="delta" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="230">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">import</item>
@@ -2145,7 +2781,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="safety_threshold" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="50">
+        <field name="safety_threshold" component="Iranimij_OpenImport/js/form/source-field" formElement="input" sortOrder="240">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="addafter" xsi:type="string" translate="true">% of the records</item>
@@ -2165,7 +2801,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="filter_mode" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="60">
+        <field name="filter_mode" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="250">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">any</item>
@@ -2220,7 +2856,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="filter_match" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="70">
+        <field name="filter_match" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="260">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">any</item>
@@ -2252,7 +2888,7 @@
                 </select>
             </formElements>
         </field>
-        <dynamicRows name="row_filters" sortOrder="80">
+        <dynamicRows name="row_filters" sortOrder="270">
             <settings>
                 <label translate="true">Conditions</label>
                 <addButtonLabel translate="true">Add condition</addButtonLabel>
@@ -2401,21 +3037,74 @@
                 <notice translate="true">minute hour day month weekday, for example 30 5 * * 1-6</notice>
             </settings>
         </field>
-        <field name="is_active" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="30">
+        <field name="trigger_events" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="23">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">any</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Also run when</label>
+                <dataScope>triggers.events</dataScope>
+                <notice translate="true">Starts a live run within a minute after the event, while automatic runs are on. Many events in a minute make one run; what OpenImport's own runs write starts nothing (use "Then run" for that). Hold Ctrl or ⌘ to choose several.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Trigger\TriggerEvents"/>
+                        <size>6</size>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="trigger_order_statuses" component="Iranimij_OpenImport/js/form/source-multiselect" formElement="multiselect" sortOrder="26">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="forDirection" xsi:type="string">any</item>
                     <item name="showWhen" xsi:type="array">
-                        <item name="schedule_preset" xsi:type="array">
-                            <item name="filled" xsi:type="string">1</item>
+                        <item name="triggers.events" xsi:type="array">
+                            <item name="match" xsi:type="string">order_status_changed</item>
                         </item>
                     </item>
                 </item>
             </argument>
             <settings>
-                <label translate="true">Schedule is on</label>
+                <label translate="true">To the statuses</label>
+                <dataScope>triggers.order_statuses</dataScope>
+                <notice translate="true">"An order changes status" runs only for these new statuses. None chosen = every change.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\OrderStatus"/>
+                        <size>6</size>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="is_active" component="Iranimij_OpenImport/js/form/source-checkbox" formElement="checkbox" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <!-- One of: a schedule, a trigger. -->
+                    <item name="showWhen" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="schedule_preset" xsi:type="array">
+                                <item name="filled" xsi:type="string">1</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="triggers.events" xsi:type="array">
+                                <item name="filled" xsi:type="string">1</item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Automatic runs are on</label>
                 <dataScope>is_active</dataScope>
-                <notice translate="true">New profiles start off: switch the schedule on after a dry run you are happy with.</notice>
+                <notice translate="true">The schedule and the triggers start runs only while this is on. New profiles start off: switch it on after a dry run you are happy with.</notice>
             </settings>
             <formElements>
                 <checkbox>
@@ -2468,6 +3157,45 @@
                 <notice translate="true">Comma-separated. Empty = the admin who created the profile.</notice>
             </settings>
         </field>
+        <field name="then_profile_id" formElement="select" sortOrder="70">
+            <settings>
+                <label translate="true">Then run</label>
+                <dataScope>then_profile_id</dataScope>
+                <notice translate="true">Job chain: the profile that runs after this one (as a live run, with this run as its parent). Not after dry runs. A profile cannot run again in the same chain.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\ThenProfile"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="then_when" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="75">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="forDirection" xsi:type="string">any</item>
+                    <item name="showWhen" xsi:type="array">
+                        <item name="then_profile_id" xsi:type="array">
+                            <item name="not" xsi:type="array">
+                                <item name="0" xsi:type="string"></item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">When</label>
+                <dataScope>then_when</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Iranimij\OpenImport\Model\Config\Source\ThenWhen"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="after_success" component="Iranimij_OpenImport/js/form/source-select" formElement="select" sortOrder="60">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -2478,6 +3206,9 @@
                             <item name="1" xsi:type="string">sftp</item>
                             <item name="2" xsi:type="string">ftp</item>
                             <item name="3" xsi:type="string">s3</item>
+                            <item name="4" xsi:type="string">google_drive</item>
+                            <item name="5" xsi:type="string">dropbox</item>
+                            <item name="6" xsi:type="string">onedrive</item>
                         </item>
                     </item>
                 </item>

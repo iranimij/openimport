@@ -32,7 +32,12 @@ class ProfileJson
     private const FIELDS = ['name', 'direction', 'entity', 'is_active', 'source_type', 'source_config', 'format',
         'format_options', 'behavior', 'on_error', 'allowed_errors', 'delta', 'safety_threshold', 'schedule',
         'after_success', 'notify', 'notify_emails', 'row_filters', 'export_options', 'import_options', 'mapping',
-        'value_maps'];
+        'value_maps', 'then_profile', 'then_when', 'triggers'];
+
+    /**
+     * @var array<int, string> prepared profile index => the name of the profile to run next (resolved on save)
+     */
+    private array $chains = [];
 
     /**
      * @param ProfileRepositoryInterface $profiles
@@ -94,6 +99,9 @@ class ProfileJson
             'row_filters' => $profile->getRowFilters(),
             'export_options' => $this->connectionByName($this->secrets->strip($profile->getExportOptions())),
             'import_options' => $profile->getImportOptions(),
+            'then_profile' => $this->thenProfileName($profile),
+            'then_when' => $profile->getThenWhen(),
+            'triggers' => $profile->getTriggers(),
             'mapping' => $profile->getMapping(),
             'value_maps' => $profile->getValueMaps(),
         ];
@@ -109,6 +117,12 @@ class ProfileJson
     public function prepare(string $json): array
     {
         $data = json_decode($json, true);
+        if ($data === null && trim($json) !== 'null') {
+            throw new \InvalidArgumentException(sprintf(
+                'The file is not valid JSON (%s). Use a file from "Download as JSON" or openimport:profiles:export.',
+                trim($json) === '' ? 'it is empty' : json_last_error_msg()
+            ));
+        }
         if (!is_array($data) || !isset($data['profiles']) || !is_array($data['profiles'])) {
             throw new \InvalidArgumentException('The file is not an OpenImport profile export (no "profiles" list).');
         }
@@ -118,6 +132,13 @@ class ProfileJson
         $prepared = [];
         $problems = [];
         $names = [];
+        $this->chains = [];
+        $fileNames = [];
+        foreach ($data['profiles'] as $row) {
+            if (is_array($row) && !empty($row['name'])) {
+                $fileNames[strtolower((string) $row['name'])] = true;
+            }
+        }
         foreach (array_values($data['profiles']) as $position => $row) {
             $label = is_array($row) && !empty($row['name']) ? (string) $row['name'] : sprintf('profile %d', $position + 1);
             if (!is_array($row)) {
@@ -147,7 +168,23 @@ class ProfileJson
             } catch (NoSuchEntityException $exception) {
                 $existing = null;
             }
+            $wasActive = $existing !== null && $existing->isActive();
             $profile = $this->apply($existing ?? $this->factory->create(), $row);
+            $next = is_scalar($row['then_profile'] ?? null) ? trim((string) $row['then_profile']) : '';
+            if ($next !== '') {
+                try {
+                    $profile->setThenProfileId((int) $this->profiles->getByName($next)->getProfileId());
+                } catch (NoSuchEntityException $exception) {
+                    if (!isset($fileNames[strtolower($next)])) {
+                        $problems[] = sprintf('%s: there is no profile named "%s" to run next.', $label, $next);
+                    }
+                    // A profile of this file: linked once every profile is saved.
+                    $this->chains[count($prepared)] = $next;
+                }
+            }
+            // Automatic runs are never switched on by a file: new profiles start off (run a dry run first), updated
+            // ones keep their state.
+            $profile->setIsActive($wasActive);
             foreach ($this->validator->validate($profile) as $problem) {
                 $problems[] = $label . ': ' . $problem;
             }
@@ -174,8 +211,30 @@ class ProfileJson
             $this->profiles->save($profile);
             $exists ? $updated++ : $created++;
         }
+        foreach ($this->chains as $index => $next) {
+            [$profile] = $prepared[$index];
+            $profile->setThenProfileId((int) $this->profiles->getByName($next)->getProfileId());
+            $this->profiles->save($profile);
+        }
+        $this->chains = [];
 
         return [$created, $updated];
+    }
+
+    /**
+     * @param ProfileInterface $profile
+     * @return string the name of the profile that runs next, "" for none
+     */
+    private function thenProfileName(ProfileInterface $profile): string
+    {
+        if ($profile->getThenProfileId() === null) {
+            return '';
+        }
+        try {
+            return $this->profiles->getById($profile->getThenProfileId())->getName();
+        } catch (NoSuchEntityException $exception) {
+            return '';
+        }
     }
 
     /**
@@ -254,6 +313,9 @@ class ProfileJson
             ->setAfterSuccess($text('after_success', 'keep'))
             ->setNotify($text('notify', 'failure'))
             ->setNotifyEmails($text('notify_emails', ''))
+            ->setThenProfileId(null)
+            ->setThenWhen($text('then_when', ProfileInterface::THEN_SUCCESS))
+            ->setTriggers($list('triggers'))
             ->setRowFilters($list('row_filters'))
             ->setExportOptions($export)
             ->setImportOptions($list('import_options'))

@@ -127,10 +127,10 @@ class CmsImporter implements ImporterInterface
         }
         $existing = $this->records->find($this->kind, $identifier, $this->storeIds($row, $stores));
         if ($behavior === Import::BEHAVIOR_DELETE && $existing === null) {
-            return ['identifier', 'there is no such ' . $this->kind];
+            return ['identifier', $this->kind === CmsRecords::PAGE ? 'there is no such page' : 'there is no such block'];
         }
         if ($behavior !== Import::BEHAVIOR_DELETE && $existing === null && trim((string) ($row['title'] ?? '')) === '') {
-            return ['title', 'a new ' . $this->kind . ' needs a title'];
+            return ['title', $this->kind === CmsRecords::PAGE ? 'a new page needs a title' : 'a new block needs a title'];
         }
 
         return null;

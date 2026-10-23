@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Controller\Adminhtml\Run;
 
 use Iranimij\OpenImport\Api\RunRepositoryInterface;
+use Iranimij\OpenImport\Model\Execution\RunFiles;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -26,10 +27,12 @@ class Status extends Action implements HttpGetActionInterface
     /**
      * @param Context $context
      * @param RunRepositoryInterface $runs
+     * @param RunFiles $runFiles
      */
     public function __construct(
         Context $context,
-        private readonly RunRepositoryInterface $runs
+        private readonly RunRepositoryInterface $runs,
+        private readonly RunFiles $runFiles
     ) {
         parent::__construct($context);
     }
@@ -51,6 +54,7 @@ class Status extends Action implements HttpGetActionInterface
             'status' => $run->getStatus(),
             'progress' => $run->getProgressRows(),
             'counts' => $run->getCounts(),
+            'writing' => $run->getStatus() === 'running' && $this->runFiles->isWriting((int) $run->getRunId()),
         ]);
     }
 }

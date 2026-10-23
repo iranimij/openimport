@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Iranimij\OpenImport\Controller\Adminhtml\Profile;
 
+use Iranimij\OpenImport\Model\Admin\FileAccess;
 use Iranimij\OpenImport\Model\Admin\FileSample;
 use Iranimij\OpenImport\Model\Admin\UploadStore;
 use Iranimij\OpenImport\Model\Reader\ReaderException;
@@ -16,6 +17,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * The first rows of an uploaded file with the format options chosen in the form (re-read when options change).
@@ -28,11 +30,15 @@ class Sample extends Action implements HttpPostActionInterface
      * @param Context $context
      * @param UploadStore $uploads
      * @param FileSample $sample
+     * @param FileAccess $fileAccess
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly UploadStore $uploads,
-        private readonly FileSample $sample
+        private readonly FileSample $sample,
+        private readonly FileAccess $fileAccess,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -44,7 +50,8 @@ class Sample extends Action implements HttpPostActionInterface
     {
         /** @var Json $json */
         $json = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $path = $this->uploads->path((string) $this->getRequest()->getParam('file'));
+        $token = (string) $this->getRequest()->getParam('file');
+        $path = $this->uploads->path($token);
         if ($path === null) {
             return $json->setData(['error' => (string) __('Upload a file first.')]);
         }
@@ -57,7 +64,14 @@ class Sample extends Action implements HttpPostActionInterface
                 is_array($options) ? $options : []
             );
         } catch (ReaderException $exception) {
-            return $json->setData(['error' => $exception->getMessage()]);
+            return $json->setData(['error' => $this->text->translate($exception->getMessage())]);
+        }
+
+        if (!$this->fileAccess->canSee($token)) {
+            $data['rows'] = [];
+            $data['warnings'] = [(string) __(
+                'The file\'s rows are not shown: your role may not see file contents ("Download run files").'
+            )];
         }
 
         return $json->setData($data);

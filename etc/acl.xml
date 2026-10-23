@@ -18,6 +18,7 @@
                             <resource id="Iranimij_OpenImport::run" title="Run profiles (dry run and live)" translate="title" sortOrder="30"/>
                             <resource id="Iranimij_OpenImport::run_destructive" title="Confirm runs above the safety limit" translate="title" sortOrder="40"/>
                             <resource id="Iranimij_OpenImport::runs" title="View runs and error reports" translate="title" sortOrder="50"/>
+                            <resource id="Iranimij_OpenImport::run_files" title="Download run files (the imported file, the export)" translate="title" sortOrder="55"/>
                             <resource id="Iranimij_OpenImport::connections" title="Manage connections" translate="title" sortOrder="60"/>
                         </resource>
                     </resource>

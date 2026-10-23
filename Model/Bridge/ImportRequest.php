@@ -27,6 +27,7 @@ class ImportRequest
      * @param string $imagesDirectory folder core reads pictures from: absolute, or relative to the Magento root
      *                                ('' = core's default, pub/media/import)
      * @param string $historyLabel name shown in core's System › Data Transfer › Import History
+     * @param array<string, mixed> $options the profile's import options, for OpenImport's own importers
      */
     public function __construct(
         public readonly string $entity,
@@ -37,7 +38,8 @@ class ImportRequest
         public readonly string $multipleValueSeparator = Import::DEFAULT_GLOBAL_MULTI_VALUE_SEPARATOR,
         public readonly string $emptyValueConstant = Import::DEFAULT_EMPTY_ATTRIBUTE_VALUE_CONSTANT,
         public readonly string $imagesDirectory = '',
-        public readonly string $historyLabel = 'openimport.csv'
+        public readonly string $historyLabel = 'openimport.csv',
+        public readonly array $options = []
     ) {
     }
 

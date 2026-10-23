@@ -22,6 +22,7 @@ use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Saves the profile form; "Save and dry run" queues a dry run and opens its page.
@@ -41,6 +42,7 @@ class Save extends Action implements HttpPostActionInterface
      * @param RunStarter $runStarter
      * @param Session $authSession
      * @param ProblemLocator $problemLocator
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
@@ -50,7 +52,8 @@ class Save extends Action implements HttpPostActionInterface
         private readonly DataPersistorInterface $dataPersistor,
         private readonly RunStarter $runStarter,
         private readonly Session $authSession,
-        private readonly ProblemLocator $problemLocator
+        private readonly ProblemLocator $problemLocator,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -72,7 +75,7 @@ class Save extends Action implements HttpPostActionInterface
             $profile = $this->profiles->save($this->mapper->fromForm($data, $profile));
             $this->dataPersistor->clear(self::PERSIST_KEY);
         } catch (LocalizedException $exception) {
-            $problems = explode("\n", $exception->getMessage());
+            $problems = explode("\n", $this->text->translate($exception->getMessage()));
             foreach ($problems as $problem) {
                 $this->messageManager->addErrorMessage($problem);
             }
@@ -91,7 +94,7 @@ class Save extends Action implements HttpPostActionInterface
                 $run = $this->runStarter->start($profile, RunInterface::MODE_DRY_RUN);
                 return $redirect->setPath('*/run/view', ['id' => $run->getRunId()]);
             } catch (LocalizedException $exception) {
-                $this->messageManager->addErrorMessage($exception->getMessage());
+                $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
             }
         }
         if ($this->getRequest()->getParam('back') !== null) {

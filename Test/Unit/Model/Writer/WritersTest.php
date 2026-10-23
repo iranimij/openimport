@@ -15,6 +15,7 @@ use Iranimij\OpenImport\Model\Value\NumberText;
 use Iranimij\OpenImport\Model\Writer\Cells;
 use Iranimij\OpenImport\Model\Writer\CsvWriter;
 use Iranimij\OpenImport\Model\Writer\JsonWriter;
+use Iranimij\OpenImport\Model\Writer\OdsWriter;
 use Iranimij\OpenImport\Model\Writer\WriterException;
 use Iranimij\OpenImport\Model\Writer\WriterInterface;
 use Iranimij\OpenImport\Model\Writer\XlsxWriter;
@@ -145,6 +146,42 @@ class WritersTest extends TestCase
         self::assertSame('9.99', $rows[1]['price']);
         self::assertSame('00123', $rows[1]['sku']);
         self::assertFalse(file_exists($path . '.sheet.xml'), 'temporary sheet removed');
+    }
+
+    public function testOdsRoundTrip(): void
+    {
+        $writer = new OdsWriter($this->cells(), new NumberParser());
+        $path = $this->writeAll($writer, ['sheet' => 'Preise [2026]']);
+
+        $zip = new \ZipArchive();
+        self::assertTrue($zip->open($path));
+        self::assertSame('mimetype', $zip->getNameIndex(0), 'mimetype first');
+        self::assertSame(\ZipArchive::CM_STORE, $zip->statIndex(0)['comp_method'], 'mimetype uncompressed');
+        self::assertSame(OdsWriter::MIME, $zip->getFromName('mimetype'));
+        $content = (string) $zip->getFromName('content.xml');
+        self::assertStringContainsString('table:name="Preise  2026"', $content);
+        self::assertStringContainsString('office:value-type="float" office:value="12.50"', $content, 'numbers');
+        self::assertStringContainsString('<text:p>00123</text:p>', $content, 'leading zeros stay text');
+        self::assertStringContainsString('<text:p>line1</text:p><text:p>line2</text:p>', $content, 'paragraphs');
+        self::assertStringContainsString('&apos;=SUM(A1)', $content, 'formula guard');
+        self::assertStringContainsString('<table:table-cell table:number-columns-repeated="2"/>', $content, 'empty qty and note');
+        self::assertStringContainsString('<table:table-header-rows>', $content);
+        $zip->close();
+        self::assertSame(2, $writer->count());
+
+        $rows = $this->readBack($path, 'ods');
+        self::assertCount(2, $rows);
+        self::assertSame(['sku', 'name', 'price', 'qty', 'note', 'formula'], array_keys($rows[0]));
+        self::assertSame('Jacke "Regen"', $rows[0]['name']);
+        self::assertSame("line1\nline2", $rows[0]['note']);
+        self::assertSame('12.5', $rows[0]['price'], 'numbers come back as numbers, as from Excel');
+        self::assertSame('3', $rows[0]['qty']);
+        self::assertSame('9.99', $rows[1]['price']);
+        self::assertSame('00123', $rows[1]['sku']);
+        self::assertSame('', $rows[1]['qty']);
+        self::assertSame('=SUM(A1)', $rows[0]['formula'], 'the reader takes the guard\'s apostrophe off again');
+        self::assertFalse(file_exists($path . '.content.xml'), 'temporary content removed');
+        self::assertSame('ods', (new ReaderFactory())->detect($path, 'download.bin'), 'detected by the mimetype entry');
     }
 
     public function testJsonRoundTrip(): void

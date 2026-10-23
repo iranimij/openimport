@@ -72,6 +72,81 @@
             <argument name="kind" xsi:type="string">block</argument>
         </arguments>
     </virtualType>
+    <virtualType name="OpenImportCartRuleImporter" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleImporter">
+        <arguments>
+            <argument name="kind" xsi:type="string">cart</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCartRuleSource" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleEntitySource">
+        <arguments>
+            <argument name="kind" xsi:type="string">cart</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCartRuleReader" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">OpenImportCartRuleSource</argument>
+            <argument name="kind" xsi:type="string">cart</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCatalogRuleImporter" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleImporter">
+        <arguments>
+            <argument name="kind" xsi:type="string">catalog</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCatalogRuleSource" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleEntitySource">
+        <arguments>
+            <argument name="kind" xsi:type="string">catalog</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportReviewReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\ReviewSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="product_sku" xsi:type="string">product_sku</item>
+                <item name="nickname" xsi:type="string">nickname</item>
+                <item name="title" xsi:type="string">title</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportNewsletterReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\NewsletterSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="email" xsi:type="string">email</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportSearchTermReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SearchTermSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="query_text" xsi:type="string">query_text</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportSynonymReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SynonymSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="synonyms" xsi:type="string">synonyms</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCategoryPositionReader" type="Iranimij\OpenImport\Model\Import\Small\SmallRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\CategoryPositionSource</argument>
+            <argument name="identifier" xsi:type="array">
+                <item name="category_path" xsi:type="string">category_path</item>
+                <item name="product_sku" xsi:type="string">product_sku</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="OpenImportCatalogRuleReader" type="Iranimij\OpenImport\Model\Import\PriceRule\PriceRuleRecordReader">
+        <arguments>
+            <argument name="source" xsi:type="object">OpenImportCatalogRuleSource</argument>
+            <argument name="kind" xsi:type="string">catalog</argument>
+        </arguments>
+    </virtualType>
     <!-- OpenImport's own importers; every other entity goes through core's import engine. -->
     <type name="Iranimij\OpenImport\Model\Bridge\ImporterPool">
         <arguments>
@@ -80,7 +155,22 @@
                 <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeImporter</item>
                 <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageImporter</item>
                 <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockImporter</item>
+                <item name="openimport_shipment" xsi:type="object">Iranimij\OpenImport\Model\Import\Shipment\ShipmentImporter</item>
+                <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteImporter</item>
+                <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleImporter</item>
+                <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleImporter</item>
+                <item name="openimport_review" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\ReviewImporter</item>
+                <item name="openimport_newsletter" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\NewsletterImporter</item>
+                <item name="openimport_search_term" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SearchTermImporter</item>
+                <item name="openimport_search_synonym" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SynonymImporter</item>
+                <item name="openimport_category_position" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\CategoryPositionImporter</item>
+                <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Import\Order\OrderImporter</item>
             </argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Model\Admin\FileAccess">
+        <arguments>
+            <argument name="session" xsi:type="object">Magento\Backend\Model\Session\Storage</argument>
         </arguments>
     </type>
     <type name="Iranimij\OpenImport\Model\Pipeline\Step\RowStepPool">
@@ -88,6 +178,7 @@
             <argument name="steps" xsi:type="array">
                 <item name="images" xsi:type="object">Iranimij\OpenImport\Model\Image\ImageStep</item>
                 <item name="url_keys" xsi:type="object">Iranimij\OpenImport\Model\UrlKey\UrlKeyStep</item>
+                <item name="replace_url_keys" xsi:type="object">Iranimij\OpenImport\Model\UrlKey\ReplaceUrlKeyStep</item>
                 <item name="configurable" xsi:type="object">Iranimij\OpenImport\Model\Configurable\ConfigurableStep</item>
                 <item name="stock" xsi:type="object">Iranimij\OpenImport\Model\Stock\StockChangeStep</item>
                 <item name="missing" xsi:type="object">Iranimij\OpenImport\Model\Missing\MissingProductsStep</item>
@@ -105,6 +196,16 @@
                 <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeRecordReader</item>
                 <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageReader</item>
                 <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockReader</item>
+                <item name="openimport_shipment" xsi:type="object">Iranimij\OpenImport\Model\Import\Shipment\ShipmentRecordReader</item>
+                <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteRecordReader</item>
+                <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleReader</item>
+                <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleReader</item>
+                <item name="openimport_review" xsi:type="object">OpenImportReviewReader</item>
+                <item name="openimport_newsletter" xsi:type="object">OpenImportNewsletterReader</item>
+                <item name="openimport_search_term" xsi:type="object">OpenImportSearchTermReader</item>
+                <item name="openimport_search_synonym" xsi:type="object">OpenImportSynonymReader</item>
+                <item name="openimport_category_position" xsi:type="object">OpenImportCategoryPositionReader</item>
+                <item name="openimport_order" xsi:type="object">Iranimij\OpenImport\Model\Import\Order\OrderRecordReader</item>
             </argument>
         </arguments>
     </type>
@@ -210,10 +311,17 @@
             </argument>
         </arguments>
     </virtualType>
+    <!-- Magento's grid data provider filters through its Reporting object, which carries the filter pool. -->
+    <virtualType name="Iranimij\OpenImport\Ui\DataProvider\GridReporting"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\Reporting">
+        <arguments>
+            <argument name="filterPool" xsi:type="object">Iranimij\OpenImport\Ui\DataProvider\GridFilterPool</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="Iranimij\OpenImport\Ui\DataProvider\GridDataProvider"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
         <arguments>
-            <argument name="filterPool" xsi:type="object">Iranimij\OpenImport\Ui\DataProvider\GridFilterPool</argument>
+            <argument name="reporting" xsi:type="object">Iranimij\OpenImport\Ui\DataProvider\GridReporting</argument>
         </arguments>
     </virtualType>
 
@@ -226,6 +334,19 @@
                 <item name="sftp" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\SftpSource</item>
                 <item name="ftp" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\FtpSource</item>
                 <item name="s3" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\S3Source</item>
+                <item name="google_drive" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\GoogleDriveSource</item>
+                <item name="onedrive" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\OneDriveSource</item>
+                <item name="rest" xsi:type="object">Iranimij\OpenImport\Model\Rest\RestSource</item>
+                <item name="dropbox" xsi:type="object">Iranimij\OpenImport\Model\Execution\Source\DropboxSource</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Iranimij\OpenImport\Model\OAuth\OAuthFlow">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="google_drive" xsi:type="object">Iranimij\OpenImport\Model\Google\GoogleOAuthProvider</item>
+                <item name="dropbox" xsi:type="object">Iranimij\OpenImport\Model\Dropbox\DropboxOAuthProvider</item>
+                <item name="onedrive" xsi:type="object">Iranimij\OpenImport\Model\Microsoft\MicrosoftOAuthProvider</item>
             </argument>
         </arguments>
     </type>
@@ -236,6 +357,10 @@
                 <item name="sftp" xsi:type="string">SFTP</item>
                 <item name="ftp" xsi:type="string">FTP</item>
                 <item name="s3" xsi:type="string">Amazon S3 / S3-compatible</item>
+                <item name="google_drive" xsi:type="string">Google Drive / Sheets</item>
+                <item name="dropbox" xsi:type="string">Dropbox</item>
+                <item name="onedrive" xsi:type="string">OneDrive / SharePoint</item>
+                <item name="rest" xsi:type="string">REST API</item>
             </argument>
             <argument name="inline" xsi:type="array">
                 <item name="sftp" xsi:type="string">sftp</item>
@@ -259,6 +384,21 @@
             <argument name="protocol" xsi:type="string">s3</argument>
         </arguments>
     </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Execution\Source\GoogleDriveSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
+        <arguments>
+            <argument name="protocol" xsi:type="string">google_drive</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Execution\Source\DropboxSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
+        <arguments>
+            <argument name="protocol" xsi:type="string">dropbox</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Execution\Source\OneDriveSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
+        <arguments>
+            <argument name="protocol" xsi:type="string">onedrive</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="Iranimij\OpenImport\Model\Execution\Source\FtpSource" type="Iranimij\OpenImport\Model\Execution\Source\RemoteSource">
         <arguments>
             <argument name="protocol" xsi:type="string">ftp</argument>
@@ -269,6 +409,7 @@
             <argument name="writers" xsi:type="array">
                 <item name="csv" xsi:type="string">Iranimij\OpenImport\Model\Writer\CsvWriter</item>
                 <item name="xlsx" xsi:type="string">Iranimij\OpenImport\Model\Writer\XlsxWriter</item>
+                <item name="ods" xsi:type="string">Iranimij\OpenImport\Model\Writer\OdsWriter</item>
                 <item name="json" xsi:type="string">Iranimij\OpenImport\Model\Writer\JsonWriter</item>
                 <item name="xml" xsi:type="string">Iranimij\OpenImport\Model\Writer\XmlWriter</item>
             </argument>
@@ -282,6 +423,14 @@
                 <item name="openimport_attribute" xsi:type="object">Iranimij\OpenImport\Model\Import\Attribute\AttributeEntitySource</item>
                 <item name="openimport_cms_page" xsi:type="object">OpenImportCmsPageSource</item>
                 <item name="openimport_cms_block" xsi:type="object">OpenImportCmsBlockSource</item>
+                <item name="openimport_url_rewrite" xsi:type="object">Iranimij\OpenImport\Model\Import\UrlRewrite\UrlRewriteEntitySource</item>
+                <item name="openimport_cart_rule" xsi:type="object">OpenImportCartRuleSource</item>
+                <item name="openimport_catalog_rule" xsi:type="object">OpenImportCatalogRuleSource</item>
+                <item name="openimport_review" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\ReviewSource</item>
+                <item name="openimport_newsletter" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\NewsletterSource</item>
+                <item name="openimport_search_term" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SearchTermSource</item>
+                <item name="openimport_search_synonym" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\SynonymSource</item>
+                <item name="openimport_category_position" xsi:type="object">Iranimij\OpenImport\Model\Import\Small\CategoryPositionSource</item>
             </argument>
         </arguments>
     </type>
@@ -293,6 +442,21 @@
     <virtualType name="Iranimij\OpenImport\Model\Export\Destination\S3Destination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
         <arguments>
             <argument name="protocol" xsi:type="string">s3</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Export\Destination\GoogleDriveDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
+        <arguments>
+            <argument name="protocol" xsi:type="string">google_drive</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Export\Destination\DropboxDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
+        <arguments>
+            <argument name="protocol" xsi:type="string">dropbox</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Model\Export\Destination\OneDriveDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
+        <arguments>
+            <argument name="protocol" xsi:type="string">onedrive</argument>
         </arguments>
     </virtualType>
     <virtualType name="Iranimij\OpenImport\Model\Export\Destination\FtpDestination" type="Iranimij\OpenImport\Model\Export\Destination\RemoteDestination">
@@ -308,6 +472,10 @@
                 <item name="sftp" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\SftpDestination</item>
                 <item name="ftp" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\FtpDestination</item>
                 <item name="s3" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\S3Destination</item>
+                <item name="google_drive" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\GoogleDriveDestination</item>
+                <item name="onedrive" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\OneDriveDestination</item>
+                <item name="rest" xsi:type="object">Iranimij\OpenImport\Model\Rest\RestDestination</item>
+                <item name="dropbox" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\DropboxDestination</item>
                 <item name="email" xsi:type="object">Iranimij\OpenImport\Model\Export\Destination\EmailDestination</item>
             </argument>
         </arguments>
@@ -318,6 +486,9 @@
                 <item name="sftp" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\SftpClient</item>
                 <item name="ftp" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\FtpClient</item>
                 <item name="s3" xsi:type="string">Iranimij\OpenImport\Model\Execution\Source\Remote\S3Client</item>
+                <item name="google_drive" xsi:type="string">Iranimij\OpenImport\Model\Google\DriveClient</item>
+                <item name="dropbox" xsi:type="string">Iranimij\OpenImport\Model\Dropbox\DropboxClient</item>
+                <item name="onedrive" xsi:type="string">Iranimij\OpenImport\Model\Microsoft\OneDriveClient</item>
             </argument>
         </arguments>
     </type>
@@ -330,6 +501,33 @@
         <arguments>
             <argument name="logger" xsi:type="object">Iranimij\OpenImport\Logger</argument>
             <argument name="processor" xsi:type="object">Iranimij\OpenImport\Model\Execution\RunProcessor\Proxy</argument>
+        </arguments>
+    </type>
+
+    <!-- Triggers: one observer class, one instance per shop event (etc/events.xml). -->
+    <virtualType name="Iranimij\OpenImport\Observer\ProductSavedTrigger" type="Iranimij\OpenImport\Observer\TriggerRuns">
+        <arguments>
+            <argument name="event" xsi:type="const">Iranimij\OpenImport\Model\Trigger\TriggerEvents::PRODUCT_SAVED</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Observer\StockChangedTrigger" type="Iranimij\OpenImport\Observer\TriggerRuns">
+        <arguments>
+            <argument name="event" xsi:type="const">Iranimij\OpenImport\Model\Trigger\TriggerEvents::STOCK_CHANGED</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Observer\CustomerRegisteredTrigger" type="Iranimij\OpenImport\Observer\TriggerRuns">
+        <arguments>
+            <argument name="event" xsi:type="const">Iranimij\OpenImport\Model\Trigger\TriggerEvents::CUSTOMER_REGISTERED</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Iranimij\OpenImport\Observer\CustomerSavedTrigger" type="Iranimij\OpenImport\Observer\TriggerRuns">
+        <arguments>
+            <argument name="event" xsi:type="const">Iranimij\OpenImport\Model\Trigger\TriggerEvents::CUSTOMER_SAVED</argument>
+        </arguments>
+    </virtualType>
+    <type name="Iranimij\OpenImport\Model\Trigger\TriggerQueue">
+        <arguments>
+            <argument name="logger" xsi:type="object">Iranimij\OpenImport\Logger</argument>
         </arguments>
     </type>
 </config>

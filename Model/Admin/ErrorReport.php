@@ -40,21 +40,25 @@ class ErrorReport
      * Writes the report into the run folder and returns its absolute path.
      *
      * @param RunInterface $run
+     * @param bool $withSourceData whether the source row's cells follow each error (they are file contents, so
+     *                             only for users allowed to download run files)
      * @return string
      */
-    public function write(RunInterface $run): string
+    public function write(RunInterface $run, bool $withSourceData = true): string
     {
         $runId = (int) $run->getRunId();
         $columns = [];
-        for ($offset = 0; $batch = $this->errors->fetch($runId, self::BATCH, $offset); $offset += self::BATCH) {
-            foreach ($batch as $error) {
-                foreach (array_keys($error->sourceData ?? []) as $column) {
-                    $columns[$column] = true;
+        if ($withSourceData) {
+            for ($offset = 0; $batch = $this->errors->fetch($runId, self::BATCH, $offset); $offset += self::BATCH) {
+                foreach ($batch as $error) {
+                    foreach (array_keys($error->sourceData ?? []) as $column) {
+                        $columns[$column] = true;
+                    }
                 }
             }
         }
         $columns = array_keys($columns);
-        $path = $this->runFiles->folder($runId) . '/errors.csv';
+        $path = $this->runFiles->folder($runId) . ($withSourceData ? '/errors.csv' : '/errors-without-rows.csv');
         $file = new \SplFileObject($path, 'wb');
         $file->fwrite("\xEF\xBB\xBF");
         $file->fputcsv(array_merge(['Row', 'Record', 'Field', 'Error'], $columns), ',', '"', '');

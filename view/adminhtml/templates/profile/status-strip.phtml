@@ -32,7 +32,9 @@ $waiting = ($counts['queued'] ?? 0) + ($counts['running'] ?? 0);
         <?php elseif ($strip->cronStale()): ?>
             <?= $escaper->escapeHtml(__('last ran OpenImport %1 minutes ago — check that cron runs every minute.', (int) floor($age / 60))) ?>
         <?php else: ?>
-            <?= $escaper->escapeHtml(__('runs (last %1 minute(s) ago)', (int) floor($age / 60))) ?>
+            <?= $escaper->escapeHtml($age < 60
+                ? __('runs (last run just now)')
+                : __('runs (last %1 minute(s) ago)', (int) floor($age / 60))) ?>
         <?php endif; ?>
     </span>
 </div>

@@ -19,6 +19,7 @@ $run = $view->run();
          'Iranimij_OpenImport/js/run/status' => [
              'url' => $view->url('openimport/run/status'),
              'status' => $run->getStatus(),
+             'writing' => $view->isWriting(),
          ],
      ])) ?>'
      <?php endif; ?>>
@@ -27,7 +28,9 @@ $run = $view->run();
             <strong class="title"><?= $escaper->escapeHtml(__('Status')) ?></strong>
         </div>
         <?php
-        $lines = $run->getMessage() === '' ? [] : explode("\n", $run->getMessage());
+        // Stored in English when the run happened; shown in the admin's language.
+        $message = $view->text($run->getMessage());
+        $lines = $message === '' ? [] : explode("\n", $message);
         $headline = (string) array_shift($lines);
         ?>
         <div class="openimport-run-head">
@@ -47,6 +50,10 @@ $run = $view->run();
                 · <?= $escaper->escapeHtml(__('file %1', (string) $run->getOptions()['original_name'])) ?>
             <?php endif; ?>
             · <?= $escaper->escapeHtml(__('started by %1', $view->startedBy())) ?>
+            <?php if ($run->getParentRunId() !== null): ?>
+                <?= $escaper->escapeHtml(__('after')) ?>
+                <a href="<?= $escaper->escapeUrl($view->runUrl((int) $run->getParentRunId())) ?>"><?= $escaper->escapeHtml(__('run #%1', (int) $run->getParentRunId())) ?></a>
+            <?php endif; ?>
             <?php if ($view->duration() !== ''): ?>
                 · <?= $escaper->escapeHtml(__('took %1', $view->duration())) ?>
             <?php endif; ?>
@@ -56,17 +63,21 @@ $run = $view->run();
         </p>
         <?php if ($view->isActive()): ?>
             <div class="message message-notice" role="status">
-                <?= $escaper->escapeHtml($run->getStatus() === 'queued'
-                    ? __('Waiting for OpenImport\'s cron (runs every minute). This page updates by itself.')
-                    : __('Running. Rows done so far:')) ?>
-                <span data-role="progress"><?= $escaper->escapeHtml($run->getStatus() === 'running' ? (string) $run->getProgressRows() : '') ?></span>
+                <?php if ($view->isWriting()): ?>
+                    <?= $escaper->escapeHtml(__('Writing to Magento: this step cannot be stopped. This page updates by itself.')) ?>
+                <?php else: ?>
+                    <?= $escaper->escapeHtml($run->getStatus() === 'queued'
+                        ? __('Waiting for OpenImport\'s cron (runs every minute). This page updates by itself.')
+                        : __('Running. Rows done so far:')) ?>
+                    <span data-role="progress"><?= $escaper->escapeHtml($run->getStatus() === 'running' ? (string) $run->getProgressRows() : '') ?></span>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
         <?php if (array_filter($lines, static fn (string $line): bool => trim($line) !== '') !== []): ?>
             <?php $failed = in_array($run->getStatus(), ['failed', 'needs_confirmation'], true); ?>
             <div class="message <?= $escaper->escapeHtmlAttr($failed ? 'message-warning' : 'message-notice') ?>">
                 <?php foreach ($lines as $line): ?>
-                    <?= $escaper->escapeHtml($line) ?><br/>
+                    <?= /* @noEscape */ $view->linkRuns($escaper->escapeHtml($line), $escaper) ?><br/>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
@@ -106,7 +117,19 @@ $run = $view->run();
                 <a class="action-secondary" href="<?= $escaper->escapeUrl($view->profileUrl()) ?>"><?= $escaper->escapeHtml(__('Edit profile')) ?></a>
             <?php endif; ?>
             <?php if ($view->canCancel()): ?>
-                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/cancel')) ?>">
+                <?php
+                // A running live run: ask first (a queued run or a dry run just stops).
+                $cancelInit = $run->getStatus() === 'running' && !$run->isDryRun()
+                    ? ['Iranimij_OpenImport/js/run/confirm-submit' => [
+                        'title' => (string) __('Stop this run?'),
+                        'message' => (string) __('It stops within seconds while it still reads the file, and nothing is changed. Once it writes to Magento it cannot stop half-way.'),
+                        'button' => (string) __('Stop the run'),
+                        'dismiss' => (string) __('Keep running'),
+                    ]]
+                    : [];
+                ?>
+                <form method="post" action="<?= $escaper->escapeUrl($view->url('openimport/run/cancel')) ?>"
+                      <?php if ($cancelInit !== []): ?>data-mage-init='<?= $escaper->escapeHtmlAttr((string) json_encode($cancelInit)) ?>'<?php endif; ?>>
                     <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>"/>
                     <button type="submit" class="action-secondary"><span><?= $escaper->escapeHtml(__('Cancel')) ?></span></button>
                 </form>
@@ -116,7 +139,9 @@ $run = $view->run();
                 $againParams = ['id' => (int) $run->getProfileId(), 'mode' => $run->getMode()];
                 $againInit = $run->isDryRun() ? [] : ['Iranimij_OpenImport/js/run/confirm-submit' => [
                     'title' => (string) __('Run "%1" again?', $run->getProfileName()),
-                    'message' => (string) __('The run reads the source again and changes the shop.'),
+                    'message' => $run->getDirection() === 'export'
+                        ? (string) __('The run exports again and delivers a new file to the destination.')
+                        : (string) __('The run reads the source again and changes the shop.'),
                     'button' => (string) __('Run again'),
                 ]];
                 ?>
@@ -126,10 +151,10 @@ $run = $view->run();
                     <button type="submit" class="action-secondary"><span><?= $escaper->escapeHtml($run->isDryRun() ? __('Dry run again') : __('Run again')) ?></span></button>
                 </form>
             <?php endif; ?>
-            <?php if ($run->getSourceFile() !== null): ?>
+            <?php if ($run->getSourceFile() !== null && $view->canDownloadFiles()): ?>
                 <a class="action-secondary" href="<?= $escaper->escapeUrl($view->url('openimport/run/download')) ?>"><?= $escaper->escapeHtml(__('Download the file')) ?></a>
             <?php endif; ?>
-            <?php if ($run->getOutputFile() !== null): ?>
+            <?php if ($run->getOutputFile() !== null && $view->canDownloadFiles()): ?>
                 <a class="<?= $escaper->escapeHtmlAttr($runForReal ? 'action-secondary' : 'action-primary') ?>"
                    href="<?= $escaper->escapeUrl($view->url('openimport/run/download', ['file' => 'output'])) ?>"><?= $escaper->escapeHtml(__('Download the export')) ?></a>
             <?php endif; ?>
@@ -247,7 +272,7 @@ $run = $view->run();
                             <td><?= $escaper->escapeHtml($error->sourceRow > 0 ? (string) $error->sourceRow : '–') ?></td>
                             <td><?= $escaper->escapeHtml($error->identifier) ?></td>
                             <td><?= $escaper->escapeHtml($error->field) ?></td>
-                            <td class="openimport-wrap"><?= $escaper->escapeHtml($error->message) ?></td>
+                            <td class="openimport-wrap"><?= $escaper->escapeHtml($view->text($error->message)) ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

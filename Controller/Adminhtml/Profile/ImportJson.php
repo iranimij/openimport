@@ -19,6 +19,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem\Driver\File;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Imports profiles from a JSON file (the format of "Download as JSON" and openimport:profile:export): GET shows the
@@ -33,11 +34,13 @@ class ImportJson extends Action implements HttpGetActionInterface, HttpPostActio
      * @param Context $context
      * @param ProfileJson $json
      * @param File $file
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly ProfileJson $json,
-        private readonly File $file
+        private readonly File $file,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -69,10 +72,15 @@ class ImportJson extends Action implements HttpGetActionInterface, HttpPostActio
                 $created,
                 $updated
             ));
+            if ($created > 0) {
+                $this->messageManager->addNoticeMessage((string) __(
+                    'New profiles are switched off: switch them on after a dry run you are happy with.'
+                ));
+            }
 
             return $redirect->setPath('*/*/');
         } catch (\InvalidArgumentException | LocalizedException $exception) {
-            foreach (explode("\n", $exception->getMessage()) as $problem) {
+            foreach (explode("\n", $this->text->translate($exception->getMessage())) as $problem) {
                 $this->messageManager->addErrorMessage($problem);
             }
 

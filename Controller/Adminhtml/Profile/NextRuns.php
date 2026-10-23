@@ -15,6 +15,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * The next three times a schedule runs, in the store time zone (shown under the schedule in the form), or what is
@@ -27,10 +28,12 @@ class NextRuns extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param TimezoneInterface $timezone
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
-        private readonly TimezoneInterface $timezone
+        private readonly TimezoneInterface $timezone,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -50,7 +53,7 @@ class NextRuns extends Action implements HttpPostActionInterface
         try {
             $next = (new CronExpression($schedule))->next(new \DateTimeImmutable('now', new \DateTimeZone($zone)), 3);
         } catch (\InvalidArgumentException $exception) {
-            return $result->setData(['times' => [], 'error' => $exception->getMessage()]);
+            return $result->setData(['times' => [], 'error' => $this->text->translate($exception->getMessage())]);
         }
 
         return $result->setData([

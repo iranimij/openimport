@@ -86,7 +86,9 @@ class RunActions extends Column
                     'post' => true,
                 ] + ($dry ? [] : ['confirm' => [
                     'title' => __('Run "%1" again?', $name),
-                    'message' => __('The run reads the source again and changes the shop.'),
+                    'message' => ($item['direction'] ?? '') === 'export'
+                        ? __('The run exports again and delivers a new file to the destination.')
+                        : __('The run reads the source again and changes the shop.'),
                     'button' => __('Run again'),
                 ]]);
             }

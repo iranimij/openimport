@@ -15,6 +15,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * Copies a profile (inactive, without secrets) and opens the copy.
@@ -27,11 +28,13 @@ class Duplicate extends Action implements HttpPostActionInterface
      * @param Context $context
      * @param ProfileRepositoryInterface $profiles
      * @param ProfileInterfaceFactory $profileFactory
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly ProfileRepositoryInterface $profiles,
-        private readonly ProfileInterfaceFactory $profileFactory
+        private readonly ProfileInterfaceFactory $profileFactory,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -71,13 +74,16 @@ class Duplicate extends Action implements HttpPostActionInterface
                 ->setRowFilters($original->getRowFilters())
                 ->setExportOptions($original->getExportOptions())
                 ->setImportOptions($original->getImportOptions())
+                ->setThenProfileId($original->getThenProfileId())
+                ->setThenWhen($original->getThenWhen())
+                ->setTriggers($original->getTriggers())
                 ->setMapping($original->getMapping())
                 ->setValueMaps($original->getValueMaps());
             $copy = $this->profiles->save($copy);
-            $this->messageManager->addSuccessMessage((string) __('Copied to "%1". Its schedule is off until you switch it on.', $name));
+            $this->messageManager->addSuccessMessage((string) __('Copied to "%1". Its automatic runs are off until you switch them on.', $name));
             return $redirect->setPath('*/*/edit', ['id' => $copy->getProfileId()]);
         } catch (LocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
         }
 
         return $redirect->setPath('*/*/');

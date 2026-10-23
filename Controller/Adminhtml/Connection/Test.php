@@ -22,6 +22,7 @@ use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Psr\Log\LoggerInterface;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * "Test connection" with what the form holds now (stored secrets for empty secret fields); nothing is saved.
@@ -38,6 +39,7 @@ class Test extends Action implements HttpPostActionInterface
      * @param ConnectionValidator $validator
      * @param ConnectionTester $tester
      * @param LoggerInterface $logger
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
@@ -46,7 +48,8 @@ class Test extends Action implements HttpPostActionInterface
         private readonly ConnectionFormMapper $mapper,
         private readonly ConnectionValidator $validator,
         private readonly ConnectionTester $tester,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -74,12 +77,12 @@ class Test extends Action implements HttpPostActionInterface
         $connection = $this->mapper->fromForm($data, $connection);
         $problems = $this->validator->validate($connection);
         if ($problems !== []) {
-            return $json->setData(['ok' => false, 'message' => implode(' ', $problems)]);
+            return $json->setData(['ok' => false, 'message' => $this->text->translate(implode(' ', $problems))]);
         }
         try {
             $message = $this->tester->test($connection);
         } catch (PipelineException $exception) {
-            return $json->setData(['ok' => false, 'message' => $exception->getMessage()]);
+            return $json->setData(['ok' => false, 'message' => $this->text->translate($exception->getMessage())]);
         } catch (\Throwable $exception) {
             $this->logger->error(
                 'OpenImport test connection: ' . $exception->getMessage(),
@@ -88,10 +91,10 @@ class Test extends Action implements HttpPostActionInterface
 
             return $json->setData([
                 'ok' => false,
-                'message' => (string) __('The test failed unexpectedly: %1', $exception->getMessage()),
+                'message' => (string) __('The test failed unexpectedly: %1', $this->text->translate($exception->getMessage())),
             ]);
         }
 
-        return $json->setData(['ok' => true, 'message' => $message]);
+        return $json->setData(['ok' => true, 'message' => $this->text->translate($message)]);
     }
 }

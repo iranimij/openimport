@@ -16,16 +16,18 @@ class ReaderFactory
     public const FORMAT_AUTO = 'auto';
     public const FORMAT_CSV = 'csv';
     public const FORMAT_XLSX = 'xlsx';
+    public const FORMAT_ODS = 'ods';
     public const FORMAT_JSON = 'json';
     public const FORMAT_XML = 'xml';
 
-    public const FORMATS = [self::FORMAT_CSV, self::FORMAT_XLSX, self::FORMAT_JSON, self::FORMAT_XML];
+    public const FORMATS = [self::FORMAT_CSV, self::FORMAT_XLSX, self::FORMAT_ODS, self::FORMAT_JSON, self::FORMAT_XML];
 
     private const EXTENSIONS = [
         'csv' => self::FORMAT_CSV,
         'tsv' => self::FORMAT_CSV,
         'txt' => self::FORMAT_CSV,
         'xlsx' => self::FORMAT_XLSX,
+        'ods' => self::FORMAT_ODS,
         'json' => self::FORMAT_JSON,
         'xml' => self::FORMAT_XML,
     ];
@@ -44,6 +46,7 @@ class ReaderFactory
         return match ($format) {
             self::FORMAT_CSV => new CsvReader($file, $options),
             self::FORMAT_XLSX => new XlsxReader($file, $options),
+            self::FORMAT_ODS => new OdsReader($file, $options),
             self::FORMAT_JSON => new JsonReader($file, $options),
             self::FORMAT_XML => new XmlReader($file, $options),
             default => throw new ReaderException(sprintf('The file format "%s" is not supported.', $format)),
@@ -105,7 +108,10 @@ class ReaderFactory
     public function sniff(string $head): string
     {
         if (str_starts_with($head, "PK\x03\x04")) {
-            return self::FORMAT_XLSX;
+            // An ODS file starts with its uncompressed "mimetype" entry, so the type is readable in the first bytes.
+            return str_contains($head, 'application/vnd.oasis.opendocument.spreadsheet')
+                ? self::FORMAT_ODS
+                : self::FORMAT_XLSX;
         }
         if (str_starts_with($head, "\xD0\xCF\x11\xE0")) {
             throw new ReaderException('Old Excel files (.xls) are not supported. Save the file as .xlsx or .csv.');

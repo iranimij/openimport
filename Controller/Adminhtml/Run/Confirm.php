@@ -17,6 +17,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
+use Iranimij\OpenImport\Model\I18n\StoredText;
 
 /**
  * "Run for real" after a dry run, and the typed confirmation for runs above the safety limit.
@@ -31,13 +32,15 @@ class Confirm extends Action implements HttpPostActionInterface
      * @param ProfileRepositoryInterface $profiles
      * @param RunStarter $runStarter
      * @param ConfirmationWord $confirmationWord
+     * @param StoredText $text
      */
     public function __construct(
         Context $context,
         private readonly RunRepositoryInterface $runs,
         private readonly ProfileRepositoryInterface $profiles,
         private readonly RunStarter $runStarter,
-        private readonly ConfirmationWord $confirmationWord
+        private readonly ConfirmationWord $confirmationWord,
+        private readonly StoredText $text
     ) {
         parent::__construct($context);
     }
@@ -65,7 +68,7 @@ class Confirm extends Action implements HttpPostActionInterface
             }
             $live = $this->runStarter->liveFromDryRun($profile, $run, $confirmed);
         } catch (LocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->messageManager->addErrorMessage($this->text->translate($exception->getMessage()));
             return $redirect->setPath('*/*/view', ['id' => $runId]);
         }
 

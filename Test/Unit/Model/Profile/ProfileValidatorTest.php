@@ -22,6 +22,8 @@ use Iranimij\OpenImport\Model\Export\DestinationPool;
 use Iranimij\OpenImport\Model\Writer\CsvWriter;
 use Iranimij\OpenImport\Model\Writer\WriterFactory;
 use Iranimij\OpenImport\Model\Writer\XlsxWriter;
+use Iranimij\OpenImport\Model\Xslt\XsltStep;
+use Magento\Framework\Filesystem\Driver\File;
 use Iranimij\OpenImport\Test\Unit\Model\Connection\ConnectionStub;
 use Iranimij\OpenImport\Test\Unit\Model\Connection\FakeConnectionRepository;
 use Iranimij\OpenImport\Test\Unit\Model\FakeObjectManager;
@@ -29,6 +31,13 @@ use PHPUnit\Framework\TestCase;
 
 class ProfileValidatorTest extends TestCase
 {
+    private FakeChainLinks $chains;
+
+    protected function setUp(): void
+    {
+        $this->chains = new FakeChainLinks();
+    }
+
     private function validator(): ProfileValidator
     {
         $codes = new class extends EntityCodes {
@@ -41,7 +50,7 @@ class ProfileValidatorTest extends TestCase
             {
                 return $direction === 'export'
                     ? ['catalog_product', 'openimport_order']
-                    : ['catalog_product', 'customer', 'openimport_stock_price', 'openimport_category'];
+                    : ['catalog_product', 'customer', 'openimport_stock_price', 'openimport_category', 'openimport_shipment'];
             }
         };
 
@@ -59,7 +68,9 @@ class ProfileValidatorTest extends TestCase
                     new ConnectionStub(6, 'Feeds bucket', 's3', ['bucket' => 'feeds']),
                 ]),
                 new ConnectionTypes(['sftp' => 'SFTP', 'ftp' => 'FTP', 's3' => 'S3'])
-            )
+            ),
+            new XsltStep(new File()),
+            $this->chains
         );
     }
 
@@ -161,7 +172,7 @@ class ProfileValidatorTest extends TestCase
             'name' => '  ',
             'direction' => 'import',
             'entity' => 'catalog_category',
-            'source_type' => 'dropbox',
+            'source_type' => 'box',
             'format' => 'pdf',
             'after_success' => 'archive',
             'notify' => 'sometimes',
@@ -177,8 +188,8 @@ class ProfileValidatorTest extends TestCase
         self::assertSame([
             'Give the profile a name.',
             'Magento has no import entity "catalog_category".',
-            'The source type "dropbox" is not one of upload, folder, url, sftp, ftp, s3.',
-            'The format "pdf" is not one of auto, csv, xlsx, json, xml.',
+            'The source type "box" is not one of upload, folder, url, sftp, ftp, s3, google_drive, dropbox, onedrive, rest.',
+            'The format "pdf" is not one of auto, csv, xlsx, ods, json, xml.',
             'The after-success action "archive" is not one of keep, move, delete.',
             'The notification setting "sometimes" is not one of never, failure, always.',
             'The behaviour "merge" is not one of add_update, only_add, only_update, replace, delete.',
@@ -287,7 +298,7 @@ class ProfileValidatorTest extends TestCase
             ['source_type' => 's3', 'source_config' => ['connection_id' => '6', 'path' => 'feeds']] + $base
         )));
         self::assertSame(
-            ['Choose a saved S3 connection.'],
+            ['Choose a saved connection for this source.'],
             $validator->validate(new ProfileStub(['source_type' => 's3', 'source_config' => ['path' => 'feeds']] + $base))
         );
         self::assertSame(
@@ -312,8 +323,8 @@ class ProfileValidatorTest extends TestCase
 
         self::assertSame([], $validator->validate(new ProfileStub(['format' => 'xlsx', 'export_options' => ['destination' => 'download']] + $base)));
         self::assertSame(
-            ['"dropbox" is not an export destination.', 'OpenImport cannot write json files.'],
-            $validator->validate(new ProfileStub(['format' => 'json', 'export_options' => ['destination' => 'dropbox']] + $base))
+            ['"box" is not an export destination.', 'OpenImport cannot write json files.'],
+            $validator->validate(new ProfileStub(['format' => 'json', 'export_options' => ['destination' => 'box']] + $base))
         );
         self::assertSame(
             ['Enter the server folder to write to.'],
@@ -350,5 +361,111 @@ class ProfileValidatorTest extends TestCase
             'row_filters' => [],
         ] + $this->valid()));
         self::assertNotEmpty(array_filter($export, static fn (string $p): bool => str_contains($p, 'scheduled export needs a destination')));
+    }
+
+    public function testTriggersNeedKnownEventsAChangingSourceAndADestination(): void
+    {
+        $manual = ['schedule' => null] + $this->valid();
+        $events = ['events' => ['product_saved', 'order_status_changed'], 'order_statuses' => ['processing']];
+        self::assertSame([], $this->validator()->validate(new ProfileStub(['triggers' => $events, 'is_active' => true] + $manual)));
+
+        $unknown = $this->validator()->validate(new ProfileStub(['triggers' => ['events' => ['product_deleted']]] + $manual));
+        self::assertCount(1, $unknown);
+        self::assertStringStartsWith('"product_deleted" is not an event a profile can run after (product_saved, ', $unknown[0]);
+
+        $upload = $this->validator()->validate(new ProfileStub(
+            ['source_type' => 'upload', 'is_active' => true, 'triggers' => $events] + $manual
+        ));
+        self::assertNotEmpty(array_filter($upload, static fn (string $p): bool => str_contains($p, 'uploaded file cannot run after shop events')));
+        $off = $this->validator()->validate(new ProfileStub(
+            ['source_type' => 'upload', 'is_active' => false, 'triggers' => $events] + $manual
+        ));
+        self::assertSame([], $off, 'switched off: the events are kept for later');
+
+        $export = $this->validator()->validate(new ProfileStub([
+            'direction' => 'export',
+            'entity' => 'catalog_product',
+            'is_active' => true,
+            'triggers' => $events,
+            'export_options' => ['destination' => 'download'],
+            'mapping' => [],
+            'row_filters' => [],
+        ] + $manual));
+        self::assertNotEmpty(array_filter($export, static fn (string $p): bool => str_contains($p, 'runs after shop events needs a destination')));
+    }
+
+    public function testArchiveCompressionAndXsltSettings(): void
+    {
+        $xsl = '<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">'
+            . '<xsl:template match="/"><r/></xsl:template></xsl:stylesheet>';
+        self::assertSame([], $this->validator()->validate(new ProfileStub(
+            ['format' => 'xml', 'format_options' => ['archive' => 'none', 'archive_entry' => '*.xml', 'xslt' => $xsl]]
+            + $this->valid()
+        )));
+        $problems = $this->validator()->validate(new ProfileStub(
+            ['format_options' => ['archive' => 'maybe', 'xslt' => '<xsl:stylesheet><xsl:include href="a.xsl"/></xsl:stylesheet>']]
+            + $this->valid()
+        ));
+        self::assertContains('The archive setting "maybe" is not one of auto, none.', $problems);
+        self::assertContains('The XSLT stylesheet may not include or import other files.', $problems);
+        $problems = $this->validator()->validate(new ProfileStub(
+            ['format_options' => ['xslt' => 'not xml']] + $this->valid()
+        ));
+        self::assertStringContainsString('The XSLT stylesheet is not well-formed XML', $problems[0] ?? '');
+
+        $export = $this->validator()->validate(new ProfileStub(
+            ['direction' => 'export', 'export_options' => ['compress' => 'rar', 'xslt' => $xsl]] + $this->valid()
+        ));
+        self::assertSame(['"rar" is not a compression OpenImport writes (zip, gz, tar.gz).'], $export);
+    }
+
+    public function testShipmentsCanOnlyBeAdded(): void
+    {
+        $base = ['entity' => 'openimport_shipment', 'mapping' => [['target' => 'increment_id', 'source' => 'order']]] + $this->valid();
+        self::assertSame([], $this->validator()->validate(new ProfileStub(['behavior' => 'add_update'] + $base)));
+        self::assertSame([], $this->validator()->validate(new ProfileStub(['behavior' => 'only_add'] + $base)));
+        foreach (['only_update', 'delete'] as $behavior) {
+            self::assertContains(
+                'openimport_shipment can only be added: use Add/Update.',
+                $this->validator()->validate(new ProfileStub(['behavior' => $behavior] + $base))
+            );
+        }
+        $replace = $this->validator()->validate(new ProfileStub(['behavior' => 'replace'] + $base));
+        self::assertContains('openimport_shipment cannot be imported with "Replace": use Add/Update.', $replace);
+    }
+
+    public function testJobChainsAreCheckedAtSave(): void
+    {
+        $this->chains = new FakeChainLinks([
+            1 => ['name' => 'Nightly stock', 'then' => 2],
+            2 => ['name' => 'Stock report', 'then' => 3],
+            3 => ['name' => 'Cleanup', 'then' => null],
+            4 => ['name' => 'Upload import', 'direction' => 'import', 'source_type' => 'upload'],
+        ]);
+        $own = $this->valid() + ['profile_id' => 1];
+
+        self::assertSame([], $this->validator()->validate(new ProfileStub($own + ['then_profile_id' => 2])));
+        self::assertSame(
+            ['A profile cannot run itself afterwards.'],
+            $this->validator()->validate(new ProfileStub($own + ['then_profile_id' => 1]))
+        );
+        self::assertSame(
+            ['There is no profile with id 9 to run afterwards.'],
+            $this->validator()->validate(new ProfileStub($own + ['then_profile_id' => 9]))
+        );
+        self::assertSame(
+            ['"Upload import" reads an uploaded file, so it cannot run afterwards: give it a server folder, web address, '
+                . 'SFTP, FTP or cloud source.'],
+            $this->validator()->validate(new ProfileStub($own + ['then_profile_id' => 4]))
+        );
+        // Cleanup (3) would run Nightly stock (1) again: 3 → 1 → 2 → 3.
+        $cleanup = $this->valid() + ['profile_id' => 3, 'name' => 'Cleanup', 'then_profile_id' => 1];
+        self::assertSame(
+            ['The chain would loop: Cleanup → Nightly stock → Stock report → Cleanup. '
+                . 'A profile cannot run again in the same chain.'],
+            $this->validator()->validate(new ProfileStub($cleanup))
+        );
+        // A new profile (no id yet) may point at any chain: nothing can loop back to it.
+        self::assertSame([], $this->validator()->validate(new ProfileStub($this->valid() + ['then_profile_id' => 3])));
     }
 }

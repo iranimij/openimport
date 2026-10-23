@@ -10,13 +10,33 @@ Step 2 of the profile form. Every source delivers one file per run; the run keep
 | **Web address (URL)** | address, login (none, user name and password, bearer token), sheet gid | http and https. A Google Sheets link (shared "anyone with the link" or published) is read as CSV; `gid` picks the sheet. |
 | **SFTP** | server, port, user name, password or private key (+ passphrase), remote folder, pattern, which file, move-to | Key login with an OpenSSH or PEM key, pasted into its multi-line field (a key that lost its line breaks is repaired before the login). |
 | **FTP** | server, port, user name, password, explicit TLS (FTPS), passive mode, remote folder, pattern, which file, move-to | |
+| **Google Drive / Sheets (login)** | saved Google connection, folder link, id or path, pattern, which file, move-to | Private files and Sheets (Sheets are read as Excel files); see [Google Drive and Google Sheets](connections.md#google-drive-and-google-sheets). |
+| **Dropbox**, **OneDrive / SharePoint** | saved connection, folder path, pattern, which file, move-to | See [Dropbox](connections.md#dropbox) and [OneDrive and SharePoint](connections.md#onedrive-and-sharepoint). |
+| **REST API** | saved REST connection, path, records path, pages | JSON answers, paged; see [REST APIs](connections.md#rest-apis). |
 | **Amazon S3 / S3-compatible** | saved S3 connection, folder in the bucket, pattern, which file, move-to | Amazon S3, Cloudflare R2, Wasabi, MinIO, Garage and other S3-compatible services; the login is always a [saved connection](connections.md#amazon-s3-and-s3-compatible-storage). |
 
 For SFTP and FTP, **Saved connection** picks a login saved under System › Data Transfer › OpenImport Connections
 instead of entering it in the profile (since 1.4); see [Saved connections](connections.md).
 
+Any source may deliver a ZIP, gzip or tar archive: the file inside is read, see [Archives](archives.md). XML files
+can go through an [XSLT stylesheet](file-formats.md#xslt-since-14) before they are read.
+
 **Test connection** checks the settings as they are in the form (saved or not) and says what the next run would read,
 without importing anything.
+
+## Big files
+
+An upload goes through the web server and PHP first, and both limit its size: PHP's `upload_max_filesize` and
+`post_max_size` (the form shows the smaller one under the drop zone) and the web server's own limit (nginx
+`client_max_body_size`, 1 MB by default; Apache `LimitRequestBody`), which PHP cannot see. A file over the web
+server's limit is refused before OpenImport sees it: the form says "The file is larger than the web server
+accepts".
+
+For big files:
+
+- zip or gzip the file before uploading: OpenImport unpacks it (a 20,000-row product CSV of 2.5 MB is a 200 KB ZIP);
+- or let OpenImport fetch it: a server folder, a web address (URL), SFTP/FTP or cloud storage have no upload limit;
+- or raise the limits on your server.
 
 ## Which file
 

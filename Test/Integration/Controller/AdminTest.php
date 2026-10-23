@@ -296,6 +296,17 @@ class AdminTest extends AbstractBackendController
         self::assertStringContainsString($prefix . '-2', $body);
         self::assertStringContainsString('Download error report', $body);
 
+        // Magento's own row errors carry no source row; an error of OpenImport's mapping does (as from a transform).
+        Bootstrap::getObjectManager()->get(\Iranimij\OpenImport\Model\Storage\ErrorLog::class)->add($runId, [
+            new \Iranimij\OpenImport\Model\Storage\ErrorRecord(
+                3,
+                'Mapping error',
+                $prefix . '-2',
+                'name',
+                ['sku' => $prefix . '-2', 'name' => 'Two ' . $prefix, 'price' => 'abc']
+            ),
+        ]);
+
         // The controller writes the report; the file answer (FileResponse) does not reach the test response, so
         // the file is read from the run folder. Downloads themselves are covered by the Playwright E2E tests.
         $this->fresh();

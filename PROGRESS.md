@@ -105,6 +105,10 @@ code.
 
 ## Exact next step
 
+**Status 2026-10-23:** review 5 is closed for high and medium. 1.5.4 is released (#82) and merged into main with L1
+(#83); M3 is merged (#84). Open: the review 5 lows L2–L20 (Notion page 18). 1.6 stays paused after slice 2 until
+Iman says go (TODO list in Notion page 15 §3.1).
+
 **1.5.4** (browser review 5, Notion page 18, 2026-10-23; Iman: "fix all high and medium ones"), on `fix/1.5.4` from
 `release/1.5`: H1 a cancelled or failing products export delivered a partial file (ExportRunner remembers errors
 raised inside Magento's export, which swallows them), H2 the profiles grid sent encrypted secrets, H3 (found while

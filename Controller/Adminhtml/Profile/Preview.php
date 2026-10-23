@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Iranimij\OpenImport\Controller\Adminhtml\Profile;
 
 use Iranimij\OpenImport\Api\Data\ProfileInterfaceFactory;
+use Iranimij\OpenImport\Model\Admin\FileAccess;
 use Iranimij\OpenImport\Model\Admin\MappingPreview;
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
 use Iranimij\OpenImport\Model\Admin\UploadStore;
@@ -32,13 +33,15 @@ class Preview extends Action implements HttpPostActionInterface
      * @param ProfileFormMapper $mapper
      * @param UploadStore $uploads
      * @param MappingPreview $preview
+     * @param FileAccess $fileAccess
      */
     public function __construct(
         Context $context,
         private readonly ProfileInterfaceFactory $profileFactory,
         private readonly ProfileFormMapper $mapper,
         private readonly UploadStore $uploads,
-        private readonly MappingPreview $preview
+        private readonly MappingPreview $preview,
+        private readonly FileAccess $fileAccess
     ) {
         parent::__construct($context);
     }
@@ -56,6 +59,11 @@ class Preview extends Action implements HttpPostActionInterface
         $path = $this->uploads->path((string) ($source['file'] ?? ''));
         if ($path === null) {
             return $json->setData(['problems' => [(string) __('Upload a file to see the preview.')]]);
+        }
+        if (!$this->fileAccess->canSee((string) ($source['file'] ?? ''))) {
+            return $json->setData(['problems' => [(string) __(
+                'The preview is not shown: your role may not see file contents ("Download run files").'
+            )]]);
         }
         $profile = $this->mapper->fromForm($data, $this->profileFactory->create());
 

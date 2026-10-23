@@ -13,6 +13,7 @@ use Iranimij\OpenImport\Api\ProfileRepositoryInterface;
 use Iranimij\OpenImport\Controller\Adminhtml\Profile\Save;
 use Iranimij\OpenImport\Model\Admin\ProfileFormMapper;
 use Iranimij\OpenImport\Model\Admin\RecentRuns;
+use Iranimij\OpenImport\Model\Admin\UploadLimit;
 use Iranimij\OpenImport\Model\Config;
 use Iranimij\OpenImport\Model\ResourceModel\Profile\CollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
@@ -39,6 +40,7 @@ class ProfileFormDataProvider extends AbstractDataProvider
      * @param AuthorizationInterface $authorization
      * @param Config $config
      * @param RecentRuns $recentRuns
+     * @param UploadLimit $uploadLimit
      * @param array<string, mixed> $meta
      * @param array<string, mixed> $data
      */
@@ -55,6 +57,7 @@ class ProfileFormDataProvider extends AbstractDataProvider
         private readonly AuthorizationInterface $authorization,
         private readonly Config $config,
         private readonly RecentRuns $recentRuns,
+        private readonly UploadLimit $uploadLimit,
         array $meta = [],
         array $data = []
     ) {
@@ -103,6 +106,15 @@ class ProfileFormDataProvider extends AbstractDataProvider
         // An empty safety limit means the one in the configuration: say which.
         $meta['rules']['children']['safety_threshold']['arguments']['data']['config']['placeholder'] =
             (string) __('Default: %1%', $this->config->getSafetyThresholdPercent());
+        // Bigger files fail before PHP sees them: say what this server takes.
+        $limit = $this->uploadLimit->text();
+        if ($limit !== '') {
+            $meta['where']['children']['upload']['arguments']['data']['config']['limitText'] = (string) __(
+                // phpcs:ignore Generic.Files.LineLength.TooLong
+                'Up to %1 per upload on this server (the web server may allow less). Zip big files, or use a server folder, web address, SFTP or cloud storage.',
+                $limit
+            );
+        }
         if (!$this->authorization->isAllowed('Iranimij_OpenImport::profiles_edit')) {
             foreach (['what', 'where', 'file', 'map', 'rules', 'when'] as $fieldset) {
                 $meta[$fieldset]['arguments']['data']['config']['disabled'] = true;

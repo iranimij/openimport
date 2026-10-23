@@ -24,6 +24,20 @@ can go through an [XSLT stylesheet](file-formats.md#xslt-since-14) before they a
 **Test connection** checks the settings as they are in the form (saved or not) and says what the next run would read,
 without importing anything.
 
+## Big files
+
+An upload goes through the web server and PHP first, and both limit its size: PHP's `upload_max_filesize` and
+`post_max_size` (the form shows the smaller one under the drop zone) and the web server's own limit (nginx
+`client_max_body_size`, 1 MB by default; Apache `LimitRequestBody`), which PHP cannot see. A file over the web
+server's limit is refused before OpenImport sees it: the form says "The file is larger than the web server
+accepts".
+
+For big files:
+
+- zip or gzip the file before uploading: OpenImport unpacks it (a 20,000-row product CSV of 2.5 MB is a 200 KB ZIP);
+- or let OpenImport fetch it: a server folder, a web address (URL), SFTP/FTP or cloud storage have no upload limit;
+- or raise the limits on your server.
+
 ## Which file
 
 For folders and servers, the pattern picks the candidates (`*` any text, `?` one character, case does not matter,

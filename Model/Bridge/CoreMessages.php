@@ -40,6 +40,12 @@ class CoreMessages
             '',
             'The picture in %1 is neither a web address (http/https) nor a file name in var/import/images (no "../", no paths from the root).',
         ],
+        // "Url key: 'x' was already generated for an item with the SKU: 'y'. You need to specify the unique URL key manually"
+        'duplicatedUrlKey' => [
+            'url_key',
+            // phpcs:ignore Generic.Files.LineLength.TooLong
+            'Another product of the file or the shop already has this URL key. Give %1 a unique value, or set a URL key pattern such as {name}-{sku} in step 5.',
+        ],
         'mediaPathNotAvailable' => [
             '',
             'The picture in %1 is not in var/import/images (the import images folder).',
@@ -53,6 +59,7 @@ class CoreMessages
     private const FORMATTED = [
         "/^Value for '[a-z0-9_]+' attribute contains incorrect value/" => 'invalidAttributeType',
         '/^Wrong URL\/path used for attribute [a-z0-9_]+/' => 'invalidMediaUrlPath',
+        "/^Url key: '.*' was already generated for an item with the SKU/" => 'duplicatedUrlKey',
     ];
 
     /**

@@ -8,7 +8,10 @@ page lists what the module does about that, what the settings control, and what 
 - Every controller is behind an ACL resource: *View profiles*, *Create and edit profiles*, *Run profiles*, *Confirm
   runs above the safety limit*, *View runs and error reports*, *Download run files*, *Manage connections*, plus the
   configuration section. Roles that may view but
-  not edit get a read-only form.
+  not edit get a read-only form. File contents (first rows, the mapping preview, an export's first rows, the source
+  cells of error reports) need *Download run files*.
+- Grids send no secrets: the profiles grid strips the encrypted passwords, keys and tokens from the settings it sends
+  to the browser (since 1.5.4).
 - Everything that changes state is a POST with Magento's form key; everything that reads is a GET. File answers go
   through Magento's `FileFactory`, never a raw path.
 - Uploads: 256 MB at most, only `.csv .tsv .txt .xlsx .json .xml`, stored under a random token in `var/openimport/tmp`

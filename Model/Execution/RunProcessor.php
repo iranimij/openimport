@@ -145,6 +145,16 @@ class RunProcessor
             }
         }
 
+        if ($outcome->status !== RunInterface::STATUS_CANCELLED && $this->runFiles->cancelRequested($runId)) {
+            // The cancel came while Magento was writing: the run finished that step instead.
+            $outcome = new RunOutcome(
+                $outcome->status,
+                $outcome->counts,
+                $outcome->message . "\n" . 'Cancel was requested while the run was writing to Magento, which cannot be'
+                . ' stopped half-way; the run finished.',
+                $outcome->historyId
+            );
+        }
         $finished = $this->finish($runId, $outcome);
         if ($profile !== null) {
             $this->fileBatch->stopAfterFailure($profile, $finished);
@@ -200,9 +210,12 @@ class RunProcessor
     {
         $runId = (int) $run->getRunId();
         $folder = $this->runFiles->folder($runId);
-        $heartbeat = function (bool $canStop = false) use ($locks, $runId): void {
+        $heartbeat = function (bool $canStop = false, bool $writing = false) use ($locks, $runId): void {
             foreach ($locks as $name) {
                 $this->locks->heartbeat($name, $runId);
+            }
+            if ($writing) {
+                $this->runFiles->markWriting($runId);
             }
             if ($canStop && $this->runFiles->cancelRequested($runId)) {
                 throw new RunCancelledException('Cancelled while running, before anything was written or sent.');

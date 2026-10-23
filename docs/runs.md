@@ -54,7 +54,12 @@ records of that kind in the shop) stop with the status **Needs confirmation** an
 | Partial | Valid rows were imported, some rows had errors. |
 | Failed | Nothing was imported; the message says why. |
 | Needs confirmation | Above the safety threshold; nothing was done. |
-| Cancelled | Stopped by an admin before it started. |
+| Cancelled | Stopped by an admin: before it started, or while it still read its file (nothing was written or sent). |
+
+**Cancel** stops a queued run at once and a running one within seconds while it still reads its file. Once a live
+run writes to Magento (or delivers its export) it cannot stop half-way: the run page says "Writing to Magento",
+Cancel is no longer offered, and a cancel that came too late is named in the finished run's message. An export that
+is stopped or fails while Magento reads its records delivers nothing (since 1.5.4).
 
 Only one run of a profile runs at a time, and only one live import per kind of record (products, customers …), so
 two imports never fight over the same indexers.

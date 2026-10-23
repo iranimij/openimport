@@ -126,8 +126,10 @@ define([
                 processData: false,
                 contentType: false,
                 dataType: 'json',
-                // The message below says what went wrong; Magento's global "technical problem" banner would stay.
-                global: false
+                // The message below says what went wrong. Magento's $.ajaxSetup error handler would add a "technical
+                // problem" banner that stays: this request brings its own (empty) handler instead.
+                global: false,
+                error: function () {}
             }).done(function (response) {
                 if (response.error) {
                     self.message = response.error;

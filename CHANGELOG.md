@@ -22,6 +22,7 @@ All notable changes to this project are documented here. The format follows
   automatic runs are on and the next profile; the destination messages name the destinations that count.
 
 ### Fixed
+- The step 6 summary says "Nach:" in the German admin again ("After:" was not translated).
 - Triggers: *Export each order when it is placed* saved as `true` (profile JSON, API) queued nothing.
 - Job chains: deleting a profile that others run next says which chains stop there; *Then run* no longer offers
   imports that read an uploaded file. The run page links "queued as run N" lines and the parent run.

@@ -15,6 +15,7 @@ Fixes from the fifth hands-on review (Notion "18 · Browser review 5").
   exception in its page loop and returns the rows so far, so such runs used to end as SUCCESS with a partial file.
 - Export destination "E-mail" on Magento 2.4.8 and 2.4.9: the file is attached again. The run failed with "Call to
   undefined method Symfony\Component\Mime\Part\TextPart::getMimePart()" since Magento moved to Symfony mail.
+  The e-mail also said "exported 0 row(s)": destinations now get the run's counts.
 - The profiles grid no longer sends stored secrets (encrypted passwords, keys, tokens) to the browser.
 - "Replace existing records" for products keeps each product's URL key when the file has no `url_key` column;
   Magento gave all existing products an empty key, so two or more collided ("Url key: '' was already generated").

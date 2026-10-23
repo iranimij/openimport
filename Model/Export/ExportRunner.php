@@ -183,6 +183,10 @@ class ExportRunner
             return [new RunOutcome(RunInterface::STATUS_SUCCESS, $this->counts, 'Dry run: ' . $summary . ' The file was not delivered.'), $path];
         }
         $this->progress(false, true);
+        // Destinations read the counts from the run (the e-mail says how many rows it carries).
+        foreach ($this->counts as $name => $value) {
+            $run->setCount($name, $value);
+        }
         $delivered = $this->destinations->get($profile)->deliver($profile, $run, $path, $writer);
         $source->finish($profile, $this->runId);
 

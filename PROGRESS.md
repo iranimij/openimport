@@ -130,6 +130,11 @@ CHANGELOG, docs, en_US + de_DE, unit + integration + E2E. Rule since 2026-10-21:
 into main (#79, #78). 1.6-only fixes (mass action with triggers, `on_place` true, step 6 summary, chain notes, run
 links) in #78. 1.6 stays paused after slice 2 until Iman says go; next is slice 3 webhook/Slack (15 · Plan §3.1).
 
+**Browser review 5** (Notion page 18, 2026-10-23): roles, German admin, cancel, behaviours at 20,000 rows, exports.
+2 high (H1 a cancelled products export ends SUCCESS with a partial file: Magento's `Export\Product` swallows the
+cancel exception; H2 the profiles grid sends encrypted secrets to the browser), 5 medium, 13 low. Nothing fixed
+yet: waiting for Iman. Proposed: 1.5.4 from `release/1.5` for everything except L1 (main).
+
 Local store: after a schema change, double-click `claude-upgrade.command` in the dev-env folder (runs
 `setup:upgrade`); the cloud thread cannot run Warden commands.
 
